@@ -11,5 +11,31 @@
     "frozen": "2026-10-15",
     "gate": "G1",
     "approved": "Director, asked which one is v3_4 and shown it: \"I like it\""
+  },
+  {
+    "name": "gator_sheet",
+    "file": "assets/frozen/gator_sheet.png",
+    "source": "assets/raw/gator_sheet_v2_1.png",
+    "prompt": "assets/prompts/gator_sheet.v2.md",
+    "sidecar": "assets/raw/thumbs/gator_sheet_v2_1.json",
+    "variant": "v2_1 (revision of v1_1)",
+    "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9",
+    "size": "1672x941",
+    "frozen": "2026-10-15",
+    "gate": "G2",
+    "approved": "Director: \"G2: freeze gator sheet v2_1 and hero_1.\""
+  },
+  {
+    "name": "gator_hero",
+    "file": "assets/frozen/gator_hero.png",
+    "source": "assets/raw/gator_hero_v1_1.png",
+    "prompt": "assets/prompts/gator_hero.v1.md",
+    "sidecar": "assets/raw/thumbs/gator_hero_v1_1.json",
+    "variant": "v1_1 (hero_1)",
+    "sha256": "bf02530ba4a6214ea701dc2c6c72c4ff2917f26cb36a13dccefce54b6e20f8fb",
+    "size": "1536x1024",
+    "frozen": "2026-10-15",
+    "gate": "G2",
+    "approved": "Director: \"G2: freeze gator sheet v2_1 and hero_1.\""
   }
 ]

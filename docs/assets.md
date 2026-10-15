@@ -13,6 +13,7 @@ A sheet is one generation with several cut pieces (doc 08), and it counts as one
 | # | Name | Type | Pieces | Shots | Group | Notes |
 |---|---|---|---|---|---|---|
 | 1 | `gator_sheet` | character | Turnaround (side, front, back, 3/4 head) and parts: body, head, upper jaw/snout, lower jaw, arm_l, arm_r, leg_l, leg_r (short, stubby, foot forward), tail, pocket | s02–s12, s14–s18 | 2 | Close-up in s06, s15, s18 H: one sheet at the largest size, nothing else on it |
+| 1b | `gator_hero` | character | One large side view, the same pose and design as the sheet's side view | s06, s15, s18 close-ups | 2 | Added at G2 round 2: the sheet's ~425 px figure can't hold the close-ups |
 | 2 | `face_sheet` | face | Eyes: open, closed, tired, gasp, worried, side. Mouths: neutral, smile, o, line | s02–s18 | 3 | Shared, scaled, by the roommates and the Freshman; must also read from above in s13 |
 | 3 | `roommates_sheet` | character | roommate_tall (split for a walk cycle), roommate_round | s05 | 4 | Merges `roommate_tall` + `roommate_round`: both appear only in s05, medium-wide and background |
 | 4 | `custodian_sheet` | character | custodian (body, head, cap, 2 arms, tail), custodian_cart (frame, tray, bucket), mop | s14 | 4 | Merges `custodian_cart`, as doc 08 already pairs them. His tiny blob is code |

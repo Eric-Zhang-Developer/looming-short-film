@@ -166,3 +166,9 @@ The director, after watching the Act 1 preview: "I think the blob should get big
 - one step of shrinking per solved problem
 
 Director: "agree I like those changes".
+
+## 2026-10-15 · G2 (gator): sheet v2_1 and hero_1 frozen
+Director, verbatim: "G2: freeze gator sheet v2_1 and hero_1."
+- `assets/frozen/gator_sheet.png` (v2_1) and `assets/frozen/gator_hero.png` (hero_1) are in the manifest. `gator_hero` is a new asset row in `docs/assets.md`.
+- Known: the box gaps are under 40 px (side view against body), but `cut.mjs --auto` gives 14 clean islands. On v2_1's front view the nostril dots could read as eyes until the face sheet's eyes sit on top.
+- Next: the face sheet (references: style tile plus gator sheet), then refit the rig to the frozen parts (`hipHeight` from the real `leg_l`).
