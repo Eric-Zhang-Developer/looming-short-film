@@ -14,11 +14,13 @@ export function createStage({ width = 1920, height = 1080, fov = 20 } = {}) {
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(fov, width / height, 0.05, 20);
   const fns = [];
+  let draw = () => renderer.render(scene, camera);
   const renderFrame = (t) => {
     for (const fn of fns) fn(t);
-    renderer.render(scene, camera);
+    draw();
   };
-  return { renderer, scene, camera, onFrame: (fn) => { fns.push(fn); }, renderFrame, ready: Promise.resolve() };
+  const setRender = (fn) => { draw = fn; };  // post.js swaps in its composer here
+  return { renderer, scene, camera, onFrame: (fn) => { fns.push(fn); }, renderFrame, setRender, ready: Promise.resolve() };
 }
 
 export function exposeForRender(stage, { duration, fps = 24 }) {

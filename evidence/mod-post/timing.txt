@@ -1,0 +1,4 @@
+lab/post.html, 1920x1080, headless Chrome Chrome/155.0.8059.40 on darwin, MSAA x4 composer
+post ON  (median of 40): 12.0 ms/frame  [min 11.8, max 12.6]
+post OFF (median of 40): 2.0 ms/frame  [min 1.9, max 10.9]
+Timed from Node around page.evaluate with a 1-px readPixels to wait for the GPU. Includes shadow-free Lambert scene only (lab is light).
