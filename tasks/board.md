@@ -49,7 +49,7 @@
 - anim-s14 · builder · `src/shots/s14.js` · built (merged, v1 reel) · evidence/reel-s14/sheet.jpg
 - anim-s16 · builder · `src/shots/s16.js` · built (merged, v1 reel) · evidence/reel-s16/montage_wide.jpg
 - anim-s17 · builder · `src/shots/s17.js` · built (merged, v1 reel) · evidence/reel-s17/sheet.jpg
-- anim-s18 · builder · `src/shots/s18.js` · in-progress (reel bar, sensor spec) · —
+- anim-s18 · builder · `src/shots/s18.js` · built (merged, v1 reel) · evidence/reel-s18/sheet.jpg
 - contract-timing · builder · `src/core/ease.js`, `src/lights.js` (onTwos snap, lamp dust sphere) · verified (merged) · evidence/contract-timing/
 - anim-s11 · builder · `src/shots/s11.js` · blocked (merged) · evidence/anim-s11/sheet.jpg
 - anim-s05 · builder · `src/shots/s05.js` · verified (merged) · evidence/anim-s05/sheet.jpg
