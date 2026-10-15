@@ -22,8 +22,8 @@ Call only what contracts.md lists. If you need a contract change, stop, write it
 - No legible text anywhere.
 
 ## Acceptance
-- [ ] `node render.mjs --page=index.html --strip=<shot start>:<shot end> --cols=8 --out=evidence/anim-sNN/strip.jpg` with ~1 frame per beat and per key pose. Look at it.
-- [ ] Two full-res stills at the shot's most important beats (`--stills`)
+- [ ] A key-moment sheet: `node render.mjs --page=index.html --sheet=<one t per beat and key pose> --cols=6 --out=evidence/anim-sNN/sheet.jpg` (end just before the next shot starts). Look at it.
+- [ ] Two full-res stills at the shot's most important beats (`--stills`), saved as `.jpg` (evidence files stay under 2 MB)
 - [ ] Shadow scale measured where the spec gives one (±20%)
 - [ ] `tools/determinism.mjs --page=index.html --t=<two times inside your shot>,<one in another shot>,<the first again>` passes
 - [ ] Readability: one line on what a cold viewer would understand from your strip alone, against the spec's Story job
