@@ -48,7 +48,11 @@ const prompt = [block('style.md'), block('lighting.md'), assetBlock, technical, 
 const OUT_LINE = 'Generate exactly one image. Save it as `out.png` in the current working directory (the workspace root).';
 const runPrompt = `${prompt}\n\n## Output\n\n${OUT_LINE}\n`;
 
-const refs = spec.refs.map(r => resolve(ROOT, r));
+// reference-videos/ is gitignored and lives only in the main checkout, so resolve it there
+// (parent of the shared .git dir); every other ref resolves in this tree.
+const MAIN = resolve(execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'],
+  { cwd: ROOT, encoding: 'utf8' }).trim(), '..');
+const refs = spec.refs.map(r => resolve(r.startsWith('reference-videos/') ? MAIN : ROOT, r));
 const codexArgs = run => ['exec', '-C', run, '-s', 'workspace-write', '--json', '--skip-git-repo-check',
   '-o', join(run, 'last_message.txt'), ...refs.flatMap(r => ['-i', r]), '-'];
 const q = s => s.includes('$RUN') ? `"${s}"` : /^[\w./=-]+$/.test(s) ? s : `'${s.replaceAll("'", "'\\''")}'`;
@@ -107,7 +111,10 @@ for (let k = firstK; k < firstK + variants; k++) {
     model: 'unknown (Codex image_gen)',
     model_note: 'The image_gen call does not appear in the --json event stream, so the model name is not reported.',
     codex_thread_id: events.find(e => e.type === 'thread.started')?.thread_id ?? null,
-    codex_source_file: raw.match(/[~\w/.-]*generated_images\/[\w/.-]+\.png/)?.[0] ?? null,
+    // Codex sometimes re-rolls inside one call; the copied image is the last one it names, and every
+    // distinct image is a generation the 8-cap's file count can't see.
+    codex_source_file: [...raw.matchAll(/[~\w/.-]*generated_images\/[\w/.-]+\.png/g)].at(-1)?.[0] ?? null,
+    codex_images_generated: new Set(raw.match(/generated_images\/[\w/.-]+\.png/g) ?? []).size,
     codex_run_dir: run,
     copied_into_workspace_by: `gen.mjs (copied ${images[0]} out of the Codex temp dir)`,
     usage: events.findLast(e => e.type === 'turn.completed')?.usage ?? null,

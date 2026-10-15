@@ -1,0 +1,52 @@
+{
+  "output": "assets/raw/style_tile_v2_3.png",
+  "prompt_file": "assets/prompts/style_tile.v2.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/style_tile.v2.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "reference-videos/frames/torn_paper_ref.jpg",
+      "sha256": "fa9f2dad2d2e74653acd38189ff544e3389939839ce3647df72a3c28ca94da2c"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a13fd0-cc38-7cb2-a3e0-fa5aeb17e56e",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a13fd0-cc38-7cb2-a3e0-fa5aeb17e56e/exec-1b3d30c8-3a33-4d69-a8b2-5d0f134d90e5.png",
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-eyXRxR",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 175048,
+    "cached_input_tokens": 155008,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1451,
+    "reasoning_output_tokens": 111
+  },
+  "timestamp_start_utc": "2026-10-15T13:46:50Z",
+  "timestamp_end_utc": "2026-10-15T13:48:42Z",
+  "output_sha256": "94b310bb2e7f5c546e041d9ad6089b55e1db3593f2a9a7681a9f0df551762161",
+  "width": 1983,
+  "height": 793,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/style_tile_v2_3.jpg",
+  "screening": {
+    "rank": 4,
+    "verdict": "survivor, borderline (rank 4 of 4)",
+    "baked_light_or_shadow": "no cast shadow or glow, but the gator and hoodie have soft volumetric shading that reads like a photographed plush toy.",
+    "background_flat_and_keyable": "real alpha, clean edge over grey and navy, no halo. Interiors at alpha 253 as in v2_2.",
+    "pieces_separated": "yes, 6 islands. Gaps 33-56 px, the only one near the asked 40.",
+    "on_palette": "yes, but the material is fuzzy felt/fleece, not matte cardstock with dry-brush gouache. Off-style.",
+    "resolution": "1983x793. Gator ~324 px tall, lamp only ~256.",
+    "banned_ai_tells": "none clear.",
+    "notes": "Scale is off: the gator is nearly 3x the desk height, against the spec (head a little above the desktop). Best \"desk edge\" shape of the four. Kept rather than dropped because no checklist item fails outright; the texture is a style miss for the director to weigh. 1 image_gen call.",
+    "text": "none: calendar boxes blank, no logo, no letters or numbers anywhere",
+    "method": "Viewed full size with the Read tool, composited over #808080 and #1E2440 (evidence/asset-style-tile/contact.jpg), 3x zoom of the gator head edge, and alpha islands counted with tools/cut.mjs --auto (6 of 6 in every variant)."
+  },
+  "codex_images_generated": 1,
+  "backfill_note": "codex_source_file and codex_images_generated recomputed from evidence/asset-style-tile/codex/ after the gen.mjs fix in 0aecb27; this run used the earlier first-match regex."
+}

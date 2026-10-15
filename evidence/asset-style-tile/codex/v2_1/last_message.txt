@@ -1,0 +1,1 @@
+Saved [out.png](/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-CcptU8/out.png) using the allowed magenta background fallback. Built-in image generation returned 1672 × 941 pixels.

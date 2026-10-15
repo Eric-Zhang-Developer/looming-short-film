@@ -1,0 +1,52 @@
+{
+  "output": "assets/raw/style_tile_v2_1.png",
+  "prompt_file": "assets/prompts/style_tile.v2.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/style_tile.v2.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "reference-videos/frames/torn_paper_ref.jpg",
+      "sha256": "fa9f2dad2d2e74653acd38189ff544e3389939839ce3647df72a3c28ca94da2c"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a13fcc-fe88-7310-96e2-39234d00dac8",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a13fcc-fe88-7310-96e2-39234d00dac8/exec-0546c0a8-cd85-4c2e-bfc9-c01e3aa3b974.png",
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-CcptU8",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 247066,
+    "cached_input_tokens": 223104,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2133,
+    "reasoning_output_tokens": 89
+  },
+  "timestamp_start_utc": "2026-10-15T13:42:40Z",
+  "timestamp_end_utc": "2026-10-15T13:45:22Z",
+  "output_sha256": "f261ccfed32686617ca50e52ab21a83d25fa184fc8fd356fc5fc0952af58d578",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgb24",
+  "thumbnail": "assets/raw/thumbs/style_tile_v2_1.jpg",
+  "screening": {
+    "rank": 3,
+    "verdict": "survivor (rank 3 of 4)",
+    "baked_light_or_shadow": "no cast shadow or glow. Mild form shading: the desk is drawn as a closed box whose front is darker than its top, a top-down light read.",
+    "background_flat_and_keyable": "no alpha (rgb24): Codex used the magenta #FF00FF fallback after discarding its own first render for halos. Key is flat, but a hard key leaves a 1 px pink fringe on every edge (visible over grey and navy); needs despill before use.",
+    "pieces_separated": "yes, 6 islands. Gaps 18-32 px (asked ~40).",
+    "on_palette": "yes. Gator green only on the gator, one red circle, amber absent. Lamp base and laptop carry dashed white stitch lines, which read as sewn felt rather than cut paper.",
+    "resolution": "1672x941. Gator ~238 px tall, laptop ~103 px.",
+    "banned_ai_tells": "every piece has the same thin cream torn rim (doc 03: the same procedural edge on every shape).",
+    "notes": "The \"desk edge\" came back as a lidded box. Brushwork is a heavy impasto that drifts from dry-brush gouache. 2 image_gen calls inside this one Codex run.",
+    "text": "none: calendar boxes blank, no logo, no letters or numbers anywhere",
+    "method": "Viewed full size with the Read tool, composited over #808080 and #1E2440 (evidence/asset-style-tile/contact.jpg), 3x zoom of the gator head edge, and alpha islands counted with tools/cut.mjs --auto (6 of 6 in every variant)."
+  },
+  "codex_images_generated": 2,
+  "backfill_note": "codex_source_file and codex_images_generated recomputed from evidence/asset-style-tile/codex/ after the gen.mjs fix in 0aecb27; this run used the earlier first-match regex."
+}

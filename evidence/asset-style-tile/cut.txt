@@ -1,0 +1,15 @@
+# cut.mjs run from a byte-identical copy so outputs land outside the repo (cut.mjs has no --out and isn't in this task's owns)
+78f14ee35dbab52d8f6721cf8df388854e0562ecf66aadb1ea5be5ba6d1ce656  tools/cut.mjs
+78f14ee35dbab52d8f6721cf8df388854e0562ecf66aadb1ea5be5ba6d1ce656  <scratch>/cutroot/tools/cut.mjs
+$ node <scratch>/cutroot/tools/cut.mjs --in=/Users/ericzhang/.worktrees/looming/asset-style-tile/assets/raw/style_tile_v2_4.png --auto --key=#FF00FF
+no alpha in style_tile_v2_4: keyed #FF00FF (tol 80), 1108532 px cleared
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cutroot/assets/cut/style_tile_v2_4.boxes.json
+style_tile_v2_4_1: [18, 122, 331, 523] -> <scratch>/cutroot/assets/cut/style_tile_v2_4_1.png
+style_tile_v2_4_2: [372, 354, 446, 291] -> <scratch>/cutroot/assets/cut/style_tile_v2_4_2.png
+style_tile_v2_4_3: [838, 265, 311, 331] -> <scratch>/cutroot/assets/cut/style_tile_v2_4_3.png
+style_tile_v2_4_4: cleared 4963 px (neighbouring islands, alpha<16 dust)
+style_tile_v2_4_4: [1173, 255, 266, 392] -> <scratch>/cutroot/assets/cut/style_tile_v2_4_4.png
+style_tile_v2_4_5: [1401, 470, 309, 175] -> <scratch>/cutroot/assets/cut/style_tile_v2_4_5.png
+style_tile_v2_4_6: [1726, 279, 304, 369] -> <scratch>/cutroot/assets/cut/style_tile_v2_4_6.png
+exit 0 (cut.mjs exit status, confirmed on a rerun)

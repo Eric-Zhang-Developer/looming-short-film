@@ -1,0 +1,52 @@
+{
+  "output": "assets/raw/style_tile_v2_2.png",
+  "prompt_file": "assets/prompts/style_tile.v2.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/style_tile.v2.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "reference-videos/frames/torn_paper_ref.jpg",
+      "sha256": "fa9f2dad2d2e74653acd38189ff544e3389939839ce3647df72a3c28ca94da2c"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a13fcf-7992-7100-9795-d37fcea243c3",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a13fcf-7992-7100-9795-d37fcea243c3/exec-6e4d7541-f086-4dbf-bbb4-77ccd27a2cdd.png",
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-ekfDdo",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 102962,
+    "cached_input_tokens": 86784,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1301,
+    "reasoning_output_tokens": 71
+  },
+  "timestamp_start_utc": "2026-10-15T13:45:22Z",
+  "timestamp_end_utc": "2026-10-15T13:46:50Z",
+  "output_sha256": "d4a1d55955e6a681879b5e3b0aa377b7fb76c2769855e17ba344bd13d047f02d",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/style_tile_v2_2.jpg",
+  "screening": {
+    "rank": 2,
+    "verdict": "survivor (rank 2 of 4)",
+    "baked_light_or_shadow": "no cast shadow or glow. Mild form shading on the hoodie folds and the laptop bevel. The shade interior is painted amber, which reads as a lit inside even though it is flat.",
+    "background_flat_and_keyable": "real alpha, clean 1-2 px edge over grey and navy, no halo. But piece interiors sit at alpha 253 (99%), not 255: 0.1% of pixels are fully opaque.",
+    "pieces_separated": "yes, 6 islands. Gaps 16-20 px, tightest of the four (asked ~40).",
+    "on_palette": "yes. Navy, cream, kraft, amber ring and shade interior, one red circle, gator green only on the gator.",
+    "resolution": "1672x941. Gator ~256 px tall.",
+    "banned_ai_tells": "none clear. Edges vary: torn rim on the wall, smoother cut on furniture.",
+    "notes": "Desk reads as a low bench rather than a desk edge. Calendar with rings and a navy header is the most legible \"calendar\" of the four. 1 image_gen call.",
+    "text": "none: calendar boxes blank, no logo, no letters or numbers anywhere",
+    "method": "Viewed full size with the Read tool, composited over #808080 and #1E2440 (evidence/asset-style-tile/contact.jpg), 3x zoom of the gator head edge, and alpha islands counted with tools/cut.mjs --auto (6 of 6 in every variant)."
+  },
+  "codex_images_generated": 1,
+  "backfill_note": "codex_source_file and codex_images_generated recomputed from evidence/asset-style-tile/codex/ after the gen.mjs fix in 0aecb27; this run used the earlier first-match regex."
+}
