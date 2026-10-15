@@ -83,3 +83,4 @@
 - asset-gator-sheet-v2 · painter · `assets/prompts/gator_sheet.v2.md`, `gator_hero.v1.md`, specs gator_sheet/gator_hero · built (awaiting G2) · evidence/asset-gator-sheet-v2/contact.jpg
 - spec-sensor · builder (docs) · docs 02/03/05/assets, shots README/QUESTIONS/s09–s18 · built (merged) · done/spec-sensor.md
 - contract-sensor · builder · `src/lights.js` (sensorLight), `src/timeline.js` renames, cues/foley · in-progress · —
+- spec-blob-meter · builder (docs) · doc 02/03/05 blob parts, shots README/QUESTIONS/s01–s18 · in-progress · —
