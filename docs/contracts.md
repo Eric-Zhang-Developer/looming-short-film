@@ -158,3 +158,29 @@ export function loadLUT(name)  // → texture for the per-act color grade (doc 0
 ```
 
 There's no bloom pass.
+
+## `src/audio/` (task `snd-engine`)
+
+Offline and deterministic: plain Node, no Web Audio. Mono or stereo `Float32Array` at 48 kHz.
+
+```js
+// synth.js: voices from doc 05; each returns a Float32Array, seeded where noise is involved
+export function feltPiano(midi, { vel = 0.7, dur = 1.5 } = {})
+export function musicBox(midi, { vel = 0.6, dur = 1.2 } = {})
+export function pad(midis, { dur, attack = 1.5, release = 2 } = {})
+export function subSwell({ hz = 50, dur, attack })
+export function noise(seed, dur)                 // white noise, seeded
+export function lowpass(buf, hz), highpass(buf, hz), env(buf, { a, d, s, r })
+export function mixInto(dest, src, atSec, gain = 1)
+
+// foley.js: named sounds from doc 05's foley table
+export const FOLEY   // { lampClick, penUncap, inkDrip, paperRustle, fluorescentHum, ... } → (seed) => Float32Array
+
+// cues.js
+export const CUES    // [{ beat: 'lampClickHome', sound: 'lampClick', gain: 0.8 }, ...]: by beat name, never raw time
+```
+
+```
+node tools/mix.mjs [--range=a:b]   → out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav,
+                                     loudness-normalized to -14 LUFS (ffmpeg loudnorm), prints measured LUFS and true peak
+```
