@@ -11,11 +11,13 @@
 
 Dates are relative until the final deadline is confirmed on ProposalSpace. When it is, pin W6 to end five days before it.
 
+The work runs as **waves** of subagents driven by one orchestrator. Doc 09 has the wave-by-wave task list and director gates G1–G6. This table is the calendar view of the same plan.
+
 | Week | Goal | Done when |
 |---|---|---|
 | **W0** | Spec | These docs are reviewed and pushed |
-| **W1** | Image pipeline + test shot + gator rig | The `codex exec` smoke test passes. The style tile, gator sheet and face sheet are frozen (doc 08). The 10 s test passes (below). The gator puppet shows all face swaps on a model sheet. |
-| **W2** | Look locked + animatic | Every shot exists as blocking with placeholder paper and temp sound, cut to 3:00. The readability test with 3 cold viewers is passed. |
+| **W1** | Waves 1–3: image pipeline + test shot + gator rig | The `codex exec` smoke test passes. The style tile, gator sheet and face sheet are frozen (doc 08). The 10 s test passes (below). The gator puppet shows all face swaps on a model sheet. |
+| **W2** | Wave 4: look locked + animatic | Every shot exists as blocking with placeholder paper and temp sound, cut to 3:00. The readability test with 3 cold viewers is passed. |
 | **W3** | Act 1 + 2a final | Shots 1–8 at final quality |
 | **W4** | Act 2b + 3 final | Shots 9–16 at final quality, including the crowd reveal |
 | **W5** | Dawn, button, sound | Quiet 2 and the button are done. Score and foley are synthesized. First full mix. |
@@ -95,6 +97,7 @@ Totals: 12 acting shots, 5 light shots, 1 crowd shot. Shots 6 and 15 must match 
 
 ## Review loop
 
+- Every shot goes through build → verify → two independent reviews → director (doc 09). Reviews use `templates/review.md`.
 - Contact sheets for timing, frame strips for motion, cropped close-ups for faces (the KnightHacks `render.mjs` flags).
 - Watch every finished shot in context, never on its own.
 - Weekly cold-viewer check: one person who has never heard the story watches the current cut.

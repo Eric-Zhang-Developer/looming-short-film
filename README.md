@@ -28,6 +28,8 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 | [06 Production Plan](docs/06-production-plan.md) | Test shot, milestones, shot list, risks |
 | [07 Process Log](docs/07-process-log.md) | Director's log format and the decisions made so far |
 | [08 Image Pipeline](docs/08-image-pipeline.md) | How Claude drives Codex image gen: prompts, references, the pick-and-freeze loop |
+| [09 Orchestration](docs/09-orchestration.md) | One orchestrator, many subagents: roles, ownership, waves, director gates, state files |
+| [AGENTS.md](AGENTS.md) | The one-page rulebook every subagent reads first |
 
 ## Locked decisions
 
@@ -41,10 +43,12 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 | Painted surfaces | Claude prompts Codex image gen with reference images; the director picks; picks are frozen in `assets/` with a manifest. Code cuts, lights and rigs them. |
 | Sound | Synthesized in code and locked to the timeline. No vocals. |
 | Team | Solo director plus Claude as code collaborator |
+| How it's built | One orchestrator agent drives many subagents (at most 4–6 writing code at once). The director decides at gates in chat. Progress lives in local files. |
 | Deadline | Final due date to confirm on ProposalSpace; the plan assumes 6+ weeks |
 
 ## Ground rules for anyone (human or AI) working in this repo
 
+- Agents: read `AGENTS.md` and your brief in `tasks/` first. The orchestrator also reads `docs/09-orchestration.md` and `NOW.md`.
 - Read `docs/` before writing code. If the code and the spec disagree, fix the spec first, then the code.
 - Every frame is a pure function of time `t`. No wall-clock time, no unseeded randomness.
 - No on-screen words, captions, HUDs or UI. If a beat needs text to read, the beat is wrong.

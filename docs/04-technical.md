@@ -150,6 +150,9 @@ looming/
   src/audio/                         # synthesis (doc 05)
   tools/gen.mjs  cut.mjs  check_timeline.mjs  determinism.mjs
   render.mjs  index.html  package.json
+  AGENTS.md  NOW.md  templates/      # orchestration (doc 09)
+  tasks/  done/  evidence/  reviews/
+  docs/contracts.md                  # contract module interfaces, written before wave 2
 ```
 
 ## Reuse from earlier projects
