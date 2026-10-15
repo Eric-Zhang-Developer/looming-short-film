@@ -11,7 +11,9 @@
 
 Merged so far: s01–s05, s07–s10, s13 (10 of 18). Style tile v3 is built and **awaiting the director's G1/G2 pick** (recommendation: v3_4).
 
-**Disk:** it filled up on 2026-10-15; the director freed space (5.2 GB free). The builder ceiling is back to 5.
+**Disk:** it filled up on 2026-10-15; the director freed space (5.2 GB free).
+
+**RAM (2026-10-15, director: "my ram is dying"):** each builder's headless Chrome GPU process held 3–6 GB, about 14 GB in all, and one orphaned `measure.mjs` (s14) held 5.5 GB. **The builder ceiling is now 3**, with one Chrome per builder at a time, closed when finished. s17 is paused with its worktree kept; resume it once s14, s16 and s18 land. Before starting a batch, check `top -o mem` for orphaned `Google Chrome Helper` processes whose `measure.mjs` or `render.mjs` parent is gone.
 
 ## Director decisions (2026-10-15)
 - **G1:** "make style tile v3 with the value-contrast rule (+4 generations)". `asset-style-tile-v3` is running: 4 variants, each a different gator design direction. The director also said "the gator is really ugly ngl", so appeal is the priority. **G1/G2 pick comes next.**
