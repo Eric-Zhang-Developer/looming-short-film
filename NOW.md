@@ -1,6 +1,6 @@
 # NOW
 
-**Wave:** 2 · Foundations · branch `wave/2-foundations` · **planned, waiting on the director to dispatch batch 1**
+**Wave:** 2 · Foundations · branch `wave/2-foundations` · **batch 1 in flight (core, render, timeline, tool-gen)**
 **Updated:** 2026-10-15
 
 ## Plan
@@ -19,12 +19,11 @@ Each batch's tasks are squash-merged into `wave/2-foundations` after the orchest
 - none
 
 ## Next 3 moves
-1. Director approves batch 1. Dispatch 4 builders in worktrees.
+1. Batch 1 builders running in worktrees; check their evidence as each finishes.
 2. Check evidence, merge, dispatch batch 2.
 3. Batches 3–4, then the wave 2 PR with the lookdev result.
 
 ## Open director questions
-- Dispatch batch 1?
 - Final submission deadline (confirm on ProposalSpace).
 
 ## Models
