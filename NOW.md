@@ -32,6 +32,7 @@ Merged so far: s01–s05, s07–s10, s13 (10 of 18). Style tile v3 is built and 
 - **s13:** reads dark and busy at thumbnail size (check at G4). Back-to-back figures merge.
 - **s07:** the seam light at 8.0 is 7.3% (spec 5%), and he's a backlit silhouette during the montage. Fix in the final lighting pass. Its straight-cut curtains conflict with s08's torn, glowing rims.
 - **s08:** his face is a few px of proxy, so the yawn reads from the shadow's eyes. The ladder from s07 is still in frame (fine for continuity, but check at G4).
+- **s12 is meant to be the film's darkest frame and only just is:** mean luma 26.3 (s12 at 86.0) vs 26.9 (s11 at 72.5) on the 16–235 scale. Brighten s11's laptop beat at G4 rather than darken s12 further.
 - **s11:** the first 2.6 s are very dark (the gator barely reads), the lid opening is small, and the face fill is 83% of the desk top (rule 30–45%). Check at G4.
 - **Shadow-scale chain across the night:** s11 ends 5.96×, s12 and s13 hold 7.1× (s12's phone z solved to about 0.103), and s15 opens 4.2× on its own closer camera.
 - **Lamp click count:** doc 05 says the click is heard three times. The reconciled reading is home on, home off, Marston on; the neighbour's click is seen, not heard (Q2). `cues.js` has no click on `lampOffHome` yet, so add it in the sound pass with the same buffer.
