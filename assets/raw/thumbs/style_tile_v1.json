@@ -1,0 +1,29 @@
+{
+  "output": "assets/raw/style_tile_v1.png",
+  "prompt_file": "assets/prompts/style_tile.v1.md",
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save the result as `assets/raw/style_tile_v1.png` in this workspace.",
+  "references": [
+    { "file": "torn_paper_ref.jpg", "sha256": "fa9f2dad2d2e74653acd38189ff544e3389939839ce3647df72a3c28ca94da2c" }
+  ],
+  "model": "unknown",
+  "model_note": "Codex events report no model name. Codex says it used the built-in image_gen tool; the image_gen call itself is not in the --json event stream.",
+  "codex_thread_id": "01a13f9d-79c6-7510-b096-d3b26f5df344",
+  "codex_source_file": "~/.codex/generated_images/01a13f9d-79c6-7510-b096-d3b26f5df344/exec-dc6b48b6-77de-45be-90ec-08b7069b709d.png",
+  "copied_into_workspace_by": "codex (its own cp command, item_5 in codex_events.jsonl)",
+  "timestamp_start_utc": "2026-10-15T12:50:46Z",
+  "timestamp_end_utc": "2026-10-15T12:52:14Z",
+  "output_sha256": "63d283584b081e9b6d375eec95e90edb2b53a14f0edde808a86ed08c643bbadc",
+  "width": 1983,
+  "height": 793,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/style_tile_v1.jpg (1024x410, alpha flattened over white)",
+  "screening": {
+    "verdict": "pipeline pass; asset needs a revision before it could be a style tile (director decides at G1)",
+    "baked_light_or_shadow": "no cast or drop shadows, no glow, no vignette. Mild form shading remains: desk apron darker than desktop, tonal pleats on the lamp shade, light bevel edge on the laptop. Codex itself reported 'some baked-in shadows remain'.",
+    "background_flat_and_keyable": "not green: the background is real alpha (64.5% of pixels alpha 0, RGB 0,0,0 beneath). Flat and keyable via alpha; #00FF00 colorkey not applicable. Keyed preview over mid-grey is clean, edge ring 1-2 px, no visible halo or spill.",
+    "pieces_separated": "yes, 5 pieces, none touching, none cropped. Horizontal gaps 32, 36, 36 px (asked ~40); lamp-to-laptop about 75 px. Content 91-682 px vertically.",
+    "text": "none. Calendar boxes blank, laptop has no logo.",
+    "on_palette": "mostly: night navy, cream, kraft browns (desk is darker than #A8835A), amber touches, one red circle. No visible green (120 greenish pixels by a crude RGB test, not visible). Unrequested extra content on the wall: window with moon, stars, city skyline, pinned notes.",
+    "resolution": "1983x793, landscape. Whether this was the largest size available is unknown. Each piece is about 300-500 px wide, small for full-frame use."
+  }
+}

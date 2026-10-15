@@ -1,0 +1,3 @@
+Saved one image to `assets/raw/style_tile_v1.png` using built-in image generation.
+
+The output is 1983 × 793. It deviates from your prompt: the background is transparent instead of solid green, and some baked-in shadows remain.
