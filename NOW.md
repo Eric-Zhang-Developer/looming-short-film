@@ -1,6 +1,6 @@
 # NOW
 
-**Wave:** 3 · Assets · branch `wave/3-assets` · **wave 2 merged (#2); waiting on G1 + Q1–Q8; mod-film building**
+**Wave:** 3 · Assets (+ wave 4 prep) · branch `wave/3-assets` · **mod-film merged; char-rigs, anim-s01, anim-s13 building; G1 + Q1–Q8 open**
 **Updated:** 2026-10-15
 
 ## In flight
@@ -21,7 +21,7 @@
 - none
 
 ## Next 3 moves
-1. Merge `mod-film` into `wave/3-assets`; then wave 4 animatic shot builders (blocking, proxies) in batches of 5, following the QUESTIONS recommendations until the director answers.
+1. When char-rigs merges, dispatch gator shots in batches of ≤5 (brief `tasks/anim-shot.md`): B1 s02 s04 s09 s15 s03; B2 s05 s06 (after s15) s10 s16 s07; B3 s08 s11 s12 s14 s17; B4 s18. Then assemble the animatic with temp sound for G4.
 2. **Waiting on G1.** On the pick: freeze it to `assets/frozen/style_tile.png` (despilled), then dispatch the gator sheet painter (G2).
 3. `sb-reconcile` running (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names + snd-score's fridge/gameNight/curtainsStart/scrollStart/marstonEnter into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
 
