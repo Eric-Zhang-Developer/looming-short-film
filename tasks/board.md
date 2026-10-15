@@ -28,7 +28,7 @@
 - lookdev-composite · builder · `lab/lookdev.html`, `lab/lookdev.js`, `evidence/lookdev-composite/`, `done/lookdev-composite.md` · built (merged; look half passes) · evidence/lookdev-composite/vs_reference.jpg
 - contract-puppet · builder · `src/puppet.js`, `lab/puppet.js`, `docs/contracts.md` §puppet · verified (merged) · evidence/contract-puppet/boil_strip.jpg
 - look-pass-1 · builder · `src/paper.js`, `src/post.js`, `src/lights.js`, `lab/lookdev.*`, contracts §paper/§post/§lights · verified (merged; 2 rig gaps → look-pass-2) · evidence/look-pass-1/before_after.jpg
-- look-pass-2 · builder · `src/material.js`, `src/blob.js`, `src/lights.js`, contracts §material/§blob/§lights · in-progress · —
+- look-pass-2 · builder · `src/material.js`, `src/blob.js`, `src/lights.js`, contracts §material/§blob/§lights · verified (merged) · evidence/look-pass-2/before_after.jpg
 - snd-score-reveal · builder · `src/audio/score.js` · verified (merged) · evidence/snd-score-reveal/timeline.png
 
 ### wave 4 prep
