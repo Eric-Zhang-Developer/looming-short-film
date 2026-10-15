@@ -78,5 +78,5 @@
 - tool-cut-fixes · builder · `tools/cut.mjs`, `tools/gen.mjs`, `evidence/tool-cut-fixes/`, `done/tool-cut-fixes.md` · verified (merged) · evidence/tool-cut-fixes/despill.jpg
 - contract-audio · builder · `tools/mix.mjs`, `src/audio/cues.js`, `src/audio/selftest.js`, `src/audio/foley.js` (signatures), `docs/contracts.md` §audio · verified (merged) · evidence/contract-audio/linear_check.txt
 - snd-score-clicks · builder · `src/audio/score.js` · verified (merged) · evidence/snd-score-clicks/levels.txt
-- asset-gator-sheet · painter · `assets/prompts/gator_sheet.v1.md`, specs gator_sheet · in-progress · —
-- ref-ufl · researcher (read-only) · `reference-videos/ufl/` (gitignored), `docs/ref-ufl.md` · in-progress · —
+- asset-gator-sheet · painter · `assets/prompts/gator_sheet.v1.md`, specs gator_sheet · built (awaiting G2) · evidence/asset-gator-sheet/contact.jpg
+- ref-ufl · researcher (read-only) · `reference-videos/ufl/` (gitignored), `docs/ref-ufl.md` · built · docs/ref-ufl.md
