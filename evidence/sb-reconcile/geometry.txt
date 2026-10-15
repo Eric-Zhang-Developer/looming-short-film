@@ -1,0 +1,138 @@
+== Gator eye, back-projected from s15 Camera A px (533, 525) onto the body plane z 0.074
+  eye ≈ (-0.0560, 0.0300, 0.0740)
+
+== s15 / s06 (Camera A), hero blob r 0.012 at (0, 0.012, 0.098)
+  phone shadow: scale 7.13x, center (0.061, 0.061), x -0.024..0.147, y -0.025..0.147, width 0.171
+  phone -> blob half-angle 35.8°
+  off-axis phone->baseL    61.3°  wall hit (-0.0670, 0.0040, 0.0000) (scale 3.17)
+  off-axis phone->baseR    41.2°  wall hit (-0.0163, 0.0040, 0.0000) (scale 3.17)
+  off-axis phone->stemTop  49.8°  wall hit (-0.0417, 0.2130, 0.0000) (scale 3.17)
+  off-axis phone->stemMid  43.3°  wall hit (-0.0417, 0.1022, 0.0000) (scale 3.17)
+  off-axis phone->knob     46.7°  wall hit (-0.0505, 0.0635, 0.0000) (scale 3.17)
+  off-axis phone->shade    31.5°  wall hit (0.0343, 0.1687, 0.0000) (scale 3.17)
+  off-axis phone->eye      73.4°  wall hit (-0.1411, 0.0781, 0.0000) (scale 2.85)
+  lamp pool: width 0.0305 = 1.27x, x -0.0164..0.0142, z 0.0980..0.1130
+  pool ratio 0.056/(0.056-r) at r 0.012: 1.27x
+  pool ratio 0.056/(0.056-r) at r 0.0105: 1.23x
+  pool ratio 0.056/(0.056-r) at r 0.009: 1.19x
+  pool ratio 0.056/(0.056-r) at r 0.008: 1.17x
+  pool ratio 0.056/(0.056-r) at r 0.007: 1.14x
+  pool ratio 0.056/(0.056-r) at r 0.006: 1.12x
+  pool ratio 0.056/(0.056-r) at r 0.005: 1.10x
+  pool ratio 0.056/(0.056-r) at r 0.013: 1.30x
+  pool ratio 0.056/(0.056-r) at r 0.01: 1.22x
+  A blob                       (0.0000, 0.0120, 0.0980) -> px (1058, 758)  ndc (0.10, -0.40)
+  A knob                       (-0.0228, 0.0228, 0.0780) -> px (841, 600)  ndc (-0.12, -0.11)
+  A wall-shadow center         (0.0613, 0.0610, 0.0000) -> px (1516, 138)  ndc (0.58, 0.74)
+  A phone                      (-0.0100, 0.0015, 0.1140) -> px (960, 915)  ndc (0.00, -0.69)
+  A page center                (-0.0205, 0.0003, 0.0950) -> px (859, 855)  ndc (-0.11, -0.58)
+  A calendar bottom-left       (0.1000, 0.0400, 0.0060) -> px (1818, 308)  ndc (0.89, 0.43)
+  A calendar center            (0.1500, 0.1000, 0.0060) -> px (2262, -172)  ndc (1.36, 1.32)  OUT OF FRAME
+  B blob                       (0.0000, 0.0120, 0.0980) -> px (1283, 717)  ndc (0.34, -0.33)
+  B name                       (-0.0250, 0.0000, 0.0860) -> px (919, 808)  ndc (-0.04, -0.50)
+  lamp aim (-0.0080, 0.0000, 0.1020): distance 0.0621, pool radius at angle 0.35 ≈ 0.0227
+  aim -> blob-shadow center offset 0.0071; aim -> phone 0.0122; aim -> page center 0.0143
+  s17: blob on his hand (-0.046, 0.000, 0.088) is 0.56 rad off the lamp axis (cone 0.35)
+
+== Home desk (s02, s03), same unit; apt_desk flush to the wall (z 0..0.120)
+s02 camera (0.060, 0.130, 0.640) -> (0.060, 0.072, 0.060)
+  calendar top-left            (0.1000, 0.1600, 0.0060) -> px (1155, 87)  ndc (0.20, 0.84)
+  calendar bottom-right        (0.2000, 0.0400, 0.0140) -> px (1639, 672)  ndc (0.71, -0.24)
+  red circle                   (0.1700, 0.0950, 0.0080) -> px (1493, 404)  ndc (0.55, 0.25)
+  landing                      (0.1700, 0.0020, 0.0200) -> px (1495, 859)  ndc (0.56, -0.59)
+  B                            (0.0400, 0.0120, 0.0600) -> px (856, 850)  ndc (-0.11, -0.57)
+  eye                          (-0.0560, 0.0300, 0.0740) -> px (340, 771)  ndc (-0.65, -0.43)
+  hip                          (-0.0750, -0.0120, 0.0740) -> px (244, 991)  ndc (-0.75, -0.83)
+  lamp shade                   (0.0040, 0.0560, 0.0780) -> px (657, 636)  ndc (-0.32, -0.18)
+  phone rest                   (-0.0100, 0.0015, 0.1140) -> px (560, 971)  ndc (-0.42, -0.80)
+  desk front-left              (-0.0330, 0.0000, 0.1200) -> px (423, 988)  ndc (-0.56, -0.83)
+  distance cam->calendar 0.641, cam->B 0.592
+  s02 sun dir (-0.6926, -0.5147, -0.5054); blob-center shadow on desk plane (0.0239, 0.0000, 0.0482) (z<0 means it reaches the wall first)
+  ... on the wall plane (-0.0422, -0.0491, 0.0000)
+
+s03 phone positions and scales (wall z 0)
+  0.50 lift    phone (-0.0150, 0.0100, 0.1050) blob (0.0400, 0.0120, 0.0600): scale 2.33x, center (0.113, 0.015), x 0.085..0.141, y -0.013..0.043, width 0.056; half-angle 9.7°
+  1.50 grip L  phone (-0.0120, 0.0040, 0.0900) blob (0.0400, 0.0120, 0.0600): scale 3.00x, center (0.144, 0.028), x 0.108..0.180, y -0.008..0.064, width 0.072; half-angle 11.4°
+  3.67 scoot   phone (-0.0120, 0.0040, 0.0900) blob (0.0340, 0.0120, 0.0630): scale 3.33x, center (0.141, 0.031), x 0.101..0.181, y -0.009..0.071, width 0.080; half-angle 12.9°
+  off-axis L->baseL      112.9°
+  off-axis L->baseR      60.3°
+  off-axis L->stemTop    83.4°
+  off-axis L->stemMid    84.7°
+  off-axis L->knob       92.0°
+  off-axis L->shade      61.5°
+  off-axis L->eye        119.6°
+  off-axis L->calendarBR 10.3°
+  L->B crosses lamp plane z 0.078 at (0.0088, 0.0072, 0.0780); silhouette half-width there 0.0048
+  reach to phone left end (-0.0195, 0.004): lean 24, arm -11, |shoulder->tip| 0.0320
+  reach to lifted phone left end (-0.0225, 0.010): lean 16, arm -6, |shoulder->tip| 0.0319
+s03 camera (0.060, 0.090, 0.530) -> (0.060, 0.038, 0.060)
+  B                            (0.0400, 0.0120, 0.0600) -> px (831, 706)  ndc (-0.13, -0.31)
+  phone L                      (-0.0120, 0.0040, 0.0900) -> px (466, 794)  ndc (-0.51, -0.47)
+  phone rest                   (-0.0100, 0.0015, 0.1140) -> px (453, 845)  ndc (-0.53, -0.57)
+  eye                          (-0.0560, 0.0300, 0.0740) -> px (187, 603)  ndc (-0.80, -0.12)
+  lamp shade                   (0.0040, 0.0560, 0.0780) -> px (581, 432)  ndc (-0.39, 0.20)
+  wall shadow center (L)       (0.1440, 0.0280, 0.0000) -> px (1442, 559)  ndc (0.50, -0.04)
+  wall shadow top (L)          (0.1440, 0.0640, 0.0000) -> px (1446, 352)  ndc (0.51, 0.35)
+  wall shadow right (scoot)    (0.1813, 0.0307, 0.0000) -> px (1657, 544)  ndc (0.73, -0.01)
+  calendar bottom-right        (0.2000, 0.0400, 0.0140) -> px (1787, 498)  ndc (0.86, 0.08)
+  distance cam->B 0.477, cam->wall-shadow 0.540
+  3.0x shadow on screen: 38% of frame height
+
+== s06 (Camera A, home paper)
+  7.1x shadow spans px y -569..766 (frame is 0..1080)
+  after the 2.00 hop, blob at (-0.0030, 0.0120, 0.0980): pool width 0.0305 = 1.27x, x -0.0202..0.0104, z 0.0980..0.1130
+  after the hop, phone shadow: scale 7.13x, center (0.040, 0.061), x -0.046..0.125, y -0.025..0.147, width 0.171
+
+== Marston table (s11, s12, s14) in unit coords; window wall z 0
+  s11 phone lift   (-0.0120, 0.0080, 0.1240): scale 4.77x, center (0.045, 0.027), x -0.012..0.102, y -0.030..0.084, width 0.114; off-axis eye 65°, shade 37°
+  s11 phone settle (-0.0140, 0.0080, 0.1180): scale 5.90x, center (0.069, 0.032), x -0.002..0.139, y -0.039..0.102, width 0.142; off-axis eye 76°, shade 39°
+  reach to held phone left end (-0.0195, 0.008): lean 23, arm -5, |shoulder->tip| 0.0319
+  reach to closed laptop lid edge (-0.020, 0.004): lean 23, arm -12, |shoulder->tip| 0.0320
+  lid edge at 20°: (-0.0179, 0.0140, 0.0000); reach: lean 28, arm 10, |shoulder->tip| 0.0320
+  lid edge at 25°: (-0.0167, 0.0168, 0.0000); reach: lean 40, arm 26, |shoulder->tip| 0.0323
+  lid edge at 100°: (0.0211, 0.0365, 0.0000); reach: lean 40, arm 27, |shoulder->tip| 0.0749
+s11 camera (0.020, 0.033, 0.668) -> push to z 0.628, looking straight down -z
+  start hip                    (-0.0750, -0.0120, 0.0740) -> px (470, 772)  ndc (-0.51, -0.43)
+  start eye                    (-0.0560, 0.0300, 0.0740) -> px (568, 556)  ndc (-0.41, -0.03)
+  start blob                   (0.0000, 0.0120, 0.0980) -> px (853, 653)  ndc (-0.11, -0.21)
+  start lampShade              (0.0040, 0.0560, 0.0780) -> px (877, 421)  ndc (-0.09, 0.22)
+  start laptopHinge            (0.0150, 0.0020, 0.0600) -> px (935, 696)  ndc (-0.03, -0.29)
+  start wallShadow             (0.0686, 0.0316, -0.0000) -> px (1183, 546)  ndc (0.23, -0.01)
+  end wallShadow               (0.0686, 0.0316, -0.0000) -> px (1197, 547)  ndc (0.25, -0.01)
+  s11 frame at body plane z 0.074 (start): x -0.166..0.206, y -0.072..0.138
+s12 camera (0.040, 0.038, 0.440) straight down -z, locked
+  head                         (-0.0400, 0.0080, 0.0740) -> px (291, 791)  ndc (-0.70, -0.46)
+  phone                        (-0.0100, 0.0015, 0.1140) -> px (490, 883)  ndc (-0.49, -0.63)
+  blob                         (0.0000, 0.0120, 0.0980) -> px (602, 773)  ndc (-0.37, -0.43)
+  wallShadowCenter             (0.0613, 0.0610, 0.0000) -> px (1108, 380)  ndc (0.15, 0.30)
+  wallShadowLeft               (-0.0243, 0.0610, 0.0000) -> px (513, 380)  ndc (-0.47, 0.30)
+  wallShadowRight              (0.1468, 0.0610, 0.0000) -> px (1703, 380)  ndc (0.77, 0.30)
+  s12 frame at wall: x -0.098..0.178, y -0.040..0.116
+  s12 off-axis phone->head (-0.040, 0.008, 0.074): 69°
+  s12 breath scale 0.94: shadow width 0.1607
+  s12 breath scale 1.06: shadow width 0.1813
+s14 camera (0.000, 0.033, 0.708) straight down -z, locked
+  hip                          (-0.0750, -0.0120, 0.0740) -> px (598, 757)  ndc (-0.38, -0.40)
+  eye                          (-0.0560, 0.0300, 0.0740) -> px (689, 555)  ndc (-0.28, -0.03)
+  blob                         (0.0000, 0.0120, 0.0980) -> px (960, 645)  ndc (0.00, -0.20)
+  wallShadow                   (0.0613, 0.0610, 0.0000) -> px (1225, 419)  ndc (0.28, 0.22)
+  tinyBlobAt2_3                (0.0000, 0.0180, 0.2300) -> px (960, 636)  ndc (0.00, -0.18)
+  cartFrontEnter               (0.2300, 0.0000, 0.2280) -> px (2427, 751)  ndc (1.53, -0.39)  OUT OF FRAME
+  s14 t 0.68: x_k 0.250, cart center 0.180
+  s14 t 1.36: x_k 0.175, cart center 0.105
+  s14 t 2.3: x_k 0.072, cart center 0.002
+  s14 t 3.05: x_k -0.010, cart center -0.080
+  s14 t 3.68: x_k -0.080, cart center -0.150
+  s14 t 3.95: x_k -0.109, cart center -0.179
+  s14 t 4.68: x_k -0.190, cart center -0.260
+
+== s16 neighbor (mirrored unit x' = 0.350 - x), blob r 0.013
+  neighbor phone shadow: scale 7.13x, center (0.289, 0.068), x 0.196..0.381, y -0.024..0.161, width 0.185
+  neighbor lamp pool: width 0.0339 = 1.30x, x 0.3343..0.3681, z 0.0980..0.1153
+  D neighbor wall-shadow       (0.2887, 0.0681, 0.0000) -> px (1322, 409)  ndc (0.38, 0.24)
+  D hero blob (r 0.0105)       (0.0000, 0.0105, 0.0980) -> px (411, 646)  ndc (-0.57, -0.20)
+  B hero blob (r 0.0105)       (0.0000, 0.0105, 0.0980) -> px (1282, 737)  ndc (0.34, -0.37)
+
+== s18 G Freshman (r 0.012, local coords): phone (0.120, 0.004, 0.114), blob (0.110, 0.012, 0.098)
+  scale 7.13x, center (0.049, 0.061), x -0.037..0.134, y -0.025..0.147, width 0.171
+  E camera distance for a 0.12 m sheet at 70% frame height: 0.486
