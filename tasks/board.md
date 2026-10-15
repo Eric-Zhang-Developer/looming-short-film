@@ -26,3 +26,9 @@
 ### batch 4 (needs all modules)
 - mod-puppet · builder · `src/puppet.js`, `lab/puppet.html`, `lab/puppet.js`, `evidence/mod-puppet/`, `done/mod-puppet.md` · todo · —
 - lookdev-composite · builder · `lab/lookdev.html`, `lab/lookdev.js`, `evidence/lookdev-composite/`, `done/lookdev-composite.md` · todo · —
+
+### parallel track: storyboard (docs)
+- sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · todo · —
+- sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · todo · —
+- sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · todo · —
+- snd-engine · builder · `src/audio/`, `tools/mix.mjs` · todo (after a builder slot frees) · —

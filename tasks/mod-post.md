@@ -8,6 +8,7 @@
 Make the diorama read as a miniature: shallow depth of field, a per-act color grade, grain and vignette. No bloom.
 
 ## Owns
+- `src/core/stage.js` (additive only: implement `setRender(fn)` from the updated contract, default unchanged)
 - `src/post.js`
 - `lab/post.html`
 - `lab/post.js`
