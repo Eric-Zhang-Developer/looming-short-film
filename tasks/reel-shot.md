@@ -17,6 +17,12 @@ The director submits tonight (deadline Oct 15, 11:59 PM EDT). The film goes in a
 - Characters from `src/characters/`, faces swapped per the spec.
 - No legible text. No sound work: cues live in `src/audio/`.
 
+## The rough → final rule (director, 2026-10-15)
+This reel is tagged `v1-animatic` and later shown **side by side with the final**. So:
+- Don't move beat times or the shot's start and end.
+- Choose framing you'd keep. The final pass improves art and light, not staging.
+- Keep tunables (`BLOB_R`, light positions, intensities) as named constants at the top of your file.
+
 ## Skip tonight
 Precision measurement scripts (`measure.mjs`, pixel-scale checks, luminance percentages), full-res stills and crops.
 

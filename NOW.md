@@ -24,6 +24,9 @@ Merged so far: s01–s05, s07–s10, s13 (10 of 18). Style tile v3 is built and 
 - **Q1–Q9:** "go with every recommendation". The specs already follow them. Still to do: **Q7 Exam matte ink** (task `exam-ink`, queued until a code-writer slot frees; it owns `src/blob.js`).
 - Still open: removing the third-party transcription file from the repo, and the deadline.
 
+## Roadmap
+`docs/11-roadmap.md`: **M1 rough draft tonight (`v1-animatic`, submitted by 11:59 PM EDT, director review by 8 PM) → story lock → look lock → final art → `v3-final` → a rough-vs-final split screen for Oct 26.** The rough and the final share one timeline: beat times and cut points are frozen after M1 except by director notes. Tag and release `v1-animatic` before any later work.
+
 ## Standing duty: submission answers
 `docs/10-submission.md` is the living draft of the ProposalSpace answers (director, 2026-10-15). After every merge, gate or director decision that changes a claim or number, update the matching answer and its tag, and log it in doc 07. The **10 MB per-file cap** shapes the final encode (see its §Submission files).
 

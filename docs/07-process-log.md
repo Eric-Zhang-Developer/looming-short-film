@@ -175,3 +175,12 @@ Director, verbatim: "G2: freeze gator sheet v2_1 and hero_1."
 
 ## 2026-10-15 · Submission answers become a living draft
 The director shared the ProposalSpace form and asked for markdown answers that stay updated "as we go". The draft is `docs/10-submission.md`, and updating it is now a standing duty in `NOW.md`. Finding: the form caps each file at **10 MB**, so a 3:00 film gets about 440 kbit/s. The Act 1 preview scales to about 14 MB at the current encode, so the final encode needs work (HEVC or a two-pass target bitrate).
+
+## 2026-10-15 · Roadmap: rough first, then final, shown side by side
+Facts found today: the ProposalSpace deadline is Oct 15 at 11:59 PM EDT, and Gator Create's competition day is Oct 26 (AI Days page). Director, verbatim: "having a shitty rough draft, fully fleshed out, and then doing a final compared to the final polished version will be really, really satisfying." The new roadmap is `docs/11-roadmap.md`, which supersedes doc 06's calendar:
+- **M1:** `v1-animatic`, submitted tonight
+- story lock, then look lock, then final art
+- `v3-final`
+- a frame-aligned split screen for competition day
+
+The rule that makes the comparison work is one shared timeline: beat times and cut points freeze after M1, except by director notes.

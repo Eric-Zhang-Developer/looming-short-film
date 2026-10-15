@@ -9,6 +9,8 @@
 
 ## Milestones (6 weeks plus buffer)
 
+> **Superseded by `docs/11-roadmap.md`** (2026-10-15): the submission deadline is Oct 15 and the competition is Oct 26. The plan is now a rough draft tonight, the final before Oct 26, and the two shown side by side. The principles above and the checklists below still apply.
+
 Dates are relative until the final deadline is confirmed on ProposalSpace. When it is, pin W6 to end five days before it.
 
 The work runs as **waves** of subagents driven by one orchestrator. Doc 09 has the wave-by-wave task list and director gates G1–G6. This table is the calendar view of the same plan.

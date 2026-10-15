@@ -34,6 +34,8 @@ Goal: one honest, gentle film about starting, made in a way anyone can open up a
 
 *Optional line (doc 01 says to own the irony):* "I hit the same first-step wall making it." [director: only if true and you want it]
 
+*Process line:* "What you're watching is the film's own first step: a complete rough draft, with placeholder art, on the final timeline. The finished version is in production for October 26, and we'll show the two side by side." [now, if tonight's upload is the rough; reword once the organisers answer]
+
 ---
 
 ## Project Context
