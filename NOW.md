@@ -24,6 +24,9 @@ Merged so far: s01–s05, s07–s10, s13 (10 of 18). Style tile v3 is built and 
 - **Q1–Q9:** "go with every recommendation". The specs already follow them. Still to do: **Q7 Exam matte ink** (task `exam-ink`, queued until a code-writer slot frees; it owns `src/blob.js`).
 - Still open: removing the third-party transcription file from the repo, and the deadline.
 
+## Standing duty: submission answers
+`docs/10-submission.md` is the living draft of the ProposalSpace answers (director, 2026-10-15). After every merge, gate or director decision that changes a claim or number, update the matching answer and its tag, and log it in doc 07. The **10 MB per-file cap** shapes the final encode (see its §Submission files).
+
 ## Next moves
 1. Merge batch 1 as each shot finishes. Merge pattern: check the diff touches only its owns, run `determinism.mjs` on `index.html` across the shot, convert any PNG over 2 MB to JPEG, squash with a "why" message, remove the worktree, update the board.
 2. Batch 2: s05, s06 (mirror s15's numbers from `done/anim-s15.md`), s07, s10, s16. Batch 3: s08, s11, s12, s14, s17. Batch 4: s18. Brief: `tasks/anim-shot.md`. Builders use `src/characters/` rigs, take `visible` sizes from `assets.load`, and save JPEG evidence. **Pace:** at most 5 concurrent builders; use Sonnet for simpler shots (s05, s08, s10, s14), and check `get_usage` before each batch.

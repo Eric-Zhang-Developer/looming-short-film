@@ -59,7 +59,7 @@ An outside cold read of the early treatment scored it Creativity 6, Innovation 4
 
 ## Submission questionnaire: answer plan
 
-Draft the full answers in the last production week. These are the points each answer must hit.
+**Superseded for wording by `docs/10-submission.md`, the living draft kept current through production.** These were the points each answer must hit.
 
 1. **Principal researcher:** Eric Zhang.
 2. **Research associates:** leave blank.
