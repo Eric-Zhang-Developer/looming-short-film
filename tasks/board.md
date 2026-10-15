@@ -26,7 +26,7 @@
 ### batch 4 (needs all modules)
 - mod-puppet · builder · `src/puppet.js`, `lab/puppet.html`, `lab/puppet.js`, `evidence/mod-puppet/`, `done/mod-puppet.md` · verified (merged) · evidence/mod-puppet/action_strip.jpg
 - lookdev-composite · builder · `lab/lookdev.html`, `lab/lookdev.js`, `evidence/lookdev-composite/`, `done/lookdev-composite.md` · built (merged; look half passes) · evidence/lookdev-composite/vs_reference.jpg
-- contract-puppet · builder · `src/puppet.js`, `lab/puppet.js`, `docs/contracts.md` §puppet · in-progress · —
+- contract-puppet · builder · `src/puppet.js`, `lab/puppet.js`, `docs/contracts.md` §puppet · verified (merged) · evidence/contract-puppet/boil_strip.jpg
 - look-pass-1 · builder · `src/paper.js`, `src/post.js`, `src/lights.js`, `lab/lookdev.*`, contracts §paper/§post/§lights · in-progress · —
 
 ### parallel track: storyboard (docs)

@@ -6,7 +6,6 @@
 ## In flight
 | Task | Kind | Notes |
 |---|---|---|
-| `contract-puppet` | builder | puppet boil |
 | `sb-act1`, `sb-act2`, `sb-act3` | storyboard (docs) | parallel track |
 | **G1** | director | revised after lookdev: recommend a v3 tile with a value-contrast rule (+4 generations) instead of freezing a v2 |
 | `look-pass-1` | builder | code-side look fixes: rim, night grade, light shapes, paper cache |
