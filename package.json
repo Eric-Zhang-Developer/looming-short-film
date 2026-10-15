@@ -1,0 +1,9 @@
+{
+  "name": "looming",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "puppeteer-core": "25.14.0",
+    "three": "0.186.1"
+  }
+}

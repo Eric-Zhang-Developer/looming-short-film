@@ -1,0 +1,6 @@
+0b04000ca8013093561a6ba66b2aa645f6b20f87af3d36c6f77103472e7a9613  phone_t0.5.png (first render of the session)
+0b04000ca8013093561a6ba66b2aa645f6b20f87af3d36c6f77103472e7a9613  phone_t0.5_again.png (re-render after t=4.0, measurements, boil frames, tissue test)
+94a8e3f68cc80f7844299a8d1a123a3759b115842642ebacda1fed365a4a01ef  lamp_t4.0.png
+IDENTICAL
+
+(Orchestrator note: the PNGs these hashes describe were re-encoded to JPEG at merge to stay under the 2 MB evidence limit; re-run smoke/paper/render.mjs to reproduce the PNGs and hashes.)

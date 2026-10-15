@@ -1,0 +1,13 @@
+computed shadow scale (doc 02 formula, along light->cutout-center ray):
+  phone 3.000x  light at -0.016,0.014,0.225
+  lamp  1.048x  light at 0.200,0.550,0.240
+observed phone: shadow 503x476px vs cutout 198x186px -> screen 2.54x wide, world 2.95x wide (17.3 cm / 5.9 cm)
+observed lamp: shadow 226x9px vs cutout 197x190px -> screen 1.15x wide, world 1.16x wide (6.7 cm / 5.8 cm)
+render.mjs on darwin, Chrome Chrome/155.0.8059.40, three 0.186.1, 1920x1080
+render only, cached boil step (median of 20): 2.5 ms/frame  [min 2.2, max 5.6]
+render with a new boil step, texture rebuild (median of 20): 10.4 ms/frame  [min 9.8, max 15.5]
+render + PNG capture to disk (median of 5): 148.8 ms/frame
+Timed from Node around page.evaluate, with a 1-px readPixels to wait for the GPU.
+determinism t=0.5: IDENTICAL 0b04000ca8013093 0b04000ca8013093
+page console:
+[error] Failed to load resource: the server responded with a status of 404 (Not Found)
