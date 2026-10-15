@@ -23,11 +23,11 @@ Why this is the right shape:
 ## Milestones
 | Milestone | Tag | Content | Target |
 |---|---|---|---|
-| **M1 · Rough draft** | `v1-animatic` | A complete 3:00 story reel: all 18 shots readable and on their beats, with placeholder art, motion-sensor lights at Marston and temp sound. Submitted tonight under 10 MB. | **Oct 15, by 8 PM for director review** |
+| **M1 · Rough draft** | `v1-animatic` | A complete 3:00 story reel: all 18 shots readable and on their beats, with placeholder art, motion-sensor lights at Marston and temp sound. Published on YouTube at full quality (the director uploads it), with a compressed backup copy under 10 MB in ProposalSpace. | **Oct 15, by 8 PM for director review** |
 | M2 · Story lock (G4) | none | The director's notes pass on M1, plus 3 cold viewers. Fold in the blob dread meter and any notes. | Oct 16–17 |
 | M3 · Look lock (G2 / G3) | `v0-test-shot` | Face sheet frozen. Rig refit to the frozen gator. One shot (s15) at final art as the test. | Oct 17–18 |
 | M4 · Final art | `v2-rough-cut` | Sets and props painted from the UF reference (Marston, Plaza). Every shot at final art. First mix. | Oct 18–22 |
-| M5 · Final | `v3-final` | Colour, final mix (measured on the exported MP4), captions, encode under 10 MB, plus a full-quality release. | Oct 23–24 |
+| M5 · Final | `v3-final` | Colour, final mix (measured on the exported MP4, aiming at YouTube's ~−14 LUFS), captions, a full-quality master for YouTube, plus a compressed backup copy under 10 MB for ProposalSpace. | Oct 23–24 |
 | **M6 · The comparison** | (in the `v3-final` release) | A split screen of `v1-animatic` and `v3-final`, frame-aligned, plus a short "paintings vs lit and cut" panel. For competition day and the write-up. | Oct 24–25 |
 
 Dates after M1 assume files can be updated before Oct 26. If the organisers say tonight's upload is final, M2–M6 still happen, for the competition-day screening, the public release and the portfolio. The dates hold either way.

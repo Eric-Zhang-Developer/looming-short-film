@@ -184,3 +184,6 @@ Facts found today: the ProposalSpace deadline is Oct 15 at 11:59 PM EDT, and Gat
 - a frame-aligned split screen for competition day
 
 The rule that makes the comparison work is one shared timeline: beat times and cut points freeze after M1, except by director notes.
+
+## 2026-10-15 · Distribution: YouTube at full quality, plus a compressed backup
+Director: "You don't have to do the under 10 MB. I'm going to upload it on YouTube in full quality. We should do one, like a compressed one, just in case." The master is encoded at full quality for YouTube, and the link goes in the answers. A compressed copy of 10 MB or less is still uploaded to ProposalSpace as a backup. The director does the YouTube upload himself.

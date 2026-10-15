@@ -126,7 +126,9 @@ It also contributes a working example of AI used transparently in art. Nothing h
 ## Submission files
 > 10 MB max per file. Allowed: .doc, .docx, .gif, .jpeg, .jpg, .mov, .mp4, .pdf, .png, .ppt, .pptx, .tif, .tiff, .wmv, .zip
 
-**The 10 MB cap is a real production constraint.** For a 3:00 film that's a budget of about **440 kbit/s for video and audio together.** For reference, the Act 1 preview (0:44) encoded at 720p H.264 CRF 24 came to 3.5 MB, which scales to about 14 MB for the full film: **over the limit.** Plan:
+**Director, 2026-10-15: the film is published on YouTube at full quality; the ProposalSpace upload is a compressed backup copy.** Put the YouTube link in Project Context (and Synopsis if there's room). The director uploads it to YouTube himself.
+
+**The 10 MB cap now only applies to the backup copy.** For a 3:00 film that's a budget of about **440 kbit/s for video and audio together.** For reference, the Act 1 preview (0:44) encoded at 720p H.264 CRF 24 came to 3.5 MB, which scales to about 14 MB for the full film: **over the limit.** Plan:
 1. Test encodes at 720p and 1080p: H.264 at a two-pass target bitrate, and HEVC (`hvc1` in `.mp4`, which plays in Safari and macOS and in most modern players). Paper grain and boil are the hardest content to compress, so judge on a phone and a laptop, not by bitrate alone.
 2. Submit the best version under 10 MB as the main file, and link the full-quality release (GitHub Release) in Project Context.
 3. **Captions:** `.srt` and `.vtt` aren't allowed types, so add a burned-in captioned version as a second MP4 (also ≤ 10 MB), or a PDF caption sheet.
