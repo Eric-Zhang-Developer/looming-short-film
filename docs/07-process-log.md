@@ -95,6 +95,12 @@ Don't log routine coding steps. Git history covers those.
 **Limits found in research:** Codex output has no alpha, so we use a chroma-key background. Recurring characters drift across generations, so we generate one sheet per character. Default sizes are about 1.2–1.5K, so we need 2K or more for close-ups.
 **Who:** director proposed; Claude researched and set the limits.
 
+### 2026-10-15 · Claude drives Codex, with extensive prompts
+**Decision:** Claude writes the asset specs and long, layered prompts (style, lighting, asset, technical and notes blocks), attaches approved images as references, and calls Codex through `codex exec`. The director picks every frozen asset. Rejects are kept in the repo as evidence. Full workflow in doc 08.
+**Alternatives:** the director prompting Codex by hand in the app; one-line prompts.
+**Why:** versioned prompt files and reference chaining keep 30-odd assets consistent with one style tile, and make every image traceable.
+**Who:** director.
+
 ## Publishing
 
 At submission, link this file from the README and the synopsis. Include 6–10 before/after frames for the biggest overrides. Leave in the experiments that failed. They're the most convincing evidence that a human was directing.

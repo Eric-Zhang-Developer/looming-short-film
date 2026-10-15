@@ -34,20 +34,12 @@
 
 ## Asset pipeline (generated art)
 
-**Generation.** Use the Codex `image_gen` tool (enabled on this machine via the ChatGPT login). Rules:
-- **One image per character design sheet.** Generate the gator turnaround *and* its separated parts (head, snout, jaw, arms, body, tail, hoodie) together, so the style matches across parts. Generate the eye and mouth set as one sheet for the same reason.
-- **Flat chroma-key background** (pure `#00FF00` or `#FF00FF`, whichever doesn't appear in the art). Codex's default model gives opaque RGB with no transparency.
-- **Style prompt block shared by every generation.** Something like: "hand-painted dry-brush on cardstock, matte, flat even lighting, no cast shadows, no highlights, picture-book." Light must not be baked into the art, because three.js does the lighting.
-- **Resolution:** at least 2048 px on the long edge for anything that can fill more than half the frame. Smaller is fine for far background plates, since depth of field softens them.
+Claude drives Codex `image_gen` through `codex exec` with long, layered prompts and reference images. Rejects are kept as evidence, and the director picks what gets frozen. **The full workflow, prompt templates and generation order are in [doc 08](08-image-pipeline.md).** The technical constraints that matter here:
 
-**Curation.** The director picks, rejects or regenerates. Every pick is logged (doc 07).
-
-**Freezing.** Accepted images are copied into `assets/generated/<name>.png` and recorded in `assets/generated/manifest.json`:
-
-```json
-{ "file": "gator_parts_v3.png", "model": "gpt-image-2 (Codex image_gen)",
-  "date": "2026-10-20", "prompt": "...", "sha256": "...", "used_for": ["student"] }
-```
+- Output is opaque RGB, so every generation uses a flat chroma-key background (`#00FF00`, or `#FF00FF` for green subjects).
+- Art must be flat-lit with no baked shadows, because three.js does all the lighting.
+- At least 2048 px on the long edge for anything that can fill more than half the frame.
+- Frozen picks live in `assets/frozen/` and are recorded in `assets/generated/manifest.json` (prompt file, reference hashes, model, date, sha256). They're never generated at render time.
 
 **Cutting.** `tools/cut.mjs` (offline, run once per asset):
 1. Key out the chroma color to get a rough mask.
@@ -148,13 +140,15 @@ Marston extras are `InstancedMesh` silhouettes cut from 4–6 generated poses, e
 ```
 looming/
   README.md  docs/
-  assets/generated/  manifest.json   # frozen Codex output
+  assets/specs.json  assets/prompts/  # asset specs, versioned prompts (doc 08)
+  assets/raw/  assets/frozen/       # all outputs + rejects; director picks
+  assets/generated/manifest.json
   assets/cut/                        # keyed, split parts
   assets/scans/                      # real paper photos (optional)
   src/paper.js  material.js  lights.js  puppet.js  blob.js  crowd.js  post.js
   src/timeline.js  src/shots/s01_*.js … s18_*.js
   src/audio/                         # synthesis (doc 05)
-  tools/cut.mjs  check_timeline.mjs  determinism.mjs
+  tools/gen.mjs  cut.mjs  check_timeline.mjs  determinism.mjs
   render.mjs  index.html  package.json
 ```
 

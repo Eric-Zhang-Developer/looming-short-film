@@ -27,6 +27,7 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 | [05 Sound](docs/05-sound.md) | Code-synthesized score, foley, mix |
 | [06 Production Plan](docs/06-production-plan.md) | Test shot, milestones, shot list, risks |
 | [07 Process Log](docs/07-process-log.md) | Director's log format and the decisions made so far |
+| [08 Image Pipeline](docs/08-image-pipeline.md) | How Claude drives Codex image gen: prompts, references, the pick-and-freeze loop |
 
 ## Locked decisions
 
@@ -37,7 +38,7 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 | Characters | Paper-cutout gators. The Exam is the only thing made of ink. |
 | Look | Lit paper diorama: torn-paper cutouts on separate depth planes, real light, real shadows |
 | Engine | three.js scene of flat paper planes; frames rendered headless and encoded with ffmpeg |
-| Painted surfaces | Generated once with Codex image gen, curated, frozen in `assets/` with a manifest. Code cuts, lights and rigs them. |
+| Painted surfaces | Claude prompts Codex image gen with reference images; the director picks; picks are frozen in `assets/` with a manifest. Code cuts, lights and rigs them. |
 | Sound | Synthesized in code and locked to the timeline. No vocals. |
 | Team | Solo director plus Claude as code collaborator |
 | Deadline | Final due date to confirm on ProposalSpace; the plan assumes 6+ weeks |

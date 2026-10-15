@@ -14,13 +14,23 @@ Dates are relative until the final deadline is confirmed on ProposalSpace. When 
 | Week | Goal | Done when |
 |---|---|---|
 | **W0** | Spec | These docs are reviewed and pushed |
-| **W1** | Test shot + gator rig | The 10 s test passes (below). The gator puppet shows all face swaps on a model sheet. |
+| **W1** | Image pipeline + test shot + gator rig | The `codex exec` smoke test passes. The style tile, gator sheet and face sheet are frozen (doc 08). The 10 s test passes (below). The gator puppet shows all face swaps on a model sheet. |
 | **W2** | Look locked + animatic | Every shot exists as blocking with placeholder paper and temp sound, cut to 3:00. The readability test with 3 cold viewers is passed. |
 | **W3** | Act 1 + 2a final | Shots 1–8 at final quality |
 | **W4** | Act 2b + 3 final | Shots 9–16 at final quality, including the crowd reveal |
 | **W5** | Dawn, button, sound | Quiet 2 and the button are done. Score and foley are synthesized. First full mix. |
 | **W6** | Polish + submission | Color pass, final render, captions, process log published, all 13 questionnaire answers written |
 | Buffer | 3–5 days | Reserved for whatever breaks |
+
+## Image pipeline smoke test (W1, day 1)
+
+Generate one style tile through `codex exec` from the repo root, with a single reference image attached. It passes when:
+- [ ] it runs headless, with no interactive prompt
+- [ ] the file lands in `assets/raw/` with a versioned name
+- [ ] the background is flat and keyable
+- [ ] the plan usage it cost is noted in the process log
+
+If `codex exec` won't call `image_gen` headless, fall back to running the same prompt files in the Codex app by hand, and keep everything else in doc 08 the same.
 
 ## The test shot (W1)
 
@@ -100,6 +110,8 @@ Totals: 12 acting shots, 5 light shots, 1 crowd shot. Shots 6 and 15 must match 
 | Shadow artifacts (acne, peter-panning, alpha edges) | Medium | Custom depth material for cutouts, tuned bias; see doc 04 |
 | Scope creep beyond 3:00 | Medium | The cut list in doc 02 is binding |
 | Deadline unknown | Medium | Confirm on ProposalSpace in W0 |
+| Generated art drifts or bakes in lighting | Medium | Every character generated once, as a sheet; flat-light prompt block; screening checklist (doc 08) |
+| Image generation eats plan quota | Medium | 8-generation cap per asset; usage logged from the smoke test on |
 
 ## Definition of done
 
