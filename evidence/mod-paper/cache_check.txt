@@ -1,0 +1,7 @@
+ok   boilSeed(0.69)=6, (0.7)=7, (7/10)=7, (1, 4)=4
+ok   same (key, seed, res) returns the cached sheet
+ok   another seed is a new sheet
+ok   another res is a new sheet
+ok   300 entries kept
+ok   past 300, the least recently used is evicted
+ok   sheet shape
