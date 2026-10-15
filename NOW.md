@@ -6,10 +6,11 @@
 ## In flight
 | Task | Kind | Notes |
 |---|---|---|
-| `mod-puppet`, `lookdev-composite` | batch 4 builders | lookdev uses v2_4 pending G1 |
-| `contract-audio` | builder | click identity in final mix; bed durations |
+| `contract-puppet` | builder | puppet boil |
 | `sb-act1`, `sb-act2`, `sb-act3` | storyboard (docs) | parallel track |
-| **G1** | director | style tile v2_1–v2_4 in `evidence/asset-style-tile/contact.jpg`; orchestrator recommends v2_4 |
+| **G1** | director | revised after lookdev: recommend a v3 tile with a value-contrast rule (+4 generations) instead of freezing a v2 |
+| `look-pass-1` | builder | code-side look fixes: rim, night grade, light shapes, paper cache |
+| `snd-score-clicks` | builder | silence score under lamp clicks so mix.wav click check passes |
 
 ## Plan
 | Batch | Tasks | Needs | State |
@@ -17,13 +18,13 @@
 | 1 | `mod-core`, `mod-render`, `mod-timeline`, `tool-gen` | nothing | merged |
 | 2 | `mod-paper`, `mod-lights`, `mod-blob`, `mod-post` | `mod-core` | merged |
 | 3 | `mod-material` | `mod-paper`, `mod-lights` | merged |
-| 4 | `mod-puppet`, `lookdev-composite` | everything | in-progress |
+| 4 | `mod-puppet`, `lookdev-composite` | everything | merged (lookdev: look half passes) |
 
 ## Blocked
 - none
 
 ## Next 3 moves
-1. Merge batch 4, then open the wave 2 PR with lookdev as the headline evidence.
+1. Open the wave 2 PR once look-pass-1, contract-puppet and snd-score-clicks merge (lookdev before/after as headline evidence).
 2. **Waiting on G1.** On the pick: freeze it to `assets/frozen/style_tile.png` (despilled), then dispatch the gator sheet painter (G2).
 3. `sb-reconcile` running (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names + snd-score's fridge/gameNight/curtainsStart/scrollStart/marstonEnter into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
 
