@@ -45,6 +45,9 @@
 - anim-s13 · builder · `src/shots/s13.js` · verified (merged) · evidence/anim-s13/strip.jpg
 - anim-s15 · builder · `src/shots/s15.js` · built (merged; loom 4.2×, in frame) · evidence/anim-s15/sheet.jpg
 - anim-s06 · builder · `src/shots/s06.js` · in-progress · —
+- anim-s12 · builder · `src/shots/s12.js` · in-progress · —
+- anim-s14 · builder · `src/shots/s14.js` · in-progress · —
+- anim-s16 · builder · `src/shots/s16.js` · in-progress · —
 - contract-timing · builder · `src/core/ease.js`, `src/lights.js` (onTwos snap, lamp dust sphere) · verified (merged) · evidence/contract-timing/
 - anim-s11 · builder · `src/shots/s11.js` · in-progress · —
 - anim-s05 · builder · `src/shots/s05.js` · verified (merged) · evidence/anim-s05/sheet.jpg
