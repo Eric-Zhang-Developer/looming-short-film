@@ -1,0 +1,48 @@
+{
+  "output": "assets/raw/style_tile_v3_4.png",
+  "prompt_file": "assets/prompts/style_tile.v3.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/style_tile.v3.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "reference-videos/frames/torn_paper_ref.jpg",
+      "sha256": "fa9f2dad2d2e74653acd38189ff544e3389939839ce3647df72a3c28ca94da2c"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a1406b-ae44-7b90-9b91-db9a84ede462",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a1406b-ae44-7b90-9b91-db9a84ede462/exec-d496665a-4044-4b0e-a2e6-deab8673eed6.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-3i7afF",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 114684,
+    "cached_input_tokens": 86400,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1593,
+    "reasoning_output_tokens": 38
+  },
+  "timestamp_start_utc": "2026-10-15T16:36:00Z",
+  "timestamp_end_utc": "2026-10-15T16:37:44Z",
+  "output_sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8",
+  "width": 2043,
+  "height": 770,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/style_tile_v3_4.jpg",
+  "screening": {
+    "verdict": "pass",
+    "rank": 1,
+    "value_contrast": "all 5 props PASS: desk 38.7%, calendar 63.6%, lamp 50.8%, laptop 59.0%, gator 45.4% (wall Y' 53.2)",
+    "gator_appeal": "Unmistakably a gator (long blunt snout, small cream tooth tips, scalloped tail) and still friendly: big forward eye with highlight, smile line, stubby legs. Flat geometric shapes map directly onto the 8-part rig (head, snout, jaw, arms, tail). Closest to palette green (#688856, distance 13). Largest gator (box 399x364 px). Weakness: the long tail makes it the widest piece, and it is less cuddly than (a). Only 2 tooth tips visible, not the 3-4 asked.",
+    "checklist": "Method: full-size Read of the PNG, composite over #808080 and #1E2440 (evidence/asset-style-tile-v3/contact.jpg), gator at 2x nearest zoom, props over navy, cut.mjs --auto into scratch, contrast.mjs on the cut parts (evidence/asset-style-tile-v3/contrast.txt). Shared across all four: real alpha, interiors at 250-254 (cut.mjs clamps); some near-zero-alpha coloured dust under pieces, invisible when composited and cleared by cut.mjs; exactly 6 alpha islands; no text, numbers or logo; one red circle; lamp shade plain cream inside and out; no cast or drop shadows; navy only on the wall; laptop has a thin light-grey keyboard band (grey is off the named palette, very small); lamp base and desk slab show a top face and a side band (dimensional drawing, but evenly lit). Gaps between pieces are under the asked 40 px (smallest box gap wall-desk 12-24 px; the lamp shade overhangs the laptop so their boxes overlap, islands stay separate). Same pale torn rim on most pieces, though the wall rim is heavier than the props."
+  },
+  "gator_direction": "(d) graphic picture-book",
+  "assembled_prompt": "evidence/asset-style-tile-v3/prompt_v3_4.txt",
+  "prompt_note": "style_tile.v3.md's [GATOR DIRECTION] line was replaced by direction (d) graphic picture-book for this run only; the exact prompt sent is in assembled_prompt."
+}

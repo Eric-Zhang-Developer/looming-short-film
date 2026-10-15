@@ -1,0 +1,48 @@
+{
+  "output": "assets/raw/style_tile_v3_1.png",
+  "prompt_file": "assets/prompts/style_tile.v3.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/style_tile.v3.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "reference-videos/frames/torn_paper_ref.jpg",
+      "sha256": "fa9f2dad2d2e74653acd38189ff544e3389939839ce3647df72a3c28ca94da2c"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a14067-6f20-7240-92cc-5b392a031f91",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a14067-6f20-7240-92cc-5b392a031f91/exec-d269e259-3aa5-46dc-b780-88e96f2c1b2c.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-QSMjfG",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 115461,
+    "cached_input_tokens": 87936,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1674,
+    "reasoning_output_tokens": 130
+  },
+  "timestamp_start_utc": "2026-10-15T16:31:21Z",
+  "timestamp_end_utc": "2026-10-15T16:33:03Z",
+  "output_sha256": "f9cc89081d31bc2b3bbf8380927b866c1eaa05705bd24f0d41c288429adf6212",
+  "width": 1983,
+  "height": 793,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/style_tile_v3_1.jpg",
+  "screening": {
+    "verdict": "pass",
+    "rank": 2,
+    "value_contrast": "all 5 props PASS: desk 37.0%, calendar 61.9%, lamp 53.6%, laptop 58.9%, gator 45.8% of full scale above the wall (wall Y' 53.1)",
+    "gator_appeal": "Big round eye with highlight looking up, warm smile, bean body, stubby legs, short bumpy tail: the most huggable of the four. Risk: the eye bump on a round head with a short snout reads as a frog at a glance. Kraft stitch lines on the hoodie. Mean green #819056 (RGB distance 20 from #6F8F5E). Gator box 280x372 px.",
+    "checklist": "Method: full-size Read of the PNG, composite over #808080 and #1E2440 (evidence/asset-style-tile-v3/contact.jpg), gator at 2x nearest zoom, props over navy, cut.mjs --auto into scratch, contrast.mjs on the cut parts (evidence/asset-style-tile-v3/contrast.txt). Shared across all four: real alpha, interiors at 250-254 (cut.mjs clamps); some near-zero-alpha coloured dust under pieces, invisible when composited and cleared by cut.mjs; exactly 6 alpha islands; no text, numbers or logo; one red circle; lamp shade plain cream inside and out; no cast or drop shadows; navy only on the wall; laptop has a thin light-grey keyboard band (grey is off the named palette, very small); lamp base and desk slab show a top face and a side band (dimensional drawing, but evenly lit). Gaps between pieces are under the asked 40 px (smallest box gap wall-desk 12-24 px; the lamp shade overhangs the laptop so their boxes overlap, islands stay separate). Same pale torn rim on most pieces, though the wall rim is heavier than the props."
+  },
+  "gator_direction": "(a) soft and round",
+  "assembled_prompt": "evidence/asset-style-tile-v3/prompt_v3_1.txt",
+  "prompt_note": "style_tile.v3.md's [GATOR DIRECTION] line was replaced by direction (a) soft and round for this run only; the exact prompt sent is in assembled_prompt."
+}

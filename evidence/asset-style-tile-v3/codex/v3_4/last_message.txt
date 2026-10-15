@@ -1,0 +1,1 @@
+Saved [out.png](out.png) — one landscape PNG with transparency, generated using the built-in image tool from your six-piece style-tile prompt.

@@ -5,8 +5,9 @@
     "refs": [
       "reference-videos/frames/torn_paper_ref.jpg"
     ],
-    "prompt": "assets/prompts/style_tile.v2.md",
+    "prompt": "assets/prompts/style_tile.v3.md",
     "variants": 4,
+    "cap": 12,
     "target": "largest landscape size available, 6 separate pieces (wall, desk edge, calendar, lamp, laptop, gator)",
     "key": {
       "name": "magenta",

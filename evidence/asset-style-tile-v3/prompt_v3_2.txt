@@ -1,0 +1,68 @@
+# gen.mjs dry run · style_tile · prompt v3 · 1 variant(s) · 8/12 used
+
+## Assembled prompt (piped on stdin)
+
+## 1. Style
+
+Hand-painted cut-paper illustration for a stop-motion paper diorama. Matte cardstock surfaces painted with dry-brush gouache: visible bristle streaks, slightly uneven pigment, soft paper grain. Limited palette only: night navy #1E2440, cream #F2E8D5, gator green #6F8F5E, kraft brown #A8835A, plus small touches of lamp amber #F0A84A. Picture-book charm, simple rounded shapes, strong readable silhouettes. Match the attached style tile exactly in brushwork, texture and color.
+
+## 2. Lighting
+
+Flat, even, shadowless studio lighting, as if the paper were scanned. No cast shadows, no drop shadows, no highlights, no rim light, no glow, no vignette, no ambient occlusion. Lighting will be added later by a 3D engine, so the art must contain none.
+
+## 3. Asset
+
+The style tile for the film: a small corner of a student's apartment at night, built as a paper diorama and shown as its separate cut-paper pieces laid out flat, straight-on front view. There is no frozen style tile yet; this image becomes it. The attached image is a reference frame from a torn-paper picture-book animation: match its torn-paper feel, its dry-brush texture, its thin pale fiber rims along torn edges and its simple, friendly dot-eyed character charm, not its content, characters or colors.
+
+The most important rule, the value rule: night navy is used for the wall piece only. Every other piece is clearly lighter and warmer than the navy wall. If this image were converted to black and white, the wall would be nearly black and every other piece would read as a light grey or near white against it. No prop, no outline, no linework and no detail on any prop is navy, dark blue or black, except the gator's black pupil.
+
+Six pieces. Each is one complete closed cut-paper shape with a slightly torn edge and a thin pale fiber rim. Vary the tear with the paper: heavier card tears tighter and cleaner, the tissue lampshade tears raggedly, the calendar's cream paper tears softly, so no two pieces share the same edge.
+(1) a section of wall: night navy #1E2440 cardstock with dry-brush texture, plain, with nothing pinned or painted on it (no window, no notes, no skyline). This is the only navy piece.
+(2) a desk edge: kraft brown #A8835A textured card with visible fiber, the desktop and its front edge as one piece, seen straight on as a long low slab, not a box and not a table with legs.
+(3) a paper wall calendar: cream #F2E8D5 pages with a grid of blank boxes drawn in thin kraft-brown lines, a few kraft-brown binding rings along the top, and exactly one box circled in calendar red (the only red in the image). No numbers, no letters.
+(4) a desk lamp: a translucent cream tissue shade with a ragged torn edge, plain cream inside and out (no amber or yellow painted inside the shade); the arm, stem and base are kraft brown card, with one small lamp-amber #F0A84A switch knob as the only amber. Painted flat with no glow.
+(5) a closed laptop seen from the side and slightly above: a cream lid with a thin kraft-brown base edge and hinge, no logo, nothing dark.
+(6) one small paper gator figure, the film's main character, a young alligator college student, standing upright in strict side view, facing right. Gator green #6F8F5E cardstock with a lighter cream belly showing under the jaw and below the hoodie, and a slightly darker green dry-brush texture along the back and tail (texture only, never scales). Wears an oversized cream hoodie. In the diorama it is about 8 cm tall: draw it to scale with the desk edge, so if it stood beside the desk its head would come a little above the desktop.
+
+Gator design for this variant, "lanky, sleepy student": a taller, narrower gator, about 2 times as tall as it is wide, standing with a gentle relaxed S-curve (soft and easy, not hunched, not defeated). The height comes from a long body inside an oversized cream hoodie that falls to the knees, not from long legs: the legs below the hem are still short and stubby, two rounded nubs with feet flat on the ground. The head is a smooth elongated oval with a moderately short, softly rounded snout (about half the head's length, blunt rounded tip, nothing like a crocodile). One big round eye with a smooth, heavy, sleepy upper lid that covers the top third of the eye: the lid edge is a soft gentle curve, the same green as the head, with no eyebrow and no angled or frowning line. Below the lid, a large black pupil looking forward, with one small cream dot painted in it. A tiny relaxed half-smile at the corner of the mouth. The hoodie sleeves are far too long and flop past the hands in soft rounded cuffs; the hood is down in a loose roll at the back of the neck. A long, smoothly tapering tail with a rounded tip curves along the ground behind. The feeling: sweet, cozy, tired after a late night, endearing rather than grumpy.
+
+Appeal rules for the gator, which matter as much as the value rule:
+- Make it appealing and lovable, the kind of character a child would want as a toy, but made of cardstock and paper, never felt, fabric, plush or clay.
+- A clear, simple silhouette that reads at small size, built from a few soft simple shapes.
+- One big readable eye (the film is wordless, so the eye carries the story), set forward on the head, looking forward or slightly up, never down. The small cream dot in the pupil is part of the painted eye design, not a lighting effect.
+- No eyebrow, no brow ridge, no angled or scowling lid line, no grumpy or sullen look.
+- Warm, not gross: no realistic scales, no bumpy armor plates, no spiky ridges or spines along the back or tail, no claws, no gums, no tongue, no realistic reptile skin, no visible nostrils beyond at most one tiny dot.
+- Short stubby legs, feet flat on the ground; the gator stands on its own, not leaning on anything.
+- Gator green appears only on the gator. The hoodie is cream, never navy or grey.
+
+Layout, left to right in one row, evenly spaced, nothing touching or overlapping: wall, desk edge, calendar, lamp, laptop, gator. Every piece sits apart with at least 40 px of empty background around it, so each can be cut out separately. No piece is cropped by the frame edge. All pieces share one consistent scale.
+
+Palette: night navy only on the wall; cream, kraft brown and gator green everywhere else; lamp amber only on the lamp's small switch knob; the single red circle on the calendar. Nothing in the artwork is magenta, pink or purple.
+
+Banned: no text, no letters, no numbers on the calendar (its boxes stay blank), no logo on the laptop. No cast shadows, no drop shadows, no glow or halo around the lamp or anything else, and no baked-in light direction: no piece is lighter on one side than the other, every surface is lit evenly as if scanned.
+
+Size: the largest landscape size available.
+
+## 4. Technical
+
+Background: fully transparent (real alpha channel), with clean edges and no halo. If transparency isn't possible, use perfectly flat solid pure magenta #FF00FF instead, with no gradient, no texture and no shadow on it, and no magenta anywhere in the artwork. Highest available resolution, landscape. No text, letters, numbers, labels, logos, watermarks or borders anywhere.
+
+## 5. Notes
+
+Revision of style tile v2. Director, verbatim: "make style tile v3 with the value-contrast rule (+4 generations)." and "the gator is really ugly ngl."
+- In v2 the lamp stem and base and the laptop were painted night navy, so on the navy wall they vanished and only their pale rims showed. In this version only the wall is navy; every prop is cream, kraft or green.
+- The v2 gators were judged unappealing: a heavy angled lid that read as a scowl, a long crocodile snout, spiky ridges down the back and tail, a small head on a hunched body, and in one variant a fuzzy felt texture with rounded 3D shading. Avoid all of these.
+- In v2 the inside of the lampshade was painted amber, which reads as lit. Keep the shade plain cream inside and out.
+- In v2 every piece got the same thin cream torn rim. Vary the tear by paper weight.
+- In v2 the gaps between pieces were often only 16 to 30 px. Keep at least 40 px everywhere.
+
+## Output
+
+Generate exactly one image. Save it as `out.png` in the current working directory (the workspace root).
+
+## Commands (one per variant, each in its own fresh temp dir)
+
+RUN=$(mktemp -d "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-XXXXXX")
+codex exec -C "$RUN" -s workspace-write --json --skip-git-repo-check -o "$RUN/last_message.txt" -i /Users/ericzhang/code/media/looming/reference-videos/frames/torn_paper_ref.jpg - < <assembled prompt> > "$RUN/events.jsonl"
+#   then copy the new image to assets/raw/style_tile_v3_2.png, thumb + sidecar to assets/raw/thumbs/
+

@@ -10,7 +10,7 @@ import { join, resolve, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const CAP = 8; // doc 08: at most 8 generations per asset
+const CAP_DEFAULT = 8; // doc 08: at most 8 generations per asset; a spec's "cap" overrides it (director raised style_tile to 12 at G1)
 const RAW = join(ROOT, 'assets/raw'), THUMBS = join(RAW, 'thumbs');
 
 const args = Object.fromEntries(process.argv.slice(2).map(a => {
@@ -23,6 +23,7 @@ if (!args.asset) die('usage: node tools/gen.mjs --asset=<name> [--variants=N] [-
 const spec = JSON.parse(readFileSync(join(ROOT, 'assets/specs.json'), 'utf8')).find(a => a.name === args.asset);
 if (!spec) die(`no asset "${args.asset}" in assets/specs.json`);
 const name = spec.name;
+const CAP = spec.cap ?? CAP_DEFAULT;
 const version = spec.prompt.match(/\.v(\d+)\.md$/)?.[1] ?? die(`prompt path must end in .vN.md: ${spec.prompt}`);
 const variants = Number(args.variants ?? spec.variants ?? 3);
 if (!(variants >= 1)) die(`bad --variants: ${args.variants}`);
