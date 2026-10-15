@@ -157,3 +157,12 @@ The director pointed out that Marston has no desk lamps, and research found no s
 - **The rule still holds.** Overhead light means a small shadow and low phone light means a huge one. At Marston the overhead light is a ceiling fluorescent on a motion sensor.
 - **The arc:** at home he clicks the lamp off and chooses the dark (s06). At Marston, stillness lets the lights time out (s11), and moving brings them back (s15 the pen, s16 standing, s18 walking past the Freshman).
 - **Unverified:** whether Marston's upper floors actually use occupancy sensors. It's common in libraries and plausible to a UF audience.
+
+## 2026-10-15 · The blob's size becomes the dread meter
+The director, after watching the Act 1 preview: "I think the blob should get bigger… I think there's a lot of stuff going on in the first act that you can't really tell from subtext. I think we need to make things a little bit more explicit. While still remaining tasteful." The orchestrator proposed:
+- an explicit birth: a tight insert of ink beading on the red Friday circle next to the exam glyph, then the blob's first look going to the glyph and then to him
+- the blob growing one step with each avoidance (glance at the exam, look away, gulp and swell on a beat, the Exam motif a little lower each time), peaking at about the gator's head size
+- the shadow kept on top as "how it feels"
+- one step of shrinking per solved problem
+
+Director: "agree I like those changes".
