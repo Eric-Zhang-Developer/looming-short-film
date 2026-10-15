@@ -1,0 +1,57 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s05 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s05 measurement rig (the smoke-paper method): builds src/shots/s05.js on its own stage without post, renders
+  // the frame twice with the blob invisible to the camera (colorWrite off), once casting and once not, with the window
+  // light's shadow off so only the phone's shadow differs. Changed pixels are back-projected onto the wall plane
+  // (z 0); only hits on the wall above the desk (y > 0.0005) count. Scale = shadow width / blob width, where the blob
+  // width is its own camera mask back-projected onto its plane.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build } from '/src/shots/s05.js';
+
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: () => ({ set() {} }) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 5 });
+  const { exam, dawn, tv } = shot.parts;
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  const grabPx = () => { renderer.render(scene, camera); const p = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, p); return p; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+  const onPlane = (x, y, z) => { ndc.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1); ray.setFromCamera(ndc, camera); return ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -z), hit); };
+  function box(mask, z, keep = () => true) {
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, n = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!mask[y * W + x]) continue;
+      const h = onPlane(x, y, z); if (!keep(h)) continue; n++;
+      x0 = Math.min(x0, h.x); x1 = Math.max(x1, h.x); y0 = Math.min(y0, h.y); y1 = Math.max(y1, h.y);
+    }
+    return { x0, x1, y0, y1, w: x1 - x0, n };
+  }
+  window.measure = (t) => {
+    stage.renderFrame(t);
+    const mat = exam.mesh.material, stain = exam.stain.visible;
+    dawn.light.castShadow = false; tv.castShadow = false; exam.stain.visible = false;
+    mat.colorWrite = false; mat.depthWrite = false;
+    exam.mesh.castShadow = true; const a = grabPx();
+    exam.mesh.castShadow = false; const b = grabPx();
+    mat.colorWrite = true; mat.depthWrite = true; exam.mesh.castShadow = true;
+    // blob mask: blob drawn vs not drawn, casting nothing either way
+    exam.mesh.castShadow = false; exam.mesh.visible = false; const c = grabPx(); exam.mesh.visible = true; const d = grabPx(); exam.mesh.castShadow = true;
+    dawn.light.castShadow = false; tv.castShadow = true; exam.stain.visible = stain;
+    const sm = new Uint8Array(W * H), bm = new Uint8Array(W * H);
+    for (let i = 0; i < W * H; i++) {
+      const da = Math.abs(a[i * 4] - b[i * 4]) + Math.abs(a[i * 4 + 1] - b[i * 4 + 1]) + Math.abs(a[i * 4 + 2] - b[i * 4 + 2]);
+      const db = Math.abs(c[i * 4] - d[i * 4]) + Math.abs(c[i * 4 + 1] - d[i * 4 + 1]) + Math.abs(c[i * 4 + 2] - d[i * 4 + 2]);
+      sm[i] = da > 12 ? 1 : 0; bm[i] = db > 12 ? 1 : 0;
+    }
+    const s = box(sm, 0, (h) => h.y > 0.0005), bl = box(bm, exam.mesh.position.z);
+    return { t, shadow: s, blob: bl, scale: s.w / bl.w };
+  };
+  window.shot = shot;
+</script>
