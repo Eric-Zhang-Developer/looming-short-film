@@ -45,3 +45,8 @@ Each one changes a story beat, a character's design, the palette or a film-wide 
 - (a) No marker. *(current)*
 - (b) A cross-off scribble on Wednesday's cell in a later desk shot. No home desk shot follows s08, so this needs a new insert or a calendar in s08's bedroom.
 - **Recommend (a).** "Before the exam" already reads from Marston at night. *Shots: s08.*
+
+**Q9 · Does the gator have legs?** (from `char-rigs`) `gator_sheet`'s piece list has no legs, so the rig stands 5.3 cm, not the 8 cm that contracts §Conventions and README §1 assume. Walks are a legless waddle, and kneeling looks like standing.
+- (a) Add `leg_l` and `leg_r` (short, stubby) to `gator_sheet`, and keep 8 cm. Every v2 style-tile variant already paints him standing on legs. *(current: the rig gets proxy legs now)*
+- (b) Keep him legless and correct the 8 cm figure and the blob ratio film-wide.
+- **Recommend (a).** It matches the style tile and makes walks and the s04 kneel readable. *Shots: every gator shot.*
