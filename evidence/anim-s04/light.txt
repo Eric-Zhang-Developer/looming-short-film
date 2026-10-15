@@ -1,0 +1,6 @@
+# before (committed stills from c559d07, no character fill):
+tLocal 5 (evidence/anim-s04/t25_00.jpg): face 32.2  lit wall 185.1  shadow 119.9  face/wall 17 %  shadow contrast n/a (box is outside the 5× shadow)  (head px 1473,865)
+tLocal 7.5 (evidence/anim-s04/t27_50.jpg): face 32.7  lit wall 182.6  shadow 52.3  face/wall 18 %  shadow contrast 71 %  (head px 1535,881)
+# after (FACE_I 0.014):
+tLocal 5 (index.html render): face 65.6  lit wall 185.2  shadow 119.7  face/wall 35 %  shadow contrast n/a (box is outside the 5× shadow)  (head px 1473,865)
+tLocal 7.5 (index.html render): face 66.6  lit wall 182.8  shadow 51.9  face/wall 36 %  shadow contrast 72 %  (head px 1535,881)
