@@ -79,7 +79,7 @@ main ─────●────────────●──────
 2. Run `tools/check_timeline.mjs` and `tools/determinism.mjs`.
 3. Squash, with a message that names the task and argues the change.
 
-Then delete the task branch and worktree.
+Then copy any gitignored local outputs the task produced (full-size `assets/raw/*.png`) into the main checkout's `assets/raw/`, and only after that delete the task branch and worktree. Wave 1 lost a full-size original this way and had to recover it from `~/.codex/generated_images/`.
 
 **Wave branches** (`wave/<n>-<name>`): cut from `main` at the start of each wave. At the end of the wave the orchestrator pushes it and opens **one PR to `main`**. The PR body lists every task with:
 - its state
