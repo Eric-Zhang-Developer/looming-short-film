@@ -23,6 +23,7 @@ How the film gets built: **one orchestrator agent driving many subagents**, with
 | **Cold viewer** | Subagent with no context | Watches frames or the animatic and answers the three readability questions (doc 02) | Is told the story first |
 | **Judge** | Subagent | Scores the current cut on the five competition criteria and writes the 5 hardest judge questions | Softens scores |
 | **Briefer** | Subagent | Keeps doc 07 current from done notes; drafts the 13 submission answers | Invents numbers or claims |
+| **Chronicler** | Subagent (docs only, no Chrome) | Weaves the `## Story` sections of done notes, doc 07 and the evidence into the making-of chapters in `docs/12-making-of/`, after every wave | Invents drama, quotes or numbers; tells it without evidence links |
 
 ## State files
 
