@@ -8,18 +8,18 @@
 //   t >= 2000:   every walk set walking in place: side, front, back, tall, stoop (step 1/3 s, from t0 = 2000).
 // window.lab = { rigs, POSES, NAMES, walk } for evidence/char-rigs/walk_loop.mjs.
 import * as THREE from 'three';
-import { createStage, exposeForRender } from '../src/core/stage.js';
-import { PALETTE } from '../src/core/palette.js';
-import * as assets from '../src/assets.js';
-import { makePaper } from '../src/paper.js';
-import { paperMesh } from '../src/material.js';
-import { makeGator } from '../src/characters/gator.js';
-import { makeFreshman } from '../src/characters/freshman.js';
-import { makeRoommateTall, makeRoommateRound } from '../src/characters/roommates.js';
-import { makeCustodian, makeCart } from '../src/characters/custodian.js';
-import { makeCrowd, makeHeroTop, makeSeated } from '../src/characters/crowd.js';
-import { makeExam, SHRINK } from '../src/characters/exam.js';
-import { POSES, POSE_INFO, walk } from '../src/characters/poses.js';
+import { createStage, exposeForRender } from '/src/core/stage.js';
+import { PALETTE } from '/src/core/palette.js';
+import * as assets from '/src/assets.js';
+import { makePaper } from '/src/paper.js';
+import { paperMesh } from '/src/material.js';
+import { makeGator, HIP as GHIP, hipHeight } from '/src/characters/gator.js';
+import { makeFreshman } from '/src/characters/freshman.js';
+import { makeRoommateTall, makeRoommateRound } from '/src/characters/roommates.js';
+import { makeCustodian, makeCart } from '/src/characters/custodian.js';
+import { makeCrowd, makeHeroTop, makeSeated } from '/src/characters/crowd.js';
+import { makeExam, SHRINK } from '/src/characters/exam.js';
+import { POSES, POSE_INFO, walk } from '/src/characters/poses.js';
 
 const stage = createStage();
 const { scene, camera } = stage;
@@ -31,7 +31,7 @@ scene.add(key, new THREE.AmbientLight(0xffffff, 1.2));
 const ctx = { assets };
 const NAMES = Object.keys(POSES);
 const FLOOR = new Set(['kneel_reach', 'kneel_antic', 'inspect', 'place', 'shake_a', 'shake_b', 'sit_heels', 'stand', 'look_up', 'sigh', 'nod',
-  'drill_a', 'drill_b', 'blow', 'crouch', 'lift_rod', 'tug', 'pull_curtain', 'prone', 'prone_flick', 'yawn', 'walk_side_a', 'walk_side_pass', 'walk_side_b']);
+  'drill_a', 'drill_b', 'blow', 'crouch', 'lift_rod', 'tug', 'pull_curtain', 'prone', 'prone_flick', 'yawn', 'walk_side_a', 'walk_side_pass', 'walk_side_b', 'walk_side_pass_b']);
 const HIP = 0.022;  // seated hip height above the floor (s15: hip −0.012, floor −0.034)
 
 async function build() {
@@ -70,10 +70,10 @@ const look = (cx, cy, h) => {  // frame a box of height h centred on (cx, cy)
 };
 const FRAME = {
   gator: [0.03, 0.045, 0.1], freshman: [0.03, 0.04, 0.09], neighbor: [0.03, 0.045, 0.1], sleeper: [0.03, 0.045, 0.1],
-  front: [0, 0.035, 0.08], back: [0, 0.035, 0.08], tall: [0.01, 0.065, 0.16], round: [0, 0.045, 0.11],
+  front: [0, 0.042, 0.095], back: [0, 0.042, 0.095], tall: [0.01, 0.065, 0.16], round: [0, 0.045, 0.11],
   custodian: [0, 0.04, 0.1], heroTop: [0, -0.005, 0.11],
 };
-const ROOT_Y = { tall: 0.027 };
+const ROOT_Y = { tall: 0.027, gator: GHIP, freshman: GHIP * 0.85 };
 const LIFT = { prone: 0.012, prone_flick: 0.012, yawn: 0.012 };  // a pose can't carry translation: the shot lifts the root
 const FACES = ['gator', 'front', 'freshman', 'tall', 'round'];
 
@@ -91,7 +91,7 @@ stage.onFrame((t) => {
   if (t < 1000) {  // one pose per cell
     const i = Math.floor(t), name = NAMES[Math.min(i, NAMES.length - 1)], rig = i < NAMES.length ? POSE_INFO[name].rig : 'gator';
     const seated = ['gator', 'freshman', 'neighbor', 'sleeper'].includes(rig) && !FLOOR.has(name);
-    show(rig, 0, seated ? HIP : (ROOT_Y[rig] ?? LIFT[name] ?? 0), i < NAMES.length ? name : 'sit');
+    show(rig, 0, seated ? HIP : rig === 'gator' ? Math.max(LIFT[name] ?? 0, hipHeight(POSES[name])) : (ROOT_Y[rig] ?? LIFT[name] ?? 0), i < NAMES.length ? name : 'sit');
     if (i >= NAMES.length) rigs.gator.head34(true);
     context.visible = seated;
     floor.visible = rig !== 'heroTop';
@@ -108,7 +108,7 @@ stage.onFrame((t) => {
   } else {  // every walk set walking in place
     const sets = [['gator', 'side', 0], ['front', 'front', 0.09], ['back', 'back', 0.16], ['tall', 'tall', 0.25], ['custodian', 'stoop', 0.36]];
     for (const [n, set, x] of sets) {
-      const { keys, lift } = walk(t, { set, t0: 2000 }), r = show(n, x, (ROOT_Y[n] ?? 0) + lift, null);
+      const { keys, lift, hip } = walk(t, { set, t0: 2000 }), r = show(n, x, hip ?? (ROOT_Y[n] ?? 0) + lift, null);
       r.blend(POSES, keys, t);
     }
     look(0.17, 0.09, 0.26);
@@ -116,3 +116,33 @@ stage.onFrame((t) => {
 });
 
 exposeForRender(stage, { duration: 2010 });
+
+// Draws one rig alone (root at the origin) through an orthographic camera at 0.05 mm/px on cream and returns the box
+// around every non-background pixel, in meters: what the paper actually shows, torn edges included.
+// opts: keys + t (a blend instead of one pose), y (root height), parts (draw only these parts).
+window.probe = async (rigName, pose, { t = 0, keys = [[0, pose]], y = 0, parts = null } = {}) => {
+  await ready;
+  const { renderer } = stage, PX = 0.00005, W = 3000, H = 3000;
+  window.renderFrame(t);
+  L.floor.visible = false; L.context.visible = false; L.exams.forEach((e) => (e.mesh.visible = false));
+  for (const r of Object.values(L.rigs)) r.group.visible = false;
+  const r = L.rigs[rigName]; r.group.visible = true; r.group.position.set(0, y, 0); r.blend(POSES, keys, t);
+  const drawn = parts ?? Object.keys(r.meshes).filter((n) => n !== 'head34');
+  for (const [n, m] of Object.entries(r.meshes)) m.visible = drawn.includes(n);
+  const cam = new THREE.OrthographicCamera(-W * PX / 2, W * PX / 2, 0.1, 0.1 - H * PX, 0.01, 10);
+  cam.position.set(0, 0, 1);
+  const rt = new THREE.WebGLRenderTarget(W, H), px = new Uint8Array(W * H * 4);
+  renderer.setRenderTarget(rt); renderer.render(scene, cam); renderer.readRenderTargetPixels(rt, 0, 0, W, H, px); renderer.setRenderTarget(null);
+  rt.dispose();
+  for (const [n, m] of Object.entries(r.meshes)) m.visible = n !== 'head34';
+  const B = [px[0], px[1], px[2]];  // a corner is always background
+  let x0 = W, x1 = -1, y0 = H, y1 = -1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const i = (y * W + x) * 4;
+    if (Math.abs(px[i] - B[0]) + Math.abs(px[i + 1] - B[1]) + Math.abs(px[i + 2] - B[2]) < 12) continue;
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  // readRenderTargetPixels rows run bottom-up: row y is at world 0.1 − H·PX + (y + 0.5)·PX
+  const wy = (y) => 0.1 - H * PX + (y + 0.5) * PX, wx = (x) => -W * PX / 2 + (x + 0.5) * PX;
+  return { bottom: wy(y0), top: wy(y1), left: wx(x0), right: wx(x1), height: wy(y1) - wy(y0) };
+};
