@@ -37,6 +37,7 @@
 - proxy-margin · builder · `src/assets.js` · verified (merged) · evidence/proxy-margin/proxies.jpg
 - contract-blob · builder · `src/blob.js`, `src/shots/s13.js` (API swap), contracts §blob · verified (merged) · evidence/contract-blob/eyes.jpg
 - rig-legs · builder · `src/assets.js`, `src/characters/`, contracts §characters · in-progress · —
+- snd-cues · builder · `src/audio/cues.js` · in-progress · —
 
 ### wave 4 · animatic (brief: `tasks/anim-shot.md`)
 - anim-s01 · builder · `src/shots/s01.js` · verified (merged) · evidence/anim-s01/sheet.jpg
