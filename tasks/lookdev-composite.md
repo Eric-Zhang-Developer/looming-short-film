@@ -14,7 +14,9 @@ The real paper test that wave 1 asked for. The five painted Codex pieces (wall, 
 - `done/lookdev-composite.md`
 
 ## Inputs
-All wave 2 modules. Style tile parts: run `node tools/cut.mjs --auto` on the local `assets/raw/style_tile_v1.png` (copy it from the main checkout; it's gitignored) into your worktree's `assets/cut/`. Don't commit the cut PNGs, since the asset isn't frozen.
+All wave 2 modules. Style tile parts: the v2 variants are at `/Users/ericzhang/code/media/looming/assets/raw/style_tile_v2_*.png` (gitignored, unfrozen; G1 is pending). Use **v2_4** (the orchestrator's recommendation) and cut it with `node tools/cut.mjs --in=<abs path> --auto --out=assets/cut/` in your worktree; cut.mjs despills its magenta key. Don't commit the cut PNGs. v2_4 also has a painted gator: stand it on the desk as a static prop beside the blob, so the test shows a painted character in the rig.
+
+Known from wave 2 done notes: PointLight shadows need `shadow.camera.near` ≈ 0.01 on a tabletop; PCF radius ≤ 5; addon pages need `"three/examples/jsm/"` in the import map; lamp angle ~0.35 reads better than 0.6.
 
 ## Spec
 - Build the apartment corner as a diorama of 3–4 depth layers using the pieces, `paperMesh` and the light rigs. The blob sits on the desk.
