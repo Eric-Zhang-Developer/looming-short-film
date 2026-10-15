@@ -36,7 +36,7 @@
 - char-rigs · builder · `src/characters/`, `lab/characters.*`, contracts §characters · verified (merged; legs → Q9) · evidence/char-rigs/cast.jpg
 - proxy-margin · builder · `src/assets.js` · verified (merged) · evidence/proxy-margin/proxies.jpg
 - contract-blob · builder · `src/blob.js`, `src/shots/s13.js` (API swap), contracts §blob · verified (merged) · evidence/contract-blob/eyes.jpg
-- rig-legs · builder · `src/assets.js`, `src/characters/`, contracts §characters · in-progress · —
+- rig-legs · builder · `src/assets.js`, `src/characters/`, contracts §characters · verified (merged) · evidence/rig-legs/poses.jpg
 - snd-cues · builder · `src/audio/cues.js` · in-progress · —
 
 ### wave 4 · animatic (brief: `tasks/anim-shot.md`)

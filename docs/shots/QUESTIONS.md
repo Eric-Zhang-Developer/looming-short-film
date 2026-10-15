@@ -49,4 +49,4 @@ Each one changes a story beat, a character's design, the palette or a film-wide 
 **Q9 · Does the gator have legs?** (from `char-rigs`) `gator_sheet`'s piece list has no legs, so the rig stands 5.3 cm, not the 8 cm that contracts §Conventions and README §1 assume. Walks are a legless waddle, and kneeling looks like standing.
 - (a) Add `leg_l` and `leg_r` (short, stubby) to `gator_sheet`, and keep 8 cm. Every v2 style-tile variant already paints him standing on legs. *(current: the rig gets proxy legs now)*
 - (b) Keep him legless and correct the 8 cm figure and the blob ratio film-wide.
-- **Recommend (a).** It matches the style tile and makes walks and the s04 kneel readable. *Shots: every gator shot.*
+- **Recommend (a).** It matches the style tile and makes walks and the s04 kneel readable. Note: the rig's legs are 37% of his height (the tile's are ~20%), forced by 8 cm plus s15's fixed head height; shorter legs mean a shorter gator or new s15 numbers. *Shots: every gator shot.*
