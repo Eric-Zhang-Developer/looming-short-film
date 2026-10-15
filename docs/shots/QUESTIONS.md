@@ -26,7 +26,7 @@ Each one changes a story beat, a character's design, the palette or a film-wide 
 - (b) A navy pencil circle; red stays unique to the first exam.
 - **Recommend (a).** The rhyme needs the same mark to read as "another exam". *Shots: s18 (s02).*
 
-**Q5 · Does the blob itself grow, or only its shadow?** Doc 02 says the Exam "grows because it is ignored" and later shrinks to "hamster-sized". The logline and the visual rule say the *shadow* grows.
+**Q5 · Does the blob itself grow, or only its shadow?** **Superseded 2026-10-15 (the dread meter):** the director chose growth after the Act 1 preview. The body grows by gulps to 2.5× and shrinks per solved problem (`docs/shots/README.md` §1); the shadow rides on top. The counterpoint below is answered by keeping the two apart on screen: the light changes the shadow while the body holds (s03 0.5–1.5, the lamp and wake beats), and each gulp swells body and shadow together. Doc 02 says the Exam "grows because it is ignored" and later shrinks to "hamster-sized". The logline and the visual rule say the *shadow* grows.
 - (a) Body constant at r 0.012 through s15; all of Act 2's growth is shadow geometry; the body shrinks only in s16, one step per solved problem (0.012 → 0.005). *(current)*
 - (b) The body grows too, e.g. 0.008 at s02 → 0.012 by s07, with the shadow doing the rest.
 - **Recommend (a).** "The metaphor is the algorithm": if the body grows, the audience can't tell whether light or neglect made the shadow big. Counterpoint: doc 02's wording. *Shots: s02–s18.*
@@ -71,3 +71,24 @@ Marston has no desk lamps; its desk light is a ceiling fluorescent on a motion s
 - (a) The fluorescent tone (≈ `#DEDBC3`) in every zone. Act 3's warmth comes from the grade at the wake (s15 is built with an amber grade from the press) and from dawn in s17. Amber stays the home lamp's and dawn's. *(current)*
 - (b) Warm the woken zones toward Lamp Amber (for example halfway). The turn keeps its color payoff, but the fluorescent stops looking like one.
 - **Recommend (a).** It keeps Marston believable and saves the gold for dawn, where Quiet 2 needs it. Counterpoint: the climax may read cooler than the board intended; check it on s15's built frames at G4. *Shots: s15–s18 (doc 03 color script).*
+
+# Opened by spec-blob-meter (2026-10-15), unanswered
+
+The blob's own size is now the dread meter (process log 2026-10-15; `docs/shots/README.md` §1). The specs are built to each **Recommend** line until you answer. No beat time or cut moves in any option.
+
+**Q13 · How big is the peak?** The brief said "about the gator's head height (around 3×)"; the process log's proposal said "about the gator's head size".
+- (a) **2.5× (r 0.030)**, 6.8 × 6.0 cm. Sitting on the desk its eyes are level with his, so the s15 look is eye to eye. *(current)*
+- (b) 3× (r 0.036), 8.2 × 7.2 cm, as tall as he is seated, measured from the floor. Its eyes sit 9 mm above his at the desk. In Camera A′ it fills about a third of the frame height. The Marston mark moves back to z 0.066 (S 2.37 keeps the 7.1-unit loom, whose top lands at y 0.165, so A′ still holds it); the laptop and the trough's aim are unchanged.
+- (c) 2× (r 0.024), its top level with his head.
+- **Recommend (a).** Eye level is a specific, readable image, and the desk close-ups keep room for him and the loom. Counterpoint: the brief's 3× reads bigger in the wide shots (s09, s10, s13).
+
+**Q14 · Do other gators' blobs show the meter too?** The s13 crowd, the neighbor (s16, s17) and the Freshman (s18) keep 0.75–1.17× blobs under their 3–9× shadows, so the hero's 2.5× is the biggest in the room.
+- (a) Keep their sizes: seen through his eyes, other people's exams look small and only their shadows look huge. The decals carry "everyone has one". *(current)*
+- (b) Grow theirs to 1.5–2.5×, each different, keeping every decal's on-screen width. s13's table, s16/s17's neighbor and s18's Freshman change.
+- **Recommend (a).** It restates the thesis (smaller than its shadow) in every other gator, costs no rework, and keeps the Freshman's s18 blob a fresh 1×. Counterpoint: in s13's top view his big blob could read as "his is the worst", which edges against "he isn't alone".
+
+**Q15 · Camera A′ for s06 and s15.** A grown blob plus any loom bigger than it doesn't fit Camera A (about 9 cm of wall in view). Doc 11 keeps each shot's framing between the rough and the final unless a note changes it; this is that note.
+- (a) **Camera A′** for both shots: A pulled back 0.26 m along its own axis, the whole loom in frame, and s15's push-in to Camera B′ restores the closeness. *(current)*
+- (b) Keep Camera A and let the loom overflow the frame: dark wall with two eye holes, the "moons" anim-s15 already rejected.
+- (c) Keep Camera A for the rough (`v1-animatic` is built that way) and switch to A′ for the final. The comparison then differs in framing in these two shots, not just in art.
+- **Recommend (a).** The turn has to show a shape dropping to a pool, and the s06 ↔ s15 rhyme survives because both move together. Counterpoint: he is a third of the frame height before the push, smaller than in the built shot.

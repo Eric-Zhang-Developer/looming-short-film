@@ -20,6 +20,8 @@ The score is small and intimate, like music played in the room.
 ## Leitmotifs
 
 - **The Exam motif:** four music-box notes rising and falling, played slightly out of tune. It plays when the ink drop forms, and returns softer each time the blob is small.
+- **The gulp** (the meter, doc 02): each of the five gulps plays the Exam motif's **first two notes** (its rising major third) on the music box, the first on the gulp's snap drawing (`gulp1`…`gulp5`) and the second 0.275 s later, half the motif's spacing, so it sounds like a swallow. **Each gulp is one semitone lower than the last:** −1, −2, −3, −4, −5 against the motif's own pitch. The interval stays the motif's, so the ear hears the same creature getting heavier; five semitones over 60 s is clear without turning ominous. Velocity 0.30 rising to 0.42, and the second note a few cents flatter each time (the motif's out-of-tune drift growing). A soft `inkDrip` swallow at −18 dB under the first note. The shadow's swell rides on the existing `subSwell` for that dodge; the gulp adds no sub.
+- **The shrink:** each solved problem in s16 answers with the same two notes falling (second note first), **one semitone higher each time**, −4 at #1 up to +1 at #6, at −6 dB under that problem's theme note, starting 0.25 s after it. The blob ends a semitone above its birth pitch, small enough for a pocket.
 - **The avoidance groove:** a light, bouncy piano figure for the Act 2a montage. Each dodge adds a layer, and the sub swell grows under it with the shadow.
 - **The first step:** **one piano note**, held, at the moment he writes his name. Then the theme enters slowly, one note per solved problem.
 

@@ -76,7 +76,9 @@ The dawn rose is **lamp amber mixed into cream through tissue**, not a new color
 - eyes: open, closed/content, half-lid tired, wide/gasp, worried (with sweat dots), side-glance
 - mouth: neutral, small smile, open "o", tight line
 
-**The Exam (ink blob).** A soft round drop, about the size of a coffee mug in its first scene. Two small round eyes in cream, the only light parts of it. It moves like liquid: squash on landing, slow wobble at rest, stretch when it rolls. In lamplight it looks small and nervous. Its shadow is a clean, soft-edged silhouette of the blob, eyes included as holes.
+**The Exam (ink blob).** A soft round drop, about the size of a coffee mug in its first scene. Two small round eyes in cream, the only light parts of it. It moves like liquid: squash on landing, slow wobble at rest, stretch when it rolls. In light from above it looks nervous, and small next to its shadow at any size. Its shadow is a clean, soft-edged silhouette of the blob, eyes included as holes.
+
+**Its size is the meter** (doc 02, `docs/shots/README.md` §1). It grows in steps from 1× at birth (2.4 cm across) to 2.5× by Marston (6 cm tall, its eyes level with his at the desk), then shrinks one step per solved problem to 0.42×, small enough for his pocket. Each step is a **gulp**: eyes closed on a squash, a one-drawing snap to the next size with a stretch, a settle, and its eyes back on him. Bigger means heavier and more anxious, never meaner: the eyes stay round cream discs, it never gets a mouth or teeth, and the matte ink, the painted highlight and the stain scale with it unchanged. It never swells slowly. Each size must read against props the audience knows: the calendar circle, the jars and the stool (s04), the coffee table (s05), his head (s06 on).
 
 **Roommates, Custodian, Freshman.** The same puppet system with different proportions and paper colors: a tall roommate, a round one, an older custodian with a hunch and a cap, a small Freshman with an oversized backpack.
 
