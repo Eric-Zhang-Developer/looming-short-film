@@ -11,7 +11,10 @@ import { mulberry32, seedOf } from '../core/rng.js';
 import { makeGator } from '../characters/gator.js';
 import { makeExam } from '../characters/exam.js';
 import { POSES, specPose, pressKeys } from '../characters/poses.js';
-import { UNIT } from './s15.js';
+import { UNIT as S15 } from './s15.js';
+// s15 went to motion-sensor lights (44cc607) and dropped its desk-lamp geometry; the home lamp keeps it, values as of 8b1d916.
+const UNIT = { ...S15, lampZ: 0.078, knob: [-0.0228, 0.0228], knobZ: 0.0855, knobPressed: [-0.0223, 0.0211],
+  shadeMouth: [0.004, 0.056], lampAim: [-0.008, 0, 0.096] };
 
 const ID = 's06', D = Math.PI / 180;
 const dr = (n) => n / 12;                                    // drawing n (12 fps) → local seconds

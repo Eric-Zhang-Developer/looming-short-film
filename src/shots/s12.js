@@ -1,5 +1,6 @@
 // s12 · Quiet 1 (docs/shots/s12.md). The low point: fully locked camera, one held pose, the blob's shadow breathing.
-// The Marston hero desk unit with s15's revised numbers (done/anim-s15.md): blob, phone and lamp aim come from UNIT.
+// The Marston hero desk unit with s15's revised numbers (done/anim-s15.md): blob and phone come from UNIT.
+// No desk lamp: Marston has none (motion-sensor lights, docs/07); the old unlit lamp read s15's removed lamp geometry.
 // Only light, the edge boil (4/s) and the blob's breath move. Characters step on 2s; light at 24.
 import * as THREE from 'three';
 import { makePaper, boilSeed } from '../paper.js';
@@ -19,14 +20,13 @@ const DIM = [[0, 1], [6, 1], [6.5, 0.6]];                // auto-dim, shared by 
 const FILL_DIM = 0.6;                                    // fill 0.30 → 0.18 with the dim
 const SAT = [[0, 1], [2, 0.55]];                         // gator saturation: ease(0–2), then hold
 
-const visibleSize = (a, name) => { const [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name]; return [w * (u1 - u0), h * (v1 - v0)]; };
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const C = (k) => new THREE.Color(PALETTE[k]);
   const V = (a) => new THREE.Vector3(...a);
   scene.background = C('navy').lerp(C('ink'), 0.5);
 
-  const [furn, lampA, props] = await Promise.all(['marston_furniture_sheet', 'desk_lamp', 'study_props_sheet'].map((n) => assets.load(n)));
+  const [furn, props] = await Promise.all(['marston_furniture_sheet', 'study_props_sheet'].map((n) => assets.load(n)));
   const boiling = [];
   const sheet = (opts, parent = scene) => {
     const mesh = paperMesh(makePaper({ ...opts, seed: 0 }));
@@ -60,18 +60,6 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   cut(props, 'laptop_base').position.set(-0.0075, 0.0015, 0.060);        // closed: he shut it across the cut
   cut(props, 'laptop_lid').position.set(-0.0075, 0.0045, 0.0601);
 
-  const LZ = UNIT.lampZ;                                                  // unlit desk_lamp, s15's placement
-  cut(lampA, 'base').position.set(-0.020, 0.002, LZ);
-  cut(lampA, 'stem').position.set(-0.020, 0.035, LZ);
-  cut(lampA, 'knob').position.set(...UNIT.knob, UNIT.knobZ);
-  const arm = cut(lampA, 'arm'); arm.position.set(-0.008, 0.069, LZ); arm.rotation.z = Math.atan2(-0.002, 0.024);
-  const shade = cut(lampA, 'shade', { weight: 'tissue' });
-  const [sw, sh] = visibleSize(lampA, 'shade'), sk = 0.016 / sh;
-  shade.rotation.z = Math.PI / 2; shade.scale.setScalar(sk);
-  shade.position.set(UNIT.shadeMouth[0], UNIT.shadeMouth[1] + sw * sk / 2, LZ + 0.0005);
-  // The phone spot lights the unlit shade's tissue to the brightest thing in the frame, which fights "the shadow owns the
-  // frame". Pull it down to a dim paper shape (proxy tune; revisit with frozen art).
-  shade.traverse((o) => { if (o.material) o.material.color.setScalar(0.04); });
 
   flat(cut(props, 'exam_page', { res: 1024 })).position.set(-0.0205, 0.0003, 0.095);   // blank
   const pen = new THREE.Group(); scene.add(pen);                          // capped, on the page's front edge
