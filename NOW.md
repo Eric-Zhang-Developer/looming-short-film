@@ -25,7 +25,7 @@
 ## Next 3 moves
 1. Merge batch 4, then open the wave 2 PR with lookdev as the headline evidence.
 2. **Waiting on G1.** On the pick: freeze it to `assets/frozen/style_tile.png` (despilled), then dispatch the gator sheet painter (G2).
-3. When sb-act1 and sb-act3 merge, dispatch `sb-reconcile` (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names + snd-score's fridge/gameNight/curtainsStart/scrollStart/marstonEnter into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
+3. `sb-reconcile` running (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names + snd-score's fridge/gameNight/curtainsStart/scrollStart/marstonEnter into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
 
 ## Carry-overs for wave 3
 - `assets/prompts/style_tile.v1.md` asks for a green key; v2 (alpha-first) is in progress in `asset-style-tile`.

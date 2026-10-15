@@ -28,9 +28,10 @@
 - lookdev-composite · builder · `lab/lookdev.html`, `lab/lookdev.js`, `evidence/lookdev-composite/`, `done/lookdev-composite.md` · in-progress · —
 
 ### parallel track: storyboard (docs)
-- sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · in-progress · —
+- sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · built (merged) · done/sb-act1.md
 - sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · built (merged) · done/sb-act2.md
 - sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · built (merged) · done/sb-act3.md
+- sb-reconcile · builder (docs) · `docs/shots/`, `docs/assets.md`, `src/timeline.js` (additive beats) · in-progress · —
 - snd-engine · builder · `src/audio/`, `tools/mix.mjs` · verified (merged) · evidence/snd-engine/loudness.txt
 
 ### wave 3, started early
