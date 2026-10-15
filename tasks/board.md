@@ -24,8 +24,9 @@
 - mod-material · builder · `src/material.js`, `lab/material.html`, `lab/material.js`, `evidence/mod-material/`, `done/mod-material.md` · verified (merged) · evidence/mod-material/tissue_on_off.jpg
 
 ### batch 4 (needs all modules)
-- mod-puppet · builder · `src/puppet.js`, `lab/puppet.html`, `lab/puppet.js`, `evidence/mod-puppet/`, `done/mod-puppet.md` · in-progress · —
+- mod-puppet · builder · `src/puppet.js`, `lab/puppet.html`, `lab/puppet.js`, `evidence/mod-puppet/`, `done/mod-puppet.md` · verified (merged) · evidence/mod-puppet/action_strip.jpg
 - lookdev-composite · builder · `lab/lookdev.html`, `lab/lookdev.js`, `evidence/lookdev-composite/`, `done/lookdev-composite.md` · in-progress · —
+- contract-puppet · builder · `src/puppet.js`, `lab/puppet.js`, `docs/contracts.md` §puppet · in-progress · —
 
 ### parallel track: storyboard (docs)
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · built (merged) · done/sb-act1.md
