@@ -1,0 +1,5 @@
+t=73.5  cf46b8f954a5ab3b cf46b8f954a5ab3b cf46b8f954a5ab3b  PASS
+t=77  028bf82a8416e87e 028bf82a8416e87e 028bf82a8416e87e  PASS
+t=62  431a714cce5c57ce 431a714cce5c57ce 431a714cce5c57ce  PASS
+t=73.5  cf46b8f954a5ab3b cf46b8f954a5ab3b cf46b8f954a5ab3b  PASS
+determinism: PASS
