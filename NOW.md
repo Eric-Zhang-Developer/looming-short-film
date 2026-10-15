@@ -26,7 +26,7 @@
 ## Next 3 moves
 1. Merge `mod-material`, then dispatch batch 4 (`mod-puppet`, `lookdev-composite`).
 2. **Waiting on G1.** On the pick: freeze it to `assets/frozen/style_tile.png` (despilled), then dispatch the gator sheet painter (G2).
-3. Fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
+3. When sb-act1 and sb-act3 merge, dispatch `sb-reconcile` (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
 
 ## Carry-overs for wave 3
 - `assets/prompts/style_tile.v1.md` asks for a green key; v2 (alpha-first) is in progress in `asset-style-tile`.
@@ -35,6 +35,7 @@
 - Stage gained `setRender` (implemented by `mod-post`). Addon pages need `three/examples/jsm/` in the import map (contracts updated).
 
 ## Open director questions
+- **For G2/animatic (from sb-act2):** (a) blob size: contract 0.025 m is over half the gator's height; storyboard used 0.012 m. (b) A phone that lights the blob also lights its holder, so a true phone loom throws the gator's own giant shadow too; sb-act2 aimed the light at the blob only. Film-wide call.
 - **G2 agenda: the Exam's look.** `mod-blob` reads as glossy CG gel (cute, nervous), not ink on paper; the specular highlight can sit where a mouth would. Options to show at G2: keep gel, matte ink with a painted highlight, or a painted Codex blob on paper. Evidence: `evidence/mod-blob/squash_strip.jpg`.
 - Final submission deadline (confirm on ProposalSpace).
 
