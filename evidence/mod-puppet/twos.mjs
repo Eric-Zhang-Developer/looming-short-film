@@ -1,6 +1,6 @@
 // node evidence/mod-puppet/twos.mjs   (from the repo root)
 // Steps lab/puppet.html through t = 0..4 at 24 fps and reads the scene graph after each renderFrame(t):
-// the puppet's state (every part's world matrix and current map) and the lamp's world position.
+// the puppet's state (every part's world matrix; boil swaps textures at its own 8-12 Hz rate and isn't motion) and the lamp's world position.
 // Pass: the puppet changes only between frames 2m-1 and 2m (12 fps), and the lamp changes on every frame (24 fps).
 import { serve, launch, openPage } from '../../tools/lib/page.mjs';
 
@@ -11,7 +11,7 @@ const states = await page.evaluate(() => {
   const { gator, lamp, THREE } = window.lab, v = new THREE.Vector3(), out = [];
   for (let i = 0; i <= 96; i++) {
     window.renderFrame(i / 24);
-    const puppet = Object.values(gator.meshes).map((m) => m.matrixWorld.elements.join(',') + '|' + m.material.map.uuid).join(';');
+    const puppet = Object.values(gator.meshes).map((m) => m.matrixWorld.elements.join(',')).join(';');
     out.push({ puppet, light: lamp.light.getWorldPosition(v).toArray().join(',') });
   }
   return out;
