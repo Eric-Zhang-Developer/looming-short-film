@@ -1,0 +1,29 @@
+$ node tools/determinism.mjs --page=lab/blob.html --t=0.5,1.45,2.58,3.5
+t=0.5  929b4b2b9f339ea0 929b4b2b9f339ea0 929b4b2b9f339ea0  PASS
+t=1.45  a69dcd80ad09a219 a69dcd80ad09a219 a69dcd80ad09a219  PASS
+t=2.58  5fd91b08e872dfe1 5fd91b08e872dfe1 5fd91b08e872dfe1  PASS
+t=3.5  e60dd9da0a2f5cf2 e60dd9da0a2f5cf2 e60dd9da0a2f5cf2  PASS
+determinism: PASS
+
+$ node tools/determinism.mjs --page=index.html --t=16.5,25,89.6,16.5
+t=16.5  09cacf607b4dd8c5 09cacf607b4dd8c5 09cacf607b4dd8c5  PASS
+t=25  71b75f7d831b7ea3 71b75f7d831b7ea3 71b75f7d831b7ea3  PASS
+t=89.6  a6db114b203ece8c a6db114b203ece8c a6db114b203ece8c  PASS
+t=16.5  09cacf607b4dd8c5 09cacf607b4dd8c5 09cacf607b4dd8c5  PASS
+determinism: PASS
+
+$ query views (first render / reverse-order re-render / fresh page), a scratch copy of determinism.mjs that accepts a query
+lab/blob.html?cam=stain&key=lamp t=0.5  7c7e02aa5171ffee 7c7e02aa5171ffee 7c7e02aa5171ffee  PASS
+lab/blob.html?cam=stain&key=lamp t=1.5  6e6106eefe275766 6e6106eefe275766 6e6106eefe275766  PASS
+lab/blob.html?cam=stain&key=lamp t=6  fb343a5d2d44ff86 fb343a5d2d44ff86 fb343a5d2d44ff86  PASS
+lab/blob.html?cam=stain&key=lamp t=11.5  56469234c14e7834 56469234c14e7834 56469234c14e7834  PASS
+lab/blob.html?cam=close&key=lamp t=0.5  5e7ceb0b985e58b3 5e7ceb0b985e58b3 5e7ceb0b985e58b3  PASS
+lab/blob.html?cam=close&key=lamp t=3.5  92c1b9c4b332653e 92c1b9c4b332653e 92c1b9c4b332653e  PASS
+lab/blob.html?cam=eyes&d=0.31 t=3.5  f0dc8aefbeef56db f0dc8aefbeef56db f0dc8aefbeef56db  PASS
+lab/blob.html?cam=eyes&d=0.31 t=5.5  0f4712972ac81573 0f4712972ac81573 0f4712972ac81573  PASS
+
+$ grep -nE "Math.random|Date.now|performance.now" src/blob.js lab/blob.js
+(no matches)
+
+$ node tools/check_timeline.mjs
+ok (18 shots, 41 beats, 180.0s)

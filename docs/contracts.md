@@ -203,6 +203,19 @@ blob.silhouette({ color = PALETTE.ink, soft = 0.1 } = {})  // → THREE.MeshBasi
 - **Key light** (`contract-light-key`) is the light that contributes most at the blob (intensity × colour luminance × distance falloff × spot cone), not the brightest by raw intensity, so a phone spot 5 cm away beats a dim window. `blob.update(t, { key: someLight })` forces a key (ignored while its intensity is 0). Evidence: `evidence/contract-light-key/s03_key_before.jpg`, `s03_key_after.jpg`, `key_auto.jpg`, `key_win.jpg`.
 - **Silhouette** is for shadows drawn without a light (s13's crowd). A shot with a real shadow-casting light needs nothing: the shadow pass already uses the same field.
 
+Added by `exam-ink` (Q7 b; supersedes the gloss described above for the body):
+
+```js
+blob.update(tLocal, { ..., left })
+  // left: the tLocal at which the blob left its stain. From then the stain's opacity eases from 0.6 to 0 over 10 s.
+  //   Omit it and update() never touches stain.material.opacity. update() must keep being called while the stain shows.
+```
+
+- **Matte ink.** The body is flat ink: no Fresnel rim, no specular reflection, no shading by the key's direction. Pigment pools in a darker band at the outline, the middle is mottled, and a fine grain rides the body (it squashes with it). The room and the key still light the eyes, their catchlights and the highlight.
+- **One painted highlight.** A tapered cream stroke on the upper-left shoulder, a fixed distance inside the outline, so it sits up and left of the eyes in every eye state and never under them. It slides a little along the edge toward the key's side; it doesn't follow the view. Evidence: `evidence/exam-ink/before_after.jpg`, `eyes.jpg`.
+- **Stain.** A blotted ring 3.2 × 2.2 radii, wider than the drop's foot so it shows around it, opacity 0.6. `stain.material.alphaMap` is still the blot's solid outline (s02 stretches it into its calendar trail); the ring is in `stain.material.map`'s alpha. It stays wherever the shot puts it: to leave a stain behind, stop moving the stain and pass `left`. Evidence: `stain_fade.jpg`, `stain_crop.jpg`, `s02_trail.jpg`.
+- **Unchanged:** the field, the shadow (`customDepthMaterial`) and `silhouette()`. Their GLSL wasn't touched; s03's wall shadow and s13's decals are pixel-identical (`s03_diff.txt`, `s13_diff.txt`).
+
 ## `src/post.js` (task `mod-post`)
 
 ```js

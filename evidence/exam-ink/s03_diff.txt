@@ -1,0 +1,2 @@
+changed pixels: 23357 of 2073600 (max channel delta 215); 1 patches:
+  x 720–928, y 624–800

@@ -1,10 +1,11 @@
-// The Exam: the one thing in the film that isn't paper. A vertical plane carrying a 2D metaball field,
-// shaded as glossy ink lit by the scene's key light, with two cream eyes near its top.
+// The Exam: the one thing in the film that isn't paper. A vertical plane carrying a 2D metaball field, drawn as a flat
+// drop of matte ink (Q7 b): no 3D shading, pigment pooled darker at its edge, a faint grain, one painted cream
+// highlight up and left of the eyes, and two cream eyes near its top.
 // The shadow pass runs the same field (eyes cut out as holes), so the shadow is exactly this shape.
 // All motion comes from update(tLocal, ...); nothing reads a clock.
 import * as THREE from 'three';
 import { mulberry32, seedOf } from './core/rng.js';
-import { onTwos } from './core/ease.js';
+import { onTwos, ease } from './core/ease.js';
 import { PALETTE } from './core/palette.js';
 
 const N = 5;          // ball slots in the shader; unused slots get weight 0
@@ -16,6 +17,12 @@ const EYE_X = 0.42, EYE_DROP = 0.92, EYE_R = 0.2;   // in radius units, measured
 // live code in the field shader moves a few pixels by 1/255 on this GPU, and s13's frames must stay bit-identical.
 const EYES = { open: [0, 1, 0], closed: [1, 1, 0], worried: [0, 0.68, 0.15], tired: [-1, 1, -0.04], gasp: [0, 1.35, 0.08], side: [-2, 1, 0] };
 const SIDE_SHIFT = 0.2;    // how far `side` slides both eyes toward `look`, radius units
+// Painted highlight: one tapered brush stroke along the upper-left shoulder, an arc about the body ball's centre
+// HI_IN inside the outline (radius units), centred on the ray at HI_A and HI_SPAN radians either side, HI_W at its
+// thickest. Tied to the outline, not the eyes, so it sits up and left of them in every eye state and can't land
+// where a mouth or tear would; hugging the edge keeps it from reading as an eyebrow.
+const HI_A = 2.3, HI_SPAN = 0.26, HI_IN = 0.2, HI_W = 0.05;
+const STAIN = 0.6, STAIN_FADE = 10;   // stain opacity, and seconds it takes to fade once the blob has left (update's `left`)
 
 // Field in radius units. p is plane-local / radius, with y = 0 on the surface below.
 // Each ball is [x, y, support, weight]; squash scales space so the bottom stays planted.
@@ -101,6 +108,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     uLightKind: { value: 0 },                              // 0 none, 1 spot, 2 point, 3 directional
     uCone: { value: new THREE.Vector2(-1, -1) },           // cos(angle), cos(angle * (1 - penumbra))
     uFalloff: { value: new THREE.Vector2(0, 2) },           // cutoff distance, decay
+    uHiR: { value: 0.8 },                                   // painted highlight: the stroke's arc radius (radius units)
   };
 
   const mat = new THREE.ShaderMaterial({
@@ -120,12 +128,18 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     fragmentShader: /* glsl */`
       ${GLSL_FIELD}
       uniform vec3 uInk, uCream, uAmb, uLightPos, uLightDir, uLightColor;
+      uniform float uHiR;
       uniform mat4 modelMatrix;   // three sets it on any program that declares it
       uniform int uLightKind;
       uniform vec2 uCone, uFalloff;
       varying vec2 vLocal;
       varying vec3 vWorld;
       const float PI = 3.141592653589793;
+      float hash(vec2 c) { return fract(sin(dot(c, vec2(127.1, 311.7))) * 43758.5453); }
+      float vnoise(vec2 x) {
+        vec2 i = floor(x), u = fract(x); u = u * u * (3.0 - 2.0 * u);
+        return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), u.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x), u.y);
+      }
 
       void main() {
         vec2 p = vLocal / uRadius;
@@ -137,15 +151,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
         float alpha = clamp(inside / fwidth(inside) + 0.5, 0.0, 1.0) * clamp((p.y - uFloor) / fwidth(p.y) + 0.5, 0.0, 1.0);
         if (alpha <= 0.0) discard;
 
-        // Height: for the body ball alone this is exactly a hemisphere; lobes blend in smoothly.
-        // Its gradient gives the normal, steep at the rim and round on top.
-        vec2 hg = vec2(height(p + vec2(e, 0.0)) - height(p - vec2(e, 0.0)), height(p + vec2(0.0, e)) - height(p - vec2(0.0, e))) / (2.0 * e);
-        vec3 nLocal = normalize(vec3(-hg, 1.0));
-        vec3 N = normalize(mat3(modelMatrix) * nLocal);
-        vec3 V = normalize(cameraPosition - vWorld);
-        if (dot(N, V) < 0.0 && gl_FrontFacing == false) N = -N;   // seen from behind: mirror the dome
-
-        // Key light, attenuated the way three's punctual lights are.
+        // Key light, attenuated the way three's punctual lights are. It lights only the eyes and the painted highlight.
         vec3 L = vec3(0.0, 0.0, 1.0); vec3 E = vec3(0.0);
         if (uLightKind == 3) { L = -uLightDir; E = uLightColor; }
         else if (uLightKind > 0) {
@@ -155,28 +161,31 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
           if (uLightKind == 1) att *= smoothstep(uCone.x, uCone.y, dot(-L, uLightDir));
           E = uLightColor * att;
         }
-        float nl = max(dot(N, L), 0.0);
-        vec3 H = normalize(L + V);
-        float nh = max(dot(N, H), 0.0);
-        vec3 lit = min(E / PI, vec3(1.5));                   // a highlight is a reflection of the bulb: it saturates
-        // Wet = a crisp-edged reflection of the source (a rounded screen-like rectangle) with a hot core.
-        vec3 hx = normalize(cross(vec3(0.0, 1.0, 0.0), H)), hy = cross(H, hx);
-        vec2 q = abs(vec2(dot(N - H, hx), dot(N - H, hy))) - vec2(0.08, 0.15) + 0.05;
-        float sd = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - 0.05;
-        vec3 spec = lit * (0.9 * smoothstep(0.006, -0.006, sd) + 1.5 * pow(nh, 400.0));
-        // Ink stays ink: the room's fill never reaches the body or its rim (a lifted night fill turned it to grey
-        // glass, look-pass-1), and the key's strength doesn't either. The body is PALETTE.ink where it faces the key,
-        // a little darker where it turns away; the only gloss is the key light: its reflection and a faint wet edge
-        // on the side it lights.
-        float fres = pow(1.0 - max(dot(N, V), 0.0), 5.0);
-        vec3 env = 0.12 * lit * fres * nl;
+        vec3 lit = min(E / PI, vec3(1.5));
+        vec3 paint = uCream * (uAmb + lit);   // cream paper and paint: lit by the room like everything else, unshaded by angle
+        vec2 lp = normalize((transpose(mat3(modelMatrix)) * L).xy + 1e-4);   // the key's side, in the plane
 
-        vec3 ink = uInk * mix(0.55, 1.0, smoothstep(0.0, 0.5, nl)) + spec + env;
+        // Matte ink, flat: no light reaches the body (look-pass-2) and nothing models it as a dome. Pigment pools in a
+        // dark band at the edge like a dried drop, the middle is a touch thinner and mottled, and a fine grain sits on
+        // top so it holds up next to paper. Texture rides the body: it squashes with it.
+        vec2 tp = p / uScale;
+        float rim = 1.0 - smoothstep(0.03, 0.18, inside);
+        float dens = mix(0.85 + 0.4 * vnoise(tp * 2.5 + 7.0), 0.45, rim) * (0.85 + 0.3 * vnoise(tp * 40.0));
+        vec3 ink = uInk * dens;
+
+        // One painted highlight: a tapered cream stroke on the upper-left shoulder (its radius set by update()), slid a
+        // little along the edge toward the key's side. Drawn, not reflected: it doesn't move with the view, and it is
+        // clipped clear of the outline.
+        vec2 q = p - vec2(0.0, 0.88 * uScale.y);
+        float a0 = ${HI_A} - 0.12 * lp.x, k = clamp((atan(q.y, q.x) - a0) / ${HI_SPAN}, -1.0, 1.0);
+        float sd = length(q - uHiR * vec2(cos(a0 + k * ${HI_SPAN}), sin(a0 + k * ${HI_SPAN}))) - ${HI_W} * (1.0 - 0.85 * k * k);
+        float hi = clamp(-sd / fwidth(sd) + 0.5, 0.0, 1.0) * smoothstep(0.02, 0.06, inside);
+        ink = mix(ink, 0.9 * paint, hi);
+
         float ed = eyesDist(p);
         float eye = clamp(-ed / fwidth(ed) + 0.5, 0.0, 1.0);
-        vec3 eyeCol = uCream * (uAmb + lit) + 0.5 * spec;   // unshaded by angle: the eyes stay the lightest part of it
+        vec3 eyeCol = paint;
         // A catchlight on the light's side of each open eye, so it reads as an eye and not a hole.
-        vec2 lp = normalize((transpose(mat3(modelMatrix)) * L).xy + 1e-4);
         vec4 ce = p.x < 0.5 * (uEye[0].x + uEye[1].x) ? uEye[0] : uEye[1];
         float cd = length(p - ce.xy - lp * 0.45 * ce.z) - 0.22 * ce.z;
         eyeCol += (1.0 - step(0.5, ce.w)) * clamp(-cd / fwidth(cd) + 0.5, 0.0, 1.0) * (vec3(0.6) + lit);
@@ -286,7 +295,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   const shaders = [mat, depth];
   let lidded = false;
 
-  function update(tLocal, { squash = 0, wobble = 1, eyes = 'open', look = 1, key = null } = {}) {
+  function update(tLocal, { squash = 0, wobble = 1, eyes = 'open', look = 1, key = null, left } = {}) {
     keyOverride = key;
     const t = onTwos(tLocal);   // a character: it moves on 2s like the puppets (doc 03 · Motion)
     const balls = [[0, 0.88 + 0.015 * wobble * Math.sin(6.283 * breath.f * t + breath.p), 2, 1]];
@@ -313,23 +322,34 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
       const x = side * EYE_X * sx;   // height from the unshifted spot, so a side glance keeps the eyes level
       uniforms.uEye.value[i].set(x + dx, topAt(balls, sx, sy, x) - EYE_DROP * Math.min(1, sy) + lift, er, shape);
     });
+    let d = 0.5;   // march out along the shoulder ray to the outline, then step back in
+    const cx = Math.cos(HI_A), cy = Math.sin(HI_A), y0 = 0.88 * sy;
+    while (d < 3 && fieldJS(balls, sx, sy, d * cx, y0 + d * cy) >= T) d += 0.02;
+    uniforms.uHiR.value = d - HI_IN;
+    if (left !== undefined) stain.material.opacity = STAIN * (1 - ease((tLocal - left) / STAIN_FADE));
   }
 
-  // Stain: a soft, slightly irregular ink blot lying flat (XZ) at the origin. Fade it with stain.material.opacity.
-  const S = 64, data = new Uint8Array(S * S * 4);
+  // Stain: a blotted ink ring lying flat (XZ) at the origin, a little wider than the drop so it shows around its foot.
+  // Pigment dried at the rim (the ring), a thin uneven wash inside. Fade it with stain.material.opacity, or let
+  // update(t, { left }) fade it over STAIN_FADE s once the blob has gone.
+  // The blot's outline is the alphaMap (solid inside, as before: s02 stretches it into its calendar trail); the ring
+  // and wash are the map's alpha, which multiplies it.
+  const S = 64, cover = new Uint8Array(S * S * 4), tone = new Uint8Array(S * S * 4).fill(255);
   const harm = [2, 3, 5].map((k) => [k, r(0.03, 0.08), r(0, 6.283)]);
+  const blot = [1, 2, 3].map(() => [r(2, 5), r(2, 5), r(0, 6.283), r(0, 6.283)]);
   for (let j = 0; j < S; j++) for (let i = 0; i < S; i++) {
-    const x = (i + 0.5) / S * 2 - 1, y = (j + 0.5) / S * 2 - 1, a = Math.atan2(y, x);
+    const x = (i + 0.5) / S * 2 - 1, y = (j + 0.5) / S * 2 - 1, a = Math.atan2(y, x), d = Math.hypot(x, y), o = (j * S + i) * 4;
     const edge = 0.8 + harm.reduce((acc, [k, amp, ph]) => acc + amp * Math.sin(k * a + ph), 0);
-    const v = Math.max(0, Math.min(1, (edge - Math.hypot(x, y)) / 0.25));
-    data.fill(Math.round(255 * v * v), (j * S + i) * 4, (j * S + i) * 4 + 4);
+    const wash = 0.3 + 0.1 * blot.reduce((acc, [fx, fy, px, py]) => acc + Math.sin(fx * x + px) * Math.sin(fy * y + py), 0);
+    const ring = Math.exp(-(((edge - 0.09 - d) / 0.07) ** 2));
+    cover.fill(Math.round(255 * Math.max(0, Math.min(1, (edge - d) / 0.04))), o, o + 4);
+    tone[o + 3] = Math.round(255 * Math.min(1, wash + ring));
   }
-  const alphaMap = new THREE.DataTexture(data, S, S);
-  alphaMap.magFilter = alphaMap.minFilter = THREE.LinearFilter;
-  alphaMap.needsUpdate = true;
+  const tex = (data) => Object.assign(new THREE.DataTexture(data, S, S), { magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter, needsUpdate: true });
+  const alphaMap = tex(cover), map = tex(tone);
   const stain = new THREE.Mesh(
-    new THREE.PlaneGeometry(2.8 * radius, 1.8 * radius).rotateX(-Math.PI / 2),
-    new THREE.MeshBasicMaterial({ color: PALETTE.ink, alphaMap, transparent: true, opacity: 0.45, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }),
+    new THREE.PlaneGeometry(3.2 * radius, 2.2 * radius).rotateX(-Math.PI / 2),
+    new THREE.MeshBasicMaterial({ color: PALETTE.ink, map, alphaMap, transparent: true, opacity: STAIN, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -1 }),
   );
   stain.name = 'blob-stain';
   stain.position.y = 0.0003;

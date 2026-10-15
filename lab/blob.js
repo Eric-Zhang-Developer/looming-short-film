@@ -4,6 +4,8 @@
 // ?cam=close frames the blob for close-ups; the default frames the blob and its wall shadow.
 // ?cam=eyes&d=<m>: the film-size blob (r 0.012) seen from d m (default 1.2, s07's distance; s15's Camera A is 0.31),
 // one eye state per second: open, closed, tired, gasp, worried, side (look +1), side (look −1).
+// ?key=lamp swaps the phone for a warm desk lamp above and left of the blob (any view).
+// ?cam=stain: from above-front, the blob sits 0–1 s, hops off to the right at 1 s, and its stain fades over 1–11 s.
 import * as THREE from 'three';
 import { createStage, exposeForRender } from '../src/core/stage.js';
 import { PALETTE } from '../src/core/palette.js';
@@ -23,7 +25,7 @@ const desk = plane(1.6, 1.2, 'kraft');
 desk.rotation.x = -Math.PI / 2; desk.position.set(0, 0, 0.6);
 
 const BLOB_Z = 0.24;
-const q = new URLSearchParams(location.search), EYES_VIEW = q.get('cam') === 'eyes';
+const q = new URLSearchParams(location.search), EYES_VIEW = q.get('cam') === 'eyes', STAIN_VIEW = q.get('cam') === 'stain';
 const blob = createBlob({ radius: EYES_VIEW ? 0.012 : 0.025, seed: 1 });
 blob.mesh.position.set(0, 0, BLOB_Z);
 blob.stain.position.set(0, 0.0003, BLOB_Z);
@@ -39,11 +41,18 @@ phone.shadow.mapSize.set(2048, 2048);
 phone.shadow.camera.near = 0.02; phone.shadow.camera.far = 1.5;
 phone.shadow.radius = 3; phone.shadow.bias = -0.0004;
 scene.add(phone, phone.target, new THREE.HemisphereLight(PALETTE.navy, PALETTE.kraft, 0.06));
+if (q.get('key') === 'lamp') {
+  phone.color.set(PALETTE.lamp); phone.intensity = 0.5; phone.angle = 0.7; phone.penumbra = 0.5;
+  phone.position.set(-0.16, 0.24, 0.42);
+  phone.target.position.set(0, 0, BLOB_Z);
+}
 
 if (EYES_VIEW) {
   const d = Number(q.get('d') || 1.2), mid = new THREE.Vector3(0, 0.012, BLOB_Z);
   camera.position.set(-0.032, 0.339, 0.940).multiplyScalar(d).add(mid);   // Camera A's direction onto the blob
   camera.lookAt(mid);
+} else if (STAIN_VIEW) {
+  camera.position.set(0.03, 0.22, 0.62); camera.lookAt(0.03, 0.01, BLOB_Z);
 } else if (q.get('cam') === 'close') {
   camera.position.set(0, 0.04, 0.62); camera.lookAt(0, 0.03, BLOB_Z);
 } else {
@@ -55,6 +64,11 @@ const STATES = [['open'], ['closed'], ['tired'], ['gasp'], ['worried'], ['side',
 if (EYES_VIEW) stage.onFrame((t) => {
   const [eyes, look] = STATES[Math.min(STATES.length - 1, Math.floor(t))];
   blob.update(t, { eyes, look });
+});
+else if (STAIN_VIEW) stage.onFrame((tRaw) => {
+  const t = onTwos(tRaw), u = Math.min(1, Math.max(0, (t - 1) / 0.25));   // one hop, 1.00–1.25 s, three radii right
+  blob.mesh.position.set(0.075 * u, 4 * HOP * u * (1 - u), BLOB_Z);
+  blob.update(tRaw, { left: 1 });
 });
 else stage.onFrame((tRaw) => {
   const t = onTwos(tRaw);
@@ -69,4 +83,4 @@ else stage.onFrame((tRaw) => {
   blob.update(tRaw, { squash, wobble: t >= 3 ? 1.7 : 1, eyes });
 });
 
-exposeForRender(stage, { duration: EYES_VIEW ? STATES.length : 4 });
+exposeForRender(stage, { duration: EYES_VIEW ? STATES.length : STAIN_VIEW ? 12 : 4 });
