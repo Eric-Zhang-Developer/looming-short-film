@@ -46,10 +46,10 @@
 - anim-s15 · builder · `src/shots/s15.js` · built (merged; loom 4.2×, in frame) · evidence/anim-s15/sheet.jpg
 - anim-s06 · builder · `src/shots/s06.js` · blocked (merged; mirrors s15 at 4.2×) · evidence/anim-s06/sheet.jpg
 - anim-s12 · builder · `src/shots/s12.js` · blocked (merged) · evidence/anim-s12/sheet.jpg
-- anim-s14 · builder · `src/shots/s14.js` · in-progress · —
-- anim-s16 · builder · `src/shots/s16.js` · in-progress · —
+- anim-s14 · builder · `src/shots/s14.js` · paused (RAM/disk; re-brief after spec-sensor) · —
+- anim-s16 · builder · `src/shots/s16.js` · paused (RAM/disk; re-brief after spec-sensor) · —
 - anim-s17 · builder · `src/shots/s17.js` · paused (RAM; worktree kept, resume after s14/s16/s18) · —
-- anim-s18 · builder · `src/shots/s18.js` · in-progress · —
+- anim-s18 · builder · `src/shots/s18.js` · paused (RAM/disk; re-brief after spec-sensor) · —
 - contract-timing · builder · `src/core/ease.js`, `src/lights.js` (onTwos snap, lamp dust sphere) · verified (merged) · evidence/contract-timing/
 - anim-s11 · builder · `src/shots/s11.js` · blocked (merged) · evidence/anim-s11/sheet.jpg
 - anim-s05 · builder · `src/shots/s05.js` · verified (merged) · evidence/anim-s05/sheet.jpg

@@ -13,6 +13,10 @@ Merged so far: s01–s05, s07–s10, s13 (10 of 18). Style tile v3 is built and 
 
 **Disk:** it filled up on 2026-10-15; the director freed space (5.2 GB free).
 
+**Marston light (director, 2026-10-15): motion-sensor fluorescents, no desk lamps** (process log). `spec-sensor` is rewriting docs 02/03/05, assets and s09–s18. **s14, s16, s17 and s18 stay paused until it merges**; then re-brief them, rework s15 (pen trips the sensor) and strip the unlit lamp from s11/s12.
+
+**Swap caused both disk-full events:** RAM pressure from headless Chrome wrote about 13.8 GB of swap. Resume at most 2 builders, render measurements at --w ≤ 960, and check `sysctl vm.swapusage` and `df -h /` before each batch.
+
 **RAM (2026-10-15, director: "my ram is dying"):** each builder's headless Chrome GPU process held 3–6 GB, about 14 GB in all, and one orphaned `measure.mjs` (s14) held 5.5 GB. **The builder ceiling is now 3**, with one Chrome per builder at a time, closed when finished. s17 is paused with its worktree kept; resume it once s14, s16 and s18 land. Before starting a batch, check `top -o mem` for orphaned `Google Chrome Helper` processes whose `measure.mjs` or `render.mjs` parent is gone.
 
 ## Director decisions (2026-10-15)
