@@ -13,5 +13,94 @@
       "name": "magenta",
       "hex": "#FF00FF"
     }
+  },
+  {
+    "name": "gator_sheet",
+    "purpose": "The Student, the film's hero gator: a turnaround plus separated cutout parts that drop straight onto the side rig in src/characters/gator.js. Gate G2. Carries G1's approved design (style tile v3_4, the graphic picture-book gator) and Q9 (short stubby legs).",
+    "shots": "s02-s12, s14-s18 (close-ups in s06, s15, s18 H)",
+    "refs": [
+      "assets/frozen/style_tile.png"
+    ],
+    "prompt": "assets/prompts/gator_sheet.v1.md",
+    "variants": 3,
+    "cap": 8,
+    "target": "largest landscape size available, one sheet with nothing else on it: 4 turnaround pieces (top row) and 10 rig parts (bottom row), one shared scale, every piece >= 40 px from every other and from the frame edge",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "parts": {
+      "turn_side": {
+        "rig": "s12 whole-figure piece (no face slots)",
+        "face": "painted: eye, smile line, tooth tips, nostril dot",
+        "orientation": "full figure facing +x, standing, arms down, legs ~20% of standing height"
+      },
+      "turn_front": {
+        "rig": "makeGator facing 'front': body, pivot [0.5, 1] (feet)",
+        "face": "blank: eyes and mouth are face_sheet swaps",
+        "orientation": "full figure facing camera, painted without arms (the rig adds arm_l/arm_r)"
+      },
+      "turn_back": {
+        "rig": "makeGator facing 'back': body, pivot [0.5, 1] (feet)",
+        "face": "none (back view)",
+        "orientation": "full figure from behind, arms down, tail toward camera"
+      },
+      "turn_head34": {
+        "rig": "side rig head34, pivot [0.4, 0.75], swaps head+snout+jaw (s14)",
+        "face": "blank",
+        "orientation": "head and snout in 3/4 front view, turned toward +x"
+      },
+      "body": {
+        "rig": "body (root), pivot [0.45, 0.95] = hip",
+        "orientation": "hoodie torso facing +x, hood rolled down at the back of the neck, green hips below the hem; no head, arms, legs, tail or pocket"
+      },
+      "head": {
+        "rig": "head, pivot [0.3, 0.75] = neck",
+        "face": "blank: eyes and mouth are face_sheet swaps",
+        "orientation": "cranium facing +x with the semicircle eye bump on top, no snout, no jaw"
+      },
+      "snout": {
+        "rig": "snout (upper jaw), parent head, pivot [0.1, 0.5]",
+        "orientation": "pointing +x, root left, blunt rounded tip right, one tiny nostril dot near the tip"
+      },
+      "jaw": {
+        "rig": "jaw (lower jaw), parent head, pivot [0.1, 0.3]",
+        "orientation": "pointing +x, root left; cream underside; 3-4 tiny cream triangle tooth tips along its top edge"
+      },
+      "arm_l": {
+        "rig": "arm_l (far), reach 0.032, z -0.004",
+        "orientation": "horizontal, shoulder end left, rounded green mitten hand right"
+      },
+      "arm_r": {
+        "rig": "arm_r (near), reach 0.032, z 0.012",
+        "orientation": "horizontal, shoulder end left, rounded green mitten hand right"
+      },
+      "leg_l": {
+        "rig": "leg_l (far), pivot [0.31, 0.08] = hip, z -0.003",
+        "orientation": "vertical, hip end up, foot pointing +x; short and stubby"
+      },
+      "leg_r": {
+        "rig": "leg_r (near), pivot [0.31, 0.08] = hip, z -0.001",
+        "orientation": "vertical, hip end up, foot pointing +x; short and stubby"
+      },
+      "tail": {
+        "rig": "tail, pivot [0.92, 0.5] = root, z -0.002",
+        "orientation": "pointing -x, root right; cream underside, darker green rounded scallops along the top edge"
+      },
+      "pocket": {
+        "rig": "pocket, pivot [0.5, 0], z 0.003, tissue weight",
+        "orientation": "cream hoodie kangaroo pocket, a soft rounded rectangle"
+      }
+    },
+    "proportions": "legs about 20% of standing height, as in v3_4 (the rig's legs are 37%; the sheet sets the truth and the rig is refit to it)",
+    "acceptance": [
+      "keeps v3_4's design: flat geometric shapes, strong simple silhouette, blunt long snout with a few tiny cream triangle tooth tips, semicircle eye bump, scalloped tail, cream hoodie, stubby legs, friendly read",
+      "torn paper, not felt: flat colour, pale torn fibre rim at every cut edge, fine paper grain, no fuzz or pile",
+      "no baked-in light or shadow; background alpha or flat magenta",
+      "every piece >= 40 px from every other piece, no overlapping bounding boxes, nothing touching the frame edge",
+      "no text or artifacts; on palette (gator green, cream, a black pupil on turn_side only)",
+      "head, turn_front and turn_head34 painted without eye or mouth; turn_side fully featured",
+      "cut.mjs --auto gives one island per piece (14)"
+    ]
   }
 ]

@@ -1,0 +1,49 @@
+{
+  "output": "assets/raw/gator_sheet_v1_2.png",
+  "prompt_file": "assets/prompts/gator_sheet.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/gator_sheet.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a14095-3fe3-76c1-bafb-fe1a8bf805a4",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a14095-3fe3-76c1-bafb-fe1a8bf805a4/exec-c32a9b21-2aaf-4ee2-b223-199d6bf29683.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-KYYoKn",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 149741,
+    "cached_input_tokens": 127616,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1779,
+    "reasoning_output_tokens": 55
+  },
+  "timestamp_start_utc": "2026-10-15T17:21:24Z",
+  "timestamp_end_utc": "2026-10-15T17:23:03Z",
+  "output_sha256": "dbfb43f1a0762a678bd7e8125699eaf55d6fc82c10524b2da4f7b3ed3e775f2f",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/gator_sheet_v1_2.jpg",
+  "screening": {
+    "verdict": "survivor",
+    "rank": 2,
+    "gaps": "smallest pixel gap 43 px (turn_side/turn_front), smallest box gap 32 px (turn_side/body), no box overlaps, frame margin 27 px",
+    "legs": "17.5% of standing height below the hem (tile 18.4%)",
+    "appeal_vs_v3_4": "Equally faithful side view, slightly bigger head and longest tail; charming, a touch heavier.",
+    "material": "Crinkled-paper mottling with a visible pale rim on the hood; reads as paper more than the tile, less clean than v1_1.",
+    "parts": "Adds round joint discs (snout root, jaw root, leg hips, tail root), useful for pivots, but both arms carry a GREEN disc at the shoulder end, which would show on the cream hoodie for the near arm (z +0.012).",
+    "flags": "body's hood is folded oddly at the top; back view's tail points at the viewer as an oval with scallops.",
+    "checklist": "Method: full-size Read of the PNG; composites over #1E2440 and #808080 (evidence/asset-gator-sheet/contact.jpg); turn_side beside the frozen tile's gator at equal height (beside_v3_4.jpg); hoodie at 2.6x beside the tile's; measure.mjs gaps (gaps.txt); legs.mjs leg share (legs.txt). Shared by all three: real alpha (flat background), 14 alpha islands = 14 pieces, no text or labels, no cast or drop shadows, palette green/cream with black only in turn_side's pupil and nostril dots. head, turn_front and turn_head34 painted blank as asked. Shared misses: turn_head34 is a side head (snout to +x), not a 3/4 front view; turn_front shows no muzzle, so front-on he reads as a frog or bear; the asked 40 px is met between pixels but not between boxes or to the frame edge; resolution about 425 px of figure height, too low for the close-ups in s06/s15/s18 H."
+  }
+}

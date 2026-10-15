@@ -1,0 +1,5 @@
+$ node evidence/asset-gator-sheet/legs.mjs '[["assets/frozen/style_tile.png",1619,301,386,354],["assets/raw/gator_sheet_v1_1.png",29,39,468,425],["assets/raw/gator_sheet_v1_2.png",38,35,524,457],["assets/raw/gator_sheet_v1_3.png",30,51,463,426]]'
+assets/frozen/style_tile.png: hem y 588, sole y 653, top y 301: legs 65 px of 353 = 18.4%
+assets/raw/gator_sheet_v1_1.png: hem y 389, sole y 462, top y 39: legs 73 px of 424 = 17.2%
+assets/raw/gator_sheet_v1_2.png: hem y 410, sole y 490, top y 35: legs 80 px of 456 = 17.5%
+assets/raw/gator_sheet_v1_3.png: hem y 399, sole y 475, top y 51: legs 76 px of 425 = 17.9%

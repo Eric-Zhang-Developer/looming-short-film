@@ -1,0 +1,5 @@
+{"bg":["#1E2440","#808080"],"height":420,"quality":0.88,"rows":[[
+ {"src":"assets/frozen/style_tile.png","crop":[1619,301,386,354],"label":"frozen tile v3_4"},
+ {"src":"assets/raw/gator_sheet_v1_1.png","crop":[29,39,468,425],"label":"v1_1 turn_side"},
+ {"src":"assets/raw/gator_sheet_v1_2.png","crop":[38,35,524,457],"label":"v1_2 turn_side"},
+ {"src":"assets/raw/gator_sheet_v1_3.png","crop":[30,51,463,426],"label":"v1_3 turn_side"}]]}
