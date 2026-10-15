@@ -148,3 +148,12 @@ Director, verbatim: "G1: make style tile v3 with the value-contrast rule (+4 gen
 Director, after asking "which one is v3_4" and being shown it: "I like it".
 - **Frozen:** `assets/frozen/style_tile.png` (v3_4, the graphic picture-book gator), recorded in `assets/generated/manifest.json`. It is now the reference for every later generation, per doc 08's table.
 - **Carried into the gator sheet (G2)** as the painter's notes, from the v3 screening: the surface reads as felt rather than torn paper; the tile's gator stands about lamp height (the sheet fixes proportions, and scale is set in code); the legs are about 20% of height while the rig's are 37%, and the sheet's `leg_l` sets the truth.
+
+## 2026-10-15 · G2 round 1: v1_1 is the base, one revision round
+The orchestrator recommended v1_1, plus one more round to fix the front view (no muzzle, so it reads as a frog), the 3/4 head (it came out as a side head), the size for close-ups (a separate large hero side view) and the faint paper edges. Director: "sounds good ok we can continue". Nothing is frozen yet.
+
+## 2026-10-15 · Marston has no desk lamps: motion-sensor lights carry the turn
+The director pointed out that Marston has no desk lamps, and research found no source showing any (`docs/ref-ufl.md` §0). The orchestrator offered motion-sensor lights, the hero bringing his home lamp, flipping the phone, dawn light, or a different library. Director, verbatim: "Go with motion-sensor lights at Marston: stillness lets the lights die, his movement (pen, standing, walking past) brings them back in s15, s16 and s18. Keep the home lamp for s06."
+- **The rule still holds.** Overhead light means a small shadow and low phone light means a huge one. At Marston the overhead light is a ceiling fluorescent on a motion sensor.
+- **The arc:** at home he clicks the lamp off and chooses the dark (s06). At Marston, stillness lets the lights time out (s11), and moving brings them back (s15 the pen, s16 standing, s18 walking past the Freshman).
+- **Unverified:** whether Marston's upper floors actually use occupancy sensors. It's common in libraries and plausible to a UF audience.

@@ -80,3 +80,4 @@
 - snd-score-clicks · builder · `src/audio/score.js` · verified (merged) · evidence/snd-score-clicks/levels.txt
 - asset-gator-sheet · painter · `assets/prompts/gator_sheet.v1.md`, specs gator_sheet · built (awaiting G2) · evidence/asset-gator-sheet/contact.jpg
 - ref-ufl · researcher (read-only) · `reference-videos/ufl/` (gitignored), `docs/ref-ufl.md` · built · docs/ref-ufl.md
+- asset-gator-sheet-v2 · painter · `assets/prompts/gator_sheet.v2.md`, `gator_hero.v1.md`, specs gator_sheet/gator_hero · in-progress · —
