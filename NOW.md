@@ -47,3 +47,4 @@
 - `src/audio/selftest.js` needs a full `node tools/mix.mjs` run first (a `--range` mix overwrites `out/audio/mix.wav`).
 - Paper rim reads ~1 px at wide framing (reference ~2% of object size). Revisit after lookdev; likely a `contract-paper` change to object-relative rim width.
 - r186 casts cut-out shadows from `alphaMap` alone (confirmed by lights and paper builders).
+- Bed signatures are mixed: new beds take `(seed, dur)`, `paperRustle`/`fluorescentHum` take `(seed, { dur })`, and `mix.mjs` passes no duration, so cued beds play their 2–8 s default. Fix with a `contract-audio` task (cues carry `dur`, one bed signature) after `snd-score` merges, since it owns `mix.mjs`.
