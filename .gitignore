@@ -1,0 +1,4 @@
+reference-videos/
+node_modules/
+out/
+.DS_Store
