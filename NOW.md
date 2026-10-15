@@ -6,13 +6,14 @@
 ## In flight
 | Task | Kind | Notes |
 |---|---|---|
-| `anim-s02`, `anim-s03`, `anim-s04`, `anim-s09`, `anim-s15` | animatic shot builders (opus), batch 1 | Cut off by the 5-hour usage limit and resumed with SendMessage after the reset. Worktrees are in `~/.worktrees/looming/anim-sNN`. |
+| `anim-s05`, `anim-s07`, `anim-s08`, `anim-s10` | animatic shot builders | s01–s04, s09, s13 merged |
+| `anim-s15` | builder (fix round) | the loom shadow must be in frame before the click; s06 waits on it |
+| `asset-style-tile-v3` | painter | G1 |
 
-## Waiting on the director
-- **G1 · style tile.** The recommendation is a **v3 tile under a value-contrast rule**: props in cream, kraft, green, amber or red; navy only for walls and sky; +4 generations on top of the style_tile cap (7 of 8 used). Lookdev showed the v2 navy props disappearing into the navy wall. v2 variants are in `evidence/asset-style-tile/contact.jpg`; lookdev evidence is in `evidence/look-pass-2/`.
-- **Q1–Q9** in `docs/shots/QUESTIONS.md`: quiet-shot motion, neighbour click, s18 timing, second red circle, blob growth, phone shadow, the Exam's look, Thursday marker, gator legs. The specs and the animatic follow each question's "(current)" option until answered.
-- **Repo hygiene:** `Gator Create Competition - Transcription.md` (third-party page text) is tracked at the repo root since 309bb41. I recommended removing it; waiting on a yes.
-- The deadline is still unconfirmed (ProposalSpace).
+## Director decisions (2026-10-15)
+- **G1:** "make style tile v3 with the value-contrast rule (+4 generations)". `asset-style-tile-v3` is running: 4 variants, each a different gator design direction. The director also said "the gator is really ugly ngl", so appeal is the priority. **G1/G2 pick comes next.**
+- **Q1–Q9:** "go with every recommendation". The specs already follow them. Still to do: **Q7 Exam matte ink** (task `exam-ink`, queued until a code-writer slot frees; it owns `src/blob.js`).
+- Still open: removing the third-party transcription file from the repo, and the deadline.
 
 ## Next moves
 1. Merge batch 1 as each shot finishes. Merge pattern: check the diff touches only its owns, run `determinism.mjs` on `index.html` across the shot, convert any PNG over 2 MB to JPEG, squash with a "why" message, remove the worktree, update the board.
