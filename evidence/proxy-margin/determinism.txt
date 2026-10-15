@@ -1,0 +1,5 @@
+t=0.5  83aa3a471f4c0fe5 83aa3a471f4c0fe5 83aa3a471f4c0fe5  PASS
+t=10  4407c6bd89b1cd04 4407c6bd89b1cd04 4407c6bd89b1cd04  PASS
+t=95  c4bda972c2085a60 c4bda972c2085a60 c4bda972c2085a60  PASS
+t=0.5  83aa3a471f4c0fe5 83aa3a471f4c0fe5 83aa3a471f4c0fe5  PASS
+determinism: PASS

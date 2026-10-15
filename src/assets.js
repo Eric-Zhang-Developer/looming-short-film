@@ -107,10 +107,14 @@ async function loadUncached(name) {
   return { pieces, sizes, proxy: true };
 }
 
-// A flat silhouette at the piece's aspect, 256 px on the long edge (makePaper resamples it to its own res).
+// A flat silhouette at the piece's aspect, 256 px on the long edge (makePaper resamples it to its own res), inside a
+// transparent margin of 4 % of the long edge (min 8 px) so makePaper has an edge to tear on every side. The bitmap is
+// bigger than the shape; `sizes` stays the shape's size from PIECES.
 function proxy(w, h, shape, color) {
-  const L = 256, W = Math.max(8, Math.round(w >= h ? L : L * w / h)), H = Math.max(8, Math.round(w >= h ? L * h / w : L));
-  const c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
+  const L = 256, M = Math.max(8, Math.round(L * 0.04));
+  const W = Math.max(8, Math.round(w >= h ? L : L * w / h)), H = Math.max(8, Math.round(w >= h ? L * h / w : L));
+  const c = Object.assign(document.createElement('canvas'), { width: W + 2 * M, height: H + 2 * M }), g = c.getContext('2d');
+  g.translate(M, M);
   g.fillStyle = color; g.beginPath();
   const ell = (x, y, rx, ry) => { g.moveTo(x + rx, y); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); };
   const round = (x, y, w, h, r) => g.roundRect(x, y, w, h, r);

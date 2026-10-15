@@ -1,0 +1,39 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>proxy-margin · proxies</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<!-- Evidence page, not film. Same layout as evidence/mod-film/proxies.html, but every piece goes through makePaper, so
+     the edges you see are the torn ones. Labels never reach a frame. -->
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+<script type="module">
+  import * as assets from '/src/assets.js';
+  import { makePaper } from '/src/paper.js';
+  const c = Object.assign(document.createElement('canvas'), { width: 1920, height: 1600 }), g = c.getContext('2d');
+  document.body.appendChild(c);
+  // The torn sheet as pixels: map color, alpha from alphaMap.
+  function flat(sheet) {
+    const m = sheet.map.image, a = sheet.alphaMap.image, w = m.width, h = m.height;
+    const t = Object.assign(document.createElement('canvas'), { width: w, height: h }), x = t.getContext('2d');
+    x.drawImage(m, 0, 0); const d = x.getImageData(0, 0, w, h);
+    x.clearRect(0, 0, w, h); x.drawImage(a, 0, 0); const ad = x.getImageData(0, 0, w, h).data;
+    for (let i = 0; i < w * h; i++) d.data[i * 4 + 3] = ad[i * 4];
+    x.putImageData(d, 0, 0); return t;
+  }
+  const ready = (async () => {
+    g.fillStyle = '#3a3f55'; g.fillRect(0, 0, c.width, c.height);
+    const names = Object.keys(assets.PIECES), rowH = c.height / names.length, cell = 118, x0 = 210;
+    for (const [r, name] of names.entries()) {
+      const a = await assets.load(name), y = r * rowH;
+      g.fillStyle = '#ddd'; g.font = '15px sans-serif';
+      g.fillText(`${name}${a.proxy ? ' (proxy)' : ' (REAL)'}`, 8, y + rowH / 2);
+      for (const [i, [p, img]] of Object.entries(a.pieces).entries()) {
+        const sheet = makePaper({ art: img, size: a.sizes[p], key: `ev|${name}|${p}`, res: 512 }), t = flat(sheet);
+        const s = Math.min((cell - 10) / t.width, (rowH - 26) / t.height), x = x0 + i * (cell + 18);
+        g.drawImage(t, x, y + 4, t.width * s, t.height * s);
+        g.fillStyle = '#ddd'; g.font = '11px sans-serif'; g.fillText(p, x, y + rowH - 6);
+      }
+    }
+  })();
+  window.renderFrame = async () => { await ready; };
+  window.LOOMING = { duration: 1, fps: 24, ready };
+</script>
