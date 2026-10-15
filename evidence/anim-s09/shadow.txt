@@ -1,0 +1,13 @@
+spot at y 0.05 (spec, before)
+  t=4.8  blob centre y 0.045  scale 10.00x  lands at z 1.36
+  t=5  blob centre y 0.045  scale 10.00x  lands at z 1.19
+  t=5.2  blob centre y 0.045  scale 10.00x  lands at z 1.03
+  t=5.4  blob centre y 0.045  scale 10.00x  lands at z 0.86
+  t=pass  blob centre y 0.048  scale 25.00x  lands at z 2.32
+spot at y 0.145 (after, spec deviation)
+  t=4.8  blob centre y 0.045  scale 1.45x  lands at z 0.45
+  t=5  blob centre y 0.045  scale 1.45x  lands at z 0.43
+  t=5.2  blob centre y 0.045  scale 1.45x  lands at z 0.41
+  t=5.4  blob centre y 0.045  scale 1.45x  lands at z 0.38
+  t=pass  blob centre y 0.048  scale 1.49x  lands at z 0.42
+spec: <= 1.5x
