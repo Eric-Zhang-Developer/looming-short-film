@@ -43,7 +43,9 @@
 ### wave 4 · animatic (brief: `tasks/anim-shot.md`)
 - anim-s01 · builder · `src/shots/s01.js` · verified (merged) · evidence/anim-s01/sheet.jpg
 - anim-s13 · builder · `src/shots/s13.js` · verified (merged) · evidence/anim-s13/strip.jpg
-- anim-s15 · builder · `src/shots/s15.js` · in-progress · —
+- anim-s15 · builder · `src/shots/s15.js` · built (merged; loom 4.2×, in frame) · evidence/anim-s15/sheet.jpg
+- anim-s06 · builder · `src/shots/s06.js` · in-progress · —
+- contract-timing · builder · `src/core/ease.js`, `src/lights.js` (onTwos snap, lamp dust sphere) · in-progress · —
 - anim-s11 · builder · `src/shots/s11.js` · in-progress · —
 - anim-s05 · builder · `src/shots/s05.js` · verified (merged) · evidence/anim-s05/sheet.jpg
 - anim-s10 · builder · `src/shots/s10.js` · verified (merged) · evidence/anim-s10/sheet.jpg
@@ -65,7 +67,7 @@
 ### wave 3, started early
 - asset-style-tile · painter · `assets/prompts/style_tile.v2.md`, `assets/specs.json` (style_tile), `tools/gen.mjs` (fixes), `assets/raw/thumbs/`, `evidence/asset-style-tile/`, `done/asset-style-tile.md` · built (merged, awaiting G1) · evidence/asset-style-tile/contact.jpg
 - asset-style-tile-v3 · painter · `assets/prompts/style_tile.v3.md`, specs style_tile, `tools/gen.mjs` (cap) · built (awaiting G1 pick) · `evidence/asset-style-tile-v3/contact.jpg`
-- exam-ink · builder · `src/blob.js`, `lab/blob.js`, contracts §blob · in-progress · —
+- exam-ink · builder · `src/blob.js`, `lab/blob.js`, contracts §blob · built (merged) · evidence/exam-ink/before_after.jpg
 - snd-foley · builder · `src/audio/foley.js`, `evidence/snd-foley/`, `done/snd-foley.md` · verified (merged) · evidence/snd-foley/spectra.jpg
 - snd-score · builder · `src/audio/score.js`, `tools/mix.mjs`, `evidence/snd-score/`, `done/snd-score.md` · verified (merged) · evidence/snd-score/score.mp3
 - tool-cut-fixes · builder · `tools/cut.mjs`, `tools/gen.mjs`, `evidence/tool-cut-fixes/`, `done/tool-cut-fixes.md` · verified (merged) · evidence/tool-cut-fixes/despill.jpg
