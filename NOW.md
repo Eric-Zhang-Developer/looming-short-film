@@ -48,6 +48,5 @@
 - Paper rim reads ~1 px at wide framing (reference ~2% of object size). Revisit after lookdev; likely a `contract-paper` change to object-relative rim width.
 - r186 casts cut-out shadows from `alphaMap` alone (confirmed by lights and paper builders).
 - Score: `evidence/snd-score/score.mp3` (full mix, listenable). Nothing has been checked by ear yet; the director's first listen is due at G4.
-- s13 decal reuses blob.js's shadow hook (not in contracts); add `blob.silhouette()` via a contract-blob task before wave 5.
 - s13 reads dark and busy at thumbnail size; check with cold viewers at G4.
 - s01 window reads grey, dawn could pass for dusk; final pass.
