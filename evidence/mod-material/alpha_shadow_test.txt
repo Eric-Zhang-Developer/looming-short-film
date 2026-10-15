@@ -1,0 +1,19 @@
+r186 native alpha-tested shadows: lab/material.html cutout, camera-invisible caster (colorWrite/depthWrite off), 1920x1080
+
+SpotLight (customDepthMaterial), t=12
+  none     sha256 05acce4948817b2c  shadow px 0
+  shipped  sha256 8a162502faefee0d  shadow px 200069
+  native   sha256 8a162502faefee0d  shadow px 200069
+  control  sha256 f402a74dd712c198  shadow px 452931
+  shipped vs native: 0 px differ → IDENTICAL
+  shipped vs control: 260924 px differ (the test can see a rectangle)
+
+PointLight (customDistanceMaterial), t=32
+  none     sha256 ec419681263ba368  shadow px 0
+  shipped  sha256 0b30e032d06e81ba  shadow px 201590
+  native   sha256 0b30e032d06e81ba  shadow px 201590
+  control  sha256 7032ccdc1a228474  shadow px 461487
+  shipped vs native: 0 px differ → IDENTICAL
+  shipped vs control: 271843 px differ (the test can see a rectangle)
+
+answer: YES. r186 cuts shadows from the material alphaMap + alphaTest on its own, for spot (depth) and point (distance) lights. The custom materials change no pixel. They stay per doc 04.
