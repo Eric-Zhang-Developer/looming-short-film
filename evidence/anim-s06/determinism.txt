@@ -1,0 +1,6 @@
+$ node tools/determinism.mjs --page=index.html --t=37.5,39.04167,30,37.5   (s06 local 1.5 lamp + dust, 3.042 after the off, s05, 1.5 again)
+t=37.5  572f1ad61b7107d3 572f1ad61b7107d3 572f1ad61b7107d3  PASS
+t=39.04167  f212a3f99f8e1089 f212a3f99f8e1089 f212a3f99f8e1089  PASS
+t=30  8017d61779a04205 8017d61779a04205 8017d61779a04205  PASS
+t=37.5  572f1ad61b7107d3 572f1ad61b7107d3 572f1ad61b7107d3  PASS
+determinism: PASS

@@ -1,0 +1,2 @@
+lampClickHome: lampClick gain 0.8 sha256 d1bee20f474d5ed5aa94730300ab031ccc4c4084f38b15bbee7b2ad3050a4513
+lampOffHome: NO lampClick cue in src/audio/cues.js

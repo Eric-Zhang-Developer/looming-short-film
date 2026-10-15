@@ -1,0 +1,52 @@
+== Lamp and phone spot (multipliers: lamp = intensity / LAMP_I; phone = intensity / PHONE_I)
+  t 0.46  lamp 0.000  phone 1.000  lamp visible false
+  t 0.50  lamp 0.000  phone 0.025  lamp visible true
+  t 0.54  lamp 1.104  phone 0.025  lamp visible true
+  t 1.50  lamp 1.000  phone 0.025  lamp visible true
+  t 2.96  lamp 1.000  phone 0.025  lamp visible true
+  t 3.00  lamp 0.000  phone 1.000  lamp visible false
+  t 3.04  lamp 0.000  phone 1.000  lamp visible false
+  t 5.00  lamp 0.000  phone 1.000  lamp visible false
+
+== Near-hand fingertip vs s15 (evidence/anim-s15/measure.txt, same rig) and the spec table
+  K0 t 0.000  tip (-0.0511, -0.0121, 0.0870)  vs s15 0.05 mm  vs spec 0.09 mm
+  K1 t 0.083  tip (-0.0511, -0.0121, 0.0870)  vs s15 0.05 mm  vs spec 0.09 mm
+  K2 t 0.167  tip (-0.0586, -0.0127, 0.0870)  vs s15 0.04 mm  vs spec 0.54 mm
+  K3 t 0.250  tip (-0.0269, 0.0165, 0.0870)  vs s15 0.04 mm  vs spec 0.53 mm
+  K4 t 0.333  tip (-0.0255, 0.0260, 0.0870)  vs s15 0.06 mm  vs spec 0.54 mm
+  K5 t 0.417  tip (-0.0238, 0.0231, 0.0870)  vs s15 0.04 mm  vs spec 0.25 mm
+  K6 t 0.500  tip (-0.0233, 0.0215, 0.0870)  vs s15 0.04 mm  vs spec 0.04 mm
+  K7 t 0.583  tip (-0.0238, 0.0231, 0.0870)  vs s15 0.04 mm  vs spec 0.25 mm
+  K2 t 2.667  tip (-0.0586, -0.0127, 0.0870)  vs s15 0.04 mm  vs spec 0.54 mm
+  K3 t 2.750  tip (-0.0269, 0.0165, 0.0870)  vs s15 0.04 mm  vs spec 0.53 mm
+  K4 t 2.833  tip (-0.0255, 0.0260, 0.0870)  vs s15 0.06 mm  vs spec 0.54 mm
+  K5 t 2.917  tip (-0.0238, 0.0231, 0.0870)  vs s15 0.04 mm  vs spec 0.25 mm
+  K6 t 3.000  tip (-0.0233, 0.0215, 0.0870)  vs s15 0.04 mm  vs spec 0.04 mm
+  K7 t 3.083  tip (-0.0238, 0.0231, 0.0870)  vs s15 0.04 mm  vs spec 0.25 mm
+  worst vs s15: 0.06 mm → PASS (≤ 1 mm)
+
+== Shadow scale, geometry (lights.js shadowScale)
+  t 0.25  wall 4.203x  pool 1.273x  blob centre (0.0000, 0.0120, 0.0884)
+  t 2  wall 4.203x  pool 1.273x  blob centre (0.0000, 0.0120, 0.0884)
+  t 5  wall 4.203x  pool 1.273x  blob centre (-0.0030, 0.0120, 0.0884)
+
+== From pixels
+  blob width at its centre height: 0.0268 m (anim-s15's pixel measure of the same blob)
+  wall t 0.25: centre (0.0448, 0.0312); row y 0.031: shadow x -0.0085…0.1030 (frame x -0.136…0.115) = 4.16x the blob
+    body below the eyes: lit 0.908, in shadow 0.114 → contrast 87.4% display, 98.5% linear
+  wall t 1.5: centre (0.0448, 0.0312); row y 0.031: shadow x -0.0095…0.0255 (frame x -0.136…0.115) = 1.31x the blob
+    body below the eyes: lit 0.205, in shadow 0.114 → contrast 44.1% display, 64.1% linear
+  wall t 5: centre (0.0322, 0.0312); row y 0.031: shadow x -0.0200…0.0900 (frame x -0.136…0.115) = 4.10x the blob
+    body below the eyes: lit 0.919, in shadow 0.116 → contrast 87.4% display, 98.5% linear
+  1.5 s wall-shadow contrast 44.1% display / 64.1% linear → FAIL (≤ 20%)
+  shadow depth 1.5 / 0.25: 11.4% display (anim-s15's measure)
+  pool t 2 z 0.0854 (behind the blob centre): shadow x -0.0116…0.0078 = 0.72x the blob's width
+  pool t 2 z 0.0914 (in front of the blob centre): shadow x -0.0182…0.0108 = 1.08x the blob's width
+  pool t 2 z 0.0934 (in front of the blob centre): shadow x -0.0174…0.0108 = 1.05x the blob's width
+
+== Lamp vs out-shone phone at the blob (inverse square × cone, the spec's ≥ 4×)
+  t 1.5: lamp 77.7 / phone 3.0 = 25.7x → PASS
+
+== README §10: face (head centre, 9×9 px) against the key-lit receiver
+  t 0.25: face 0.272 / phone-lit wall 0.908 = 30% (30–45%)
+  t 1.5: face 0.301 / lamp-lit page 0.970 = 31% (30–45%)
