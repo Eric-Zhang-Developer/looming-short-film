@@ -31,6 +31,9 @@
 - look-pass-2 · builder · `src/material.js`, `src/blob.js`, `src/lights.js`, contracts §material/§blob/§lights · in-progress · —
 - snd-score-reveal · builder · `src/audio/score.js` · verified (merged) · evidence/snd-score-reveal/timeline.png
 
+### wave 4 prep
+- mod-film · builder · `index.html`, `src/film.js`, `src/assets.js`, `src/shots/`, contracts §film/§assets/§shots · in-progress · —
+
 ### parallel track: storyboard (docs)
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · built (merged) · done/sb-act1.md
 - sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · built (merged) · done/sb-act2.md
