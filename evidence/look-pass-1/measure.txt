@@ -1,0 +1,11 @@
+$ node evidence/look-pass-1/measure.mjs
+t=1  blob on its plane: 5.56 x 5.23 cm (x -2.80..2.76)
+  shadow on desk: 14391 px, x -0.16..14.25 cm, y -0.00..0.00, z 0.01..19.75  width ratio 2.59x
+  shadow on wall: 119403 px, x -1.53..15.43 cm, y 0.00..14.19, z 0.00..0.00  width ratio 3.05x
+t=3  blob on its plane: 5.69 x 5.06 cm (x -2.90..2.79)
+  shadow on desk: 14645 px, x 2.10..14.49 cm, y -0.00..0.00, z 0.01..19.74  width ratio 2.18x
+  shadow on wall: 118070 px, x -1.77..15.54 cm, y 0.00..13.72, z 0.00..0.00  width ratio 3.04x
+t=6  blob on its plane: 5.79 x 5.29 cm (x -2.87..2.92)
+  shadow on desk: 1877 px, x -2.40..5.74 cm, y -0.00..0.00, z 20.58..22.36  width ratio 1.41x
+t=8  blob on its plane: 5.72 x 5.19 cm (x -2.83..2.89)
+  shadow on desk: 1793 px, x -2.34..5.80 cm, y -0.00..0.00, z 20.58..22.34  width ratio 1.42x

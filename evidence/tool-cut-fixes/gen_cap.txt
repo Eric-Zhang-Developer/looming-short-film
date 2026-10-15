@@ -1,0 +1,3 @@
+# gen.mjs dry run · style_tile · prompt v2 · 1 variant(s) · 7/8 used
+gen: REFUSED: style_tile already has 7 of 8 generations; 2 more would exceed the cap. Doc 08: rethink the spec instead of re-rolling.
+  existing: style_tile_v1 (1), style_tile_v2_1 (2), style_tile_v2_2 (1), style_tile_v2_3 (1), style_tile_v2_4 (2)

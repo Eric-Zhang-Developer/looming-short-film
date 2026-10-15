@@ -1,0 +1,16 @@
+[
+  {
+    "name": "style_tile",
+    "purpose": "Defines the film's look: a small corner of the apartment as a paper diorama in the palette. Every later asset references it (doc 08, generation order 1).",
+    "refs": [
+      "reference-videos/frames/torn_paper_ref.jpg"
+    ],
+    "prompt": "assets/prompts/style_tile.v2.md",
+    "variants": 4,
+    "target": "largest landscape size available, 6 separate pieces (wall, desk edge, calendar, lamp, laptop, gator)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    }
+  }
+]

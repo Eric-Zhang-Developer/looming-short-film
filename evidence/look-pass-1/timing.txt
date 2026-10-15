@@ -1,0 +1,6 @@
+$ node evidence/look-pass-1/timing.mjs
+frames: 240 (0-10 s @ 24 fps), 1920x1080, post on (bokeh + night LUT + grain)
+cold pass: total 21.5 s, mean 89.5 ms, median 14.6 ms, p90 472.0 ms, max 502.4 ms   Chrome RSS after: 0.97 GB
+  frames that start a new 4 Hz boil step (40): total 18.6 s, mean 464.8 ms, median 474.1 ms, p90 482.9 ms, max 502.4 ms
+warm pass: total 3.8 s, mean 16.0 ms, median 14.4 ms, p90 22.5 ms, max 35.7 ms   Chrome RSS after: 0.90 GB
+  the same boil-step frames: total 1.0 s, mean 24.6 ms, median 23.2 ms, p90 31.2 ms, max 35.7 ms

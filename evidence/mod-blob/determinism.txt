@@ -1,0 +1,14 @@
+wide t=0.5  2ca8a06631d46f619b0e25b8cc78da4fdef1e260486d6cbf2abeca800d7bae46  2ca8a06631d46f619b0e25b8cc78da4fdef1e260486d6cbf2abeca800d7bae46  IDENTICAL
+wide t=1.45  c10ae31d1ea8a96714670db653c762c47ba3d684145ed4adb6ac4f4b0ade13d9  c10ae31d1ea8a96714670db653c762c47ba3d684145ed4adb6ac4f4b0ade13d9  IDENTICAL
+wide t=2.58  6a1275c4424459a94c4855faf4048500fd85c13c6bd8cd4896286857969393d7  6a1275c4424459a94c4855faf4048500fd85c13c6bd8cd4896286857969393d7  IDENTICAL
+wide t=3.5  ae4b923246ceaf595797ba7b0d89608d62dbf86b30897d4ec4179a131efb7f68  ae4b923246ceaf595797ba7b0d89608d62dbf86b30897d4ec4179a131efb7f68  IDENTICAL
+wide: 4 distinct hashes for 4 times (each time must differ from the others)
+close t=0.5  3c03f8417b5ae06a992e2a36821cbf0c11e7404e49db2d7f620cf79bc017429f  3c03f8417b5ae06a992e2a36821cbf0c11e7404e49db2d7f620cf79bc017429f  IDENTICAL
+close t=1.45  3d9581b5c6aa5ea9d0e1908356bbdca6a6ca9ee0206b5e7925f3bbd147ce96e1  3d9581b5c6aa5ea9d0e1908356bbdca6a6ca9ee0206b5e7925f3bbd147ce96e1  IDENTICAL
+close t=2.58  be8f82b144954a65cda0a5f59398cc75a756095b58123d2fae22b6381657e829  be8f82b144954a65cda0a5f59398cc75a756095b58123d2fae22b6381657e829  IDENTICAL
+close t=3.5  e5af4219860f6533648e7ced7d78dee1f7d1a46fb9e5caa0c24e3bc8d15c2d1f  e5af4219860f6533648e7ced7d78dee1f7d1a46fb9e5caa0c24e3bc8d15c2d1f  IDENTICAL
+close: 4 distinct hashes for 4 times (each time must differ from the others)
+PASS
+A second `node evidence/mod-blob/render_lab.mjs` process produced a byte-identical copy of the lines above (diff -q: no difference).
+grep -nE "Math\.random|Date\.now|performance\.now" src/blob.js lab/blob.js → no matches (exit 1).
+tools/determinism.mjs is not on this branch; render_lab.mjs stands in for it (PNG of the canvas, sha256).

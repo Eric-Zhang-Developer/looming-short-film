@@ -1,0 +1,11 @@
+$ node tools/determinism.mjs --page=lab/lookdev.html --t=1,4.95,5,7.45,9.5
+t=1  32dc52deabd144d1 32dc52deabd144d1 32dc52deabd144d1  PASS
+t=4.95  82d0417342b71c23 82d0417342b71c23 82d0417342b71c23  PASS
+t=5  d7e57002660765ed d7e57002660765ed d7e57002660765ed  PASS
+t=7.45  e1640692cb7658f8 e1640692cb7658f8 e1640692cb7658f8  PASS
+t=9.5  1c724e16ec8e9318 1c724e16ec8e9318 1c724e16ec8e9318  PASS
+determinism: PASS
+exit 0
+
+$ grep -nE "Math.random|Date.now|performance.now" lab/lookdev.js
+exit 1 (1 = no matches)

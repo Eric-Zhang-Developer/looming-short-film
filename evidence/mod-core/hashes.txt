@@ -1,0 +1,10 @@
+a84df32226f6f40542936b089169df2047d1ee88caba54e29788675d2460515b  t=0.5 render 1 (PNG of the canvas)
+0ad78fabff2dfdcd093ce5a0b00e7a3358bf3fabeb9b2961356d59c16bd615e0  t=1.5 render 1 (PNG of the canvas)
+a84df32226f6f40542936b089169df2047d1ee88caba54e29788675d2460515b  t=0.5 render 2 (PNG of the canvas)
+0ad78fabff2dfdcd093ce5a0b00e7a3358bf3fabeb9b2961356d59c16bd615e0  t=1.5 render 2 (PNG of the canvas)
+t=0.5 IDENTICAL
+t=1.5 IDENTICAL
+t=0.5 vs t=1.5 differ (as expected)
+page console:
+[error] Failed to load resource: the server responded with a status of 404 (Not Found)
+second node process: same 4 PNG hashes as the first run

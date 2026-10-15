@@ -1,0 +1,36 @@
+$ node tools/determinism.mjs --page=lab/lookdev.html --t=1,4.95,5,7.45,8.25,9.5
+t=1  9fc1e049529b4dc1 9fc1e049529b4dc1 9fc1e049529b4dc1  PASS
+t=4.95  45f5c5930c1ddc4e 45f5c5930c1ddc4e 45f5c5930c1ddc4e  PASS
+t=5  1011cb028640d0b0 1011cb028640d0b0 1011cb028640d0b0  PASS
+t=7.45  1b8236b083e75555 1b8236b083e75555 1b8236b083e75555  PASS
+t=8.25  1333109a778051ab 1333109a778051ab 1333109a778051ab  PASS
+t=9.5  1141ede222eb20ba 1141ede222eb20ba 1141ede222eb20ba  PASS
+determinism: PASS
+exit 0
+
+$ node tools/determinism.mjs --page=lab/material.html --t=1,6,12.05,21.3,26,32
+t=1  ce40d651563bb25a ce40d651563bb25a ce40d651563bb25a  PASS
+t=6  1b3970df95ef997b 1b3970df95ef997b 1b3970df95ef997b  PASS
+t=12.05  48243b6b0d054972 48243b6b0d054972 48243b6b0d054972  PASS
+t=21.3  3206f41c94fc61f0 3206f41c94fc61f0 3206f41c94fc61f0  PASS
+t=26  b922872cb4182b5c b922872cb4182b5c b922872cb4182b5c  PASS
+t=32  554b56aa44c99864 554b56aa44c99864 554b56aa44c99864  PASS
+determinism: PASS
+exit 0
+
+$ node tools/determinism.mjs --page=lab/blob.html --t=0.5,1.45,2.58,3.5
+t=0.5  28b2785e76b1c393 28b2785e76b1c393 28b2785e76b1c393  PASS
+t=1.45  73c7cec3cb490c4d 73c7cec3cb490c4d 73c7cec3cb490c4d  PASS
+t=2.58  6b0a3a745bba9f62 6b0a3a745bba9f62 6b0a3a745bba9f62  PASS
+t=3.5  8e48b59af9474421 8e48b59af9474421 8e48b59af9474421  PASS
+determinism: PASS
+exit 0
+
+$ node tools/determinism.mjs --page=lab/lights.html --t=1,3,5,7.5
+t=1  a967c8d5be4a0f77 a967c8d5be4a0f77 a967c8d5be4a0f77  PASS
+t=3  44efef11998d5109 44efef11998d5109 44efef11998d5109  PASS
+t=5  fe7c2c8c2ed7ae91 fe7c2c8c2ed7ae91 fe7c2c8c2ed7ae91  PASS
+t=7.5  1019ff07186b8c14 1019ff07186b8c14 1019ff07186b8c14  PASS
+determinism: PASS
+exit 0
+

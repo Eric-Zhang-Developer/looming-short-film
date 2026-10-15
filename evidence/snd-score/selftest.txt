@@ -1,0 +1,5 @@
+    lampClickHome@36.5s, lampClickMarston@100.5s, lampClickFreshman@164s; 24000 samples each (±0.1 s), peak 0.5645
+ok  three lamp clicks are sample-identical in out/audio/stems/foley.wav
+ok  voices and foley are deterministic and finite
+ok  unbuilt foley throws "not implemented"
+wrote /Users/ericzhang/.worktrees/looming/snd-score/out/audio/solo/{lampclick,piano_c4}.wav (19200, 146400 samples)

@@ -1,0 +1,22 @@
+$ node src/core/selftest.js
+ok  hash fixed outputs
+ok  mulberry32 fixed outputs
+ok  seedOf is a stable uint32 and separates parts
+ok  kf hits its keys exactly
+ok  ease endpoints
+ok  spring is 0 before t0 and at t0
+ok  onTwos(0.09) === 1/12
+ok  palette has the contract keys
+selftest: all passed
+exit 0
+
+$ node evidence/mod-core/xcheck_rng.mjs ~/code/media/1776/src/rng.ts src/core/rng.js   # original vs port, same inputs
+orig {"hash":[0.11478774505667388,0.24678996880538762,0.38546495721675456,0.6052086122799665,0.9985320025589317,0.23941869544796646,0.11478774505667388,0.3367758763488382],"hash2":[0.3251380540896207,0.5753428691532463,0.9398772108834237],"m42":[0.6011037519201636,0.44829055899754167,0.8524657934904099],"m0":[0.26642920868471265,0.0003297457005828619]}
+port {"hash":[0.11478774505667388,0.24678996880538762,0.38546495721675456,0.6052086122799665,0.9985320025589317,0.23941869544796646,0.11478774505667388,0.3367758763488382],"hash2":[0.3251380540896207,0.5753428691532463,0.9398772108834237],"m42":[0.6011037519201636,0.44829055899754167,0.8524657934904099],"m0":[0.26642920868471265,0.0003297457005828619]}
+
+$ exported names (rng, ease, palette via node; stage via grep since it needs a browser)
+rng: hash, hash2, mulberry32, seedOf
+ease: clamp, ease, easeIn, easeOut, kf, lerp, onTwos, spring
+palette: PALETTE
+stage: createStage
+stage: exposeForRender

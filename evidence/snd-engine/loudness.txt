@@ -1,0 +1,11 @@
+$ node tools/mix.mjs --range=30:45
+range 30:45 s  premix -27.95 LUFS, -4.83 dBTP  →  loudnorm dynamic
+mix.wav  integrated -23.3 LUFS  true peak -1.5 dBTP (ebur128)  /  -23.35 LUFS, -1.50 dBTP (loudnorm pass 2)  target -14 LUFS, ≤ -1 dBTP
+5fb9e7c23ffa91d79849fa84b392d9255455856654f833cc0bf980fcfa376deb  out/audio/mix.wav
+
+$ node tools/mix.mjs   (full 180 s)
+range 0:180 s  premix -21.48 LUFS, -4.83 dBTP  →  loudnorm dynamic
+mix.wav  integrated -14.5 LUFS  true peak -1.2 dBTP (ebur128)  /  -14.49 LUFS, -1.50 dBTP (loudnorm pass 2)  target -14 LUFS, ≤ -1 dBTP
+126cd3a090876e97c6956ba1b3ff9464095c7d24756517dc22ea7fc7a83187f7  out/audio/mix.wav
+
+evidence mix_30_45.wav = timeline 32-42 s of the --range=30:45 mix (lamp click at 36.5 s), 16-bit 48 kHz stereo, 1920044 bytes

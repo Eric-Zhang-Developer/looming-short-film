@@ -1,0 +1,15 @@
+$ node evidence/lookdev-composite/timing.mjs
+frames: 240 (0-10 s @ 24 fps), 1920x1080, post on (bokeh + night LUT + grain)
+cold pass: median 15.3 ms, p90 400.5 ms, max 456.3 ms
+  frames that start a new 4 Hz boil step (40): median 403.2 ms, p90 436.9 ms, max 456.3 ms
+warm pass: median 15.1 ms, p90 401.8 ms, max 439.0 ms
+
+render.mjs wall-clock incl. readback + encode (from its own output):
+  --sheet (12 frames, 480 px cells): 364 ms/frame; --strip (12 frames): 104 ms/frame; full-res JPEG still: ~480 ms/frame
+
+Where the boil-step time goes (scratch probe, same page; makePaper timed apart from renderFrame):
+  first visit to a step: makePaper for all 8 sheets ~375-386 ms, renderFrame 26-73 ms
+  revisit (cache hit):   makePaper 0 ms, renderFrame 14-16 ms
+The warm pass above is NOT faster because this scene has 8 sheets x 40 boil steps = 320 entries, over paper.js's
+LRU cap of 300; a sequential replay of 320 entries through a 300-entry LRU misses every time. So: ~15 ms/frame
+to draw with post on, plus ~380 ms on each of the 4 boil steps per second when the step isn't cached.

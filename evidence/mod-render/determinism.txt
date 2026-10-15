@@ -1,0 +1,7 @@
+t=0.5  0b04000ca8013093 0b04000ca8013093 0b04000ca8013093  PASS
+t=4  94a8e3f68cc80f78 94a8e3f68cc80f78 94a8e3f68cc80f78  PASS
+determinism: PASS
+# negative control: page using Math.random (temp file, not committed)
+t=1  183ce790a90a235b 15f35264a80537b6 33c75a444bfb928b  FAIL
+determinism: FAIL
+exit=1

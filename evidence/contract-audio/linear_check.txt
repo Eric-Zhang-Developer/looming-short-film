@@ -1,0 +1,4 @@
+gain 1.363013 (2.690 dB); max |mix - g·premix| = 0.50 LSB over 8640000 samples
+lampClickHome      music under the click: peak 7.66 LSB
+lampClickMarston   music under the click: peak 0.00 LSB
+lampClickFreshman  music under the click: peak 0.59 LSB

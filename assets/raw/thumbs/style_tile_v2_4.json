@@ -1,0 +1,52 @@
+{
+  "output": "assets/raw/style_tile_v2_4.png",
+  "prompt_file": "assets/prompts/style_tile.v2.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/style_tile.v2.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "reference-videos/frames/torn_paper_ref.jpg",
+      "sha256": "fa9f2dad2d2e74653acd38189ff544e3389939839ce3647df72a3c28ca94da2c"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a13fd2-84ef-7552-8178-4c64ebed9214",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a13fd2-84ef-7552-8178-4c64ebed9214/exec-f366027d-8e58-497b-bef4-a74cdb53cb1d.png",
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-GOUgf3",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 281850,
+    "cached_input_tokens": 237440,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2185,
+    "reasoning_output_tokens": 140
+  },
+  "timestamp_start_utc": "2026-10-15T13:48:42Z",
+  "timestamp_end_utc": "2026-10-15T13:51:31Z",
+  "output_sha256": "d2c51cf6db5a749f1387489aab1cbf4cf8f2c41f54b268448a767b5e9e4ffb0a",
+  "width": 2048,
+  "height": 768,
+  "pixel_format": "rgb24",
+  "thumbnail": "assets/raw/thumbs/style_tile_v2_4.jpg",
+  "screening": {
+    "rank": 1,
+    "verdict": "survivor (rank 1 of 4)",
+    "baked_light_or_shadow": "flattest of the four: no cast shadow, no glow, only line work on the hoodie. The shade interior is painted amber (same caveat as v2_2).",
+    "background_flat_and_keyable": "no alpha (rgb24): magenta #FF00FF fallback after Codex discarded its own first render for halos. Flat key; a hard key leaves a 1 px pink fringe (visible in evidence/asset-style-tile/cut_parts.jpg); needs despill before use.",
+    "pieces_separated": "yes, 6 islands, all cut whole by cut.mjs --auto. Gaps 24-32 px (asked ~40).",
+    "on_palette": "yes. Navy, cream, kraft, amber, one red circle, gator green only on the gator. Closest to dry-brush gouache on card.",
+    "resolution": "2048x768, the largest of the four. Gator ~361 px, desk ~283 px: closest to the spec scale.",
+    "banned_ai_tells": "every piece has the same thin cream torn rim (doc 03: the same procedural edge on every shape).",
+    "notes": "Proper desk with legs, perforated calendar top, side-view gator with a short snout and sleepy eye. 2 image_gen calls inside this one Codex run.",
+    "text": "none: calendar boxes blank, no logo, no letters or numbers anywhere",
+    "method": "Viewed full size with the Read tool, composited over #808080 and #1E2440 (evidence/asset-style-tile/contact.jpg), 3x zoom of the gator head edge, and alpha islands counted with tools/cut.mjs --auto (6 of 6 in every variant)."
+  },
+  "codex_images_generated": 2,
+  "backfill_note": "codex_source_file and codex_images_generated recomputed from evidence/asset-style-tile/codex/ after the gen.mjs fix in 0aecb27; this run used the earlier first-match regex."
+}

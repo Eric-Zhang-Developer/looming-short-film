@@ -1,0 +1,80 @@
+re-anchored, time unchanged: 153
+  lampOffHome -2.15 -> lampClickHome +0.35 x1
+  lampOffHome -1.6 -> lampClickHome +0.9 x1
+  lampOffHome -1.05 -> lampClickHome +1.45 x1
+  lampOffHome -0.5 -> lampClickHome +2 x1
+  quiet1Start -18 -> marstonEnter +0 x1
+  -> fridge: 9 events, from lampClickHome, max |err| 0.0e+0 s
+  -> gameNight: 17 events, from lampClickHome, max |err| 0.0e+0 s
+  -> curtainsStart: 66 events, from lampClickHome, max |err| 0.0e+0 s
+  -> scrollStart: 55 events, from lampClickHome, max |err| 0.0e+0 s
+  -> lampClickHome: 4 events, from lampOffHome, max |err| 0.0e+0 s
+  -> marstonEnter: 2 events, from lampClickHome/quiet1Start, max |err| 0.0e+0 s
+
+moved or removed (old time -> new time):
+  old headLift +1 (89.500 s) piano [45,52,60]
+  old headLift +2.5 (91.000 s) piano [41,48,57,64]
+  old headLift +4 (92.500 s) piano [38,45,53,60]
+  old headLift +5.5 (94.000 s) piano [40,47,56,62]
+  old problemOneSolved +3 (120.000 s) piano 69
+  old problemOneSolved +3 (120.000 s) piano [41,48,57]
+  old problemOneSolved +5 (122.000 s) piano 67
+  old problemOneSolved +5 (122.000 s) piano [40,48,55]
+  old problemOneSolved +6.5 (123.500 s) piano 64
+  old problemOneSolved +6.5 (123.500 s) piano [45,52]
+  old problemOneSolved +7.5 (124.500 s) piano 65
+  old problemOneSolved +7.5 (124.500 s) piano [38,45,53]
+  old problemOneSolved +8.5 (125.500 s) piano 62
+  old problemOneSolved +8.5 (125.500 s) piano [43,50,55,60]
+  old quiet2Start -8 (127.000 s) piano [60,72]
+  old quiet2Start -8 (127.000 s) piano [36,43,52]
+  old quiet2Start -7.25 (127.750 s) piano [64,76]
+  old quiet2Start -7.25 (127.750 s) piano [40,48]
+  old quiet2Start -6.5 (128.500 s) piano [69,81]
+  old quiet2Start -6.5 (128.500 s) piano [41,48,57]
+  old quiet2Start -5.75 (129.250 s) piano [67,79]
+  old quiet2Start -5.75 (129.250 s) piano [40,48,55]
+  old quiet2Start -5 (130.000 s) piano [64,76]
+  old quiet2Start -5 (130.000 s) piano [45,52]
+  old quiet2Start -4.25 (130.750 s) piano [65,77]
+  old quiet2Start -4.25 (130.750 s) piano [38,45,53]
+  old quiet2Start -3.5 (131.500 s) piano [62,74]
+  old quiet2Start -3.5 (131.500 s) piano [43,50,55,60]
+  new revealSleeper +0 (89.400 s) piano [45,52,60] | offset from beat 0, target 89.400
+  new revealDrinks +0 (90.400 s) piano [41,48,57,64] | offset from beat 0, target 90.400
+  new revealFreshman +0 (91.400 s) piano [40,47,56,62] | offset from beat 0, target 91.400
+  new problemSolved2 +0 (122.500 s) piano 69 | offset from beat 0, target 122.500
+  new problemSolved2 +0 (122.500 s) piano [41,48,57] | offset from beat 0, target 122.500
+  new problemSolved3 +0 (125.000 s) piano 67 | offset from beat 0, target 125.000
+  new problemSolved3 +0 (125.000 s) piano [40,48,55] | offset from beat 0, target 125.000
+  new problemSolved4 +0 (127.000 s) piano 64 | offset from beat 0, target 127.000
+  new problemSolved4 +0 (127.000 s) piano [45,52] | offset from beat 0, target 127.000
+  new problemSolved5 +0 (128.500 s) piano 65 | offset from beat 0, target 128.500
+  new problemSolved5 +0 (128.500 s) piano [38,45,53] | offset from beat 0, target 128.500
+  new problemSolved6 +0 (130.000 s) piano 62 | offset from beat 0, target 130.000
+  new problemSolved6 +0 (130.000 s) piano [43,50,55,60] | offset from beat 0, target 130.000
+  new problemSolved6 +0.5 (130.500 s) piano [60,72] | offset from beat 0.5, target 130.000
+  new problemSolved6 +0.5 (130.500 s) piano [36,43,52] | offset from beat 0.5, target 130.000
+  new problemSolved6 +0.85 (130.850 s) piano [64,76] | offset from beat 0.85, target 130.000
+  new problemSolved6 +0.85 (130.850 s) piano [40,48] | offset from beat 0.85, target 130.000
+  new problemSolved6 +1.2 (131.200 s) piano [69,81] | offset from beat 1.2, target 130.000
+  new problemSolved6 +1.2 (131.200 s) piano [41,48,57] | offset from beat 1.2, target 130.000
+  new problemSolved6 +1.55 (131.550 s) piano [67,79] | offset from beat 1.5499999999999998, target 130.000
+  new problemSolved6 +1.55 (131.550 s) piano [40,48,55] | offset from beat 1.5499999999999998, target 130.000
+  new problemSolved6 +1.9 (131.900 s) piano [64,76] | offset from beat 1.9, target 130.000
+  new problemSolved6 +1.9 (131.900 s) piano [45,52] | offset from beat 1.9, target 130.000
+  new problemSolved6 +2.25 (132.250 s) piano [65,77] | offset from beat 2.25, target 130.000
+  new problemSolved6 +2.25 (132.250 s) piano [38,45,53] | offset from beat 2.25, target 130.000
+  new problemSolved6 +2.6 (132.600 s) piano [62,74] | offset from beat 2.5999999999999996, target 130.000
+  new problemSolved6 +2.6 (132.600 s) piano [43,50,55,60] | offset from beat 2.5999999999999996, target 130.000
+
+reveal chords vs target beats:
+  revealSleeper 89.400 s: 1 chord, at=0, t=89.400, error 0.000000 s
+  revealDrinks 90.400 s: 1 chord, at=0, t=90.400, error 0.000000 s
+  revealFreshman 91.400 s: 1 chord, at=0, t=91.400, error 0.000000 s
+problem notes vs target beats:
+  problemSolved2 122.500 s: theme note 69 at 122.500, error 0.000000 s
+  problemSolved3 125.000 s: theme note 67 at 125.000, error 0.000000 s
+  problemSolved4 127.000 s: theme note 64 at 127.000, error 0.000000 s
+  problemSolved5 128.500 s: theme note 65 at 128.500, error 0.000000 s
+  problemSolved6 130.000 s: theme note 62 at 130.000, error 0.000000 s

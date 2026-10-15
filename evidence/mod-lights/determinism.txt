@@ -1,0 +1,6 @@
+sha256 of the PNG of lab/lights.html at each t: pass 1 in order, pass 2 in reverse order on the same page, pass 3 on a fresh page.
+t=0.5  a967c8d5be4a0f7730a4c1d49e45310500256c0db43ccc48211d4eaee1124a0e  IDENTICAL
+t=3  aa0b7d6011b60d25e4f4d48adb12f3e6a6fe660c252b8f77725ad676468ddd9c  IDENTICAL
+t=5.2  502baf5d6f5ea14da49c8680c6381b373d49a796017f33d547cabc12e89ccb6b  IDENTICAL
+t=7.5  1019ff07186b8c14569a4e3261bf2b021a57b090fef0fbcb61f7216f15cc60af  IDENTICAL
+PASS

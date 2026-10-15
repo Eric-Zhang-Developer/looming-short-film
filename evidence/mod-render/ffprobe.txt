@@ -1,0 +1,15 @@
+# video only (--encode)
+codec_name=h264
+width=1920
+height=1080
+pix_fmt=yuv420p
+r_frame_rate=24/1
+duration=1.000000
+nb_read_frames=24
+# with --audio
+codec_name=h264
+codec_type=video
+duration=1.000000
+codec_name=aac
+codec_type=audio
+duration=1.000000

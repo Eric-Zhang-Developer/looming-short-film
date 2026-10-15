@@ -1,0 +1,64 @@
+same shot count 18, DURATION 180
+same s01 start 0 duration 6
+same s02 start 6 duration 9
+same   inkDropForms @ 4
+same s03 start 15 duration 5
+same   phoneUp @ 0.5
+same s04 start 20 duration 8
+same s05 start 28 duration 8
+same s06 start 36 duration 8
+same   lampClickHome @ 0.5
+same   lampOffHome @ 3
+same s07 start 44 duration 10
+same   curtainsDone @ 8
+same s08 start 54 duration 6
+same s09 start 60 duration 6
+same s10 start 66 duration 6
+same s11 start 72 duration 6
+same s12 start 78 duration 10
+same   quiet1Start @ 0
+same s13 start 88 duration 7
+same   headLift @ 0.5
+same s14 start 95 duration 5
+same   custodianPass @ 0.5
+same s15 start 100 duration 14
+same   lampClickMarston @ 0.5
+same   penUncap @ 8
+same   nameWritten @ 10
+same s16 start 114 duration 21
+same   problemOneSolved @ 3
+same s17 start 135 duration 25
+same   quiet2Start @ 0
+same s18 start 160 duration 20
+same   nextSemester @ 0
+same   lampClickFreshman @ 4
+same   blobYawn @ 14
+
+new beats (25):
+  s04.fridge @ 0 (global 20)
+  s05.gameNight @ 0 (global 28)
+  s07.curtainsStart @ 0 (global 44)
+  s08.scrollStart @ 0 (global 54)
+  s09.marstonEnter @ 0 (global 60)
+  s10.stacksEnter @ 0 (global 66)
+  s10.stacksFlicker1 @ 0.4 (global 66.4)
+  s10.stacksFlicker2 @ 3.4 (global 69.4)
+  s11.laptopOpen @ 1 (global 73)
+  s11.phoneWake @ 3.6 (global 75.6)
+  s11.tableLightDies @ 4.2 (global 76.2)
+  s13.revealSleeper @ 1.4 (global 89.4)
+  s13.revealDrinks @ 2.4 (global 90.4)
+  s13.revealFreshman @ 3.4 (global 91.4)
+  s14.tinyBlobSeen @ 2.3 (global 97.3)
+  s15.phoneFaceDown @ 7.417 (global 107.417)
+  s16.problemSolved2 @ 8.5 (global 122.5)
+  s16.problemSolved3 @ 11 (global 125)
+  s16.problemSolved4 @ 13 (global 127)
+  s16.problemSolved5 @ 14.5 (global 128.5)
+  s16.lampClickNeighbor @ 15 (global 129)
+  s16.problemSolved6 @ 16 (global 130)
+  s17.dawnBird1 @ 6 (global 141)
+  s17.dawnBird2 @ 13.5 (global 148.5)
+  s17.dawnBird3 @ 19 (global 154)
+
+PASS: no shot boundary or existing beat moved

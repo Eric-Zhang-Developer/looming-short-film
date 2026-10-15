@@ -1,0 +1,8 @@
+music peak 88-89.4 s: -180.0 dBFS
+music peak 94.4-95 s: -21.0 dBFS
+music peak 95-100 s: -60.8 dBFS
+music peak 130.5-133 s: -6.0 dBFS
+music peak 133-134.5 s: -6.0 dBFS
+music peak 134.5-135 s: -62.9 dBFS
+music peak 135-136 s: -95.4 dBFS
+music peak 136-160 s: -180.0 dBFS

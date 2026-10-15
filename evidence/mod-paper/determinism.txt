@@ -1,0 +1,8 @@
+$ node tools/determinism.mjs --page=lab/paper.html --t=0.05,0.35,15.2,33.3,55.55
+t=0.05  95abfa48d71ab365 95abfa48d71ab365 95abfa48d71ab365  PASS
+t=0.35  29e8132a640c539d 29e8132a640c539d 29e8132a640c539d  PASS
+t=15.2  dc25001d267d9004 dc25001d267d9004 dc25001d267d9004  PASS
+t=33.3  49c5ab5f384e23e6 49c5ab5f384e23e6 49c5ab5f384e23e6  PASS
+t=55.55  09e63b90066cacab 09e63b90066cacab 09e63b90066cacab  PASS
+determinism: PASS
+exit 0

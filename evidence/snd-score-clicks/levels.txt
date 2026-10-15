@@ -1,0 +1,3 @@
+lampClickHome @36.5s  window 1752000..1766400: peak 0  rms 0  nonzero samples 0
+lampClickMarston @100.5s  window 4824000..4838400: peak 0  rms 0  nonzero samples 0
+lampClickFreshman @164s  window 7872000..7886400: peak 0  rms 0  nonzero samples 0

@@ -1,0 +1,12 @@
+Boil steps at rate 10, stress pose A held (lab/puppet.html t in [4, 6)). flip = alphaMap px (green channel, which three samples, > 0.5) changed since the previous step.
+t=4.05  all 9 parts at seed 40  body area 142162 flip 0 (0.00%)  head area 106367 flip 0 (0.00%)
+t=4.15  all 9 parts at seed 41  body area 142195 flip 1205 (0.85%)  head area 106220 flip 1091 (1.03%)
+t=4.25  all 9 parts at seed 42  body area 142254 flip 1241 (0.87%)  head area 106338 flip 1130 (1.06%)
+t=4.35  all 9 parts at seed 43  body area 142408 flip 1224 (0.86%)  head area 106347 flip 1083 (1.02%)
+t=4.45  all 9 parts at seed 44  body area 142325 flip 1235 (0.87%)  head area 106295 flip 1098 (1.03%)
+t=4.55  all 9 parts at seed 45  body area 142356 flip 1293 (0.91%)  head area 106345 flip 1198 (1.13%)
+t=4.65  all 9 parts at seed 46  body area 142204 flip 1192 (0.84%)  head area 106424 flip 1165 (1.09%)
+t=4.75  all 9 parts at seed 47  body area 142330 flip 1430 (1.00%)  head area 106440 flip 1126 (1.06%)
+t=4.85  all 9 parts at seed 48  body area 142415 flip 1259 (0.88%)  head area 106338 flip 1194 (1.12%)
+t=4.95  all 9 parts at seed 49  body area 142434 flip 1227 (0.86%)  head area 106365 flip 1127 (1.06%)
+pass rule: every step re-tears (flip > 0), silhouette holds (flip < 5% of area), all parts share the seed → PASS

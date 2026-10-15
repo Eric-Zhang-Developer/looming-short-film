@@ -1,0 +1,6 @@
+range 0:180 s  premix -16.69 LUFS, -4.83 dBTP  →  loudnorm linear
+mix.wav  integrated -14.0 LUFS  true peak -2.1 dBTP (ebur128)  /  -13.96 LUFS, -2.28 dBTP (loudnorm pass 2)  target -14 LUFS, ≤ -1 dBTP
+7ee748a7cedecc85a2afdc698e158077189caedfad4e59c4db38080bf54db1ea  /Users/ericzhang/.worktrees/looming/contract-audio/out/audio/mix.wav
+1160d4e3c75905ace0f5c5b7468b1339076fb99a507b69b3dddc8523c049adc2  out/audio/stems/ambience.wav
+25a16a0f7839cf11cec11c8a905f2a33428140ed1db9dbda12cd48750cf60c46  out/audio/stems/foley.wav
+d38ed8af89f1161d7c33d826e1d9d2037b7f6f3300f4889d08c9acaded940cdf  out/audio/stems/music.wav
