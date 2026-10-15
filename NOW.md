@@ -34,6 +34,7 @@
 - Stage gained `setRender` (implemented by `mod-post`). Addon pages need `three/examples/jsm/` in the import map (contracts updated).
 
 ## Open director questions
+- **Story-beat conflicts from sb-act3 (one-way doors, ask after reconcile):** s17 "only light and boil move" vs doc 02's sit-back and pocket climb; a 4th lamp click (the neighbor's); s18's click at 2:44 squeezes the walk-over; a second red circle on the new calendar.
 - **For G2/animatic (from sb-act2):** (a) blob size: contract 0.025 m is over half the gator's height; storyboard used 0.012 m. (b) A phone that lights the blob also lights its holder, so a true phone loom throws the gator's own giant shadow too; sb-act2 aimed the light at the blob only. Film-wide call.
 - **G2 agenda: the Exam's look.** `mod-blob` reads as glossy CG gel (cute, nervous), not ink on paper; the specular highlight can sit where a mouth would. Options to show at G2: keep gel, matte ink with a painted highlight, or a painted Codex blob on paper. Evidence: `evidence/mod-blob/squash_strip.jpg`.
 - Final submission deadline (confirm on ProposalSpace).

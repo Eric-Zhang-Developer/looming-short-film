@@ -30,7 +30,7 @@
 ### parallel track: storyboard (docs)
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · in-progress · —
 - sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · built (merged) · done/sb-act2.md
-- sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · in-progress · —
+- sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · built (merged) · done/sb-act3.md
 - snd-engine · builder · `src/audio/`, `tools/mix.mjs` · verified (merged) · evidence/snd-engine/loudness.txt
 
 ### wave 3, started early
