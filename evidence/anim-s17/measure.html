@@ -1,0 +1,48 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s17 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s17 measurement rig: builds src/shots/s17.js on its own stage with no post (pixels are the lit scene) and reads
+  // pixels back at projected world points. Driven by measure.mjs. Times are s17-local.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build } from '/src/shots/s17.js';
+
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: () => ({ set() {} }) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 25 });
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  const read = () => { const b = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, b); return b; };
+  let px = null, alt = null;
+  const project = (p) => { const v = new THREE.Vector3(...p).project(camera); return [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H]; };
+  const lumOf = (buf, [x, y]) => { x = Math.round(x); y = Math.round(y); if (x < 0 || y < 0 || x >= W || y >= H) return null;
+    const i = ((H - 1 - y) * W + x) * 4; return (0.2126 * buf[i] + 0.7152 * buf[i + 1] + 0.0722 * buf[i + 2]) / 255; };
+  Object.assign(window, {
+    W, H, project,
+    hold: (o) => Object.assign(shot.hold, o),
+    step: (t) => { shot.update(t); return shot.probe(); },                       // no render
+    frame: (t) => { stage.renderFrame(t); px = read(); return shot.probe(); },
+    // render t twice, the second time with `what` hidden ('dawn' | 'blob' | 'nbBlob'): alt holds the second
+    frameWithout: (t, what) => { const p = window.frame(t), o = shot[what]; o.visible = false; stage.renderFrame(t); alt = read(); o.visible = true; return p; },
+    lumAvg: (w, r) => { const [cx, cy] = project(w); let s = 0, n = 0;
+      for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) { const l = lumOf(px, [cx + x, cy + y]); if (l !== null) { s += l; n++; } } return s / n; },
+    // along a world segment: [s, lum, lumWithout]
+    scanBoth: (a, b, n) => Array.from({ length: n + 1 }, (_, i) => {
+      const w = a.map((v, j) => v + (b[j] - v) * i / n), q = project(w); return [w[0], lumOf(px, q), lumOf(alt, q)]; }),
+    // the pixel box between two world points (screen-space bbox): how many pixels the hidden thing brightened by > thr
+    boxDiff: (a, b, thr) => { const [x0, y0] = project(a), [x1, y1] = project(b); let n = 0, max = 0, tot = 0;
+      for (let y = Math.round(Math.min(y0, y1)); y <= Math.max(y0, y1); y++) for (let x = Math.round(Math.min(x0, x1)); x <= Math.max(x0, x1); x++) {
+        const d = lumOf(px, [x, y]) - lumOf(alt, [x, y]); tot++; if (d > thr) n++; if (d > max) max = d; }
+      return { n, max, tot }; },
+    // whole-frame difference against the previous frame() call
+    keep: () => { window._prev = px; },
+    diffPrev: () => { let n = 0, max = 0; const a = window._prev;
+      for (let i = 0; i < px.length; i += 4) { const d = Math.max(Math.abs(px[i] - a[i]), Math.abs(px[i + 1] - a[i + 1]), Math.abs(px[i + 2] - a[i + 2]));
+        if (d) n++; if (d > max) max = d; } return { n, max }; },
+  });
+</script>

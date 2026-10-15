@@ -1,0 +1,3 @@
+t=143.75  40f193c9e5cc7a13 40f193c9e5cc7a13 40f193c9e5cc7a13  PASS
+t=158  dc4137b98bd61eb9 dc4137b98bd61eb9 dc4137b98bd61eb9  PASS
+determinism: PASS
