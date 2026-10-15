@@ -28,6 +28,7 @@ codex exec -s workspace-write \
   - runs it N times for variants
   - finds each new file
   - writes a sidecar `.json` (prompt file, reference hashes, model, timestamp, output sha256)
+  - writes a ≤1024 px JPEG thumbnail to `assets/raw/thumbs/` next to the sidecar
 
 **Not yet verified:** that `codex exec` triggers `image_gen` reliably without a person in the loop, and what each image costs against the ChatGPT plan limit. The W1 smoke test checks both (doc 06).
 
@@ -114,7 +115,8 @@ Budget: about 25–35 frozen assets from roughly 100–150 generations.
 ```
 assets/specs.json            # every asset's spec and checklist
 assets/prompts/<name>.vN.md  # every prompt, versioned, committed
-assets/raw/                  # all outputs incl. rejects + sidecars (committed: they are evidence)
+assets/raw/                  # full-size outputs (gitignored, local only)
+assets/raw/thumbs/           # every output as a ≤1024 px JPEG + its sidecar .json (committed: evidence)
 assets/frozen/               # director picks, never edited
 assets/generated/manifest.json
 assets/cut/                  # keyed parts + masks
@@ -123,6 +125,6 @@ tools/gen.mjs  tools/cut.mjs
 
 ## Transparency deliverables
 
-- The manifest, the prompts and the rejected outputs are public in the repo.
+- The manifest, the prompts and every output (as thumbnails, rejects included, each with its screening reason) are public in the repo. Only the frozen picks are committed at full size, which keeps the repo at roughly 100 MB instead of 300–600 MB (doc 09 · Version control).
 - The process log (doc 07) records every director pick and note.
 - **End card:** one frozen Codex painting beside the same part cut, lit and casting its shadow in the scene. It shows the division of labor at a glance, with no words.

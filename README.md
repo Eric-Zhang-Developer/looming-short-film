@@ -55,3 +55,4 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 - Every non-trivial decision goes in the process log (see doc 07).
 - Generated images are assets, never render-time calls. Every one is listed in `assets/generated/manifest.json` with its prompt, model, date and hash.
 - `reference-videos/` is gitignored. It holds third-party videos used only for study.
+- `main` always renders. Work lands through one PR per wave. Watchable cuts are tags (`v0-test-shot` … `v3-final`), each with its MP4 on a GitHub Release (doc 09 · Version control).

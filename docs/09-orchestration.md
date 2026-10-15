@@ -64,14 +64,54 @@ Report states exactly. Never call something "done" when it's "built."
 - **Full-film renders: one at a time**, never during a shot wave.
 - For large fan-outs (wave 4 shots, wave 5 reviews), the orchestrator runs **workflows** (build → verify → 2 reviews per shot, pipelined) instead of dispatching one subagent at a time. The default workflow size is about 10 agents; the director can raise it under "Dynamic workflow size" in /config.
 
-## Merging
+## Version control
 
-The orchestrator merges a builder's worktree branch into `main` locally once the task is **verified**. Before merging:
+```
+main ─────●────────────●────────── always renders; only wave PRs (and spec commits) land here
+           \          /  \        /
+  wave/2-foundations ●    wave/5-act1 ●
+       ↑  ↑  ↑               ↑  ↑
+  task/mod-paper  task/mod-lights …  task/shot-04 …   (one per subagent worktree)
+```
+
+**Task branches** (`task/<id>`): each subagent works in its own worktree on its own branch, cut from the current wave branch. Once the task is **verified**, the orchestrator squash-merges it into the wave branch, so each task becomes **one commit** and can be reverted on its own. Before merging:
 1. Check the diff touches only the brief's `owns`.
 2. Run `tools/check_timeline.mjs` and `tools/determinism.mjs`.
-3. Fast-forward or squash, with a commit message that names the task ID and argues the change.
+3. Squash, with a message that names the task and argues the change.
 
-Push to GitHub at the end of each wave, or when the director asks.
+Then delete the task branch and worktree.
+
+**Wave branches** (`wave/<n>-<name>`): cut from `main` at the start of each wave. At the end of the wave the orchestrator pushes it and opens **one PR to `main`**. The PR body lists every task with:
+- its state
+- its evidence image (contact sheet or strip)
+- the review verdicts
+- open gaps
+
+**The director's gate approval is the merge** (a merge commit, which keeps the task commits). Push the wave branch to GitHub at least daily so work isn't only on one laptop.
+
+**`main` always renders.** Nothing lands on it except merged wave PRs, plus `spec:` commits that change only `docs/`, `AGENTS.md`, `templates/` or the README.
+
+**Commit message prefixes:** `shot(<nn>):`, `mod(<name>):`, `asset(<name>):`, `snd(<name>):`, `contract(<name>):`, `spec:`, `state:` (for `NOW.md`, board and log updates). Spec and state changes get their own commits, never mixed with code.
+
+**Versions are tags on `main`**, one per watchable cut:
+
+| Tag | Cut | Gate |
+|---|---|---|
+| `v0-test-shot` | The 10 s paper test | G3 |
+| `v1-animatic` | Full 3:00 blocking with temp sound | G4 |
+| `v2-rough-cut` | Every shot at final quality, first mix | G5 (all acts) |
+| `v3-final` | Color, final mix, captions. The submitted film. | G6 |
+| `v3.1`… | Post-submission fixes, if any | none |
+
+Each tag gets a **GitHub Release with the rendered MP4 attached** (plus the captions file for `v3-final`), so any cut can be watched without rendering. Rendered video never goes into git.
+
+**What goes in git, by size:**
+- Code, docs, prompts and sidecar JSON: always.
+- Frozen asset PNGs (about 30, roughly 100 MB): committed at full size.
+- Rejected generations: committed only as downscaled JPEG thumbnails (doc 08). Originals stay local and gitignored.
+- `out/`, `evidence/` frames over 2 MB, and `reference-videos/`: never committed.
+
+No Git LFS: its free bandwidth quota is too small for a public repo that judges may clone.
 
 ## Director gates
 

@@ -2,3 +2,5 @@ reference-videos/
 node_modules/
 out/
 .DS_Store
+assets/raw/*
+!assets/raw/thumbs/

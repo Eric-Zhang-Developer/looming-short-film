@@ -101,6 +101,15 @@ Don't log routine coding steps. Git history covers those.
 **Why:** versioned prompt files and reference chaining keep 30-odd assets consistent with one style tile, and make every image traceable.
 **Who:** director.
 
+### 2026-10-15 · Version control: task → wave → main, cuts as tags
+**Decision:** Each subagent works on its own task branch, squash-merged into a wave branch. Each wave lands on `main` as one PR, and the director's gate approval is the merge. Watchable cuts are tags with the MP4 on a Release. Rejected generations are committed only as thumbnails.
+**Alternatives:**
+- committing tasks straight to `main` (simpler, but a half-built shot can land and there's no per-gate review)
+- one PR per task (about 60 PRs, too noisy)
+- Git LFS for images (the free bandwidth is too small for a public repo)
+**Why:** `main` stays watchable, each gate gets one readable review on GitHub, and the repo stays around 100 MB instead of 300–600 MB.
+**Who:** director asked; Claude proposed; director approved.
+
 ## Publishing
 
 At submission, link this file from the README and the synopsis. Include 6–10 before/after frames for the biggest overrides. Leave in the experiments that failed. They're the most convincing evidence that a human was directing.
