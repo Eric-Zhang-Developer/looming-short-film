@@ -1,6 +1,6 @@
 # NOW
 
-**Wave:** 2 · Foundations · branch `wave/2-foundations` · **batch 1 merged; batch 2: post + lights merged; sound engine merged; style tile + foley + score started early**
+**Wave:** 3 · Assets · branch `wave/3-assets` · **wave 2 merged (#2); waiting on G1 + Q1–Q8; mod-film building**
 **Updated:** 2026-10-15
 
 ## In flight
@@ -21,7 +21,7 @@
 - none
 
 ## Next 3 moves
-1. Open the wave 2 PR once look-pass-1, contract-puppet and snd-score-clicks merge (lookdev before/after as headline evidence).
+1. Merge `mod-film` into `wave/3-assets`; then wave 4 animatic shot builders (blocking, proxies) in batches of 5, following the QUESTIONS recommendations until the director answers.
 2. **Waiting on G1.** On the pick: freeze it to `assets/frozen/style_tile.png` (despilled), then dispatch the gator sheet painter (G2).
 3. `sb-reconcile` running (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names + snd-score's fridge/gameNight/curtainsStart/scrollStart/marstonEnter into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
 

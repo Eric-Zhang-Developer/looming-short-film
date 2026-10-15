@@ -131,3 +131,7 @@ At submission, link this file from the README and the synopsis. Include 6–10 b
 ## 2026-10-15 · Lookdev: the rig works, the look half passes
 
 The first full-rig composite (`evidence/lookdev-composite/`) proved the mechanics: a 3.04× loom with eye holes under the phone, a 1.4× pool under the lamp, deterministic frames, about 15 ms per frame. Side by side with the reference, it reads as paper only where it's lit. Four rig problems went to `look-pass-1`: a doubled rim that reads as a stroke, a night grade much darker than the reference's picture-book night, 3D-looking light shapes, and a paper cache smaller than one shot. The fifth problem is the art itself. The v2 style tiles paint the props in the wall's navy, so they vanish into it and only their rims show. That's a palette call, so it goes back to the director at G1, with a recommendation to make a v3 tile under a value-contrast rule rather than freeze a v2.
+
+## 2026-10-15 · Wave 2 merged (#2)
+
+All modules verified and the lookdev passes the rig. Two look passes fixed every code-side problem the composite exposed. What still reads as vector is the art: navy props on a navy wall. That goes back to the director at G1. Sound is ahead of schedule: score, foley and a linear master with identical lamp clicks. Wave 3 (`wave/3-assets`) starts with `mod-film` in flight and G1 plus 8 story questions open.
