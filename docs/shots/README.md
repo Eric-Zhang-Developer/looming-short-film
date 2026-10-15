@@ -74,5 +74,6 @@ Faces have to read: the story is told by eyes and mouths, and doc 03's single ke
 It's a fill, not a second key, so doc 03 rule 1 (one key, one shadow) still holds. This is reversible; the director can veto it at G4.
 
 ## 11. Light helpers
-- `aim()`'s default shadow near plane can sit behind close casters. Until `contract-light-key` merges, set `spot.shadow.camera.near = 0.004` after every `aim()` where a caster is within 10 cm of the light.
+- `aim()` now defaults the shadow near plane to `min(0.004, d/20)` (contract-light-key), so no manual `near` is needed.
+- The blob keys its highlight off the light with the biggest contribution at the blob. A §10 character fill near the blob can win that, so pass `exam.update(t, { key: <your key light> })` whenever a fill sits close to the blob.
 - The colour grade for s09 and s10 is `night` (the spec's `act2b` doesn't exist, and `marston` crushes the exterior), so the s09→s10 cut doesn't jump.
