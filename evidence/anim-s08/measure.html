@@ -1,0 +1,85 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s08 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s08 measurement rig (the smoke-paper method, as anim-s03): builds src/shots/s08.js on its own stage without post,
+  // renders the frame twice with the blob invisible to the camera (colorWrite off), once casting and once not, with the
+  // dawn light's shadow off so only the phone's shadow differs. Changed pixels are back-projected onto the wall plane
+  // (z 0); only hits on the wall above the floor (y > 0.0005) and left of screen x 1100 count (the bed, 25 cm nearer the camera, is
+  // where the blob's shadow also dims the mattress; back-projected to z = 0 those pixels would land at x 0.19). Scale = shadow width / blob width, the blob width
+  // being its own camera mask back-projected onto its plane. Also: window.sunMask(t) = pixels the sun adds (sun on vs
+  // off, the phone's shadow and everything else identical), as boxes on screen, for the slash check.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build } from '/src/shots/s08.js';
+
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: () => ({ set() {} }) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 6 });
+  const { exam, sun, rig } = shot;
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  const grabPx = () => { renderer.render(scene, camera); const p = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, p); return p; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+  const onPlane = (x, y, z) => { ndc.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1); ray.setFromCamera(ndc, camera); return ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -z), hit); };
+  function box(mask, z, keep = () => true) {
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, n = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!mask[y * W + x]) continue;
+      const h = onPlane(x, y, z); if (!keep(h, x)) continue; n++;
+      x0 = Math.min(x0, h.x); x1 = Math.max(x1, h.x); y0 = Math.min(y0, h.y); y1 = Math.max(y1, h.y);
+    }
+    return { x0, x1, y0, y1, w: x1 - x0, h: y1 - y0, n };
+  }
+  const diff = (a, b, th) => { const m = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) m[i] = Math.abs(a[i * 4] - b[i * 4]) + Math.abs(a[i * 4 + 1] - b[i * 4 + 1]) + Math.abs(a[i * 4 + 2] - b[i * 4 + 2]) > th ? 1 : 0; return m; };
+  window.measure = (t) => {
+    stage.renderFrame(t);
+    const mat = exam.mesh.material, stain = exam.stain.visible, sunCast = sun.castShadow;
+    sun.castShadow = false; exam.stain.visible = false;
+    mat.colorWrite = false; mat.depthWrite = false;
+    exam.mesh.castShadow = true; const a = grabPx();
+    exam.mesh.castShadow = false; const b = grabPx();
+    mat.colorWrite = true; mat.depthWrite = true; exam.mesh.castShadow = true;
+    exam.mesh.castShadow = false; exam.mesh.visible = false; const c = grabPx(); exam.mesh.visible = true; const d = grabPx(); exam.mesh.castShadow = true;
+    sun.castShadow = sunCast; exam.stain.visible = stain;
+    const s = box(diff(a, b, 12), 0, (h, px) => h.y > 0.0005 && px < 1100), bl = box(diff(c, d, 12), exam.mesh.position.z);
+    return { t, shadow: s, blob: bl, scale: s.w / bl.w, scaleH: s.h / bl.h };
+  };
+  // Screen masks (y down, canvas px) of: the sun's added light, the blob, his head+body, for the slash overlap check.
+  window.sunMask = (t) => {
+    stage.renderFrame(t);
+    const I = sun.intensity, e = exam.mesh.material;
+    const on = grabPx(); sun.intensity = 0; const off = grabPx(); sun.intensity = I;
+    exam.mesh.castShadow = false;  // so hiding the blob hides only the blob, not its 12.6× shadow
+    exam.mesh.visible = false; const noBlob = grabPx(); exam.mesh.visible = true;
+    rig.group.visible = false; const noStu = grabPx(); rig.group.visible = true;
+    const full = grabPx(); exam.mesh.castShadow = true;
+    const mk = (m) => { let x0 = 1e9, x1 = -1, y0 = 1e9, y1 = -1, n = 0; for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (m[y * W + x]) { n++; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); } return { x0, x1, y0, y1, n }; };
+    const sunM = diff(on, off, 20), blobM = diff(full, noBlob, 12), stuM = diff(full, noStu, 12);
+    // min screen distance (px) between the sun's lit pixels and each mask, and how many sun pixels fall inside it
+    const near = (a, m) => { const idx = []; for (let i = 0; i < W * H; i++) if (m[i]) idx.push(i); let best = 1e9, inside = 0; const pts = []; for (let i = 0; i < W * H; i++) if (a[i]) pts.push(i);
+      for (const p of pts) { if (m[p]) inside++; }
+      // distance via coarse sampling of the mask (every 4th px) to keep it cheap
+      const ms = idx.filter((_, k) => k % 4 === 0), ps = pts.filter((_, k) => k % 4 === 0);
+      for (const p of ps) { const px = p % W, py = (p / W) | 0; for (const q of ms) { const dx = (q % W) - px, dy = ((q / W) | 0) - py, dd = dx * dx + dy * dy; if (dd < best) best = dd; } }
+      return { inside, minDist: Math.sqrt(best) }; };
+    return { t, sun: mk(sunM), blob: mk(blobM), student: mk(stuM), vsBlob: near(sunM, blobM), vsStudent: near(sunM, stuM) };
+  };
+  // The sun's added light as an image (x8), for looking at where the slash and seams land.
+  window.sunImage = (t) => {
+    stage.renderFrame(t);
+    const I = sun.intensity, on = grabPx(); sun.intensity = 0; const off = grabPx(); sun.intensity = I;
+    const o = document.createElement('canvas'); o.width = W; o.height = H; const g = o.getContext('2d'), id = g.createImageData(W, H);
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4, j = ((H - 1 - y) * W + x) * 4;  // readPixels is bottom-up
+      id.data[j] = Math.min(255, 4 * Math.abs(on[i] - off[i])); id.data[j + 1] = Math.min(255, 4 * Math.abs(on[i + 1] - off[i + 1])); id.data[j + 2] = Math.min(255, 4 * Math.abs(on[i + 2] - off[i + 2])); id.data[j + 3] = 255;
+    }
+    g.putImageData(id, 0, 0);
+    return o.toDataURL('image/jpeg', 0.8);
+  };
+  window.shot = shot;
+</script>

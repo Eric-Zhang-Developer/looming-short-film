@@ -1,0 +1,1 @@
+right seam edge 10–90 %: median 4 px (quartiles 3..4, 260 rows)
