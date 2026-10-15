@@ -1,0 +1,6 @@
+Temporary edits to the Quiet 2 roomTone cue, mixed with `node tools/mix.mjs --range=130:165`, then the first and
+last non-zero sample of out/audio/stems/ambience.wav (reverted afterwards with `git checkout src/audio/cues.js`):
+
+{ beat: 'quiet2Start', offset: -0.25, until: 'nextSemester', ... }  → ambience nonzero 134.750 - 160.000
+{ beat: 'quiet2Start', offset: -0.25, dur: 5, ... }                → ambience nonzero 134.750 - 139.750
+As committed (no offset, until: 'nextSemester'), full mix          → 135.000 - 160.000 (see selftest.txt)

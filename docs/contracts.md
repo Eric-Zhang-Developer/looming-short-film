@@ -175,13 +175,19 @@ export function lowpass(buf, hz), highpass(buf, hz), env(buf, { a, d, s, r })
 export function mixInto(dest, src, atSec, gain = 1)
 
 // foley.js: named sounds from doc 05's foley table
-export const FOLEY   // { lampClick, penUncap, inkDrip, paperRustle, fluorescentHum, ... } → (seed) => Float32Array
+export const FOLEY   // { lampClick, penUncap, inkDrip, paperRustle, fluorescentHum, ... } → (seed, dur?) => Float32Array
+                     // dur in seconds; beds and sized one-shots honour it, others ignore it; omitted → the sound's default length
 
 // cues.js
 export const CUES    // [{ beat: 'lampClickHome', sound: 'lampClick', gain: 0.8 }, ...]: by beat name, never raw time
+// optional per cue: offset (s, may be negative; starts at beat + offset, default 0), dur (s) or until: '<beatName>'
+// (length = beat(until) − start), stem ('foley' default | 'ambience' | 'music'), seed (default seedOf(sound))
 ```
 
 ```
 node tools/mix.mjs [--range=a:b]   → out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav,
                                      loudness-normalized to -14 LUFS (ffmpeg loudnorm), prints measured LUFS and true peak
+                                     Music stem: fixed +5 dB into a -6 dBFS sample-peak limiter (written post-limiter).
+                                     loudnorm is linear (one gain for the file; LRA gate off), so identical cues stay
+                                     identical in mix.wav; a full mix throws if loudnorm falls back to dynamic.
 ```

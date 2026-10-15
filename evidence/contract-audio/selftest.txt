@@ -1,0 +1,28 @@
+    lampClickHome@36.5s, lampClickMarston@100.5s, lampClickFreshman@164s; 24000 samples each (±0.1 s), peak 0.5645
+ok  three lamp clicks are sample-identical in out/audio/stems/foley.wav
+    roomTone in ambience: cue 135–160 s, non-zero samples 135.00002083333334–159.99997916666666 s
+ok  a bed cue with a length fills it in its stem
+ok  voices and foley are deterministic and finite
+ok  every foley sound renders, deterministic and finite
+    max diff vs lampClickMarston [8,0,1] LSB over 14400 samples each, peak 25206 LSB
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: clicks differ by up to 8 LSB
+    at file:///Users/ericzhang/.worktrees/looming/contract-audio/src/audio/selftest.js:59:10
+    at ok (file:///Users/ericzhang/.worktrees/looming/contract-audio/src/audio/selftest.js:15:28)
+    at file:///Users/ericzhang/.worktrees/looming/contract-audio/src/audio/selftest.js:48:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:413:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}
+
+Node.js v24.13.0
+exit 1

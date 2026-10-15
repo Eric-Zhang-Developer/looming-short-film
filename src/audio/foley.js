@@ -1,5 +1,5 @@
 // Named foley from doc 05's table. One-shots: (seed) => mono Float32Array at 48 kHz.
-// Beds built by snd-foley take a length: (seed, dur). The older paperRustle/fluorescentHum take (seed, { dur }).
+// Beds and sized one-shots take a length: (seed, dur), dur in seconds; omit it for the sound's default length.
 // Each sound's output peak is its intended loudness relative to the others at cue gain 1.
 // The same seed always gives the same samples, so a cue repeated with one seed is sample-identical.
 import { mulberry32 } from '../core/rng.js';
@@ -55,7 +55,7 @@ function inkDrip(seed = 1) {
 }
 
 // Paper rustle: band-passed noise (2–6 kHz) shaped by seeded crackle grains over a soft swell.
-function paperRustle(seed = 1, { dur = 0.8 } = {}) {
+function paperRustle(seed = 1, dur = 0.8) {
   const r = mulberry32(seed), n = Math.ceil(dur * SR);
   const base = bandpass(noise(seed, dur), 3500, 0.6), shape = new Float32Array(n);
   for (let g = 0; g < dur * 60; g++) {            // ~60 grains/s at random times and levels
@@ -68,7 +68,7 @@ function paperRustle(seed = 1, { dur = 0.8 } = {}) {
 
 // Fluorescent hum: 120 Hz mains buzz. A soft-clipped 120 Hz sine (odd harmonics) plus even harmonics
 // and a faint 60 Hz. 400 samples per period at 48 kHz, so any length loops cleanly. Seed unused.
-function fluorescentHum(seed = 1, { dur = 4 } = {}) {
+function fluorescentHum(seed = 1, dur = 4) {
   const w = TAU * 120 / SR;
   return gen(dur, (t, i) => {
     const buzz = Math.tanh(2.5 * Math.sin(w * i)) * 0.5;
@@ -122,7 +122,7 @@ function inkRoll(seed = 1, dur = 1.2) {
 // under a soft, darkened paper rustle.
 function shadowGrowth(seed = 1, dur = 2.5) {
   const out = subSwell({ hz: 45, dur, attack: dur * 0.6 });
-  mixInto(out, norm(lowpass(paperRustle(seed, { dur }), 4500), 0.15), 0);
+  mixInto(out, norm(lowpass(paperRustle(seed, dur), 4500), 0.15), 0);
   return norm(out, 0.6);
 }
 
@@ -173,7 +173,7 @@ function drill(seed = 1) {
 // (seed, dur) => one-shot of length dur. The Marston tubes flicker: the fluorescent buzz gated on and off in
 // seeded 20–150 ms segments (2 ms smoothing), with a crackle of 3–8 sharp ticks at each strike.
 function fluorescentFlicker(seed = 1, dur = 1.2) {
-  const r = mulberry32(seed), n = Math.ceil(dur * SR), gate = new Float32Array(n), out = scale(fluorescentHum(seed, { dur }), 2);
+  const r = mulberry32(seed), n = Math.ceil(dur * SR), gate = new Float32Array(n), out = scale(fluorescentHum(seed, dur), 2);
   let on = false;
   for (let t = 0.03; t < dur;) {
     const seg = on ? 0.03 + 0.12 * r() : 0.02 + 0.08 * r();
