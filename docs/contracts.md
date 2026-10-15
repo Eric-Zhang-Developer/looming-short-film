@@ -9,7 +9,7 @@ The interfaces every shot is built on. Wave 2 builders implement exactly these. 
 - **Time:** `t` is global seconds from 0 to 180. Shot code gets `tLocal`, seconds since its shot started. Every function that changes over time takes time as an argument and never reads a clock.
 - **Determinism:** randomness comes only from `src/core/rng.js`. The same `t` always draws the same pixels.
 - **Colors:** hex strings from doc 03. They're exported once as `PALETTE` in `src/core/palette.js`, so nobody types a hex code anywhere else.
-- **Modules:** plain ES modules in `src/`. They import three as `import * as THREE from 'three'`, resolved by an import map in each HTML page to `/node_modules/three/build/three.module.js`.
+- **Modules:** plain ES modules in `src/`. They import three as `import * as THREE from 'three'`, resolved by an import map in each HTML page to `/node_modules/three/build/three.module.js`. Pages that use `post.js` (or any three addon) also map `"three/examples/jsm/": "/node_modules/three/examples/jsm/"`.
 - **Lab pages:** every module ships a `lab/<module>.html` that shows it in isolation and exposes `window.renderFrame(t)`. That page is how the module gets rendered as evidence.
 
 ## `src/core/` (task `mod-core`)
