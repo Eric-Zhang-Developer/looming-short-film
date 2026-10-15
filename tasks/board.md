@@ -10,7 +10,7 @@
 
 ### batch 1 (no dependencies)
 - mod-core · builder · `src/core/`, `lab/core.html`, `lab/core.js`, `evidence/mod-core/`, `done/mod-core.md` · verified (merged) · evidence/mod-core/lab_t1.5.jpg
-- mod-render · builder · `render.mjs`, `tools/determinism.mjs`, `tools/lib/`, `evidence/mod-render/`, `done/mod-render.md` · in-progress · —
+- mod-render · builder · `render.mjs`, `tools/determinism.mjs`, `tools/lib/`, `evidence/mod-render/`, `done/mod-render.md` · verified (merged) · evidence/mod-render/sheet.jpg
 - mod-timeline · builder · `src/timeline.js`, `tools/check_timeline.mjs`, `evidence/mod-timeline/`, `done/mod-timeline.md` · verified (merged) · evidence/mod-timeline/check.txt
 - tool-gen · builder · `tools/gen.mjs`, `tools/cut.mjs`, `assets/specs.json`, `assets/prompts/_blocks/`, `evidence/tool-gen/`, `done/tool-gen.md` · in-progress · —
 
