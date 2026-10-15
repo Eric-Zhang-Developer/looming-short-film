@@ -36,6 +36,7 @@ Merged so far: s01–s05, s07–s10, s13 (10 of 18). Style tile v3 is built and 
 - **The rig's legs are 37% of the gator's height** (the tile's are about 20%); flagged on Q9. `hipHeight` must be re-measured from the real `leg_l` once art is frozen.
 - **Paper rim** at wide framing: fixed by look passes 1–2. Rims take the light's colour, where the reference's are painted white.
 - `render.mjs` takes no query strings.
+- **`determinism.mjs` can't see render-order bugs:** every run starts from the same first frame, so the lamp-dust bug passed it. A cross-order check (render t after a different frame, compare across runs) would have caught it.
 - The paper cache won't hold a 25 s held shot at 4 Hz boil.
 - Cut PNGs (`assets/cut/*.png`) are gitignored. Unfrozen `*.boxes.json` stay untracked.
 
