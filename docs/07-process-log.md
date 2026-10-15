@@ -143,3 +143,8 @@ Director, verbatim: "G1: make style tile v3 with the value-contrast rule (+4 gen
 - **Q1–Q9:** every recommendation stands. Most were already built as the "(current)" option. Two need work:
   - **Q7:** the Exam becomes matte ink with one painted highlight and a visible stain.
   - **Q4:** doc 03's red rule now reads "only on the calendar circles".
+
+## 2026-10-15 · G1 approved: style tile v3_4 frozen
+Director, after asking "which one is v3_4" and being shown it: "I like it".
+- **Frozen:** `assets/frozen/style_tile.png` (v3_4, the graphic picture-book gator), recorded in `assets/generated/manifest.json`. It is now the reference for every later generation, per doc 08's table.
+- **Carried into the gator sheet (G2)** as the painter's notes, from the v3 screening: the surface reads as felt rather than torn paper; the tile's gator stands about lamp height (the sheet fixes proportions, and scale is set in code); the legs are about 20% of height while the rig's are 37%, and the sheet's `leg_l` sets the truth.
