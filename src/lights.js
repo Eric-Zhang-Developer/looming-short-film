@@ -168,6 +168,7 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
       col.setXYZ(i, light.color.r * glint, light.color.g * glint, light.color.b * glint);
     });
     pos.needsUpdate = col.needsUpdate = true;
+    dustGeo.computeBoundingSphere();   // three caches it from the first render; the specks move every frame, so refit or pixels depend on frame order
   }
   return { light, cone, dust, update };
 }

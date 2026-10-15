@@ -21,4 +21,6 @@ export function kf(t, keys, e = ease) {
 export const spring = (t, t0, k = 6, w = 18) => t < t0 ? 0 : Math.exp(-k * (t - t0)) * Math.sin(w * (t - t0));
 
 // Characters animate "on 2s": t snapped down to 12 fps steps. Lights and camera use the real t.
-export const onTwos = (t, fps = 12) => Math.floor(t * fps) / fps;
+// The 1e-4 nudge absorbs the float error of the film's global-to-local subtraction (t − shot.start can land a hair
+// under a drawing boundary, e.g. 100.0833 − 100 = 0.08333333333332860). It is far below one frame (1/24 s × 12 = 0.5).
+export const onTwos = (t, fps = 12) => Math.floor(t * fps + 1e-4) / fps;

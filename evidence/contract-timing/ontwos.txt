@@ -1,0 +1,7 @@
+film-wide frames on the wrong drawing: before 681, after 0 (of 4320)
+s15 (t 100-114): before 56, after 0; frames whose drawing changes with the fix: 56
+s15 window t 100.0-101.0 (frames 2400-2424): 4 change, each one drawing later
+f2402 t=100.083 0->1
+f2408 t=100.333 3->4
+f2414 t=100.583 6->7
+f2420 t=100.833 9->10

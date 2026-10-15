@@ -26,6 +26,7 @@ export const clamp, lerp, ease, easeIn, easeOut
 export function kf(t, keys, e = ease)    // keys: [[t, value], ...]; value may be a number or an array of numbers
 export function spring(t, t0, k = 6, w = 18)   // damped kick at t0 → offset
 export function onTwos(t, fps = 12)      // → t snapped to 12 fps steps (characters animate "on 2s")
+  // onTwos floors with a 1e-4 epsilon, so the film's float-error local t (100.0833 − 100) still lands on its drawing
 
 // palette.js
 export const PALETTE                     // { navy, cream, gator, kraft, phone, lamp, ink, calendarRed }
@@ -120,6 +121,7 @@ export function phoneLight({ color = PALETTE.phone, intensity, angle = 1.2, dist
 export function lampLight({ color = PALETTE.lamp, intensity, angle = 0.6, penumbra = 0.5, reach = 2.5 } = {})
   // → { light: SpotLight, cone: Mesh (vellum cone), dust: Points (20–40 specks), update(t) }
   //   the cone runs reach × the light→target distance, so the surface the light lands on cuts it off at the pool
+  //   update(t) refits the dust's bounding sphere every call, so a frame's pixels don't depend on which frame drew first
 export function dawnLight()                    // → { light: DirectionalLight, update(t, k) }  k: 0 = cold night, 1 = gold
 export function fluorescent({ flickerSeed })   // → { light, update(t) }  seeded flicker
 export function ambient()                      // → HemisphereLight, very low (navy above, kraft below)
