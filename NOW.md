@@ -24,6 +24,16 @@ Merged so far: s01–s05, s07–s10, s13 (10 of 18). Style tile v3 is built and 
 - **Q1–Q9:** "go with every recommendation". The specs already follow them. Still to do: **Q7 Exam matte ink** (task `exam-ink`, queued until a code-writer slot frees; it owns `src/blob.js`).
 - Still open: removing the third-party transcription file from the repo, and the deadline.
 
+## HAND-OFF (2026-10-15 evening; the session hit its usage limit)
+**Deadlines:** tonight, an incomplete draft (answers in `docs/10b-submission-oct15.md`, plus the Act 1 preview `out/preview_act1_720p.mp4`). **Final: Sunday, Oct 18, 11:59 PM**, with a YouTube link and the GitHub repo allowed. The plan is `docs/11-roadmap.md`.
+
+**State of the reel (v1-animatic):** 17 of 18 shots are merged on `wave/3-assets`. s14–s17 are on the reel bar with motion-sensor lights, and s15 is the sensor turn. **s18 was building in `~/.worktrees/looming/anim-s18`** (`task/anim-s18`): check its commits and done note, verify (owns, determinism, timeline), and squash-merge. Then:
+1. Clear `out/frames`. Run `node render.mjs --page=index.html --frames --range=0:180 --workers=2` in the background (about 45 min, one Chrome), then `node render.mjs --encode --out=out/v1_animatic.mp4 --audio=out/audio/mix.wav`, plus a 720p copy. Send it to the director, tag `v1-animatic` and make a GitHub Release with the MP4.
+2. Collect the director's notes (G4) and Q11–Q15 (`docs/shots/QUESTIONS.md`). The face sheet is awaiting a pick: recommend v1_3, and see `done/asset-face-sheet.md` (eyes painted 2.2–2.5× large, so scale them in code).
+3. Then follow the roadmap: blob meter into the shots (`done/spec-blob-meter.md` has the code-change list), rig refit to the frozen gator, sets and props from `docs/ref-ufl.md`, and the 4K master Saturday night.
+
+**Machine rules (hard):** at most 2 builders; one headless Chrome per builder, foreground only, `--w ≤ 960` for evidence. Before each batch, check `df -h /`, `sysctl vm.swapusage` and `top -o mem` for orphaned Chrome. Swap filled the disk twice today.
+
 ## Roadmap
 `docs/11-roadmap.md`: **M1 rough draft tonight (`v1-animatic`, submitted by 11:59 PM EDT, director review by 8 PM) → story lock → look lock → final art → `v3-final` → a rough-vs-final split screen for Oct 26.** The rough and the final share one timeline: beat times and cut points are frozen after M1 except by director notes. Tag and release `v1-animatic` before any later work.
 

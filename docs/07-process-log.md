@@ -190,3 +190,6 @@ Director: "You don't have to do the under 10 MB. I'm going to upload it on YouTu
 
 ## 2026-10-15 · Final fidelity target
 Director: "The final version should be as high fidelity as possible." `v3-final` is mastered in 4K, which YouTube rewards with better codecs, with supersampled edges, higher shadow-map resolution, art checked against its on-screen size, and a near-lossless master. The full render is planned overnight because of RAM. Details are in doc 11.
+
+## 2026-10-15 · Deadline clarified: final due Sunday, Oct 18
+The director spoke to the organisers. Today needs only an incomplete draft. The final is due Sunday at 11:59 PM, and a YouTube link and the GitHub repo can be submitted. About 70 proposals are in progress and 30–50 submissions are expected. The roadmap (doc 11) is compressed to Sunday: tonight the draft, then the rough reel (v1-animatic), story lock, look lock and final art, with the 4K master rendered overnight Saturday into Sunday.

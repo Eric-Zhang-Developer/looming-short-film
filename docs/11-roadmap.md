@@ -15,22 +15,24 @@ Why this is the right shape:
 ## Key dates
 | Date | What | Source |
 |---|---|---|
-| **Thu Oct 15, 11:59 PM EDT** | ProposalSpace submission deadline | ProposalSpace call page (read 2026-10-15) |
+| **Thu Oct 15, 11:59 PM EDT** | Draft submission: **an incomplete draft is fine** | Organisers, by phone (director, 2026-10-15) |
+| **Sun Oct 18, 11:59 PM** | **Final submission deadline.** A YouTube link and the GitHub repo can be submitted. | Organisers, by phone (director, 2026-10-15) |
 | **Mon Oct 26** | AI Days student competitions (Gator Create), Reitz Union Grand Ballroom | ai.ufl.edu AI Days page |
 | **Tue Oct 27** | People's Choice announced (if it runs as in 2025) | UF News, 2025 |
-| Open | Can submitted files be updated before Oct 26? | Director to ask ai@ufl.edu / (352) 294-1895 |
+| Context | About 70 proposals in progress, 30–50 submissions expected | Organisers, by phone |
 
-## Milestones
+## Milestones (compressed to the Sunday deadline)
 | Milestone | Tag | Content | Target |
 |---|---|---|---|
-| **M1 · Rough draft** | `v1-animatic` | A complete 3:00 story reel: all 18 shots readable and on their beats, with placeholder art, motion-sensor lights at Marston and temp sound. Published on YouTube at full quality (the director uploads it), with a compressed backup copy under 10 MB in ProposalSpace. | **Oct 15, by 8 PM for director review** |
-| M2 · Story lock (G4) | none | The director's notes pass on M1, plus 3 cold viewers. Fold in the blob dread meter and any notes. | Oct 16–17 |
-| M3 · Look lock (G2 / G3) | `v0-test-shot` | Face sheet frozen. Rig refit to the frozen gator. One shot (s15) at final art as the test. | Oct 17–18 |
-| M4 · Final art | `v2-rough-cut` | Sets and props painted from the UF reference (Marston, Plaza). Every shot at final art. First mix. | Oct 18–22 |
-| M5 · Final | `v3-final` | Colour, final mix (measured on the exported MP4, aiming at YouTube's ~−14 LUFS), captions, a full-quality master for YouTube, plus a compressed backup copy under 10 MB for ProposalSpace. | Oct 23–24 |
-| **M6 · The comparison** | (in the `v3-final` release) | A split screen of `v1-animatic` and `v3-final`, frame-aligned, plus a short "paintings vs lit and cut" panel. For competition day and the write-up. | Oct 24–25 |
+| M0 · Draft submitted | none | Tonight's answers (`docs/10b`) and the current preview. Incomplete is fine. | **Thu Oct 15, by 11:59 PM** |
+| **M1 · Rough draft** | `v1-animatic` | The complete 3:00 story reel: all 18 shots on the final timeline, placeholder art, motion-sensor lights, temp sound. Tagged and released before anything else lands. | Thu night / Fri morning |
+| M2 · Story lock (G4) | none | The director's notes on M1, plus 3 cold viewers. Blob dread meter into the shots (spec merged). Q11–Q15 answered. | Fri Oct 16 |
+| M3 · Look lock (G2 / G3) | `v0-test-shot` | Face sheet frozen (v1_3 recommended). Rig refit to the frozen gator. s15 at final art as the test. | Fri Oct 16 |
+| M4 · Final art | `v2-rough-cut` | Sets and props painted from the UF reference. Every shot at final art. First mix. | Sat Oct 17 |
+| M5 · Final | `v3-final` | Colour, final mix, captions, and a **4K master rendered overnight Sat→Sun**, with nothing else running. | Sun Oct 18, morning |
+| **M6 · Submit** | (release) | The director uploads to YouTube. The comparison split screen (v1 against v3) goes in the release. The final answers, the YouTube link and the GitHub repo go into ProposalSpace. | **Sun Oct 18, well before 11:59 PM** |
 
-Dates after M1 assume files can be updated before Oct 26. If the organisers say tonight's upload is final, M2–M6 still happen, for the competition-day screening, the public release and the portfolio. The dates hold either way.
+The schedule is tight but realistic at today's pace: about 17 shots blocked in one day. The real limits are machine RAM (two builders at once) and the 4K render time, not agent speed. Buffer: if M4 slips, ship a 1080p final on Sunday and keep 4K for a post-deadline release.
 
 ## Fidelity target for `v3-final` (director: "The final version should be as high fidelity as possible.")
 - **Render a 4K master** (3840×2160, 24 fps). YouTube serves 4K uploads with better codecs (VP9 or AV1) to every viewer, so even people watching at 1080p see a cleaner picture than a 1080p upload gives them.
