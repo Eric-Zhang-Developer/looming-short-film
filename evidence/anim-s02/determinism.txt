@@ -1,0 +1,5 @@
+t=10  536a0fb65b9b360b 536a0fb65b9b360b 536a0fb65b9b360b  PASS
+t=14.34  39abf8d2ebf84f0b 39abf8d2ebf84f0b 39abf8d2ebf84f0b  PASS
+t=3  025168ef88dae5d2 025168ef88dae5d2 025168ef88dae5d2  PASS
+t=10  536a0fb65b9b360b 536a0fb65b9b360b 536a0fb65b9b360b  PASS
+determinism: PASS

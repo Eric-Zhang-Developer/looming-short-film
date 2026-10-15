@@ -1,0 +1,83 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s02 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s02 measurement rig: builds src/shots/s02.js on its own stage (no post) and measures from pixels.
+  // Shadow (smoke-paper method): the blob writes no colour or depth in the camera pass but still casts (the shadow
+  // pass draws its customDepthMaterial); the frame with it casting minus the frame with castShadow off is the shadow alone. The blob's
+  // own width comes from a frame with it drawn alone on white. Both pixel sets are back-projected onto their planes
+  // (shadow: the desk, y = 0; blob: its own plane, z = its z) and compared along x, which a directional light onto a
+  // level desk keeps 1:1 slice by slice: a horizontal slice of the blob (constant y) lands on a line of constant z on the
+  // desk, so the scale is the widest shadow chord along x over the widest blob chord along x. The shadow's overall x
+  // extent is longer: the light shears the shape back-left by 1.35 × height.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build } from '/src/shots/s02.js';
+
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: () => ({ set() {} }) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 9 });
+
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  const read = () => { renderer.render(scene, camera); const p = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, p); return p; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+  // x extent overall, and the widest x chord over slices of constant `slice` (1 mm bins of hit.y or hit.z).
+  function extentX(m, plane, slice) {
+    let x0 = 1e9, x1 = -1e9, n = 0; const bins = new Map();
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!m[y * W + x]) continue; n++;
+      ndc.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1); ray.setFromCamera(ndc, camera);
+      if (!ray.ray.intersectPlane(plane, hit)) continue;
+      x0 = Math.min(x0, hit.x); x1 = Math.max(x1, hit.x);
+      const k = Math.round(hit[slice] / 0.001), b = bins.get(k) ?? [1e9, -1e9];
+      bins.set(k, [Math.min(b[0], hit.x), Math.max(b[1], hit.x)]);
+    }
+    const chord = Math.max(...[...bins.values()].map(([a, b]) => b - a));
+    return { x0, x1, w: x1 - x0, chord, n };
+  }
+  const { exam } = shot, sun = scene.children.find((o) => o.isDirectionalLight);
+
+  window.blobAt = (t) => {   // the drop's center in world space (mesh origin is the contact point; center = + r·s)
+    stage.renderFrame(t); exam.mesh.updateMatrixWorld();
+    const p = exam.mesh.getWorldPosition(new THREE.Vector3());
+    return { visible: exam.mesh.visible, x: p.x, y: p.y + 0.012 * exam.mesh.scale.y, z: p.z, s: exam.mesh.scale.x };
+  };
+  window.faceAt = (t) => { stage.renderFrame(t); return shot.face; };
+  window.shadow = (t) => {
+    stage.renderFrame(t);
+    // blob alone on white
+    const vis = new Map(); scene.traverse((o) => vis.set(o, o.visible));
+    scene.children.forEach((o) => { o.visible = !!o.isLight; }); exam.mesh.visible = true;
+    const bg = scene.background; scene.background = new THREE.Color(1, 1, 1);
+    const pb = read(); scene.background = bg; vis.forEach((v, o) => { o.visible = v; });
+    const bm = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) bm[i] = pb[i * 4] < 128 ? 1 : 0;
+    const blob = extentX(bm, new THREE.Plane(new THREE.Vector3(0, 0, 1), -exam.mesh.position.z), 'y');
+    // shadow only: blob hidden from the camera, casting vs not casting
+    const m = exam.mesh.material; m.colorWrite = false; m.depthWrite = false;   // the shadow pass uses its own depth material
+    const a = read(); exam.mesh.castShadow = false; const b = read();
+    exam.mesh.castShadow = true; m.colorWrite = true; m.depthWrite = true;
+    const sm = new Uint8Array(W * H); let dmax = 0;
+    for (let i = 0; i < W * H; i++) { const d = b[i * 4 + 1] - a[i * 4 + 1]; dmax = Math.max(dmax, d); }
+    for (let i = 0; i < W * H; i++) sm[i] = b[i * 4 + 1] - a[i * 4 + 1] > 0.5 * dmax ? 1 : 0;   // half the full darkening
+    const sh = extentX(sm, new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), 'z');
+    // shadow centroid on the desk
+    let cx = 0, cz = 0, n = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (sm[y * W + x]) {
+      ndc.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1); ray.setFromCamera(ndc, camera);
+      if (ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 1, 0), 0), hit)) { cx += hit.x; cz += hit.z; n++; }
+    }
+    return { blob, shadow: sh, scale: sh.chord / blob.chord, dmax, centroid: [cx / n, cz / n] };
+  };
+  window.headPx = (t) => {   // screen px of the head and snout mesh centers (canvas px, y down)
+    stage.renderFrame(t);
+    return ['head', 'snout'].map((n) => { const v = shot.gator.meshes[n].getWorldPosition(new THREE.Vector3()).project(camera);
+      return [Math.round((v.x + 1) / 2 * W), Math.round((1 - v.y) / 2 * H)]; });
+  };
+  window.probe = (name) => { const o = scene.getObjectByName(name); return o && { visible: o.visible }; };
+  window.scene = scene;
+</script>
