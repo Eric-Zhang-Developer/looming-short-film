@@ -27,14 +27,17 @@ const version = spec.prompt.match(/\.v(\d+)\.md$/)?.[1] ?? die(`prompt path must
 const variants = Number(args.variants ?? spec.variants ?? 3);
 if (!(variants >= 1)) die(`bad --variants: ${args.variants}`);
 
-// Cap: count every output this asset has, from local raw PNGs and committed sidecars
+// Cap: count every generation this asset has, from local raw PNGs and committed sidecars
 // (raw/ is gitignored, so sidecars keep the count honest across worktrees).
 const isMine = f => new RegExp(`^${name}_v\\d+(_\\d+)?\\.(png|json)$`).test(f);
 const ls = d => existsSync(d) ? readdirSync(d) : [];
 const outputs = new Set([...ls(RAW), ...ls(THUMBS)].filter(isMine).map(f => f.replace(/\.(png|json)$/, '')));
-if (outputs.size + variants > CAP)
-  die(`REFUSED: ${name} already has ${outputs.size} of ${CAP} generations; ${variants} more would exceed the cap. ` +
-      `Doc 08: rethink the spec instead of re-rolling.\n  existing: ${[...outputs].sort().join(', ') || 'none'}`);
+// One Codex call can generate several images, so count codex_images_generated from each sidecar (1 when absent).
+const gens = o => { try { return JSON.parse(readFileSync(join(THUMBS, `${o}.json`), 'utf8')).codex_images_generated ?? 1; } catch { return 1; } };
+const used = [...outputs].reduce((n, o) => n + gens(o), 0);
+if (used + variants > CAP)
+  die(`REFUSED: ${name} already has ${used} of ${CAP} generations; ${variants} more would exceed the cap. ` +
+      `Doc 08: rethink the spec instead of re-rolling.\n  existing: ${[...outputs].sort().map(o => `${o} (${gens(o)})`).join(', ') || 'none'}`);
 
 // Prompt: shared blocks 1, 2, 4 plus the asset file's "## 3." block and optional "## 5." notes block.
 // A per-asset file with no numbered headings is taken whole as block 3.
@@ -59,7 +62,7 @@ const q = s => s.includes('$RUN') ? `"${s}"` : /^[\w./=-]+$/.test(s) ? s : `'${s
 const firstK = Math.max(0, ...[...outputs].map(o => +(o.match(new RegExp(`^${name}_v${version}_(\\d+)$`))?.[1] ?? 0))) + 1;
 
 if (args['dry-run']) {
-  console.log(`# gen.mjs dry run · ${name} · prompt v${version} · ${variants} variant(s) · ${outputs.size}/${CAP} used`);
+  console.log(`# gen.mjs dry run · ${name} · prompt v${version} · ${variants} variant(s) · ${used}/${CAP} used`);
   for (const r of refs) if (!existsSync(r)) console.log(`# WARNING: ref missing: ${r} (a live run refuses)`);
   console.log('\n## Assembled prompt (piped on stdin)\n');
   console.log(runPrompt);

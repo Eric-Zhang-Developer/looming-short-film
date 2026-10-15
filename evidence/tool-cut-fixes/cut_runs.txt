@@ -1,0 +1,19 @@
+$ node tools/cut.mjs --in=.../style_tile_v2_4.png --auto --out=<scratch>
+no alpha in style_tile_v2_4: keyed #FF00FF (tol 80), 1108532 px cleared, 19644 edge px soft-keyed and despilled
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+$ node tools/cut.mjs --in=.../style_tile_v2_1.png --auto --out=<scratch>
+no alpha in style_tile_v2_1: keyed #FF00FF (tol 80), 1295004 px cleared, 14754 edge px soft-keyed and despilled
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+$ node tools/cut.mjs --in=.../style_tile_v2_2.png --auto --out=<scratch>
+alpha in style_tile_v2_2: 296294 px at alpha 250-254 clamped to 255
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+
+island boxes identical old vs new cut.mjs (v2_4, v2_1):
+v2_4 identical
+v2_1 identical
+
+magenta-spill>40 among edge px (alpha>0 within 2px of transparency), piece 1, old vs new:
+old4/style_tile_v2_4_1.png edge px 3791, magenta-spill>40: 841
+new4/style_tile_v2_4_1.png edge px 3791, magenta-spill>40: 0
+old1/style_tile_v2_1_1.png edge px 2958, magenta-spill>40: 819
+new1/style_tile_v2_1_1.png edge px 2958, magenta-spill>40: 0

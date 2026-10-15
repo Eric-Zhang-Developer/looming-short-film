@@ -2,19 +2,21 @@
 // Split a sheet into parts: each box's RGBA crop goes to assets/cut/<part>.png.
 //   node tools/cut.mjs --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.json     boxes: { part: [x, y, w, h] }
 //   node tools/cut.mjs --in=... --auto [--boxes=...] [--pad=4] [--min-area=500]           propose boxes from alpha islands, write them, then cut
-// A sheet with no transparency is keyed first (--key=#00FF00, --tol=80): Codex usually returns real alpha (wave 1),
-// so the key is the fallback doc 08 asks for.
+//   --out=<dir> writes parts there instead of assets/cut/ (scratch tests).
+// A sheet with no transparency is keyed first (--key=#FF00FF|#00FF00, default: whichever the corner pixel is nearer, --tol=80):
+// Codex usually returns real alpha, so the key is the fallback doc 08 asks for. Keyed edges are soft-keyed and despilled.
+// A sheet with real alpha gets interior alpha >= 250 clamped to 255 (Codex leaves pieces at ~253).
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { join, resolve, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT = join(ROOT, 'assets/cut');
 const args = Object.fromEntries(process.argv.slice(2).map(a => {
   const [k, ...v] = a.replace(/^--/, '').split('=');
   return [k, v.length ? v.join('=') : true];
 }));
+const OUT = args.out ? resolve(args.out) : join(ROOT, 'assets/cut');
 const die = msg => { console.error(`cut: ${msg}`); process.exit(1); };
 if (!args.in || (!args.boxes && !args.auto)) die('usage: node tools/cut.mjs --in=<png> (--boxes=<json> | --auto [--boxes=<json>])');
 
@@ -31,13 +33,39 @@ if (px.length !== W * H * 4) die(`decoded ${px.length} bytes, expected ${W * H *
 let opaque = true;
 for (let i = 3; i < px.length; i += 4) if (px[i] < 255) { opaque = false; break; }
 if (opaque) {
-  const hex = String(args.key ?? '#00FF00').replace('#', ''), tol = Number(args.tol ?? 80);
-  const [kr, kg, kb] = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16));
-  let n = 0;
-  for (let i = 0; i < px.length; i += 4)
-    if ((px[i] - kr) ** 2 + (px[i + 1] - kg) ** 2 + (px[i + 2] - kb) ** 2 < tol * tol) { px[i + 3] = 0; n++; }
-  // ponytail: hard key, no despill or soft edge; add both if a keyed (non-alpha) sheet ever gets frozen
-  console.log(`no alpha in ${stem}: keyed #${hex} (tol ${tol}), ${n} px cleared`);
+  const near = (r, g, b, k) => (r - k[0]) ** 2 + (g - k[1]) ** 2 + (b - k[2]) ** 2;
+  const hex = String(args.key ?? (near(px[0], px[1], px[2], [255, 0, 255]) < near(px[0], px[1], px[2], [0, 255, 0]) ? '#FF00FF' : '#00FF00')).replace('#', ''), tol = Number(args.tol ?? 80);
+  const K = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const sq = i => (px[i] - K[0]) ** 2 + (px[i + 1] - K[1]) ** 2 + (px[i + 2] - K[2]) ** 2;
+  // spill = how much of the key hue a pixel carries: magenta = min(r,b) - g, green = g - max(r,b).
+  const magenta = K[0] > 128 && K[2] > 128 && K[1] < 128, green = K[1] > 128 && K[0] < 128 && K[2] < 128;
+  const spill = i => magenta ? Math.min(px[i], px[i + 2]) - px[i + 1] : green ? px[i + 1] - Math.max(px[i], px[i + 2]) : 0;
+  const hard = new Uint8Array(W * H);
+  let n = 0, soft = 0;
+  for (let p = 0; p < W * H; p++) if (sq(p * 4) < tol * tol) { hard[p] = 1; px[p * 4 + 3] = 0; n++; }
+  // Edge band: opaque pixels within 2 px of cleared key. Each is a blend a*C + (1-a)*K; read a from its spill,
+  // unmix C = (P - (1-a)K) / a, then clamp the key channels toward the others (despill). Interior pixels are untouched.
+  const band = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (hard[y * W + x]) continue;
+    for (let dy = -2; dy <= 2 && !band[y * W + x]; dy++) for (let dx = -2; dx <= 2; dx++) {
+      const nx = x + dx, ny = y + dy;
+      if (nx >= 0 && ny >= 0 && nx < W && ny < H && hard[ny * W + nx]) { band[y * W + x] = 1; break; }
+    }
+  }
+  if (magenta || green) for (let p = 0; p < W * H; p++) {
+    if (!band[p]) continue;
+    const i = p * 4, a = Math.min(1, Math.max(0.02, 1 - Math.max(0, spill(i)) / 255));
+    for (let c = 0; c < 3; c++) px[i + c] = Math.min(255, Math.max(0, Math.round((px[i + c] - (1 - a) * K[c]) / a)));
+    if (magenta) { const e = Math.min(px[i], px[i + 2]) - px[i + 1]; if (e > 0) { px[i] -= e; px[i + 2] -= e; } }
+    else { const e = px[i + 1] - Math.max(px[i], px[i + 2]); if (e > 0) px[i + 1] -= e; }
+    px[i + 3] = Math.round(a * 255); soft++;
+  }
+  console.log(`no alpha in ${stem}: keyed #${hex} (tol ${tol}), ${n} px cleared, ${soft} edge px soft-keyed and despilled`);
+} else {
+  let clamped = 0;
+  for (let i = 3; i < px.length; i += 4) if (px[i] >= 250 && px[i] < 255) { px[i] = 255; clamped++; }
+  console.log(`alpha in ${stem}: ${clamped} px at alpha 250-254 clamped to 255`);
 }
 
 // Islands on a 4 px grid (8-connected), so hairline gaps inside one piece don't split it
