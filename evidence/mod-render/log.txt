@@ -1,0 +1,39 @@
+## sheet
+evidence/mod-render/sheet.jpg  (6 frames)
+ms/frame: 21 (6 frames, fps 24)
+## strip
+evidence/mod-render/strip.jpg  (8 frames)
+ms/frame: 14 (8 frames, fps 24)
+## crop
+evidence/mod-render/crop.jpg  (2 frames)
+ms/frame: 40 (2 frames, fps 24)
+## stills
+out/stills/t0_50.png
+out/stills/t4_00.png
+ms/frame: 145 (2 frames, fps 24)
+total 11032
+drwxr-xr-x  4 ericzhang  staff      128 Oct 15 09:36 .
+drwxr-xr-x  5 ericzhang  staff      160 Oct 15 09:36 ..
+-rw-r--r--  1 ericzhang  staff  2835014 Oct 15 09:36 t0_50.png
+-rw-r--r--  1 ericzhang  staff  2809168 Oct 15 09:36 t4_00.png
+## frames first run
+0 frames to render (24 already done), 2 workers
+      24
+## frames rerun
+0 frames to render (24 already done), 2 workers
+      24
+## encode
+encoding 24 frames @ 24 fps → out/test.mp4
+wrote out/test.mp4
+## no index.html
+error: page not found: index.html (looked in /Users/ericzhang/.worktrees/looming/mod-render). Pass --page=<repo-relative html>, e.g. --page=smoke/paper/index.html
+exit=1
+## bad page
+error: page not found: nope.html (looked in /Users/ericzhang/.worktrees/looming/mod-render). Pass --page=<repo-relative html>, e.g. --page=smoke/paper/index.html
+exit=1
+## nothing to do
+error: nothing to do: see the usage notes at the top of render.mjs
+exit=1
+## encode with no frames
+error: no frames in out/frames: run --frames first
+exit=1
