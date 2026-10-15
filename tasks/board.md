@@ -46,8 +46,8 @@
 - anim-s15 · builder · `src/shots/s15.js` · in-progress · —
 - anim-s05 · builder · `src/shots/s05.js` · verified (merged) · evidence/anim-s05/sheet.jpg
 - anim-s10 · builder · `src/shots/s10.js` · verified (merged) · evidence/anim-s10/sheet.jpg
-- anim-s08 · builder · `src/shots/s08.js` · in-progress · —
-- anim-s07 · builder · `src/shots/s07.js` · in-progress · —
+- anim-s08 · builder · `src/shots/s08.js` · built · `evidence/anim-s08/sheet.jpg`
+- anim-s07 · builder · `src/shots/s07.js` · blocked (merged; seam light 7.3% vs 5% left for final lighting) · `evidence/anim-s07/sheet.jpg`
 - contract-light-key · builder · `src/lights.js`, `src/blob.js`, contracts §lights/§blob · verified (merged) · evidence/contract-light-key/s03_key_after.jpg
 - anim-s09 · builder · `src/shots/s09.js` · verified (merged) · evidence/anim-s09/walk_after.jpg
 - anim-s04 · builder · `src/shots/s04.js` · verified (merged) · evidence/anim-s04/face_before_after.jpg
@@ -63,7 +63,7 @@
 
 ### wave 3, started early
 - asset-style-tile · painter · `assets/prompts/style_tile.v2.md`, `assets/specs.json` (style_tile), `tools/gen.mjs` (fixes), `assets/raw/thumbs/`, `evidence/asset-style-tile/`, `done/asset-style-tile.md` · built (merged, awaiting G1) · evidence/asset-style-tile/contact.jpg
-- asset-style-tile-v3 · painter · `assets/prompts/style_tile.v3.md`, specs style_tile, `tools/gen.mjs` (cap) · in-progress · —
+- asset-style-tile-v3 · painter · `assets/prompts/style_tile.v3.md`, specs style_tile, `tools/gen.mjs` (cap) · built (awaiting G1 pick) · `evidence/asset-style-tile-v3/contact.jpg`
 - exam-ink · builder · `src/blob.js`, `lab/blob.js`, contracts §blob · in-progress · —
 - snd-foley · builder · `src/audio/foley.js`, `evidence/snd-foley/`, `done/snd-foley.md` · verified (merged) · evidence/snd-foley/spectra.jpg
 - snd-score · builder · `src/audio/score.js`, `tools/mix.mjs`, `evidence/snd-score/`, `done/snd-score.md` · verified (merged) · evidence/snd-score/score.mp3
