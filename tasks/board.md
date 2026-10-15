@@ -42,6 +42,11 @@
 ### wave 4 · animatic (brief: `tasks/anim-shot.md`)
 - anim-s01 · builder · `src/shots/s01.js` · verified (merged) · evidence/anim-s01/sheet.jpg
 - anim-s13 · builder · `src/shots/s13.js` · verified (merged) · evidence/anim-s13/strip.jpg
+- anim-s15 · builder · `src/shots/s15.js` · in-progress · —
+- anim-s09 · builder · `src/shots/s09.js` · in-progress · —
+- anim-s04 · builder · `src/shots/s04.js` · in-progress · —
+- anim-s03 · builder · `src/shots/s03.js` · in-progress · —
+- anim-s02 · builder · `src/shots/s02.js` · in-progress · —
 
 ### parallel track: storyboard (docs)
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · built (merged) · done/sb-act1.md
