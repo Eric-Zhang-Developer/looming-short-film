@@ -187,3 +187,6 @@ The rule that makes the comparison work is one shared timeline: beat times and c
 
 ## 2026-10-15 · Distribution: YouTube at full quality, plus a compressed backup
 Director: "You don't have to do the under 10 MB. I'm going to upload it on YouTube in full quality. We should do one, like a compressed one, just in case." The master is encoded at full quality for YouTube, and the link goes in the answers. A compressed copy of 10 MB or less is still uploaded to ProposalSpace as a backup. The director does the YouTube upload himself.
+
+## 2026-10-15 · Final fidelity target
+Director: "The final version should be as high fidelity as possible." `v3-final` is mastered in 4K, which YouTube rewards with better codecs, with supersampled edges, higher shadow-map resolution, art checked against its on-screen size, and a near-lossless master. The full render is planned overnight because of RAM. Details are in doc 11.

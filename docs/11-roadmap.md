@@ -32,6 +32,14 @@ Why this is the right shape:
 
 Dates after M1 assume files can be updated before Oct 26. If the organisers say tonight's upload is final, M2–M6 still happen, for the competition-day screening, the public release and the portfolio. The dates hold either way.
 
+## Fidelity target for `v3-final` (director: "The final version should be as high fidelity as possible.")
+- **Render a 4K master** (3840×2160, 24 fps). YouTube serves 4K uploads with better codecs (VP9 or AV1) to every viewer, so even people watching at 1080p see a cleaner picture than a 1080p upload gives them.
+- **Anti-aliasing:** render with supersampling, or at 4K and downscale for any HD copy. The torn paper edges and fibre rims are where aliasing shows first.
+- **Shadows:** raise shadow-map resolution per shot until the soft edges stop stepping at 4K, especially the s15 loom collapse.
+- **Art resolution:** close-ups use `gator_hero` and the largest generations available. Any frozen asset that's softer than its on-screen size at 4K gets regenerated or upscaled before the final pass, and listed here.
+- **Master files:** a near-lossless master (ProRes 422 HQ or H.264/H.265 at a high bitrate) for YouTube and the GitHub Release. Audio at 48 kHz/24-bit in the master and AAC 320 kbps in the upload. The compressed copy under 10 MB is cut from the master.
+- **Cost, honestly:** a 4K frame has 4× the pixels, so the 3:00 film takes a few hours with one browser on this laptop, which needs RAM headroom. Plan the final render overnight, with nothing else running.
+
 ## The rule that makes the comparison work
 **The rough and the final share one timeline.**
 - Beat **times** and **cut points** don't move after M1 unless the director's notes change the story at G4. If they do, the comparison aligns by beat name, not by frame.
