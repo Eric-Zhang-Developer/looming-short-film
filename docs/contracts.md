@@ -178,6 +178,22 @@ A plane carrying a metaball shader: glossy ink black with a specular highlight d
 
 Ink (look-pass-2): the room's fill (ambient and hemisphere lights) lights only the eyes, never the body. The body is `PALETTE.ink` where it faces the key light and down to 0.55× that where it turns away, whatever the key's strength. Its only gloss is the key's reflection, a faint wet edge on the key's side and the eye catchlights.
 
+Added by `contract-blob`:
+
+```js
+blob.update(tLocal, { squash, wobble, eyes, look = 1 })
+  // eyes: 'open' | 'closed' | 'tired' | 'gasp' | 'worried' | 'side' (the gator's names). Any other name throws.
+  // look: for 'side' only, which way the glance goes in the plane's own x: +1 → +x (screen right when the blob is
+  //   unrotated and unmirrored), −1 → −x. Fractions slide less.
+blob.silhouette({ color = PALETTE.ink, soft = 0.1 } = {})  // → THREE.MeshBasicMaterial
+  // The blob's outline as a flat decal material, eyes as holes, edge faded over ±soft (radius units of the mesh it's on).
+  // Shares the blob's uniforms, so it wobbles and blinks with blob.update(). Use it on new THREE.Mesh(blob.mesh.geometry, m);
+  // the caller places and scales that mesh. If the mesh is scaled by s, set m.userData.soft.value = halfEdgeMeters / (s * radius).
+```
+
+- **Eyes.** `tired` is a half-lid drooping to the outer corners, `gasp` is wide (1.35× and raised), `side` is a level half-lid with both eyes slid toward `look`. The shadow and any silhouette cut the same shapes as holes. Evidence: `evidence/contract-blob/eyes.jpg`.
+- **Silhouette** is for shadows drawn without a light (s13's crowd). A shot with a real shadow-casting light needs nothing: the shadow pass already uses the same field.
+
 ## `src/post.js` (task `mod-post`)
 
 ```js

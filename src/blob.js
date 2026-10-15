@@ -10,14 +10,19 @@ import { PALETTE } from './core/palette.js';
 const N = 5;          // ball slots in the shader; unused slots get weight 0
 const T = 0.5625;     // threshold: the body ball (support 2) crosses it at distance 1, so the blob is ~1 radius wide
 const EYE_X = 0.42, EYE_DROP = 0.92, EYE_R = 0.2;   // in radius units, measured from the top of the outline
-const EYES = { open: 0, closed: 1, worried: 2 };
+// Eye states (the gator's names): [shape, size × EYE_R, lift]. Shapes: 0 disc, 1 closed arc, −1 half-lid drooping
+// outward (tired), −2 disc under a level lid, slid toward `look` (side-glance). The lidded shapes are negative so the
+// catchlight test (shape < 0.5) keeps them, and their GLSL compiles only while one is showing (EYE_LIDS): any extra
+// live code in the field shader moves a few pixels by 1/255 on this GPU, and s13's frames must stay bit-identical.
+const EYES = { open: [0, 1, 0], closed: [1, 1, 0], worried: [0, 0.68, 0.15], tired: [-1, 1, -0.04], gasp: [0, 1.35, 0.08], side: [-2, 1, 0] };
+const SIDE_SHIFT = 0.2;    // how far `side` slides both eyes toward `look`, radius units
 
 // Field in radius units. p is plane-local / radius, with y = 0 on the surface below.
 // Each ball is [x, y, support, weight]; squash scales space so the bottom stays planted.
 const GLSL_FIELD = /* glsl */`
 uniform vec4 uBalls[${N}];
 uniform vec2 uScale;
-uniform vec4 uEye[2];      // x, y, radius, mode (0 open disc, 1 closed arc)
+uniform vec4 uEye[2];      // x, y, radius, shape (see EYES)
 uniform float uRadius;
 uniform float uFloor;      // surface height in radius units, plane-local (0 when resting)
 float field(vec2 p) {
@@ -33,6 +38,13 @@ float field(vec2 p) {
 // Signed distance to the eye shape, negative inside.
 float eyeDist(vec2 p, vec4 e) {
   vec2 q = p - e.xy;
+#ifdef EYE_LIDS
+  if (e.w < -0.5) {
+    // tired: the lid is down to just above the middle and droops toward the outer corner; side: a level lid a third down
+    float lid = e.w > -1.5 ? dot(q, normalize(vec2(0.35 * sign(e.x), 1.0))) - 0.15 * e.z : q.y - 0.4 * e.z;
+    return max(length(q) - e.z, lid);
+  }
+#endif
   if (e.w < 0.5) return length(q) - e.z;
   // closed: a soft lower arc, like a content smile turned into an eyelid
   float ring = abs(length(q - vec2(0.0, 0.35 * e.z)) - 0.8 * e.z) - 0.045;
@@ -93,6 +105,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
 
   const mat = new THREE.ShaderMaterial({
     uniforms,
+    defines: { EYE_LIDS: false },
     side: THREE.DoubleSide,     // the shadow pass renders the flipped side; double keeps the plane in the light's view
     alphaToCoverage: true,      // soft edge without transparency sorting (the stage renders with MSAA)
     vertexShader: /* glsl */`
@@ -177,16 +190,44 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   mesh.name = 'blob';
   mesh.castShadow = true;
 
-  // Shadow: the stock depth material with the same field discarding outside the outline and inside the eyes.
-  const depth = new THREE.MeshDepthMaterial();
-  depth.onBeforeCompile = (shader) => {
+  // Puts this blob's field into a stock material's shader (sharing its uniforms, so it wobbles with the blob) and
+  // runs `cut` at the top of main(), with bp = the fragment in radius units.
+  const withField = (shader, cut) => {
     Object.assign(shader.uniforms, { uBalls: uniforms.uBalls, uScale: uniforms.uScale, uEye: uniforms.uEye, uRadius: uniforms.uRadius, uFloor: uniforms.uFloor });
     shader.vertexShader = 'varying vec2 vLocal;\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvLocal = position.xy;');
     shader.fragmentShader = 'varying vec2 vLocal;\n' + GLSL_FIELD + shader.fragmentShader.replace('void main() {',
-      `void main() {\n vec2 bp = vLocal / uRadius;\n if (bp.y < uFloor || field(bp) < ${T} || eyesDist(bp) < 0.0) discard;`);
+      `void main() {\n vec2 bp = vLocal / uRadius;\n${cut}`);
   };
+
+  // Shadow: the stock depth material with the same field discarding outside the outline and inside the eyes.
+  const depth = new THREE.MeshDepthMaterial();
+  depth.defines = { EYE_LIDS: false };
+  depth.onBeforeCompile = (shader) => withField(shader, ` if (bp.y < uFloor || field(bp) < ${T} || eyesDist(bp) < 0.0) discard;`);
   depth.customProgramCacheKey = () => 'looming-blob';
   mesh.customDepthMaterial = depth;
+
+  // The same outline as a flat ink material for a decal (crowd shadows drawn without a light, s13): eyes are holes and
+  // the edge fades over ±soft, in radius units of the mesh it's on (set material.userData.soft.value per frame when
+  // the decal is scaled). Put it on a mesh built from blob.mesh.geometry; the caller places and scales that mesh.
+  function silhouette({ color = PALETTE.ink, soft = 0.1 } = {}) {
+    const m = new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false,
+      polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
+    m.userData.soft = { value: soft };
+    m.defines = { EYE_LIDS: lidded };
+    shaders.push(m);
+    m.onBeforeCompile = (sh) => {
+      withField(sh, `const float hh = 0.01;
+        vec2 gg = vec2(field(bp + vec2(hh, 0.0)) - field(bp - vec2(hh, 0.0)), field(bp + vec2(0.0, hh)) - field(bp - vec2(0.0, hh))) / (2.0 * hh);
+        float inside = (field(bp) - ${T}) / max(length(gg), 1e-4);
+        float sA = smoothstep(-uSoft, uSoft, inside) * smoothstep(-uSoft, uSoft, eyesDist(bp)) * step(uFloor, bp.y);
+        if (sA <= 0.0) discard;`);
+      sh.uniforms.uSoft = m.userData.soft;
+      sh.fragmentShader = 'uniform float uSoft;\n' + sh.fragmentShader
+        .replace('#include <alphamap_fragment>', 'diffuseColor.a *= sA;\n#include <alphamap_fragment>');
+    };
+    m.customProgramCacheKey = () => 'looming-blob-silhouette';
+    return m;
+  }
 
   // The ink flattens only where it touches. The stain marks the surface, so once both are placed the bottom is
   // clipped at the stain's height: lift the mesh and the drop rounds out. Runs before both the shadow and main pass.
@@ -219,7 +260,11 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     uniforms.uFalloff.value.set(key.distance || 0, key.decay ?? 2);
   };
 
-  function update(tLocal, { squash = 0, wobble = 1, eyes = 'open' } = {}) {
+  // Every material running the field; update() flips EYE_LIDS on all of them when a lidded eye comes or goes.
+  const shaders = [mat, depth];
+  let lidded = false;
+
+  function update(tLocal, { squash = 0, wobble = 1, eyes = 'open', look = 1 } = {}) {
     const t = onTwos(tLocal);   // a character: it moves on 2s like the puppets (doc 03 · Motion)
     const balls = [[0, 0.88 + 0.015 * wobble * Math.sin(6.283 * breath.f * t + breath.p), 2, 1]];
     for (const l of lobes) {
@@ -235,12 +280,15 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     for (let i = balls.length; i < N; i++) uniforms.uBalls.value[i].set(0, 0, 1, 0);
     uniforms.uScale.value.set(sx, sy);
 
-    const mode = EYES[eyes] ?? 0;
-    const er = mode === 2 ? EYE_R * 0.68 : EYE_R;
-    const lift = mode === 2 ? 0.15 : 0;
+    if (!Object.hasOwn(EYES, eyes)) throw new Error(`blob: unknown eyes '${eyes}' (${Object.keys(EYES).join(', ')})`);
+    const [shape, size, lift] = EYES[eyes], er = EYE_R * size, dx = shape === -2 ? SIDE_SHIFT * look : 0;
+    if (lidded !== shape < 0) {
+      lidded = shape < 0;
+      for (const m of shaders) { m.defines.EYE_LIDS = lidded; m.needsUpdate = true; }
+    }
     [-1, 1].forEach((side, i) => {
-      const x = side * EYE_X * sx;
-      uniforms.uEye.value[i].set(x, topAt(balls, sx, sy, x) - EYE_DROP * Math.min(1, sy) + lift, er, mode === 1 ? 1 : 0);
+      const x = side * EYE_X * sx;   // height from the unshifted spot, so a side glance keeps the eyes level
+      uniforms.uEye.value[i].set(x + dx, topAt(balls, sx, sy, x) - EYE_DROP * Math.min(1, sy) + lift, er, shape);
     });
   }
 
@@ -264,5 +312,5 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   stain.position.y = 0.0003;
 
   update(0);
-  return { mesh, update, stain };
+  return { mesh, update, stain, silhouette };
 }

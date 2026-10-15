@@ -123,7 +123,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     // Spec puts it on the floor (z 0.001), but a 3–9× shadow runs under the neighbouring desks and they hide its eye holes;
     // just above the desk-top plane it lands on desks and floor alike (≤ 8 mm parallax at the frame edge) and stays under
     // every prop, blob and figure.
-    const decal = place(new THREE.Mesh(blob.mesh.geometry, shadowMaterial(blob, PALETTE)), bx, by, 0.0325, rot);
+    const decal = place(new THREE.Mesh(blob.mesh.geometry, blob.silhouette()), bx, by, 0.0325, rot);
     // Unshadowed cyan fill above the screen: lights this desk and the floor round it, so the room appears desk by desk
     // and the decal has light to darken. Throws nothing (the decal is the shadow).
     const len = S * 2.2 * r * 1.5;   // final shadow length (the silhouette is ~1.1 × 2r wide)
@@ -201,29 +201,4 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       }
     },
   };
-}
-
-// The blob's own silhouette (eyes as holes) as a flat ink decal: reuse the blob's shadow-pass shader hook on a basic
-// material, then soften its hard discard into a 0.006 m edge. Shares the blob's uniforms, so it wobbles with it.
-// ponytail: leans on blob.js's depth-material hook (not in contracts.md); a contract `blob.silhouette()` would replace it.
-function shadowMaterial(blob, PALETTE) {
-  const m = new THREE.MeshBasicMaterial({ color: PALETTE.ink, transparent: true, depthWrite: false,
-    polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
-  const soft = { value: 0.1 };
-  m.userData.soft = soft;
-  m.onBeforeCompile = (sh) => {
-    blob.mesh.customDepthMaterial.onBeforeCompile(sh);
-    sh.uniforms.uSoft = soft;
-    const cut = /if \(bp\.y < uFloor \|\| field\(bp\) < ([\d.]+) \|\| eyesDist\(bp\) < 0\.0\) discard;/;
-    if (!cut.test(sh.fragmentShader)) throw new Error('s13: blob.js shadow hook changed; rebuild the decal shader');
-    sh.fragmentShader = 'uniform float uSoft;\n' + sh.fragmentShader
-      .replace(cut, (_, T) => `const float hh = 0.01;
-        vec2 gg = vec2(field(bp + vec2(hh, 0.0)) - field(bp - vec2(hh, 0.0)), field(bp + vec2(0.0, hh)) - field(bp - vec2(0.0, hh))) / (2.0 * hh);
-        float inside = (field(bp) - ${T}) / max(length(gg), 1e-4);
-        float sA = smoothstep(-uSoft, uSoft, inside) * smoothstep(-uSoft, uSoft, eyesDist(bp)) * step(uFloor, bp.y);
-        if (sA <= 0.0) discard;`)
-      .replace('#include <alphamap_fragment>', 'diffuseColor.a *= sA;\n#include <alphamap_fragment>');
-  };
-  m.customProgramCacheKey = () => 's13-shadow-decal';
-  return m;
 }
