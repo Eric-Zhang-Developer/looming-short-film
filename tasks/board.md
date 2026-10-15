@@ -70,10 +70,12 @@
 
 ### wave 3, started early
 - asset-style-tile · painter · `assets/prompts/style_tile.v2.md`, `assets/specs.json` (style_tile), `tools/gen.mjs` (fixes), `assets/raw/thumbs/`, `evidence/asset-style-tile/`, `done/asset-style-tile.md` · built (merged, awaiting G1) · evidence/asset-style-tile/contact.jpg
-- asset-style-tile-v3 · painter · `assets/prompts/style_tile.v3.md`, specs style_tile, `tools/gen.mjs` (cap) · built (awaiting G1 pick) · `evidence/asset-style-tile-v3/contact.jpg`
+- asset-style-tile-v3 · painter · `assets/prompts/style_tile.v3.md`, specs style_tile, `tools/gen.mjs` (cap) · approved (G1: "I like it", v3_4 frozen) · `evidence/asset-style-tile-v3/contact.jpg`
 - exam-ink · builder · `src/blob.js`, `lab/blob.js`, contracts §blob · built (merged) · evidence/exam-ink/before_after.jpg
 - snd-foley · builder · `src/audio/foley.js`, `evidence/snd-foley/`, `done/snd-foley.md` · verified (merged) · evidence/snd-foley/spectra.jpg
 - snd-score · builder · `src/audio/score.js`, `tools/mix.mjs`, `evidence/snd-score/`, `done/snd-score.md` · verified (merged) · evidence/snd-score/score.mp3
 - tool-cut-fixes · builder · `tools/cut.mjs`, `tools/gen.mjs`, `evidence/tool-cut-fixes/`, `done/tool-cut-fixes.md` · verified (merged) · evidence/tool-cut-fixes/despill.jpg
 - contract-audio · builder · `tools/mix.mjs`, `src/audio/cues.js`, `src/audio/selftest.js`, `src/audio/foley.js` (signatures), `docs/contracts.md` §audio · verified (merged) · evidence/contract-audio/linear_check.txt
 - snd-score-clicks · builder · `src/audio/score.js` · verified (merged) · evidence/snd-score-clicks/levels.txt
+- asset-gator-sheet · painter · `assets/prompts/gator_sheet.v1.md`, specs gator_sheet · in-progress · —
+- ref-ufl · researcher (read-only) · `reference-videos/ufl/` (gitignored), `docs/ref-ufl.md` · in-progress · —
