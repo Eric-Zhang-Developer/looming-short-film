@@ -27,14 +27,16 @@ ok('three lamp clicks are sample-identical in out/audio/stems/foley.wav', () => 
   assert.ok(peak > 0.1, `click present (peak ${peak})`);
   console.log(`    ${clicks.map((c) => `${c.beat}@${beat(c.beat)}s`).join(', ')}; ${slices[0].length} samples each (±0.1 s), peak ${peak.toFixed(4)}`);
 });
-ok('a bed cue with a length fills it in its stem', () => {
-  const c = CUES.find((c) => c.until || c.dur);
-  const b = readFileSync(`${out}/stems/${c.stem ?? 'foley'}.wav`);
-  const at = beat(c.beat) + (c.offset ?? 0), end = c.dur ? at + c.dur : beat(c.until);
-  let first = -1, last = -1;
-  for (let i = 0; i < (b.length - 44) / 8; i++) if (b.readFloatLE(44 + i * 8) !== 0) { if (first < 0) first = i; last = i; }
-  console.log(`    ${c.sound} in ${c.stem}: cue ${at}–${end} s, non-zero samples ${first / SR}–${(last + 1) / SR} s`);
-  assert.ok(Math.abs(first / SR - at) < 0.01 && Math.abs((last + 1) / SR - end) < 0.01);
+ok('every bed cue with a length sounds at both ends of its own span', () => {
+  // Checks each cue's own span, not the whole stem, so several beds can share a stem.
+  const stems = {}, read = (st) => (stems[st] ??= readFileSync(`${out}/stems/${st}.wav`));
+  const live = (b, t0, t1) => { for (let i = Math.floor(t0 * SR); i < t1 * SR; i++) if (b.readFloatLE(44 + i * 8) !== 0) return true; return false; };
+  const beds = CUES.filter((c) => (c.until || c.dur) && c.stem === 'ambience');  // beds live on ambience; one-shot foley with a dur may fade
+  for (const c of beds) {
+    const b = read(c.stem ?? 'foley'), at = beat(c.beat) + (c.offset ?? 0), end = c.dur ? at + c.dur : beat(c.until);
+    assert.ok(live(b, at, at + 0.05) && live(b, end - 0.05, end), `${c.sound} @ ${c.beat}: silent at an end of ${at}–${end} s`);
+  }
+  console.log(`    ${beds.length} bed cues sound at both ends of their spans`);
 });
 ok('voices and foley are deterministic and finite', () => {
   const make = [() => feltPiano(60), () => musicBox(72.14), () => pad([60, 64, 67], { dur: 2 }), () => subSwell({ dur: 3 }),
