@@ -6,8 +6,8 @@
 ## In flight
 | Task | Kind | Notes |
 |---|---|---|
-| `mod-material` | batch 3 builder | batch 2 all merged |
-| `snd-foley`, `snd-score` | builders (wave 6, early) | `snd-engine` merged; full mix -14.5 LUFS |
+| `mod-puppet`, `lookdev-composite` | batch 4 builders | lookdev uses v2_4 pending G1 |
+| `contract-audio` | builder | click identity in final mix; bed durations |
 | `sb-act1`, `sb-act2`, `sb-act3` | storyboard (docs) | parallel track |
 | **G1** | director | style tile v2_1–v2_4 in `evidence/asset-style-tile/contact.jpg`; orchestrator recommends v2_4 |
 
@@ -16,16 +16,16 @@
 |---|---|---|---|
 | 1 | `mod-core`, `mod-render`, `mod-timeline`, `tool-gen` | nothing | merged |
 | 2 | `mod-paper`, `mod-lights`, `mod-blob`, `mod-post` | `mod-core` | merged |
-| 3 | `mod-material` | `mod-paper`, `mod-lights` | in-progress |
-| 4 | `mod-puppet`, `lookdev-composite` | everything | todo |
+| 3 | `mod-material` | `mod-paper`, `mod-lights` | merged |
+| 4 | `mod-puppet`, `lookdev-composite` | everything | in-progress |
 
 ## Blocked
 - none
 
 ## Next 3 moves
-1. Merge `mod-material`, then dispatch batch 4 (`mod-puppet`, `lookdev-composite`).
+1. Merge batch 4, then open the wave 2 PR with lookdev as the headline evidence.
 2. **Waiting on G1.** On the pick: freeze it to `assets/frozen/style_tile.png` (despilled), then dispatch the gator sheet painter (G2).
-3. When sb-act1 and sb-act3 merge, dispatch `sb-reconcile` (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
+3. When sb-act1 and sb-act3 merge, dispatch `sb-reconcile` (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names + snd-score's fridge/gameNight/curtainsStart/scrollStart/marstonEnter into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
 
 ## Carry-overs for wave 3
 - `assets/prompts/style_tile.v1.md` asks for a green key; v2 (alpha-first) is in progress in `asset-style-tile`.
@@ -48,4 +48,4 @@
 - `src/audio/selftest.js` needs a full `node tools/mix.mjs` run first (a `--range` mix overwrites `out/audio/mix.wav`).
 - Paper rim reads ~1 px at wide framing (reference ~2% of object size). Revisit after lookdev; likely a `contract-paper` change to object-relative rim width.
 - r186 casts cut-out shadows from `alphaMap` alone (confirmed by lights and paper builders).
-- Bed signatures are mixed: new beds take `(seed, dur)`, `paperRustle`/`fluorescentHum` take `(seed, { dur })`, and `mix.mjs` passes no duration, so cued beds play their 2–8 s default. Fix with a `contract-audio` task (cues carry `dur`, one bed signature) after `snd-score` merges, since it owns `mix.mjs`.
+- Score: `evidence/snd-score/score.mp3` (full mix, listenable). Nothing has been checked by ear yet; the director's first listen is due at G4.
