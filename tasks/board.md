@@ -49,7 +49,7 @@
 - anim-s07 · builder · `src/shots/s07.js` · in-progress · —
 - contract-light-key · builder · `src/lights.js`, `src/blob.js`, contracts §lights/§blob · verified (merged) · evidence/contract-light-key/s03_key_after.jpg
 - anim-s09 · builder · `src/shots/s09.js` · verified (merged) · evidence/anim-s09/walk_after.jpg
-- anim-s04 · builder · `src/shots/s04.js` · in-progress · —
+- anim-s04 · builder · `src/shots/s04.js` · verified (merged) · evidence/anim-s04/face_before_after.jpg
 - anim-s03 · builder · `src/shots/s03.js` · verified (merged) · evidence/anim-s03/sheet.jpg
 - anim-s02 · builder · `src/shots/s02.js` · verified (merged) · evidence/anim-s02/sheet.jpg
 
