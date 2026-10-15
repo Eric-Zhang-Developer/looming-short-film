@@ -1,53 +1,39 @@
 # NOW
 
-**Wave:** 3 · Assets (+ wave 4 prep) · branch `wave/3-assets` · **mod-film merged; char-rigs, anim-s01, anim-s13 building; G1 + Q1–Q8 open**
+**Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-15
 
 ## In flight
 | Task | Kind | Notes |
 |---|---|---|
-| `sb-act1`, `sb-act2`, `sb-act3` | storyboard (docs) | parallel track |
-| **G1** | director | revised after lookdev: recommend a v3 tile with a value-contrast rule (+4 generations) instead of freezing a v2 |
+| `anim-s02`, `anim-s03`, `anim-s04`, `anim-s09`, `anim-s15` | animatic shot builders (opus), batch 1 | Cut off by the 5-hour usage limit and resumed with SendMessage after the reset. Worktrees are in `~/.worktrees/looming/anim-sNN`. |
 
-## Plan
-| Batch | Tasks | Needs | State |
-|---|---|---|---|
-| 1 | `mod-core`, `mod-render`, `mod-timeline`, `tool-gen` | nothing | merged |
-| 2 | `mod-paper`, `mod-lights`, `mod-blob`, `mod-post` | `mod-core` | merged |
-| 3 | `mod-material` | `mod-paper`, `mod-lights` | merged |
-| 4 | `mod-puppet`, `lookdev-composite` | everything | merged (lookdev: look half passes) |
+## Waiting on the director
+- **G1 · style tile.** The recommendation is a **v3 tile under a value-contrast rule**: props in cream, kraft, green, amber or red; navy only for walls and sky; +4 generations on top of the style_tile cap (7 of 8 used). Lookdev showed the v2 navy props disappearing into the navy wall. v2 variants are in `evidence/asset-style-tile/contact.jpg`; lookdev evidence is in `evidence/look-pass-2/`.
+- **Q1–Q9** in `docs/shots/QUESTIONS.md`: quiet-shot motion, neighbour click, s18 timing, second red circle, blob growth, phone shadow, the Exam's look, Thursday marker, gator legs. The specs and the animatic follow each question's "(current)" option until answered.
+- **Repo hygiene:** `Gator Create Competition - Transcription.md` (third-party page text) is tracked at the repo root since 309bb41. I recommended removing it; waiting on a yes.
+- The deadline is still unconfirmed (ProposalSpace).
 
-## Blocked
-- none
+## Next moves
+1. Merge batch 1 as each shot finishes. Merge pattern: check the diff touches only its owns, run `determinism.mjs` on `index.html` across the shot, convert any PNG over 2 MB to JPEG, squash with a "why" message, remove the worktree, update the board.
+2. Batch 2: s05, s06 (mirror s15's numbers from `done/anim-s15.md`), s07, s10, s16. Batch 3: s08, s11, s12, s14, s17. Batch 4: s18. Brief: `tasks/anim-shot.md`. Builders use `src/characters/` rigs, take `visible` sizes from `assets.load`, and save JPEG evidence. **Pace:** at most 5 concurrent builders; use Sonnet for simpler shots (s05, s08, s10, s14), and check `get_usage` before each batch.
+3. When all 18 are blocked: assemble the animatic (`render.mjs --frames` then `--encode` with `out/audio/mix.wav`), run 3 cold viewers (doc 02's readability questions) and a judge, then gate **G4**. Tag `v1-animatic` with a Release.
+4. After G1: v3 style tile → freeze → gator and face sheets (G2) → sets and props per `docs/assets.md` (20 frozen) → G3 test shot.
 
-## Next 3 moves
-1. When char-rigs merges, dispatch gator shots in batches of ≤5 (brief `tasks/anim-shot.md`): B1 s02 s04 s09 s15 s03; B2 s05 s06 (after s15) s10 s16 s07; B3 s08 s11 s12 s14 s17; B4 s18. Then assemble the animatic with temp sound for G4.
-2. **Waiting on G1.** On the pick: freeze it to `assets/frozen/style_tile.png` (despilled), then dispatch the gator sheet painter (G2).
-3. `sb-reconcile` running (one pass over all 18 shot specs: blob size, s06/s15 lamp continuity, s10 fluorescent vs. shadow rule, s13 crane ban, 11 proposed beat names + snd-score's fridge/gameNight/curtainsStart/scrollStart/marstonEnter into `src/timeline.js`). Then fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
-
-## Carry-overs for wave 3
-- `assets/prompts/style_tile.v1.md` asks for a green key; v2 (alpha-first) is in progress in `asset-style-tile`.
-- `reference-videos/` exists only in the main checkout. Painters in worktrees use the absolute path, and `gen.mjs` should resolve it against the main checkout.
-- Cut PNGs are gitignored (`assets/cut/*.png`); they regenerate from a frozen sheet plus its boxes JSON.
-- Stage gained `setRender` (implemented by `mod-post`). Addon pages need `three/examples/jsm/` in the import map (contracts updated).
-
-## Open director questions
-- **Story-beat conflicts from sb-act3 (one-way doors, ask after reconcile):** s17 "only light and boil move" vs doc 02's sit-back and pocket climb; a 4th lamp click (the neighbor's); s18's click at 2:44 squeezes the walk-over; a second red circle on the new calendar.
-- **For G2/animatic (from sb-act2):** (a) blob size: contract 0.025 m is over half the gator's height; storyboard used 0.012 m. (b) A phone that lights the blob also lights its holder, so a true phone loom throws the gator's own giant shadow too; sb-act2 aimed the light at the blob only. Film-wide call.
-- **G2 agenda: the Exam's look.** `mod-blob` reads as glossy CG gel (cute, nervous), not ink on paper; the specular highlight can sit where a mouth would. Options to show at G2: keep gel, matte ink with a painted highlight, or a painted Codex blob on paper. Evidence: `evidence/mod-blob/squash_strip.jpg`.
-- Final submission deadline (confirm on ProposalSpace).
+## Carry-overs and known gaps
+- **Mix headroom:** premix PLR is 12.36 dB against loudnorm's 12.5 dB linear limit, so s05/s07 foley sits under spec level. Wave 6: a limiter or makeup gain in `tools/mix.mjs`.
+- **s01:** the window reads grey and the dawn could pass for dusk. Its local proxy padding now stacks with proxy-margin, so the building is about 8% big. Fix in the final pass.
+- **s13:** reads dark and busy at thumbnail size (check at G4). Back-to-back figures merge.
+- **The rig's legs are 37% of the gator's height** (the tile's are about 20%); flagged on Q9. `hipHeight` must be re-measured from the real `leg_l` once art is frozen.
+- **Paper rim** at wide framing: fixed by look passes 1–2. Rims take the light's colour, where the reference's are painted white.
+- `render.mjs` takes no query strings.
+- The paper cache won't hold a 25 s held shot at 4 Hz boil.
+- Cut PNGs (`assets/cut/*.png`) are gitignored. Unfrozen `*.boxes.json` stay untracked.
 
 ## Models
 - Orchestrator: claude-opus-5-5
-- Builders: opus for paper, lights, blob, material, puppet, core, tool-gen and lookdev; sonnet for render, timeline and post (well-specified ports)
+- Builders: opus for rigs, contracts and hard shots; sonnet for well-specified fixes and simpler shots
 - Painters: opus
 
-## Notes
-- Fluorescent is a DirectionalLight (doc 04 updated). Lamp angle 0.35 reads better than the contract default 0.6 in the lab; shots pass it explicitly.
-- `src/audio/selftest.js` needs a full `node tools/mix.mjs` run first (a `--range` mix overwrites `out/audio/mix.wav`).
-- Paper rim reads ~1 px at wide framing (reference ~2% of object size). Revisit after lookdev; likely a `contract-paper` change to object-relative rim width.
-- r186 casts cut-out shadows from `alphaMap` alone (confirmed by lights and paper builders).
-- Score: `evidence/snd-score/score.mp3` (full mix, listenable). Nothing has been checked by ear yet; the director's first listen is due at G4.
-- s13 reads dark and busy at thumbnail size; check with cold viewers at G4.
-- s01 window reads grey, dawn could pass for dusk; final pass.
-- Mix headroom: premix PLR 12.36 dB vs loudnorm's 12.5 linear limit; s05/s07 foley sits under spec level. Wave 6 mix task: limiter / makeup in tools/mix.mjs.
+## Session hand-off
+Read AGENTS.md, docs/09-orchestration.md, this file and tasks/board.md. Resume the /loop. Subagent reports arrive as messages; merge per step 1.
