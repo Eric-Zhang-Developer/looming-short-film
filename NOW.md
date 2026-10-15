@@ -32,6 +32,8 @@ Merged so far: s01–s05, s07–s10, s13 (10 of 18). Style tile v3 is built and 
 - **s13:** reads dark and busy at thumbnail size (check at G4). Back-to-back figures merge.
 - **s07:** the seam light at 8.0 is 7.3% (spec 5%), and he's a backlit silhouette during the montage. Fix in the final lighting pass. Its straight-cut curtains conflict with s08's torn, glowing rims.
 - **s08:** his face is a few px of proxy, so the yawn reads from the shadow's eyes. The ladder from s07 is still in frame (fine for continuity, but check at G4).
+- **s11:** the first 2.6 s are very dark (the gator barely reads), the lid opening is small, and the face fill is 83% of the desk top (rule 30–45%). Check at G4.
+- **Shadow-scale chain across the night:** s11 ends 5.96×, s12 and s13 hold 7.1× (s12's phone z solved to about 0.103), and s15 opens 4.2× on its own closer camera.
 - **The blob draws 2.73 cm, not 2.4.** Any shot spec that derives a shadow width from 2.4 is off by 14%. The scale is the truth.
 - **The rig's legs are 37% of the gator's height** (the tile's are about 20%); flagged on Q9. `hipHeight` must be re-measured from the real `leg_l` once art is frozen.
 - **Paper rim** at wide framing: fixed by look passes 1–2. Rims take the light's colour, where the reference's are painted white.
