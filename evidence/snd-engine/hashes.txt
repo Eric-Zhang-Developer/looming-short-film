@@ -1,0 +1,14 @@
+run 1: node tools/mix.mjs
+126cd3a090876e97c6956ba1b3ff9464095c7d24756517dc22ea7fc7a83187f7  out/audio/mix.wav
+a020262fee4a6b3098142933cd5e42d9d9f4952f05246bfaf18ecc93b2b7f390  out/audio/stems/ambience.wav
+49c255f1312e9c6725848d78232869f6a3f5f17f45194858fe012844a1f6c4e1  out/audio/stems/foley.wav
+137267a3497076cfe16c36bfd109f0b3e66d76d0a63f5aa47c0c9c57163175a2  out/audio/stems/music.wav
+run 2: node tools/mix.mjs
+126cd3a090876e97c6956ba1b3ff9464095c7d24756517dc22ea7fc7a83187f7  out/audio/mix.wav
+a020262fee4a6b3098142933cd5e42d9d9f4952f05246bfaf18ecc93b2b7f390  out/audio/stems/ambience.wav
+49c255f1312e9c6725848d78232869f6a3f5f17f45194858fe012844a1f6c4e1  out/audio/stems/foley.wav
+137267a3497076cfe16c36bfd109f0b3e66d76d0a63f5aa47c0c9c57163175a2  out/audio/stems/music.wav
+run 1: node tools/mix.mjs --range=30:45
+5fb9e7c23ffa91d79849fa84b392d9255455856654f833cc0bf980fcfa376deb  out/audio/mix.wav
+run 2: node tools/mix.mjs --range=30:45
+5fb9e7c23ffa91d79849fa84b392d9255455856654f833cc0bf980fcfa376deb  out/audio/mix.wav

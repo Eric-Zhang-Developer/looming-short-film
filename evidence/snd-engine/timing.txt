@@ -1,0 +1,9 @@
+machine: Apple M2, node v24.13.0, ffmpeg version 8.1
+$ time node tools/mix.mjs --range=30:45
+real 1.51
+user 1.47
+sys 0.06
+$ time node tools/mix.mjs   (full 180 s)
+real 16.02
+user 15.48
+sys 0.44
