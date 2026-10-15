@@ -1,0 +1,31 @@
+# Cap test for tools/gen.mjs (doc 08: at most 8 generations per asset). No Codex run: every call is --dry-run,
+# and the cap check runs before anything else. Real state: style_tile has 1 output (assets/raw/style_tile_v1.png
+# + committed sidecar assets/raw/thumbs/style_tile_v1.json). Empty placeholder PNGs stand in for extra outputs,
+# then are deleted.
+
+$ node tools/gen.mjs --asset=style_tile --variants=1 --dry-run | head -1    # 1 used
+# gen.mjs dry run · style_tile · prompt v1 · 1 variant(s) · 1/8 used
+exit 0
+
+$ touch assets/raw/style_tile_v9_{1..6}.png    # placeholders: now 7 used
+$ node tools/gen.mjs --asset=style_tile --variants=1 --dry-run | head -1    # 7 + 1 = 8: allowed
+# gen.mjs dry run · style_tile · prompt v1 · 1 variant(s) · 7/8 used
+exit 0
+
+$ node tools/gen.mjs --asset=style_tile --variants=2 --dry-run    # 7 + 2 = 9: refused
+gen: REFUSED: style_tile already has 7 of 8 generations; 2 more would exceed the cap. Doc 08: rethink the spec instead of re-rolling.
+  existing: style_tile_v1, style_tile_v9_1, style_tile_v9_2, style_tile_v9_3, style_tile_v9_4, style_tile_v9_5, style_tile_v9_6
+exit 1
+
+$ touch assets/raw/style_tile_v9_7.png    # now 8 used: the cap is reached
+$ node tools/gen.mjs --asset=style_tile --variants=1 --dry-run
+gen: REFUSED: style_tile already has 8 of 8 generations; 1 more would exceed the cap. Doc 08: rethink the spec instead of re-rolling.
+  existing: style_tile_v1, style_tile_v9_1, style_tile_v9_2, style_tile_v9_3, style_tile_v9_4, style_tile_v9_5, style_tile_v9_6, style_tile_v9_7
+exit 1
+
+$ node tools/gen.mjs --asset=style_tile --variants=1    # live mode refuses too, before any codex call
+gen: REFUSED: style_tile already has 8 of 8 generations; 1 more would exceed the cap. Doc 08: rethink the spec instead of re-rolling.
+  existing: style_tile_v1, style_tile_v9_1, style_tile_v9_2, style_tile_v9_3, style_tile_v9_4, style_tile_v9_5, style_tile_v9_6, style_tile_v9_7
+exit 1
+
+$ rm assets/raw/style_tile_v9_*.png    # placeholders removed

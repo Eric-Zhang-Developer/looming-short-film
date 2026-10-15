@@ -1,0 +1,12 @@
+5 alpha island(s): 5 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/tool-gen/evidence/tool-gen/style_tile_v1.boxes.json
+style_tile_v1_1: cleared 5944 px (neighbouring islands, alpha<16 dust)
+style_tile_v1_1: [28, 84, 520, 604] -> /Users/ericzhang/.worktrees/looming/tool-gen/assets/cut/style_tile_v1_1.png
+style_tile_v1_2: cleared 2228 px (neighbouring islands, alpha<16 dust)
+style_tile_v1_2: [568, 332, 384, 312] -> /Users/ericzhang/.worktrees/looming/tool-gen/assets/cut/style_tile_v1_2.png
+style_tile_v1_3: cleared 3868 px (neighbouring islands, alpha<16 dust)
+style_tile_v1_3: [976, 244, 308, 368] -> /Users/ericzhang/.worktrees/looming/tool-gen/assets/cut/style_tile_v1_3.png
+style_tile_v1_4: cleared 6960 px (neighbouring islands, alpha<16 dust)
+style_tile_v1_4: [1308, 216, 320, 412] -> /Users/ericzhang/.worktrees/looming/tool-gen/assets/cut/style_tile_v1_4.png
+style_tile_v1_5: cleared 1950 px (neighbouring islands, alpha<16 dust)
+style_tile_v1_5: [1593, 452, 375, 167] -> /Users/ericzhang/.worktrees/looming/tool-gen/assets/cut/style_tile_v1_5.png
