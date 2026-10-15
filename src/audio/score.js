@@ -116,6 +116,18 @@ function fadeOut(buf, sec) {
 // Music sits under the foley: the lamp click (about -5 dBFS in the foley stem) stays the loudest transient.
 const LEVEL = 0.5;
 
+// Doc 05: every lamp click is dry and exposed, so the music stem is true zero across each click's own 0.3 s window.
+// Notes and their room tails ring through it (the groove's bar −1 stabs, 35.5 s, reach the home click), so the
+// gate fades the stem out over 40 ms before the click and back in 20 ms after the window. Beat-relative, like the notes.
+const CLICKS = ['lampClickHome', 'lampClickMarston', 'lampClickFreshman'], CLICK_LEN = 0.3, FADE_OUT = 0.04, FADE_IN = 0.02;
+function gateClicks(out) {
+  const at = (s) => Math.round(s * SR);
+  for (const b of CLICKS) {
+    const t = beat(b), a = at(t - FADE_OUT), z = at(t), y = at(t + CLICK_LEN), e = at(t + CLICK_LEN + FADE_IN);
+    for (let i = a; i < e && i < out.length; i++) out[i] *= i < z ? 1 - (i - a) / (z - a) : i < y ? 0 : (i - y) / (e - y);
+  }
+}
+
 // Renders SCORE over [0, durSec) of film time as a mono Float32Array. Notes are cached, so the groove's
 // repeats cost one synthesis each.
 export function renderScore(durSec) {
@@ -132,5 +144,6 @@ export function renderScore(durSec) {
     else if (e.voice === 'sub') mixInto(out, e.fade ? fadeOut(subSwell(e), e.fade) : subSwell(e), t, g);
     else for (const m of [e.midi].flat()) mixInto(out, note(e.voice, m, e.vel, e.dur), t, g);
   }
+  gateClicks(out);
   return out;
 }
