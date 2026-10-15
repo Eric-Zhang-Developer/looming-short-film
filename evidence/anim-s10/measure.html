@@ -1,0 +1,68 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s10 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s10 measurement rig (the s03 method). Builds src/shots/s10.js on its own stage without post, hides everything
+  // but the end wall and the blob (so the wings can't hide the shadow), and renders the frame with the blob invisible
+  // to the camera (colorWrite off), once casting and once not. Changed pixels are back-projected onto the wall plane
+  // (z 0). Scale = shadow width / blob width, the blob width being its own camera mask back-projected onto its plane.
+  // Also: the area of the gator's and backpack's shadow on the wall (blob not casting, gator casting vs not).
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build } from '/src/shots/s10.js';
+
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: () => ({ set() {} }) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 6 });
+  const { exam, wall, zG, spot } = shot.parts;
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  const grabPx = () => { renderer.render(scene, camera); const p = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, p); return p; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+  const onPlane = (x, y, z) => { ndc.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1); ray.setFromCamera(ndc, camera); return ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -z), hit); };
+  function box(mask, z, keep = () => true) {
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, n = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!mask[y * W + x]) continue;
+      const h = onPlane(x, y, z); if (!keep(h)) continue; n++;
+      x0 = Math.min(x0, h.x); x1 = Math.max(x1, h.x); y0 = Math.min(y0, h.y); y1 = Math.max(y1, h.y);
+    }
+    return { x0, x1, y0, y1, w: x1 - x0, n };
+  }
+  const diff = (a, b) => { const m = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) m[i] = Math.abs(a[i*4]-b[i*4]) + Math.abs(a[i*4+1]-b[i*4+1]) + Math.abs(a[i*4+2]-b[i*4+2]) > 12 ? 1 : 0; return m; };
+  window.measure = (t) => {
+    stage.renderFrame(t);
+    const meshes = [], keep = new Set([wall, exam.mesh]);
+    scene.traverse((o) => { if (o.isMesh && !keep.has(o)) meshes.push([o, o.visible, o.castShadow]); });
+    // blob's shadow on the wall (only wall + blob drawn)
+    for (const [o] of meshes) o.visible = false;
+    const mat = exam.mesh.material;
+    mat.colorWrite = false; mat.depthWrite = false;
+    exam.mesh.castShadow = true; const a = grabPx();
+    exam.mesh.castShadow = false; const b = grabPx();
+    mat.colorWrite = true; mat.depthWrite = true;
+    const c = grabPx(); exam.mesh.visible = false; const d = grabPx(); exam.mesh.visible = true;   // blob mask
+    exam.mesh.castShadow = true;
+    const shadow = box(diff(a, b), 0, (h) => h.y > 0.0005), blob = box(diff(c, d), exam.mesh.position.z);
+    // gator + backpack + phone shadow on the wall: everything drawn out of sight, blob not casting, with vs without
+    for (const [o, , cs] of meshes) { o.visible = false; o.castShadow = cs; }
+    exam.mesh.visible = false; exam.mesh.castShadow = false;
+    // gator parts are visible=false here, but invisible objects don't cast: make them visible with colorWrite off
+    const mats = [];
+    for (const [o] of meshes) { o.visible = true; if (o.material.colorWrite !== undefined) { mats.push([o.material, o.material.colorWrite, o.material.depthWrite]); o.material.colorWrite = false; o.material.depthWrite = false; } }
+    const e = grabPx();
+    for (const [o] of meshes) o.castShadow = false;
+    const f = grabPx();
+    for (const [m, cw, dw] of mats) { m.colorWrite = cw; m.depthWrite = dw; }
+    for (const [o, v, cs] of meshes) { o.visible = v; o.castShadow = cs; }
+    exam.mesh.visible = true; exam.mesh.castShadow = true;
+    const others = box(diff(e, f), 0, (h) => h.y > 0.0005);
+    return { t, shadow, blob, scale: shadow.w / blob.w, others, ratio: others.n / Math.max(1, shadow.n),
+      expect: (zG(t) + 0.005) / 0.030 };
+  };
+  window.shot = shot;
+</script>
