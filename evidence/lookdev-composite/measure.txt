@@ -1,0 +1,11 @@
+$ node evidence/lookdev-composite/measure.mjs
+t=1  blob on its plane: 5.56 x 5.23 cm (x -2.80..2.76)
+  shadow on desk: 14309 px, x 2.03..14.25 cm, y -0.00..0.00, z 0.01..19.75  width ratio 2.20x
+  shadow on wall: 118425 px, x -1.49..15.39 cm, y 0.00..14.15, z 0.00..0.00  width ratio 3.04x
+t=3  blob on its plane: 5.69 x 5.06 cm (x -2.90..2.79)
+  shadow on desk: 14560 px, x 2.13..14.49 cm, y -0.00..0.00, z 0.01..19.74  width ratio 2.17x
+  shadow on wall: 117112 px, x -1.73..15.51 cm, y 0.00..13.68, z 0.00..0.00  width ratio 3.03x
+t=6  blob on its plane: 5.79 x 5.29 cm (x -2.87..2.92)
+  shadow on desk: 1878 px, x -2.40..5.74 cm, y -0.00..0.00, z 20.58..22.36  width ratio 1.41x
+t=8  blob on its plane: 5.72 x 5.19 cm (x -2.83..2.89)
+  shadow on desk: 1796 px, x -2.34..5.83 cm, y -0.00..0.00, z 20.58..22.34  width ratio 1.43x
