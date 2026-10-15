@@ -80,7 +80,8 @@
 - snd-score-clicks · builder · `src/audio/score.js` · verified (merged) · evidence/snd-score-clicks/levels.txt
 - asset-gator-sheet · painter · `assets/prompts/gator_sheet.v1.md`, specs gator_sheet · built (awaiting G2) · evidence/asset-gator-sheet/contact.jpg
 - ref-ufl · researcher (read-only) · `reference-videos/ufl/` (gitignored), `docs/ref-ufl.md` · built · docs/ref-ufl.md
-- asset-gator-sheet-v2 · painter · `assets/prompts/gator_sheet.v2.md`, `gator_hero.v1.md`, specs gator_sheet/gator_hero · built (awaiting G2) · evidence/asset-gator-sheet-v2/contact.jpg
+- asset-gator-sheet-v2 · painter · `assets/prompts/gator_sheet.v2.md`, `gator_hero.v1.md`, specs gator_sheet/gator_hero · approved (G2: v2_1 + hero_1 frozen) · evidence/asset-gator-sheet-v2/contact.jpg
 - spec-sensor · builder (docs) · docs 02/03/05/assets, shots README/QUESTIONS/s09–s18 · built (merged) · done/spec-sensor.md
 - contract-sensor · builder · `src/lights.js` (sensorLight), `src/timeline.js` renames, cues/foley · in-progress · —
 - spec-blob-meter · builder (docs) · doc 02/03/05 blob parts, shots README/QUESTIONS/s01–s18 · in-progress · —
+- asset-face-sheet · painter · `assets/prompts/face_sheet.v1.md`, specs face_sheet · in-progress · —
