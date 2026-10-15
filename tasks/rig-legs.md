@@ -10,7 +10,7 @@ Q9's current option: the gator gets short, stubby legs, as in every style tile, 
 - `src/assets.js` (add `leg_l` and `leg_r` to `gator_sheet` and `freshman_sheet` pieces, plus proxies)
 - `src/characters/gator.js`, `src/characters/poses.js`, `src/characters/freshman.js`, `src/characters/crowd.js`
 - `docs/assets.md` (gator_sheet and freshman_sheet piece lists only)
-- `docs/contracts.md` §characters (additive)
+- `docs/contracts.md` §characters and §assets (additive)
 - `evidence/rig-legs/`, `done/rig-legs.md`
 
 ## Spec
@@ -24,3 +24,6 @@ Q9's current option: the gator gets short, stubby legs, as in every style tile, 
 - [ ] s15 press path error ≤ 1 mm
 - [ ] The walk loop check passes (0 changes on odd frames, k = k+16)
 - [ ] Determinism for `lab/characters.html` and `index.html` at 3 times
+
+## Also (from proxy-margin)
+Proxies now have a transparent margin, but `sizes[piece]` still gives the unpadded shape size. A shot that passes `sizes[piece]` to `makePaper` therefore draws the visible shape about 7% small, and it will jump when frozen art (tight-cropped by `cut.mjs`) swaps in. Make the loader return sizes such that the **visible shape** is the PIECES size for proxies and for real art alike, and document that in contracts §assets (additive wording). Check it on one proxy and one fake frozen piece (scratch, never committed). `s01` pads locally on top of this; note it for its final pass, and don't edit s01.

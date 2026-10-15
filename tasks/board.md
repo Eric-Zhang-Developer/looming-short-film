@@ -34,9 +34,9 @@
 ### wave 4 prep
 - mod-film · builder · `index.html`, `src/film.js`, `src/assets.js`, `src/shots/`, contracts §film/§assets/§shots · verified (merged) · evidence/mod-film/film_sheet.jpg
 - char-rigs · builder · `src/characters/`, `lab/characters.*`, contracts §characters · verified (merged; legs → Q9) · evidence/char-rigs/cast.jpg
-- proxy-margin · builder · `src/assets.js` · in-progress · —
+- proxy-margin · builder · `src/assets.js` · verified (merged) · evidence/proxy-margin/proxies.jpg
 - contract-blob · builder · `src/blob.js`, `src/shots/s13.js` (API swap), contracts §blob · in-progress · —
-- rig-legs · builder · `src/assets.js`, `src/characters/`, contracts §characters · todo (after proxy-margin) · —
+- rig-legs · builder · `src/assets.js`, `src/characters/`, contracts §characters · in-progress · —
 
 ### wave 4 · animatic (brief: `tasks/anim-shot.md`)
 - anim-s01 · builder · `src/shots/s01.js` · verified (merged) · evidence/anim-s01/sheet.jpg
