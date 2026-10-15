@@ -32,7 +32,9 @@ ok('voices and foley are deterministic and finite', () => {
     ...['lampClick', 'penUncap', 'inkDrip', 'paperRustle', 'fluorescentHum'].map((k) => () => FOLEY[k](7))];
   for (const f of make) { const x = f(), y = f(); assert.deepEqual(x, y); assert.ok(x.every(Number.isFinite)); assert.ok(x.some((v) => v !== 0)); }
 });
-ok('unbuilt foley throws "not implemented"', () => assert.throws(() => FOLEY.penScratch(1), /not implemented/));
+ok('every foley sound renders, deterministic and finite', () => {
+  for (const [k, f] of Object.entries(FOLEY)) { const x = f(7), y = f(7); assert.deepEqual(x, y, k); assert.ok(x.every(Number.isFinite) && x.some((v) => v !== 0), k); }
+});
 
 mkdirSync(`${out}/solo`, { recursive: true });
 const pad0 = (x) => { const y = new Float32Array(x.length + SR / 10); y.set(x, SR / 20); return y; };
