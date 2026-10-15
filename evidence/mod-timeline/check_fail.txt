@@ -1,0 +1,41 @@
+# temp copy: s08 start 54->56 (gap) and s15 start 100->99 (overlap with s14)
+s01     0.0 -    6.0
+s02     6.0 -   15.0
+        inkDropForms         local   4.0  global   10.0
+s03    15.0 -   20.0
+        phoneUp              local   0.5  global   15.5
+s04    20.0 -   28.0
+s05    28.0 -   36.0
+s06    36.0 -   44.0
+        lampClickHome        local   0.5  global   36.5
+        lampOffHome          local   3.0  global   39.0
+s07    44.0 -   54.0
+        curtainsDone         local   8.0  global   52.0
+s08    56.0 -   62.0
+s09    60.0 -   66.0
+s10    66.0 -   72.0
+s11    72.0 -   78.0
+s12    78.0 -   88.0
+        quiet1Start          local   0.0  global   78.0
+s13    88.0 -   95.0
+        headLift             local   0.5  global   88.5
+s14    95.0 -  100.0
+        custodianPass        local   0.5  global   95.5
+s15    99.0 -  114.0
+        lampClickMarston     local   0.5  global   99.5
+        penUncap             local   8.0  global  107.0
+        nameWritten          local  10.0  global  109.0
+s16   114.0 -  135.0
+        problemOneSolved     local   3.0  global  117.0
+s17   135.0 -  160.0
+        quiet2Start          local   0.0  global  135.0
+s18   160.0 -  180.0
+        nextSemester         local   0.0  global  160.0
+        lampClickFreshman    local   4.0  global  164.0
+        blobYawn             local  14.0  global  174.0
+
+FAIL
+  gap: 54s to 56s before s08
+  overlap: s09 starts at 60s, previous shot ends at 62s
+  overlap: s15 starts at 99s, previous shot ends at 100s
+exit=1
