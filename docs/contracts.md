@@ -111,6 +111,8 @@ export function updatePaperMesh(mesh, sheet)   // swaps textures when the boil s
 
 The paper material is Lambert plus a back-light translucency term (doc 04) and an edge catch on torn rims lit from behind.
 
+The edge catch (look-pass-2) is never an even band. Its width wanders along the edge (0.2–0.9 of the full ring), it has long breaks over about two fifths of the edge, and it is brightest where it is thinnest. The pattern is placed by the sheet's `key` and nudged by its boil `seed`, so it boils without reshuffling.
+
 ## `src/lights.js` (task `mod-lights`)
 
 ```js
@@ -126,6 +128,8 @@ export function shadowScale(lightPos, subjectPos, wallZ)   // → d(light→wall
 export function placeForScale({ subjectPos, wallZ, scale, height, side })  // → Vector3 light position that gives `scale`
 export function aim(spot, target)                          // points a spotlight and keeps its shadow camera tight
 ```
+
+The lamp's cone (look-pass-2) draws only its far wall, so anything standing in the light hides the vellum behind it instead of wearing an amber film over it. Its sides fade to nothing by view angle, over a width that wanders, so no side is a ruled line.
 
 ## `src/puppet.js` (task `mod-puppet`)
 
@@ -171,6 +175,8 @@ export function createBlob({ radius = 0.025, seed = 1 })
 ```
 
 A plane carrying a metaball shader: glossy ink black with a specular highlight driven by the scene's lights, and two cream eyes. Its `customDepthMaterial` runs the same field, so the shadow matches the shape exactly. The stain is a fading decal on the surface below.
+
+Ink (look-pass-2): the room's fill (ambient and hemisphere lights) lights only the eyes, never the body. The body is `PALETTE.ink` where it faces the key light and down to 0.55× that where it turns away, whatever the key's strength. Its only gloss is the key's reflection, a faint wet edge on the key's side and the eye catchlights.
 
 ## `src/post.js` (task `mod-post`)
 

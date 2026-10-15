@@ -77,6 +77,9 @@ export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle =
 // The cone runs `reach` × the light→target distance, well past the target, so whatever the light lands on
 // (desk, floor) cuts it off by depth where the pool is: the vellum meets its own pool, even when the cone
 // is slanted. With no receiver it softens out over its last 30% instead of ending in a hard disc.
+// look-pass-2: only the cone's far wall is drawn (BackSide, at twice the strength), so anything standing in the
+// light, like the blob in its pool, hides the vellum behind it instead of wearing an amber film. Its sides fade to
+// nothing by view angle, over a width that wanders with the vellum's frost, so they read as light, not mesh lines.
 // Add light, light.target, cone and dust to the scene root (dust is in world space).
 export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.6, penumbra = 0.5, seed = 1, reach = 2.5 } = {}) {
   const light = shadowed(new THREE.SpotLight(c, intensity, 0, angle, penumbra, 2), { radius: 2, bias: -0.0003 });
@@ -84,7 +87,7 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
   // Unit cone: apex at the origin, opening down −Y, length 1. Scaled to the light→target distance.
   const geo = new THREE.ConeGeometry(1, 1, 64, 1, true).translate(0, -0.5, 0);
   const cone = new THREE.Mesh(geo, new THREE.ShaderMaterial({
-    uniforms: { uColor: { value: new THREE.Color() }, uStrength: { value: 0.1 }, uReach: { value: reach } },
+    uniforms: { uColor: { value: new THREE.Color() }, uStrength: { value: 0.2 }, uReach: { value: reach } },
     vertexShader: /* glsl */`
       varying vec2 vUv; varying vec3 vN; varying vec3 vV;
       void main() {
@@ -101,16 +104,18 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
         return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y); }
       void main() {
         float along = 1.0 - vUv.y;                                   // 0 at the apex, 1 at the open end
-        float rim = 1.0 - abs(dot(normalize(vN), normalize(vV)));    // frosted vellum catches light at its edges
+        float ndv = abs(dot(normalize(vN), normalize(vV)));
+        float rim = 1.0 - ndv;                                       // frosted vellum catches light at its edges
         float a = along * uReach;                                    // 0 at the apex, 1 at the target
         float fade = smoothstep(0.0, 0.15, a) * (1.0 - smoothstep(0.7 * uReach, uReach, a));  // full strength to the target and well past it
         float folds = 0.88 + 0.12 * sin(vUv.x * 6.2831853 * 7.0 + 0.6 * sin(vUv.y * 9.0));  // soft, slightly bent folds
         float frost = 0.7 + 0.3 * vn(vec2(vUv.x * 60.0, vUv.y * 24.0)) + 0.15 * vn(vec2(vUv.x * 220.0, vUv.y * 90.0)) - 0.075;  // vellum fibre
-        float edge = 0.45 + 0.55 * rim * rim - 0.5 * smoothstep(0.9, 1.0, rim);  // bright toward the sides, soft right at the silhouette
+        float feather = 0.5 + 0.35 * vn(vec2(vUv.x * 30.0, vUv.y * 14.0)) + 0.2 * vn(vec2(vUv.x * 90.0, vUv.y * 40.0));  // uneven, so no side is a ruled line
+        float edge = (0.45 + 0.55 * rim * rim) * smoothstep(0.0, feather, ndv);   // bright toward the sides, then gone at the silhouette
         gl_FragColor = vec4(uColor * uStrength * fade * folds * frost * edge, 1.0);
         #include <colorspace_fragment>
       }`,
-    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide,
   }));
   cone.castShadow = cone.receiveShadow = false;
 

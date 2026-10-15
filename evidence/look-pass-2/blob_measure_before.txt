@@ -1,0 +1,7 @@
+$ node evidence/look-pass-2/blob_measure.mjs   (on look-pass-1 code: src/ at 554d7e7)
+t=3  body 21180 px, 12301 left out as highlight/eyes
+  raw    mean 38.7,59.6,80.4  max |Δ| vs #0A0A0F (10,10,15): 65.4
+  graded mean 48.1,76.7,120.8  max |Δ| vs #0A0A0F through night (20.8,25.2,50): 70.8
+t=8  body 21576 px, 13240 left out as highlight/eyes
+  raw    mean 83.9,62.2,43.6  max |Δ| vs #0A0A0F (10,10,15): 73.9
+  graded mean 71.6,65.3,76.1  max |Δ| vs #0A0A0F through night (20.8,25.2,50): 50.8

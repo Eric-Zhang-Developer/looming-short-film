@@ -151,10 +151,14 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
         vec2 q = abs(vec2(dot(N - H, hx), dot(N - H, hy))) - vec2(0.08, 0.15) + 0.05;
         float sd = length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - 0.05;
         vec3 spec = lit * (0.9 * smoothstep(0.006, -0.006, sd) + 1.5 * pow(nh, 400.0));
-        float fres = pow(1.0 - max(dot(N, V), 0.0), 2.5);
-        vec3 env = (uAmb + 0.18 * lit) * fres;               // rim picks up the room
+        // Ink stays ink: the room's fill never reaches the body or its rim (a lifted night fill turned it to grey
+        // glass, look-pass-1), and the key's strength doesn't either. The body is PALETTE.ink where it faces the key,
+        // a little darker where it turns away; the only gloss is the key light: its reflection and a faint wet edge
+        // on the side it lights.
+        float fres = pow(1.0 - max(dot(N, V), 0.0), 5.0);
+        vec3 env = 0.12 * lit * fres * nl;
 
-        vec3 ink = uInk * (uAmb + E * nl / PI) + spec + env;
+        vec3 ink = uInk * mix(0.55, 1.0, smoothstep(0.0, 0.5, nl)) + spec + env;
         float ed = eyesDist(p);
         float eye = clamp(-ed / fwidth(ed) + 0.5, 0.0, 1.0);
         vec3 eyeCol = uCream * (uAmb + lit) + 0.5 * spec;   // unshaded by angle: the eyes stay the lightest part of it
