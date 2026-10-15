@@ -49,7 +49,7 @@
 - anim-s09 · builder · `src/shots/s09.js` · in-progress · —
 - anim-s04 · builder · `src/shots/s04.js` · in-progress · —
 - anim-s03 · builder · `src/shots/s03.js` · verified (merged) · evidence/anim-s03/sheet.jpg
-- anim-s02 · builder · `src/shots/s02.js` · in-progress · —
+- anim-s02 · builder · `src/shots/s02.js` · verified (merged) · evidence/anim-s02/sheet.jpg
 
 ### parallel track: storyboard (docs)
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · built (merged) · done/sb-act1.md

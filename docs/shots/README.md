@@ -65,7 +65,7 @@ Keys switch only on beats or cuts: s06 phone → lamp → phone, s07 moon → bl
 Cues hang on beat names only (doc 05). `src/timeline.js` now names every anchor the specs use (41 beats). Foley a spec still places as "beat + offset" (drill whirrs, footsteps, hop taps) waits for an `offset` field on `CUES`, a contract-audio addition.
 
 ## 10. Character fill (added by the orchestrator after s04 and s09)
-Faces have to read: the story is told by eyes and mouths, and doc 03's single key often lands behind the characters (s04's fridge, s09's doorway), turning them into black silhouettes. So every shot with a character adds **one character fill**:
+Faces have to read: the story is told by eyes and mouths, and doc 03's single key often lands behind the characters (s04's fridge, s09's doorway), turning them into black silhouettes. So every shot with a character **measures the face first**: if it reads below ~30% of the key-lit wall, add **one character fill** (s02, lit from the front by its window, needed none):
 - a dim `PointLight` or `SpotLight` in front of the character, slightly above eye line, at **`castShadow = false`**
 - intensity set so the face reads at about 30–45% of the key-lit wall's brightness, which keeps it clearly secondary
 - colour from the shot's key: cool cyan-navy under the phone, warm cream under the lamp
