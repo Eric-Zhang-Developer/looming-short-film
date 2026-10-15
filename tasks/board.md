@@ -38,7 +38,7 @@
 - contract-blob · builder · `src/blob.js`, `src/shots/s13.js` (API swap), contracts §blob · verified (merged) · evidence/contract-blob/eyes.jpg
 - rig-legs · builder · `src/assets.js`, `src/characters/`, contracts §characters · verified (merged) · evidence/rig-legs/poses.jpg
 - snd-cues · builder · `src/audio/cues.js` · verified (merged) · evidence/snd-cues/mix.mp3
-- snd-foley-2 · builder · `src/audio/foley.js`, `src/audio/cues.js` · in-progress · —
+- snd-foley-2 · builder · `src/audio/foley.js`, `src/audio/cues.js` · verified (merged) · evidence/snd-foley-2/spectra.jpg
 
 ### wave 4 · animatic (brief: `tasks/anim-shot.md`)
 - anim-s01 · builder · `src/shots/s01.js` · verified (merged) · evidence/anim-s01/sheet.jpg

@@ -50,3 +50,4 @@
 - Score: `evidence/snd-score/score.mp3` (full mix, listenable). Nothing has been checked by ear yet; the director's first listen is due at G4.
 - s13 reads dark and busy at thumbnail size; check with cold viewers at G4.
 - s01 window reads grey, dawn could pass for dusk; final pass.
+- Mix headroom: premix PLR 12.36 dB vs loudnorm's 12.5 linear limit; s05/s07 foley sits under spec level. Wave 6 mix task: limiter / makeup in tools/mix.mjs.
