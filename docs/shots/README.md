@@ -63,3 +63,16 @@ Keys switch only on beats or cuts: s06 phone → lamp → phone, s07 moon → bl
 
 ## 9. Sound anchors
 Cues hang on beat names only (doc 05). `src/timeline.js` now names every anchor the specs use (41 beats). Foley a spec still places as "beat + offset" (drill whirrs, footsteps, hop taps) waits for an `offset` field on `CUES`, a contract-audio addition.
+
+## 10. Character fill (added by the orchestrator after s04 and s09)
+Faces have to read: the story is told by eyes and mouths, and doc 03's single key often lands behind the characters (s04's fridge, s09's doorway), turning them into black silhouettes. So every shot with a character adds **one character fill**:
+- a dim `PointLight` or `SpotLight` in front of the character, slightly above eye line, at **`castShadow = false`**
+- intensity set so the face reads at about 30–45% of the key-lit wall's brightness, which keeps it clearly secondary
+- colour from the shot's key: cool cyan-navy under the phone, warm cream under the lamp
+- light layers or a short `distance` so it doesn't light the wall: the loom shadow's contrast must not drop
+
+It's a fill, not a second key, so doc 03 rule 1 (one key, one shadow) still holds. This is reversible; the director can veto it at G4.
+
+## 11. Light helpers
+- `aim()`'s default shadow near plane can sit behind close casters. Until `contract-light-key` merges, set `spot.shadow.camera.near = 0.004` after every `aim()` where a caster is within 10 cm of the light.
+- The colour grade for s09 and s10 is `night` (the spec's `act2b` doesn't exist, and `marston` crushes the exterior), so the s09→s10 cut doesn't jump.
