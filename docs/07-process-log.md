@@ -110,6 +110,20 @@ Don't log routine coding steps. Git history covers those.
 **Why:** `main` stays watchable, each gate gets one readable review on GitHub, and the repo stays around 100 MB instead of 300–600 MB.
 **Who:** director asked; Claude proposed; director approved.
 
+### 2026-10-15 · Wave 1 smoke tests
+**Decision:** both pipelines are viable, so proceed to wave 2.
+**Evidence:**
+- `evidence/smoke-codex/contact.jpg`: headless Codex style tile with real alpha.
+- `evidence/smoke-paper/phone_t0.5.jpg` and `lamp_t4.0.jpg`: cutout-shaped shadow, 2.95× loom, small lamp pool.
+**What surprised us:**
+- Codex ignored the green key and returned alpha.
+- Codex read `AGENTS.md` and the docs, which cost about 190k input tokens for one image.
+- three r186 has no `PCFSoftShadowMap`.
+- Procedural paper surfaces read as vector, not paper.
+**Changes made:** docs 04 and 08 updated. Painted surfaces from Codex are now the main path to the paper look.
+**Cost:** 1 image generation. About 193k input tokens (167k cached) and 1.4k output tokens on the Codex side. Image cost isn't reported.
+**Who:** orchestrator-run; the director approves via the wave PR.
+
 ## Publishing
 
 At submission, link this file from the README and the synopsis. Include 6–10 before/after frames for the biggest overrides. Leave in the experiments that failed. They're the most convincing evidence that a human was directing.
