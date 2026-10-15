@@ -1,0 +1,3 @@
+click peaks in final 16-bit mix (L): -1.56 dBFS, -1.56 dBFS, -1.56 dBFS
+max |diff| click 2 vs click 1: 811 LSB
+max |diff| click 3 vs click 1: 2078 LSB

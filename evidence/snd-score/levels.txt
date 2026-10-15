@@ -1,0 +1,15 @@
+birth    music peak -12.3 rms -31.0
+avoid    music peak -5.9 rms -21.4
+marston  music peak -7.9 rms -21.1
+quiet1   music peak -Infinity rms -Infinity
+reveal   music peak -8.4 rms -25.5
+first    music peak -5.1 rms -25.2
+quiet2   music peak -Infinity rms -Infinity
+button   music peak -7.9 rms -26.1
+foley peak -5.0
+music peak ±0.3s around 36.5 -27.1
+music peak ±0.3s around 39 -22.8
+music peak ±0.3s around 100.5 -Infinity
+music peak ±0.3s around 108 -Infinity
+music peak ±0.3s around 110 -19.7
+music peak ±0.3s around 164 -82.9

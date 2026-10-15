@@ -1,5 +1,5 @@
 // node tools/mix.mjs [--range=a:b]
-// Renders CUES (by beat name) plus a placeholder Exam-motif bed onto the timeline, writes
+// Renders CUES (by beat name) and the score (src/audio/score.js) onto the timeline, writes
 // out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav normalized to -14 LUFS / -1 dBTP
 // with ffmpeg loudnorm (two-pass), then prints the mix's measured LUFS and true peak (ebur128).
 import { mkdirSync } from 'node:fs';
@@ -7,7 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { beat, DURATION } from '../src/timeline.js';
 import { seedOf } from '../src/core/rng.js';
-import { SR, musicBox, mixInto } from '../src/audio/synth.js';
+import { SR, mixInto } from '../src/audio/synth.js';
+import { renderScore } from '../src/audio/score.js';
 import { FOLEY } from '../src/audio/foley.js';
 import { CUES } from '../src/audio/cues.js';
 import { writeWav } from '../src/audio/wav.js';
@@ -25,9 +26,7 @@ for (const c of CUES) {
   mixInto(stems[c.stem ?? 'foley'], FOLEY[c.sound](c.seed ?? seedOf(c.sound)), t, c.gain);
 }
 
-// Placeholder bed: the Exam motif, four music-box notes rising then falling, each a few cents off.
-const EXAM = [[72, +14], [76, -10], [81, +18], [75, -12]];
-EXAM.forEach(([m, cents], k) => mixInto(stems.music, musicBox(m + cents / 100, { vel: 0.55, dur: 1.4 }), beat('inkDropForms') + 0.3 + k * 0.55 - a, 0.6));
+mixInto(stems.music, renderScore(b), -a);       // score is rendered from 0 so its notes ring into the range
 
 const dir = fileURLToPath(new URL('../out/audio', import.meta.url));
 mkdirSync(`${dir}/stems`, { recursive: true });
