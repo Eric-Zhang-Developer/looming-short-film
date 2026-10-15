@@ -221,3 +221,50 @@ node tools/mix.mjs [--range=a:b]   → out/audio/stems/{music,foley,ambience}.wa
                                      loudnorm is linear (one gain for the file; LRA gate off), so identical cues stay
                                      identical in mix.wav; a full mix throws if loudnorm falls back to dynamic.
 ```
+
+## `src/shots/` (task `mod-film`)
+
+One file per shot, `src/shots/sNN.js`, ids from `SHOTS` in `src/timeline.js`. A shot builder replaces only its own file (start from `src/shots/_template.js`).
+
+```js
+export async function build(ctx)   // may be async (it usually awaits assets.load)
+  // → { update(tLocal), dispose?() }
+// ctx = {
+//   stage,     // this shot's own stage: { renderer, scene, camera, onFrame(fn), setRender(fn) }, the shape createPost expects
+//   scene,     // this shot's own THREE.Scene (= stage.scene)
+//   camera,    // this shot's own PerspectiveCamera (= stage.camera): fov 20, 16:9, near 0.05, far 20 (createStage's defaults)
+//   renderer,  // the one shared WebGLRenderer
+//   assets,    // src/assets.js: await assets.load(name)
+//   PALETTE,
+//   post,      // (opts) => createPost(stage, opts): installs post on this shot only; film disposes its composer
+// }
+```
+
+- **Own everything.** A shot builds its own lights, set and camera moves inside its own `scene` and `camera`. It never touches another shot's objects, the renderer's settings (shadow type, tone mapping, color space, size, clear color) or any module-level state. Set `scene.background` on your own scene.
+- **Pure in `tLocal`.** `update(tLocal)` sets every animated value from `tLocal` alone (seconds since the shot's start), every frame. Nothing carries from one call to the next, so frames can come in any order. `ctx.stage.onFrame(fn)` callbacks run after `update` with the **global** `t` (post uses it for grain).
+- **Lifetime.** `film.js` builds a shot on the first frame inside it, keeps at most the current and next shot alive, and disposes the rest: it calls `dispose?.()`, then disposes the post composer and every geometry and material in the shot's scene. Paper textures belong to `paper.js`'s cache and are not disposed. `dispose()` only needs to free what the film can't see (render targets you made, for instance).
+
+## `src/film.js` and `index.html` (task `mod-film`)
+
+```js
+export function createFilm(stage)  // stage from createStage(); its own scene and camera go unused
+  // → { renderFrame(t): Promise, ready: Promise }
+  //   renderFrame(t): shotAt(t), build or reuse that shot, update(tLocal), run its onFrame fns with t, draw it
+```
+
+`index.html` creates the stage and the film and calls `exposeForRender(film, { duration: DURATION, fps: 24 })`, so `render.mjs` (`--sheet`, `--strip`, `--frames`) and `tools/determinism.mjs` work on the whole film. Rendering t out of order (t = 170, then 3) gives the same pixels as in order.
+
+## `src/assets.js` (task `mod-film`)
+
+```js
+export async function load(name)
+  // → { pieces: { pieceName: ImageBitmap }, sizes: { pieceName: [w, h] | undefined }, proxy: boolean }
+  // name and piece names are the ones in docs/assets.md and PIECES below. An unknown name throws.
+  // Results are cached per name: the same ImageBitmaps come back every time.
+export const PIECES   // { name: { pieceName: [w, h, shape, paletteKey] } }: the proxy table, sizes in meters
+```
+
+- **Real art:** when `assets/cut/<name>.boxes.json` and `assets/frozen/<name>.png` both exist, each key in the boxes file is loaded from `assets/cut/<key>.png`. The piece name is the key with a leading `<name>_` removed (so `gator_sheet_arm_l` → `arm_l`; this keeps cut part files from colliding across sheets). `proxy` is false. Name boxes keys after the pieces in `PIECES`.
+- **Proxies** otherwise: a flat silhouette in the asset's palette colour on a transparent background, at the piece's rough proportions (a gator-ish shape for gator parts, rectangles, rounded rectangles, ellipses or tapers for the rest). `proxy` is true, and that flag is the label: a proxy carries no text.
+- `sizes` comes from `PIECES` either way: rough sizes in meters seeded from the shot specs. A shot's own spec numbers win over it.
+- Every piece goes straight into `makePaper({ art: pieces.x, size, key, weight, seed })`.

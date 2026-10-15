@@ -1,0 +1,12 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Looming</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // The film: one stage, every shot played by time (docs/contracts.md §film).
+  import { createStage, exposeForRender } from './src/core/stage.js';
+  import { DURATION } from './src/timeline.js';
+  import { createFilm } from './src/film.js';
+  exposeForRender(createFilm(createStage()), { duration: DURATION, fps: 24 });
+</script>
