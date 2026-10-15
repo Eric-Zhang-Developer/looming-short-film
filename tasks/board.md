@@ -15,10 +15,10 @@
 - tool-gen · builder · `tools/gen.mjs`, `tools/cut.mjs`, `assets/specs.json`, `assets/prompts/_blocks/`, `evidence/tool-gen/`, `done/tool-gen.md` · in-progress · —
 
 ### batch 2 (needs mod-core)
-- mod-paper · builder · `src/paper.js`, `lab/paper.html`, `lab/paper.js`, `evidence/mod-paper/`, `done/mod-paper.md` · todo · —
-- mod-lights · builder · `src/lights.js`, `lab/lights.html`, `lab/lights.js`, `evidence/mod-lights/`, `done/mod-lights.md` · todo · —
-- mod-blob · builder · `src/blob.js`, `lab/blob.html`, `lab/blob.js`, `evidence/mod-blob/`, `done/mod-blob.md` · todo · —
-- mod-post · builder · `src/post.js`, `lab/post.html`, `lab/post.js`, `assets/luts/`, `evidence/mod-post/`, `done/mod-post.md` · todo · —
+- mod-paper · builder · `src/paper.js`, `lab/paper.html`, `lab/paper.js`, `evidence/mod-paper/`, `done/mod-paper.md` · in-progress · —
+- mod-lights · builder · `src/lights.js`, `lab/lights.html`, `lab/lights.js`, `evidence/mod-lights/`, `done/mod-lights.md` · in-progress · —
+- mod-blob · builder · `src/blob.js`, `lab/blob.html`, `lab/blob.js`, `evidence/mod-blob/`, `done/mod-blob.md` · in-progress · —
+- mod-post · builder · `src/post.js`, `lab/post.html`, `lab/post.js`, `assets/luts/`, `evidence/mod-post/`, `done/mod-post.md` · in-progress · —
 
 ### batch 3 (needs mod-paper, mod-lights)
 - mod-material · builder · `src/material.js`, `lab/material.html`, `lab/material.js`, `evidence/mod-material/`, `done/mod-material.md` · todo · —
@@ -28,7 +28,7 @@
 - lookdev-composite · builder · `lab/lookdev.html`, `lab/lookdev.js`, `evidence/lookdev-composite/`, `done/lookdev-composite.md` · todo · —
 
 ### parallel track: storyboard (docs)
-- sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · todo · —
-- sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · todo · —
-- sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · todo · —
+- sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · in-progress · —
+- sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · in-progress · —
+- sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · in-progress · —
 - snd-engine · builder · `src/audio/`, `tools/mix.mjs` · todo (after a builder slot frees) · —
