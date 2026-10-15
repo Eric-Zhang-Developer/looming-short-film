@@ -31,4 +31,4 @@
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · in-progress · —
 - sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · in-progress · —
 - sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · in-progress · —
-- snd-engine · builder · `src/audio/`, `tools/mix.mjs` · todo (after a builder slot frees) · —
+- snd-engine · builder · `src/audio/`, `tools/mix.mjs` · in-progress · —
