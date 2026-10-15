@@ -1,0 +1,34 @@
+name                 secs   sha256 (run 1)     same  finite  peak dBFS  rms dBFS  dc/peak   edge(first,last)
+cardTap               0.20  084e43f3aec8b939…  yes   yes       -8.0     -25.2     3.5e-3  0.0000
+cartonSlosh           0.35  ddaec236f2c04702…  yes   yes       -8.0     -21.1     1.2e-4  0.0000
+controllerClick       0.90  00a3477f2e5392f9…  yes   yes       -4.4     -30.1     2.8e-4  0.0000
+curtainSwish          0.67  8530a9807270615f…  yes   yes       -9.1     -23.5    -3.5e-6  0.0000
+dawnBirds             8.00  6f539a78ae40159d…  yes   yes      -16.5     -37.8   -4.6e-10  0.0000
+drill                 1.34  18dbea57f78e1897…  yes   yes       -4.4     -12.2    -3.9e-6  0.0000
+fluorescentFlicker    1.20  ee57d412eb832514…  yes   yes       -6.0     -22.2     9.1e-4  0.0000
+fluorescentHum        4.00  80c76bb7e2fdea5b…  yes   yes      -15.6     -21.7    5.5e-10  0.0001
+fridgeHum             4.00  051d9118be8339dc…  yes   yes       -9.1     -18.2    -7.0e-7  0.0000
+inkDrip               0.30  09ba0e887a3a6862…  yes   yes       -3.4     -18.3     2.4e-4  0.0000
+inkRoll               1.20  f2175907576827c4…  yes   yes       -6.0     -20.9     3.3e-5  0.0000
+jarClink              0.50  08fc18acaa5f1280…  yes   yes       -6.9     -20.2    -1.8e-5  0.0000
+ladderCreak           0.40  e6d22d6fa55eecb8…  yes   yes       -6.9     -27.5    -3.4e-7  0.0000
+lampClick             0.30  c7a9ab85a7932fa7…  yes   yes       -3.0     -29.1     5.5e-4  0.0000
+mopOnTile             6.00  93d7f4c427cc3adc…  yes   yes       -6.9     -22.4    -6.9e-4  0.0000
+nightHum              4.00  48c2ea47a2583699…  yes   yes      -23.1     -35.1    -1.7e-6  0.0000
+paperBoil             4.00  a09e1bfd570efa4f…  yes   yes      -21.9     -42.6     1.1e-3  0.0000
+paperRustle           0.80  b4b125636ddabbc3…  yes   yes       -3.9     -24.4     9.2e-5  0.0000
+penScratch            3.00  b2b4a92e2b1cf4ad…  yes   yes       -8.0     -26.6    -8.0e-7  0.0000
+penUncap              0.25  60a7a7edaabbb07e…  yes   yes       -3.5     -25.9     3.0e-5  0.0000
+phoneHum              4.00  80fd8b04f6b047ff…  yes   yes      -30.5     -35.5    2.7e-11  0.0000
+rodSnap               0.50  e0223df0c29572bb…  yes   yes       -4.4     -19.9    -3.6e-5  0.0000
+roomTone              4.00  99dd49ebd1501d24…  yes   yes      -24.4     -36.3    -5.7e-6  0.0000
+roommateStep          0.12  00f4f9532960717c…  yes   yes       -8.0     -25.5     2.7e-3  0.0000
+scrollTick            0.12  30da13f183d92525…  yes   yes      -10.5     -28.9    -9.5e-6  0.0000
+shadowBreath         10.00  c46d5d3d809ffd86…  yes   yes       -6.0     -13.9    -1.1e-3  0.0000
+shadowGrowth          2.50  78ebd8021344a92e…  yes   yes       -4.4     -12.0    -3.0e-6  0.0000
+thumbFlick            0.06  bcf1099814613863…  yes   yes      -10.5     -33.3     1.3e-4  0.0000
+tvBloops              4.00  06d595c2c2b88f31…  yes   yes      -10.5     -24.1    2.5e-11  0.0000
+winJingle             0.90  24d8dbece5802313…  yes   yes       -8.0     -16.0   -8.4e-11  0.0000
+
+sheet: evidence/snd-foley-2/spectra.jpg, tiles left→right, top→bottom in alphabetical order: cardTap, cartonSlosh, curtainSwish, drill, jarClink, ladderCreak, mopOnTile, rodSnap, roommateStep, scrollTick, shadowBreath, thumbFlick, tvBloops, winJingle
+all deterministic, finite, |peak| < 1, |dc| < 1% of peak, edges < 1% of peak

@@ -153,15 +153,17 @@ function controllerClick(seed = 1) {
   return norm(out, 0.6);
 }
 
-// (seed) => one-shot, 2.4 s. A cordless drill, two trigger pulls: a short "brr" then a long "BRRR".
-// Motor speed follows the trigger with a fast spin-up and slower coast-down; the tone is a 6-harmonic
-// buzz on a 40→300 Hz fundamental, plus brush noise (3–7 kHz) pulsing at the rotation rate.
-function drill(seed = 1) {
-  const revs = [[0.02, 0.32], [0.5, 1.7]], brush = lowpass(highpass(noise(seed, 2.4), 3000), 7000);
+// (seed, dur) => one-shot of length dur (default 1.34 s, s07's whirr windows). A cordless drill, one trigger pull:
+// a fast spin-up, held, released 0.25 s before the end to coast down. A seeded load wobble (the bit biting) keeps two
+// pulls from sounding alike. The tone is a 6-harmonic buzz on a 40→300 Hz fundamental, plus brush noise (3–7 kHz)
+// pulsing at the rotation rate.
+function drill(seed = 1, dur = 1.34) {
+  const r = mulberry32(seed), brush = lowpass(highpass(noise(seed, dur), 3000), 7000), off = Math.max(0.1, dur - 0.25);
+  const wf = 2.5 + 2 * r(), wp = TAU * r();
   let spd = 0, ph = 0;
-  const out = gen(2.4, (t, i) => {
-    const on = revs.some(([a, b]) => t >= a && t < b);
-    spd += ((on ? 1 : 0) - spd) / ((on ? 0.08 : 0.18) * SR);
+  const out = gen(dur, (t, i) => {
+    const on = t < off;
+    spd += ((on ? 1 - 0.12 * (0.5 + 0.5 * Math.sin(TAU * wf * t + wp)) : 0) - spd) / ((on ? 0.08 : 0.18) * SR);
     ph += TAU * (40 + 260 * spd) / SR;
     let v = 0;
     for (let k = 1; k <= 6; k++) v += Math.sin(k * ph) / k;
@@ -189,17 +191,17 @@ function fluorescentFlicker(seed = 1, dur = 1.2) {
   return norm(fade(out, 0.01), 0.5);
 }
 
-// (seed, dur) => bed. The custodian's mop: a stroke every ~1.4 s (seeded ±0.15 s), alternating forward/back.
-// Each stroke is a swish that crossfades a 700 Hz band into a 2.6 kHz band (back strokes the reverse),
-// with a wet low squish and a soft 140 Hz thunk as the mop head lands.
+// (seed, dur) => bed. The custodian's mop: one wet swish every 0.5 s exactly, starting at 0 (s14: 0.5 + 0.5n), so a cue
+// on a beat lands its swishes on the spec's grid. Strokes alternate forward/back; each swish crossfades a 700 Hz band into
+// a 2.6 kHz band (back strokes the reverse), with a wet low squish and a soft 140 Hz thunk as the mop head lands.
 function mopOnTile(seed = 1, dur = 6) {
   const r = mulberry32(seed), n = Math.ceil(dur * SR), out = new Float32Array(n);
   const lo = bandpass(noise(seed, dur), 700, 0.7), hi = bandpass(noise(seed + 1, dur), 2600, 0.8), wet = lowpass(noise(seed + 2, dur), 600);
-  for (let k = 0, t = 0.1; t < dur - 0.5; k++, t += 1.25 + 0.3 * r()) {
-    const len = Math.min(0.85 + 0.15 * r(), dur - t - 0.05), i0 = Math.round(t * SR), m = Math.round(len * SR);
+  for (let k = 0, t = 0; t < dur - 0.2; k++, t = k * 0.5) {
+    const len = Math.min(0.4 + 0.05 * r(), dur - t - 0.02), i0 = Math.round(t * SR), m = Math.round(len * SR);
     for (let i = 0; i < m && i0 + i < n; i++) {
       const p = i / m, e = Math.sin(Math.PI * p) ** 2 * (1 - 0.3 * p), x = k % 2 ? 1 - p : p, j = i0 + i;
-      out[j] += e * ((1 - x) * lo[j] + x * hi[j]) + wet[j] * 0.8 * Math.exp(-p / 0.08) * Math.min(1, p / 0.01);
+      out[j] += e * ((1 - x) * lo[j] + x * hi[j]) + wet[j] * 0.8 * Math.exp(-p / 0.12) * Math.min(1, p / 0.02);
     }
     mixInto(out, gen(0.12, (u) => Math.sin(TAU * 140 * u) * Math.min(1, u / 0.003) * Math.exp(-u / 0.035)), t, 0.15);
   }
@@ -251,16 +253,152 @@ function nightHum(seed = 1, dur = 4) {
   return norm(fade(out, 0.3), 0.07);
 }
 
-// (seed, dur) => bed. The shadow's breathing in Quiet 1: a 48 Hz sine and a breath of noise below 250 Hz,
-// both swelling and ebbing on a 4.5 s cycle that starts at zero.
-function shadowBreath(seed = 1, dur = 6) {
-  const air = lowpass(lowpass(noise(seed, dur), 250), 250);
-  const out = gen(dur, (t, i) => (0.5 - 0.5 * Math.cos(TAU * t / 4.5)) * (Math.sin(TAU * 48 * t) + 2 * air[i]));
+// (seed, dur) => bed (default 10 s, s12). The shadow's breathing in Quiet 1: a 45 Hz sine and a breath of noise below
+// 250 Hz, following the blob's breath (s12: period 5 s, peaks at 1.25 and 6.25 s), then holding its 6.0 s level.
+function shadowBreath(seed = 1, dur = 10) {
+  const air = lowpass(lowpass(noise(seed, dur), 250), 250), breath = (t) => 0.5 + 0.5 * Math.cos(TAU * (Math.min(t, 6) - 1.25) / 5);
+  const out = gen(dur, (t, i) => breath(t) * (Math.sin(TAU * 45 * t) + 2 * air[i]));
   return norm(fade(out, 0.3), 0.5);
+}
+
+
+// ───────── snd-foley-2: the shot specs' sounds doc 05 doesn't list ─────────
+
+// TV speaker: nothing below 300 Hz or above 4.5 kHz.
+const tv = (buf) => lowpass(lowpass(highpass(buf, 300), 4500), 4500);
+// A few odd harmonics of f: a soft 8-bit square, no aliasing.
+const square = (ph) => Math.sin(ph) + Math.sin(3 * ph) / 3 + Math.sin(5 * ph) / 5 + Math.sin(7 * ph) / 7;
+
+// (seed) => one-shot, 0.06 s. s03's thumb flick on the phone glass: a tiny bright tick and a whisper of skin.
+function thumbFlick(seed = 1) {
+  const out = decay(bandpass(noise(seed, 0.06), 4500, 1.5), 0.0007);
+  mixInto(out, decay(highpass(noise(seed + 1, 0.03), 3000), 0.008, 0.004), 0, 0.08);
+  return norm(fade(out, 0.005, 0), 0.3);
+}
+
+// (seed) => one-shot, 0.12 s. s08's scroll tick: a 60 ms thumb drag on glass ending in a soft, duller tick.
+function scrollTick(seed = 1) {
+  const out = new Float32Array(Math.ceil(0.12 * SR)), drag = bandpass(noise(seed, 0.06), 3200, 0.7);
+  for (let i = 0; i < drag.length; i++) drag[i] *= Math.sin(Math.PI * i / drag.length) * 0.15;
+  mixInto(out, drag, 0);
+  mixInto(out, decay(bandpass(noise(seed + 1, 0.04), 2200, 1.2), 0.0015), 0.055, 1);
+  return norm(fade(out, 0.01, 0), 0.3);
+}
+
+// (seed) => one-shot, 0.5 s. s04's jar clink: two glass jars touching, a seeded 1.9–2.6 kHz partial set
+// (×1, 2.32, 3.86, 5.1, higher ones dying faster) with a small impact tick, then a lighter second touch 25–45 ms later.
+function jarClink(seed = 1) {
+  const r = mulberry32(seed), out = new Float32Array(Math.ceil(0.5 * SR)), f0 = 1900 + 700 * r();
+  const hit = (at, g, s) => {
+    const parts = [[1, 1, 0.22], [2.32, 0.6, 0.12], [3.86, 0.4, 0.07], [5.1, 0.25, 0.04]];
+    mixInto(out, gen(0.4, (t) => parts.reduce((v, [m, a, tau]) => v + a * Math.sin(TAU * f0 * m * t) * Math.exp(-t / tau), 0) * Math.min(1, t / 0.0004, (0.4 - t) / 0.15)), at, g);   // tapered, so the ring never stops on a step
+    mixInto(out, decay(highpass(noise(s, 0.01), 4000), 0.0008), at, g * 0.5);
+  };
+  hit(0, 1, seed);
+  hit(0.025 + 0.02 * r(), 0.35, seed + 1);
+  return norm(fade(out, 0.05, 0), 0.45);
+}
+
+// (seed) => one-shot, 0.35 s. s04's carton slosh: a soft cardboard thump, then liquid noise whose band moves low → mid
+// → low (250, 650, 300 Hz crossfaded) with two or three rising glug bubbles.
+function cartonSlosh(seed = 1) {
+  const r = mulberry32(seed), d = 0.35, n = Math.ceil(d * SR), out = new Float32Array(n);
+  const bands = [250, 650, 300].map((f, k) => bandpass(noise(seed + k, d), f, 2));
+  for (let i = 0; i < n; i++) {
+    const p = i / n, e = Math.sin(Math.PI * p) ** 1.5, x = 2 * p;
+    out[i] = e * (x < 1 ? (1 - x) * bands[0][i] + x * bands[1][i] : (2 - x) * bands[1][i] + (x - 1) * bands[2][i]) * 2;
+  }
+  mixInto(out, gen(0.08, (t) => Math.sin(TAU * 120 * t) * Math.min(1, t / 0.002) * Math.exp(-t / 0.02)), 0, 0.5);
+  for (let k = 0, m = 2 + (r() < 0.5 ? 1 : 0); k < m; k++) {
+    const f = 300 + 300 * r(); let ph = 0;
+    mixInto(out, gen(0.05, (t) => { ph += TAU * f * (1 + 6 * t) / SR; return Math.sin(ph) * Math.sin(Math.PI * t / 0.05); }), 0.08 + 0.2 * r(), 0.3);
+  }
+  return norm(fade(lowpass(out, 2000), 0.02), 0.4);   // liquid in cardboard is dull: nothing bright
+}
+
+// (seed, dur) => bed. s05's TV game bloops through the TV speaker: seeded 8-bit blips (40–110 ms, C-major pentatonic
+// from C5 to C7, every 60–300 ms), about a third of them jump-sweeps up an octave.
+function tvBloops(seed = 1, dur = 4) {
+  const r = mulberry32(seed), out = new Float32Array(Math.ceil(dur * SR)), PENT = [0, 2, 4, 7, 9];
+  for (let t = 0.02 + 0.1 * r(); t < dur - 0.15; t += 0.06 + 0.24 * r()) {
+    const midi = 72 + 12 * Math.floor(r() * 2) + PENT[Math.floor(r() * 5)], f = 440 * 2 ** ((midi - 69) / 12);
+    const len = 0.04 + 0.07 * r(), sweep = r() < 0.33;
+    let ph = 0;
+    mixInto(out, gen(len, (u) => { ph += TAU * f * (sweep ? 1 + u / len : 1) / SR; return square(ph) * Math.min(1, u / 0.003, (len - u) / 0.008); }), t, 0.5 + 0.5 * r());
+    t += len;
+  }
+  return norm(fade(tv(out), 0.02), 0.3);
+}
+
+// (seed) => one-shot, 0.12 s. s05's roommate footstep: a soft paper foot on a paper floor, a low thud (noise under
+// 700 Hz) with a light 2 kHz paper tap on top.
+function roommateStep(seed = 1) {
+  const out = decay(highpass(lowpass(lowpass(noise(seed, 0.12), 700), 700), 40), 0.018, 0.003);
+  mixInto(out, decay(bandpass(noise(seed + 1, 0.03), 2000, 1.2), 0.004), 0.002, 0.25);
+  return norm(fade(out, 0.02, 0), 0.4);
+}
+
+// (seed) => one-shot, 0.9 s. s05's TV "win": an 8-bit C-major arpeggio up (C6 E6 G6, 70 ms each), then C7 + E7 held
+// 0.45 s with a 7 Hz vibrato, through the TV speaker. A game sound, not score. Seed unused.
+function winJingle(seed = 1) {
+  const out = new Float32Array(Math.ceil(0.9 * SR)), hz = (m) => 440 * 2 ** ((m - 69) / 12);
+  const note = (m, at, len, vib) => {
+    let ph = 0;
+    mixInto(out, gen(len, (u) => { ph += TAU * hz(m) * (1 + vib * 0.012 * Math.sin(TAU * 7 * u)) / SR; return square(ph) * Math.min(1, u / 0.003, (len - u) / 0.02); }), at, 0.5);
+  };
+  [84, 88, 91].forEach((m, k) => note(m, k * 0.07, 0.07, 0));
+  note(96, 0.21, 0.45, 1); note(100, 0.21, 0.45, 1);
+  return norm(fade(tv(out), 0.05, 0), 0.4);
+}
+
+// (seed) => one-shot, 0.4 s. s07's ladder creak: wood stick-slip, a pulse train whose rate sweeps a seeded 25 → 70 Hz,
+// each pulse ringing body modes at about 550, 1200 and 2300 Hz.
+function ladderCreak(seed = 1) {
+  const r = mulberry32(seed), d = 0.4, n = Math.ceil(d * SR), pulses = new Float32Array(n), f0 = 25 + 10 * r(), f1 = 55 + 15 * r();
+  for (let t = 0.01; t < d - 0.03; t += 1 / (f0 + (f1 - f0) * t / d) * (0.9 + 0.2 * r())) pulses[Math.round(t * SR)] = (0.6 + 0.4 * r()) * Math.sin(Math.PI * t / d);
+  const out = new Float32Array(n);
+  for (const [f, q, g] of [[550 * (0.9 + 0.2 * r()), 8, 1], [1200 * (0.9 + 0.2 * r()), 10, 0.7], [2300, 12, 0.35]]) mixInto(out, bandpass(pulses, f, q), 0, g);
+  return norm(fade(lowpass(out, 3500), 0.03), 0.45);   // wood, not a click track: the pulses' leak above 3.5 kHz goes
+}
+
+// (seed) => one-shot, 0.5 s. s07's curtain rod snapping into its bracket: a sharp click, the rod's inharmonic metal ring
+// (1150, 3170, 6200 Hz), and a small rattle 18 ms later.
+function rodSnap(seed = 1) {
+  const out = new Float32Array(Math.ceil(0.5 * SR));
+  const hit = (at, g, s) => {
+    mixInto(out, decay(bandpass(noise(s, 0.015), 3000, 0.9), 0.001), at, g);
+    mixInto(out, gen(0.45, (t) => (Math.sin(TAU * 1150 * t) * Math.exp(-t / 0.15) + 0.6 * Math.sin(TAU * 3170 * t) * Math.exp(-t / 0.08) + 0.3 * Math.sin(TAU * 6200 * t) * Math.exp(-t / 0.04)) * Math.min(1, t / 0.0005, (0.45 - t) / 0.15)), at, g * 0.35);
+  };
+  hit(0, 1, seed);
+  hit(0.018, 0.3, seed + 1);
+  return norm(fade(out, 0.05, 0), 0.6);
+}
+
+// (seed, dur) => one-shot of length dur (default 0.67 s, s07's swish windows). A curtain drawn along its rod: fabric
+// noise (1.2 kHz and 3.5 kHz bands) swelling and ebbing, with seeded ring scrapes (~18/s, 5 kHz ticks) on the rod.
+function curtainSwish(seed = 1, dur = 0.67) {
+  const r = mulberry32(seed), n = Math.ceil(dur * SR), out = bandpass(noise(seed, dur), 1200, 0.5), hi = bandpass(noise(seed + 1, dur), 3500, 0.7);
+  for (let i = 0; i < n; i++) out[i] = (out[i] + 0.5 * hi[i]) * Math.sin(Math.PI * i / n) ** 1.5;
+  for (let k = 0, m = Math.floor(dur * 18); k < m; k++) mixInto(out, decay(bandpass(noise(seed + 10 + k, 0.01), 5000, 3), 0.002), (0.1 + 0.8 * r()) * dur, 0.15 + 0.15 * r());
+  return norm(fade(out, 0.02), 0.35);
+}
+
+// (seed) => one-shot, 0.2 s. s15's card tap: the phone laid face down on the desk, a soft 180 Hz cardstock thud with a
+// dull tap (noise under 2.5 kHz) and a lighter settle tap 30 ms later.
+function cardTap(seed = 1) {
+  const out = new Float32Array(Math.ceil(0.2 * SR));
+  const tap = (at, g, s) => {
+    mixInto(out, gen(0.1, (t) => Math.sin(TAU * 180 * t) * Math.min(1, t / 0.001) * Math.exp(-t / 0.025)), at, g * 0.6);
+    mixInto(out, decay(lowpass(noise(s, 0.03), 2500), 0.004), at, g);
+  };
+  tap(0, 1, seed);
+  tap(0.03, 0.35, seed + 1);
+  return norm(fade(out, 0.03, 0), 0.4);
 }
 
 export const FOLEY = {
   lampClick, penUncap, inkDrip, paperRustle, fluorescentHum,
   penScratch, phoneHum, inkRoll, shadowGrowth, fridgeHum, controllerClick, drill,
   fluorescentFlicker, mopOnTile, paperBoil, dawnBirds, roomTone, nightHum, shadowBreath,
+  thumbFlick, scrollTick, jarClink, cartonSlosh, tvBloops, roommateStep, winJingle, ladderCreak, rodSnap, curtainSwish, cardTap,
 };
