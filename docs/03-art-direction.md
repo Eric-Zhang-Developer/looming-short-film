@@ -36,7 +36,8 @@ Separate **paper stocks** (the color of things) from **light colors** (the color
 | Paper | Gator Green (characters) | `#6F8F5E` |
 | Paper | Kraft (desks, floors, shelves) | `#A8835A` |
 | Light | Phone Cyan | `#6FD3E3` |
-| Light | Lamp Amber | `#F0A84A` |
+| Light | Lamp Amber (the home lamp) | `#F0A84A` |
+| Light | Fluorescent (Marston's ceiling light; faint green-cream) | `lerp(Cream, Gator Green, 0.15)` ≈ `#DEDBC3` (shots README §6) |
 | Ink | Exam Black | `#0A0A0F` |
 
 The dawn rose is **lamp amber mixed into cream through tissue**, not a new color. Red appears only on the calendar circles: the first exam, and the new circled date at the end (director, Q4).
@@ -48,21 +49,22 @@ The dawn rose is **lamp amber mixed into cream through tissue**, not a new color
 | Act 1 birth | Cool morning plus the first cyan of the phone | Light, curious |
 | Act 2a avoidance | Cyan grows and the room darkens with each dodge; amber flashes once (lamp beat) | Comic, slowly suffocating |
 | Act 2b Marston | Flickering fluorescent green-white, then near-black with a faint cyan | Lonely, heavy |
-| Act 3 first step | Amber takes over the frame from the desk outward | Warm, relieved |
+| Act 3 first step | The woken desk fluorescent takes the frame back from cyan, from the desk outward (whether it warms toward amber is Q12) | Warm, relieved |
 | Quiet 2 dawn | Gold through tissue windows, cold shadows warming | Peaceful |
-| Button | Night navy and one amber pool | Kind |
+| Button | Night navy and one lit pool: the home lamp's amber, then a woken fluorescent zone at Marston | Kind |
 
 **Desaturate on the low point.** During Quiet 1 the gator drains slightly toward grey, while the shadow stays rich.
 
 ## Lighting rules
 
 1. **One motivated source per shot.** Every shot names its key light (phone, lamp, fluorescent, window, dawn). Fill comes only from bounce and ambient.
-2. **Light has shape.** Lamp light is a visible vellum cone with a hard pool on the desk and a few dust specks. Phone light is a low wedge. Draw the light as an object.
+2. **Light has shape.** Lamp light is a visible vellum cone with a hard pool on the desk and a few dust specks. Phone light is a low wedge. Marston's fluorescent is a louvred trough hung over each desk, with a soft pool and no cone; where the camera sees the trough, its tube shows whether the zone is lit. Draw the light as an object.
 3. **Light falls off.** Brightness on each paper layer is computed from its distance to the source. The phone lights the gator's snout and the room fades to navy.
 4. **Light comes through paper.** Thin stock glows when lit from behind: tissue curtains, the lampshade, the window, a lit torn edge. This is the look's signature.
 5. **Light seeps out from behind layers.** Dawn creeps under the apartment door and between the Marston stacks as a hot thin seam along a paper edge.
-6. **Two temperatures, one story.** When phone and lamp share a room, the direction of the shadow tells you which one is winning.
+6. **Two temperatures, one story.** When phone and lamp (at home) or phone and fluorescent (at Marston) share a room, the direction of the shadow tells you which one is winning.
 7. **No glow without shadow.** Bloom is used sparingly, at the source only. Every glow must also cast a shadow somewhere.
+8. **Marston's light answers movement.** There are no desk lamps at Marston. Each desk has its own ceiling fluorescent on a motion sensor: stillness lets it time out, and movement wakes it with a relay clack and a three-strike stutter. Nobody switches it by hand. The home lamp is the only light anyone clicks. Numbers are in `docs/shots/README.md` §3.
 
 ## Characters
 

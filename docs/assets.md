@@ -24,11 +24,11 @@ A sheet is one generation with several cut pieces (doc 08), and it counts as one
 | 10 | `marston_ext` | set | Marston façade, 3 × 8 window holes in the key color, no lettering | s09 | 5 | Single, ≥ 2048 px: 70% of the frame width |
 | 11 | `marston_stacks` | set | Bookshelf face with blank spines and kraft shelves | s10 | 5 | Cut into ≥ 4 crops so the 8 wings don't repeat. No longer behind the hero's desk: that's the window wall now |
 | 12 | `marston_furniture_sheet` | set | marston_desk (top; apron and legs), marston_chair | s02, s03, s06, s11, s12, s14–s18 | 5 | Merges `marston_table` (s11–s14), `marston_desk` (s15–s18) and `marston_chair` into one desk unit. The chair doubles as the home chair |
-| 13 | `desk_lamp` | prop | Base, stem, knob (separate part), arm, tissue shade | s02, s03, s06, s11, s12, s14–s18 | 6 | Single: close-up in s06 and s15. One model everywhere (README §3) |
+| 13 | `desk_lamp` | prop | Base, stem, knob (separate part), arm, tissue shade | s02, s03, s06 | 6 | Single: close-up in s06. **Home only:** Marston has no desk lamps (README §3). In s18 E only its light is used; the lamp is out of frame |
 | 14 | `calendar` | prop | Sheet 1 (scribble-glyph month, Friday circled red with an exam glyph), sheet 2 (a new circled date) | s02, s03, s06, s18 | 6 | Two pieces on one image; the only red in the film (Q4 covers sheet 2's circle) |
 | 15 | `study_props_sheet` | prop | phone (glyph screen face, back), laptop (base, lid), pen (+ cap), exam_page (glyph problems), energy_drink, backpack (side, front, back, with the right side pocket) | s02, s03, s05–s12, s14–s18 | 6 | Merges `phone`, `laptop`, `pen`, `exam_page`, `energy_drink`, `backpack`. Every glyph is a scribble, never text |
 | 16 | `apt_props_sheet` | prop | fridge_contents (3 jars of falling size, 1 carton, blank labels), controllers ×2, ladder, drill | s04, s05, s07, s08 | 6 | Merges 4 |
-| 17 | `top_props_sheet` | prop | desk_top (desk and chair from above), and from above: phone, laptop, desk lamp, open textbook, energy-drink can, blank page, pen, oversized backpack | s13 | 6 | Merges `desk_top` + `props_top_sheet`; small in frame |
+| 17 | `top_props_sheet` | prop | desk_top (desk and chair from above), and from above: phone, laptop, open textbook, energy-drink can, blank page, pen, oversized backpack | s13 | 6 | Merges `desk_top` + `props_top_sheet`; small in frame |
 | 18 | `crowd_sheet` | crowd | Side-view Marston extras, 2–3 parts each: the Drinks gator / neighbor (body, head, arm; seated, slumped asleep by rig), a sleeping extra | s16, s17 | 7 | Different greens from the Student; never cloned |
 | 19 | `top_figures_sheet` | crowd | hero_top (body, head, arms, tail, backpack), 6 top-view seated poses including the Sleeper, the Drinks gator and the Freshman | s13 | 7 | Merges `gator_top` + `crowd_top_sheet` |
 
@@ -55,9 +55,10 @@ Plain shapes are built with `makePaper({ path, color, weight })`, or from a real
 | `marston_floor` | Navy-grey tile floor with a scribbled grid | s10–s18 | painted (sb-act2); procedural (sb-act3) |
 | `marston_window_wall` | Navy cardstock wall built from piers, sill and header strips around 6 window openings | s11, s12, s14–s18 | painted (sb-act3) |
 | `window_tissue` | Tissue window panes, `castShadow` off | s11, s12, s14–s18 | painted (sb-act3) |
+| `sensor_trough` | Marston's desk light: a louvred cardstock trough on two rods, with the tube as a vellum strip that glows while its zone is lit (README §3). One per desk unit; listed where it's in frame | s11, s14, s16, s17 | new (spec-sensor) |
 
 ## Code, never painted (doc 08)
-Every blob (`blob.js`), light cones and dust (`lampLight`), the s13 shadow decals, the name and answer squiggles and every glyph line, the calendar tear edge, the fade.
+Every blob (`blob.js`), the home lamp's cone and dust (`lampLight`), Marston's zone lights with their wake and timeout (`sensorLight`), the s13 shadow decals, the name and answer squiggles and every glyph line, the calendar tear edge, the fade.
 
 ## Where each storyboard name went
 | Storyboard name(s) | Now |
@@ -75,4 +76,4 @@ Every blob (`blob.js`), light cones and dust (`lampLight`), the s13 shadow decal
 | `gator_top`, `crowd_top_sheet` | `top_figures_sheet` |
 | `apt_wall`, `apt_desk`, `apt_floor`, `apt_kitchen`, `apt_window`, `blackout_curtains`, `dawn_sky`, `night_sky`, `plaza_ground`, `marston_doors`, `marston_wall`, `ceiling_header`, `marston_floor`, `marston_window_wall`, `window_tissue` | Procedural (above) |
 
-55 painted names in: 9 kept, 31 merged into 10 sheets, 15 made procedural (plus `apt_ceiling`, procedural from the start). 9 + 10 = 19.
+55 painted names in: 9 kept, 31 merged into 10 sheets, 15 made procedural (plus `apt_ceiling`, procedural from the start, and `sensor_trough`, added when Marston lost its desk lamps). 9 + 10 = 19.

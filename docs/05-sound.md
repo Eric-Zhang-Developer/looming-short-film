@@ -25,18 +25,23 @@ The score is small and intimate, like music played in the room.
 
 ## Foley and ambience
 
-The **lamp click** is the most important sound in the film. It is heard three times: on and off at home, then on at Marston, then on for the Freshman. Design it once, carefully: a dry plastic click with a tiny filament "tink" as the light comes up. The second and third clicks must be identical to the first.
+Two sounds carry the light, and they are the most important sounds in the film.
+
+- **The lamp click (home only).** Heard twice, in s06: on, then off. Design it once, carefully: a dry plastic click with a tiny filament "tink" as the light comes up. Both are the identical buffer.
+- **The sensor wake (Marston only).** Heard twice: when he reaches for the pen (s15) and when he walks past the Freshman (s18). One buffer, `sensorWake`, timed to the wake's light keys (`docs/shots/README.md` §3): a dry relay *clack* from the ceiling on the beat, a faint tick on each of the first two strikes (+0.042, +0.167 s), a small glassy fluorescent *ping* as the third strike catches (+0.292 s), then the tube's 120 Hz hum rising under it over about 0.3 s. Build the clack's transient from the lamp click's, pitched down with a short metallic tail, so the ear links the two. The two wakes must be identical.
+- **Every other zone change is seen, not heard:** the Custodian's passing in s14 (the mop covers it) and the neighbor's zone in s16 (Q2: under the montage's theme). A timeout is heard as the fluorescent crackle (s11, and s14 under the mop), never as the wake.
 
 | Sound | Where | Notes |
 |---|---|---|
-| Lamp click | 0:36, 1:40, 2:44 | See above |
+| Lamp click | 0:36, 0:39 | Home only. See above |
+| Sensor wake | 1:40, 2:44 | Marston, his own movement only. See above |
 | Pen uncap | 1:48 | Small, crisp. Followed by a held silence. |
 | Pen scratch | 1:48–2:15 | Granular noise shaped by stroke speed |
 | Phone glow hum | Whenever the phone is the key light | A very faint high sine, so the phone "sounds" cold |
 | Ink drip / roll | 0:10, blob movement | Filtered noise blip plus a pitch drop; wet |
 | Shadow growth | Every dodge | The sub swell plus a soft paper rustle |
 | Fridge hum, game controller clicks, drill | Act 2a | Comic and slightly exaggerated |
-| Fluorescent hum and flicker | Marston | A 120 Hz buzz with harmonics; crackles when lights flicker |
+| Fluorescent hum and flicker | Marston | A 120 Hz buzz with harmonics; crackles when lights flicker or a zone times out. The nearby tube's hum drops out when his zone dies (s11) and returns with the wake (s15) |
 | Mop on tile | Custodian | Slow, rhythmic |
 | Paper boil | Throughout, very low | A faint crinkle bed that makes the world sound like paper |
 | Dawn birds | Quiet 2 | Two or three synthesized chirps, far off, sparse |
@@ -50,13 +55,13 @@ The **lamp click** is the most important sound in the film. It is heard three ti
 | 1:00–1:18 Marston | Groove drops out. A lone low piano note. | Fluorescent hum |
 | 1:18–1:28 Quiet 1 | **Silence** | Hum and the shadow's breathing (sub) |
 | 1:28–1:40 Reveal | A sparse chord on each new shadow revealed | Hum, mop |
-| 1:40–2:15 First step | Click, silence, single note, then the theme builds | Pen scratch |
+| 1:40–2:15 First step | Sensor wake, silence, single note, then the theme builds | Pen scratch, the woken tube's hum |
 | 2:15–2:40 Quiet 2 | **Silence** | Room tone, distant birds |
 | 2:40–3:00 Button | Theme on felt piano, resolved; music-box tag on the yawn | Night hum |
 
 ## Sync
 
-- Audio events are defined in the **same timeline** as the picture, by beat name, not by raw timestamp (e.g. `cue('lampClickMarston')`). Moving a beat moves its sound.
+- Audio events are defined in the **same timeline** as the picture, by beat name, not by raw timestamp (e.g. `cue('penUncap')`). Moving a beat moves its sound.
 - The score has a tempo map. Act 2a dodges land on downbeats. The quiet shots are free time with no tempo.
 - Render picture and audio separately, then mux with ffmpeg.
 
@@ -65,7 +70,7 @@ The **lamp click** is the most important sound in the film. It is heard three ti
 - Deliver at **-14 LUFS integrated**, true peak at or below -1 dBTP (the norm for streaming).
 - Export stems (music, foley, ambience) so the mix can be rebalanced without re-synthesizing.
 - Check the mix on laptop speakers and on earbuds. Most judges will watch on one of those.
-- **Accessibility:** prepare a caption file with sound descriptions only (`[lamp clicks]`, `[fluorescent hum]`) for Deaf and hard-of-hearing viewers. Burn nothing into the picture.
+- **Accessibility:** prepare a caption file with sound descriptions only (`[lamp clicks]`, `[relay clacks, lights flicker on]`, `[fluorescent hum]`) for Deaf and hard-of-hearing viewers. Burn nothing into the picture.
 
 ## Reuse
 

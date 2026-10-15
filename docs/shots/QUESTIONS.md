@@ -10,12 +10,12 @@ Each one changes a story beat, a character's design, the palette or a film-wide 
 - (c) Strict for s12 only, (a) for s17.
 - **Recommend (a).** Both actions are doc 02 beats, and the 13 still seconds after 12.0 keep the Sixth Station feel. Counterpoint: (b) is the purer held shot. *Shots: s12, s16, s17.*
 
-**Q2 · Is the neighbor's lamp click heard?** Doc 05 says the click is heard three times (home, Marston, Freshman). The neighbor's lamp in s16 (`lampClickNeighbor`) makes a fourth.
+**Q2 · Is the neighbor's lamp click heard?** **Superseded 2026-10-15 (motion sensors):** there is no neighbor lamp. The answer, (b) seen not heard, carries over to the neighbor's zone waking in s16. Doc 05 says the click is heard three times (home, Marston, Freshman). The neighbor's lamp in s16 (`lampClickNeighbor`) makes a fourth.
 - (a) The same buffer at −12 dB, panned right. *(storyboarded)*
 - (b) Seen, not heard: the light comes on under the montage's theme note.
 - **Recommend (b).** It keeps the three identical clicks as the hero's own motif. Counterpoint: a silent switch may read as unmotivated. *Shots: s16 (score and cues).*
 
-**Q3 · s18's click squeezes the walk-over.** The timeline has `lampClickFreshman` at 2:44.0. Doc 02 starts the walk-over at 2:44.
+**Q3 · s18's click squeezes the walk-over.** **Superseded 2026-10-15 (motion sensors):** he no longer stops at a knob. He walks past and the wake lands mid-stride at 4.0, so nothing is squeezed. The beat stays. The timeline has `lampClickFreshman` at 2:44.0. Doc 02 starts the walk-over at 2:44.
 - (a) Keep the beat: the calendar wipe runs 0–2.0, he walks in 2.0–3.33, and presses at 4.0. *(current)*
 - (b) Move the beat later (e.g. 2:46) in a contract-timeline task so the walk breathes.
 - (c) Open G with him already at the Freshman's desk.
@@ -32,7 +32,7 @@ Each one changes a story beat, a character's design, the palette or a film-wide 
 - **Recommend (a).** "The metaphor is the algorithm": if the body grows, the audience can't tell whether light or neglect made the shadow big. Counterpoint: doc 02's wording. *Shots: s02–s18.*
 
 **Q6 · Should the phone also throw the gator's own shadow?** A real screen faces its user, so a physical phone light would put his giant shadow over the blob's.
-- (a) Stylized rig (`docs/shots/README.md` §4): the shadow light sits at the phone but aims at the blob, he stays outside its cone, his face gets an unshadowed cyan fill, and the phone spot drops to 0.2 when a lamp comes on. *(current)*
+- (a) Stylized rig (`docs/shots/README.md` §4): the shadow light sits at the phone but aims at the blob, he stays outside its cone, his face gets an unshadowed cyan fill, and the phone spot drops to 0.2 when a lamp comes on (or a desk zone wakes, README §4). *(current)*
 - (b) Physical: he casts too, and the blob's shadow competes with his.
 - (c) Hybrid: his shadow at about 30% opacity.
 - **Recommend (a).** The rule has to read with one shadow per beat. Counterpoint: an attentive viewer may notice he casts nothing. *Shots: every phone shot (s03–s08, s10–s16, s18).*
@@ -52,3 +52,22 @@ Each one changes a story beat, a character's design, the palette or a film-wide 
 - (a) Add `leg_l` and `leg_r` (short, stubby) to `gator_sheet`, and keep 8 cm. Every v2 style-tile variant already paints him standing on legs. *(current: the rig gets proxy legs now)*
 - (b) Keep him legless and correct the 8 cm figure and the blob ratio film-wide.
 - **Recommend (a).** It matches the style tile and makes walks and the s04 kneel readable. Note: the rig's legs are 37% of his height (the tile's are ~20%), forced by 8 cm plus s15's fixed head height; shorter legs mean a shorter gator or new s15 numbers. *Shots: every gator shot.*
+
+# Opened by spec-sensor (2026-10-15), unanswered
+
+Marston has no desk lamps; its desk light is a ceiling fluorescent on a motion sensor (director, process log 2026-10-15). The specs are built to each **Recommend** line until you answer.
+
+**Q10 · How long does a zone take to time out on screen?** Real occupancy sensors wait minutes, and no source gives Marston's (`docs/ref-ufl.md` §0). The film times its timeouts to beats: s11's light starts dying 0.6 s after he picks up the phone (4.2, while his hunch is still settling until 4.4), and s14's dies as the cart leaves.
+- (a) Film time: timeouts land on the beat with no on-screen sign of time passing. A zone whose occupant went still only recently stays lit (the neighbor and the hero in s17). *(current)*
+- (b) Also time out s17's zones as dawn takes over (the sleeping neighbor's early, the hero's after he goes still), so the rule never bends on screen.
+- **Recommend (a).** The rule reads from cause and effect, not from a clock, and Quiet 2 keeps its single light event, the dawn. Counterpoint: an attentive viewer may notice a sleeping neighbor under a live tube in s17, which (b) fixes. *Shots: s11, s14, s17.*
+
+**Q11 · Does the Custodian's passing wake the hero's light in s14?** Doc 02 said the Custodian "must not turn on the lamp".
+- (a) Yes, briefly. His cart wakes the hero's zone at 1.0, the hero stays still, and it times out over 4.2–5.0. At `tinyBlobSeen` both blobs are small in one frame. It shows movement bringing the light before s15, and s18 (the hero walking the same aisle past the Freshman) rhymes with it. *(current)*
+- (b) No. The hero's zone stays dead and the aisle is its own zone. s14 keeps its 5-second contrast (his 7.1× against the Custodian's 1×). But s15 becomes the first time movement brings the light, and s18 has to explain why the aisle wakes the Freshman's zone and not the hero's.
+- **Recommend (a).** The light he's given dies because he doesn't move, so the hero still takes the first step himself, and the film's two passers-by rhyme. Counterpoint: it edges toward the cut "Custodian turns on the lamp", and it spends a little of s15's first small-blob moment. *Shots: s14, s15, s18 (doc 02).*
+
+**Q12 · Is the light at the turn green-cream or warm?** Doc 03's color script had amber take over Act 3 from the desk outward, and the lamp was the film's amber. A ceiling fluorescent is faint green-cream (`docs/ref-ufl.md` §1).
+- (a) The fluorescent tone (≈ `#DEDBC3`) in every zone. Act 3's warmth comes from the grade at the wake (s15 is built with an amber grade from the press) and from dawn in s17. Amber stays the home lamp's and dawn's. *(current)*
+- (b) Warm the woken zones toward Lamp Amber (for example halfway). The turn keeps its color payoff, but the fluorescent stops looking like one.
+- **Recommend (a).** It keeps Marston believable and saves the gold for dawn, where Quiet 2 needs it. Counterpoint: the climax may read cooler than the board intended; check it on s15's built frames at G4. *Shots: s15–s18 (doc 03 color script).*

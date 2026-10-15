@@ -17,7 +17,7 @@ The whole film rests on one rule that the audience learns without words:
 > **Light held low and close makes the shadow loom. Light from above makes it small.**
 
 - The **phone** is a low, close light. It throws the Exam's shadow huge across walls and ceilings.
-- The **desk lamp** is overhead. It drops the shadow into a small pool under the blob.
+- **Light from above** drops the shadow into a small pool under the blob: the **desk lamp** at home, the **ceiling fluorescent** at Marston. Marston has no desk lamps. Its lights run on motion sensors, one zone per desk: stillness lets them time out, and movement brings them back.
 - This is real optics: shadow scale ≈ (distance from light to wall) ÷ (distance from light to blob). See doc 04.
 
 The rule must be shown **twice** before Marston (the opening phone beat and the home lamp beat), so the climax reads instantly.
@@ -28,13 +28,13 @@ A Pixar short in pacing and heart, a shadow play in look. Funny in the first act
 
 ## Characters
 
-**The Student.** A gator, freshman-to-sophomore age. A good kid, not lazy, just avoidant. Expressive through posture and a small set of eye shapes (doc 03). He never speaks. His arc is from hiding behind the phone's light to reaching for the lamp himself.
+**The Student.** A gator, freshman-to-sophomore age. A good kid, not lazy, just avoidant. Expressive through posture and a small set of eye shapes (doc 03). He never speaks. His arc is from hiding behind the phone's light to bringing the light back himself. At home he clicks the lamp off and chooses the dark. At Marston he goes still and the light dies on its own, and when he finally moves toward the work, it comes back.
 
-**The Exam.** A drop of ink that rolls off the calendar and becomes a small round blob with two eyes. It is never evil. It grows because it is ignored, the way a neglected pet acts out. Up close in lamplight it is small and a little nervous. It is the only thing in the film made of ink, not paper. It ends the film asleep in his hoodie pocket: not defeated, just manageable.
+**The Exam.** A drop of ink that rolls off the calendar and becomes a small round blob with two eyes. It is never evil. It grows because it is ignored, the way a neglected pet acts out. Up close in light from above it is small and a little nervous. It is the only thing in the film made of ink, not paper. It ends the film asleep in his hoodie pocket: not defeated, just manageable.
 
 **The Roommates (2).** Oblivious. They walk straight through the shadow during game night. They exist to show how invisible this feeling is to everyone else.
 
-**The Custodian.** An older gator mopping Marston at 3 a.m. His own blob is tiny and asleep on his cart. He never looks up and never helps. He is proof that it can be small, not a mentor. **He must not turn on the lamp.** The hero does that.
+**The Custodian.** An older gator mopping Marston at 3 a.m. His own blob is tiny and asleep on his cart. He never looks up and never helps. He is proof that it can be small, not a mentor. His passing wakes the light over our gator's desk for a moment without his noticing; our gator stays still, and it times out again. **He must not give the hero a light that stays on.** The hero does that.
 
 **The Freshman.** First seen as one of the frozen gators in the Marston crowd reveal, then again in the final button. Planting them early makes the ending a payoff, not a new character.
 
@@ -63,18 +63,18 @@ Four dodges that escalate. Each one makes the shadow bigger, and each is funnier
 
 - **1:00** Night exterior: Marston Library, a few lit windows. He walks in with his backpack.
 - **1:06** The stacks. The shadow follows him in and fills the aisles. Fluorescent lights flicker as it passes.
-- **1:12** He sits, opens his laptop, then opens his phone instead. The shadow closes over the table.
+- **1:12** He sits, opens his laptop, then opens his phone instead. The shadow closes over the table. He goes still over the phone, and the motion-sensor light over his desk times out.
 - **1:18 · Quiet 1 (~10 s).** Head on the desk. The whole frame is shadow except the faint phone glow. Fluorescent hum. The shadow slowly breathes. Nothing happens. This is the darkest frame of the film.
 - **1:28** He lifts his head and looks around. **Every gator in Marston has a shadow looming over them:** the one asleep on a textbook, the one with three energy drinks, the Freshman frozen in front of a blank page. Wide top-down shot: a grid of dark desks, each with its own shadow, a few faint phone glows.
-- **1:35** The Custodian mops past. His blob is tiny, asleep on the cart. He doesn't look up. Our gator watches the cart go by.
+- **1:35** The Custodian mops past. His blob is tiny, asleep on the cart. He doesn't look up. His passing wakes the light over our gator's desk: the shadow drops, and for a moment our gator's blob is small too. Our gator only watches the cart go by. As it leaves, his light times out again.
 
 ### Act 3: The first step (1:40–2:15)
 
-- **1:40** His hand reaches for the desk lamp. *Click.* The same gesture as the home lamp beat, in the other direction. The cone of light falls, and the shadow drops to a small pool on the desk.
+- **1:40** His hand reaches for the pen and sets its point on the page. The same gesture as the home lamp beat, aimed at the work this time. The movement trips the sensor: a relay *clack*, the tube overhead stutters on, and the shadow drops to a small pool on the desk.
 - **1:45** The blob sits in the light pool looking up at him, small and nervous. One look between them. Hold it for about 2 seconds, then move on.
 - **1:48** He turns the phone face-down. He uncaps a pen. He writes his name at the top of the page (an illegible squiggle). The shadow flinches.
 - **1:54** Problem #1. He braces, and the blob braces too. He writes the answer in about three seconds. He stares at the page in disbelief. *That was it?* This is the comedy beat and the thesis in one.
-- **2:00** Problem #2, #3. A short time-lapse montage: pages turn, the lamp stays on, and with each problem the blob shrinks. Around him, another gator sees him working and clicks on their own lamp.
+- **2:00** Problem #2, #3. A short time-lapse montage: pages turn, his light stays on because he keeps working, and with each problem the blob shrinks. He stands to stretch, and his movement wakes the dead light over a neighbor frozen at their phone. They look up at him and start working.
 
 ### Quiet 2: Dawn (2:15–2:40)
 
@@ -83,7 +83,7 @@ Four dodges that escalate. Each one makes the shadow bigger, and each is funnier
 ### Button (2:40–3:00)
 
 - **2:40** Title card treatment, no words: a wipe on the paper to "next semester" (a new calendar sheet, a new circled date).
-- **2:44** Marston at night. The Freshman sits frozen under an enormous shadow. Our gator walks over, reaches across, and clicks on their desk lamp. He walks away without a word.
+- **2:44** Marston at night. The Freshman sits frozen in a dead zone under an enormous shadow. Our gator walks past without stopping, and his movement wakes their light. He doesn't look back.
 - **2:54** His pocket. The blob peeks out and yawns.
 - **3:00** Black.
 
@@ -101,8 +101,9 @@ Four dodges that escalate. Each one makes the shadow bigger, and each is funnier
 | Exam hall finale | No tension, because we already know he's fine. It gave the film two endings. |
 | Mom on a video call | A side trip that doesn't fit in 3:00. |
 | The campus bus | Same reason. |
-| The girl across the table as her own subplot | Folded into a single "another gator clicks their lamp" moment. |
-| Custodian turns on the lamp | Took the climax away from the hero. |
+| The girl across the table as her own subplot | Folded into a single "his movement wakes another gator's light" moment. |
+| Custodian turns on the lamp | Took the climax away from the hero. His passing may wake the hero's light, but it times out again (s14). |
+| Desk lamps at Marston | No source shows any (`docs/ref-ufl.md` §0). Motion-sensor ceiling lights carry the turn (director, 2026-10-15). |
 | The 5-minute cut | The cost is in acting shots, and quiet shots fit in 3:00. |
 
 ## Readability test
