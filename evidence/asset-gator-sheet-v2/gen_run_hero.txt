@@ -1,0 +1,7 @@
+$ node tools/gen.mjs --asset=gator_hero --variants=2   # 2026-10-15T17:42:32Z
+[gator_hero_v1_1] codex exec in /var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-o1B9IL
+[gator_hero_v1_1] -> /Users/ericzhang/.worktrees/looming/asset-gator-sheet-v2/assets/raw/gator_hero_v1_1.png
+[gator_hero_v1_2] codex exec in /var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-LjpL6G
+[gator_hero_v1_2] -> /Users/ericzhang/.worktrees/looming/asset-gator-sheet-v2/assets/raw/gator_hero_v1_2.png
+contact sheet: /Users/ericzhang/.worktrees/looming/asset-gator-sheet-v2/assets/raw/thumbs/gator_hero_v1_contact.jpg (2 of 2 variants)
+exit 0  2026-10-15T17:49:04Z

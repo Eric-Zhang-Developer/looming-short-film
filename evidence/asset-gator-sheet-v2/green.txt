@@ -1,0 +1,5 @@
+gator_sheet_v1_1.png: mean green #668850 over 248628 px
+gator_sheet_v2_1.png: mean green #66864f over 251938 px
+gator_sheet_v2_2.png: mean green #688a53 over 275507 px
+gator_hero_v1_1.png: mean green #678553 over 256478 px
+gator_hero_v1_2_1.png: mean green #609152 over 239161 px

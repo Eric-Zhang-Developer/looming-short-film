@@ -1,0 +1,55 @@
+{
+  "output": "assets/raw/gator_sheet_v2_1.png",
+  "prompt_file": "assets/prompts/gator_sheet.v2.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/gator_sheet.v2.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/raw/gator_sheet_v1_1.png",
+      "sha256": "63e3566cfda3aeb7f18f8da7ef4d018213d90c3319a78a0dd55a7911469f4b95"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a140a8-9d23-7d03-9515-6b4ab9360fe6",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a140a8-9d23-7d03-9515-6b4ab9360fe6/exec-460e9927-df43-4cc0-b504-f54018784dcb.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-IN73y5",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 170312,
+    "cached_input_tokens": 140800,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1520,
+    "reasoning_output_tokens": 16
+  },
+  "timestamp_start_utc": "2026-10-15T17:42:33Z",
+  "timestamp_end_utc": "2026-10-15T17:44:40Z",
+  "output_sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/gator_sheet_v2_1.jpg",
+  "screening": {
+    "verdict": "survivor, rank 1 of 2 (sheet)",
+    "reasons": [
+      "side view: near-identical to v1_1 (same pose, shapes; mean green #66864f vs v1_1 #668850)",
+      "turn_front: muzzle added (wide green plate across the lower face, nostril dots, 4 tooth tips), cream mask gone; but the muzzle spans the full face width and the two nostril dots read as eyes on the blank face, so front-on it reads as a grinning frog as easily as a gator. Nostrils are dots, not raised bumps.",
+      "turn_head34: a real cartoon 3/4 (near eye large, far eye partly behind, snout shortened and angled right, both nostrils showing). Snout is shorter and blunter than v1_1 (cuter, some drift). Has a painted smile line, which the prompt did not ask for.",
+      "torn rim: visible pale rim ~2-4 px on every piece (edge_crop.jpg), plus a thin dark line just inside it on cream pieces that reads a little like stitching at thumbnail size",
+      "legs: tops cut flat, no cylinder ends",
+      "gaps (measure.mjs): smallest pixel gap 35 px (body/arm_l), smallest box gap 20 px (turn_side/body), no box overlaps, frame margin 47 px: FAILS the 40 px rule on gaps, passes on margin",
+      "cut.mjs --auto: 14 islands for 14 pieces",
+      "no baked light/shadow, real alpha, no text, on palette"
+    ]
+  }
+}

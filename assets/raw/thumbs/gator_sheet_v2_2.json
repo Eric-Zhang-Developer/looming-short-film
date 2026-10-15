@@ -1,0 +1,56 @@
+{
+  "output": "assets/raw/gator_sheet_v2_2.png",
+  "prompt_file": "assets/prompts/gator_sheet.v2.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/gator_sheet.v2.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/raw/gator_sheet_v1_1.png",
+      "sha256": "63e3566cfda3aeb7f18f8da7ef4d018213d90c3319a78a0dd55a7911469f4b95"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a140aa-9861-7783-aecb-868a23a086b6",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a140aa-9861-7783-aecb-868a23a086b6/exec-c5efd5f8-ece0-43c0-98c7-588b63549150.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-SdvHsl",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 206773,
+    "cached_input_tokens": 177920,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1669,
+    "reasoning_output_tokens": 113
+  },
+  "timestamp_start_utc": "2026-10-15T17:44:41Z",
+  "timestamp_end_utc": "2026-10-15T17:46:30Z",
+  "output_sha256": "c5d2e6a38efc3179b4cc3ef9c614406c19563859a8769142a23c83acd3ca313d",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/gator_sheet_v2_2.jpg",
+  "screening": {
+    "verdict": "survivor, rank 2 of 2 (sheet)",
+    "reasons": [
+      "side view: near-identical to v1_1 (mean green #688a53)",
+      "turn_front: the best front of the round: a separate rounded muzzle plate overlapping the lower face, nostril dots near its top, tooth tips at the jaw line, cream mask gone. Reads as a gator front-on, though a little hippo-like; nostrils are dots, not raised bumps.",
+      "turn_head34: a real cartoon 3/4, similar to v2_1 but slightly flatter, snout less foreshortened; painted smile line",
+      "body part is wrong for the rig: the hoodie torso has both sleeves and green mitten hands painted on, so arm_l/arm_r would double",
+      "torn rim: visible pale rim ~2-4 px on every piece, with the same thin dark inner line",
+      "legs: tops cut flat",
+      "gaps (measure.mjs): smallest pixel gap 35 px (tail/jaw), smallest box gap 27 px (turn_side/body), no box overlaps, frame margin 29 px: FAILS the 40 px rule",
+      "cut.mjs --auto: 14 islands for 14 pieces",
+      "no baked light/shadow, real alpha, no text, on palette"
+    ]
+  }
+}

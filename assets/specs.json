@@ -19,12 +19,13 @@
     "purpose": "The Student, the film's hero gator: a turnaround plus separated cutout parts that drop straight onto the side rig in src/characters/gator.js. Gate G2. Carries G1's approved design (style tile v3_4, the graphic picture-book gator) and Q9 (short stubby legs).",
     "shots": "s02-s12, s14-s18 (close-ups in s06, s15, s18 H)",
     "refs": [
-      "assets/frozen/style_tile.png"
+      "assets/frozen/style_tile.png",
+      "assets/raw/gator_sheet_v1_1.png"
     ],
-    "prompt": "assets/prompts/gator_sheet.v1.md",
-    "variants": 3,
+    "prompt": "assets/prompts/gator_sheet.v2.md",
+    "variants": 2,
     "cap": 8,
-    "target": "largest landscape size available, one sheet with nothing else on it: 4 turnaround pieces (top row) and 10 rig parts (bottom row), one shared scale, every piece >= 40 px from every other and from the frame edge",
+    "target": "largest landscape size available, one sheet with nothing else on it: 4 turnaround pieces (top row) and 10 rig parts (middle and bottom rows), one shared scale, every bounding box >= 40 px from every other and from the frame edge (prompt asks 60)",
     "key": {
       "name": "magenta",
       "hex": "#FF00FF"
@@ -38,7 +39,7 @@
       "turn_front": {
         "rig": "makeGator facing 'front': body, pivot [0.5, 1] (feet)",
         "face": "blank: eyes and mouth are face_sheet swaps",
-        "orientation": "full figure facing camera, painted without arms (the rig adds arm_l/arm_r)"
+        "orientation": "full figure facing camera, painted without arms (the rig adds arm_l/arm_r); snout foreshortened as a broad rounded muzzle with two nostril bumps and tooth tips at the jaw line; no cream face or throat patch"
       },
       "turn_back": {
         "rig": "makeGator facing 'back': body, pivot [0.5, 1] (feet)",
@@ -47,8 +48,8 @@
       },
       "turn_head34": {
         "rig": "side rig head34, pivot [0.4, 0.75], swaps head+snout+jaw (s14)",
-        "face": "blank",
-        "orientation": "head and snout in 3/4 front view, turned toward +x"
+        "face": "both eyes painted, partly visible (v2 brief: \"both eyes partly visible\"); no mouth beyond the jaw seam and tooth tips",
+        "orientation": "head and snout turned about 45 degrees toward +x, snout angling away into depth"
       },
       "body": {
         "rig": "body (root), pivot [0.45, 0.95] = hip",
@@ -77,11 +78,11 @@
       },
       "leg_l": {
         "rig": "leg_l (far), pivot [0.31, 0.08] = hip, z -0.003",
-        "orientation": "vertical, hip end up, foot pointing +x; short and stubby"
+        "orientation": "vertical, hip end up and cut flat (no lighter cylinder top), foot pointing +x; short and stubby"
       },
       "leg_r": {
         "rig": "leg_r (near), pivot [0.31, 0.08] = hip, z -0.001",
-        "orientation": "vertical, hip end up, foot pointing +x; short and stubby"
+        "orientation": "vertical, hip end up and cut flat (no lighter cylinder top), foot pointing +x; short and stubby"
       },
       "tail": {
         "rig": "tail, pivot [0.92, 0.5] = root, z -0.002",
@@ -95,12 +96,50 @@
     "proportions": "legs about 20% of standing height, as in v3_4 (the rig's legs are 37%; the sheet sets the truth and the rig is refit to it)",
     "acceptance": [
       "keeps v3_4's design: flat geometric shapes, strong simple silhouette, blunt long snout with a few tiny cream triangle tooth tips, semicircle eye bump, scalloped tail, cream hoodie, stubby legs, friendly read",
-      "torn paper, not felt: flat colour, pale torn fibre rim at every cut edge, fine paper grain, no fuzz or pile",
+      "torn paper, not felt: flat colour, a visible pale torn fibre rim of 2-6 px on every piece (as the style tile wall and desk), fine paper grain, no fuzz or pile",
       "no baked-in light or shadow; background alpha or flat magenta",
-      "every piece >= 40 px from every other piece, no overlapping bounding boxes, nothing touching the frame edge",
+      "every bounding box >= 40 px from every other piece and from the frame edge, measured",
       "no text or artifacts; on palette (gator green, cream, a black pupil on turn_side only)",
-      "head, turn_front and turn_head34 painted without eye or mouth; turn_side fully featured",
-      "cut.mjs --auto gives one island per piece (14)"
+      "head and turn_front painted without eye or mouth; turn_head34 shows both eyes partly; turn_side fully featured",
+      "cut.mjs --auto gives one island per piece (14)",
+      "turn_front reads as a gator: broad foreshortened muzzle, two nostril bumps, tooth tips at the jaw line, no cream mask",
+      "turn_head34 is a real 3/4 head (about 45 degrees, snout angling away)",
+      "keeps v1_1 side view, colours and proportions exactly",
+      "leg tops cut flat"
+    ],
+    "refs_note": "v2: v1_1 is the approved base (G2 round 1, director: \"sounds good ok we can continue\"); doc 08 lets an approved pick be a reference for its own revision. It lives only in assets/raw/ (gitignored), so gen.mjs refuses where it is missing."
+  },
+  {
+    "name": "gator_hero",
+    "purpose": "The Student, large, for the close-ups in s06, s15 and s18 H: the side view of gator_sheet (v1_1 base) repainted alone at the largest size (doc 08: one piece per image for frame-filling use). Same pose and design as the sheet side view, fully featured face.",
+    "shots": "s06, s15, s18 H (close-ups)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/raw/gator_sheet_v1_1.png"
+    ],
+    "refs_note": "v1_1 is the approved gator_sheet base (G2 round 1); it lives only in assets/raw/ (gitignored).",
+    "prompt": "assets/prompts/gator_hero.v1.md",
+    "variants": 2,
+    "cap": 4,
+    "target": "largest landscape size available, one full side-view figure alone, figure height >= 70% of the canvas height (prompt asks ~85%), >= 40 px margin to every frame edge",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "parts": {
+      "hero_side": {
+        "rig": "whole-figure close-up piece (no face slots), same as gator_sheet turn_side",
+        "face": "painted: eye, smile line, tooth tips, nostril dot",
+        "orientation": "full figure facing +x, standing, arms down, legs ~20% of standing height"
+      }
+    },
+    "acceptance": [
+      "same pose and design as gator_sheet v1_1 turn_side",
+      "figure height >= 70% of the canvas height, measured",
+      "torn paper: visible pale torn fibre rim on every cut edge, no fuzz or pile",
+      "no baked-in light or shadow; background alpha or flat magenta",
+      "nothing touching the frame edge; no text or artifacts; on palette",
+      "cut.mjs --auto gives one island"
     ]
   }
 ]

@@ -1,0 +1,2 @@
+gator_hero_v1_1: canvas 1536x1024, figure box 1160x973 at y 28-1000: height share 95.0% (>= 70% required)
+gator_hero_v1_2: canvas 1536x1024, figure box 1093x926 at y 64-989: height share 90.4% (>= 70% required)

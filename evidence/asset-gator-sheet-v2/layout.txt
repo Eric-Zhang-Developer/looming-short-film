@@ -1,0 +1,5 @@
+# Tile order in the evidence images (no labels are drawn; ffmpeg here has no drawtext and headless Chrome is off limits on this machine)
+contact.jpg     left to right: gator_sheet_v1_1 (base), gator_sheet_v2_1, gator_sheet_v2_2, gator_hero_v1_1, gator_hero_v1_2 (magenta keyed by cut.mjs); top band navy #1E2440, bottom band grey #808080; all at 440 px high
+front_views.jpg left to right: turn_front of v1_1, v2_1, v2_2, each scaled to 640 px high, over grey
+edge_crop.jpg   left to right: 200x200 px crops at 1:1 around the snout tip of the side view: v1_1, v2_1, v2_2, hero_v1_1, hero_v1_2 (keyed); navy over grey
+built with: node evidence/asset-gator-sheet-v2/strip.mjs <out> <height|native> <bg,...> <png[:x:y:w:h]> ...

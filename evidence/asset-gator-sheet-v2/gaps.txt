@@ -1,0 +1,69 @@
+$ node evidence/asset-gator-sheet/measure.mjs assets/raw/gator_sheet_v1_1.png
+assets/raw/gator_sheet_v1_1.png: 1672x941, alpha, 14 island(s) kept, 0 dust island(s) under 500 px dropped
+  #1 box [29, 39, 468, 425] area 88804 frame-edge 29 px
+  #2 box [567, 41, 218, 422] area 74166 frame-edge 41 px
+  #3 box [911, 41, 266, 429] area 83082 frame-edge 41 px
+  #4 box [1304, 98, 331, 254] area 52179 frame-edge 37 px
+  #5 box [61, 494, 214, 246] area 41708 frame-edge 61 px
+  #6 box [365, 517, 204, 176] area 26815 frame-edge 248 px
+  #7 box [1333, 559, 297, 124] area 25139 frame-edge 42 px
+  #8 box [659, 572, 289, 112] area 26158 frame-edge 257 px
+  #9 box [1023, 578, 261, 106] area 16485 frame-edge 257 px
+  #10 box [852, 766, 128, 129] area 12557 frame-edge 46 px
+  #11 box [1088, 766, 128, 129] area 12566 frame-edge 46 px
+  #12 box [1333, 785, 223, 104] area 20229 frame-edge 52 px
+  #13 box [114, 791, 221, 97] area 17977 frame-edge 53 px
+  #14 box [459, 791, 222, 97] area 18078 frame-edge 53 px
+  smallest pixel gap 49 px (#7/#9); smallest box gap 30 px (#1/#5); box overlaps: none; nearest frame edge 29 px
+  40 px rule (pixel gap >= 40, no box overlap, frame margin >= 40): FAIL
+
+$ node evidence/asset-gator-sheet/measure.mjs assets/raw/gator_sheet_v2_1.png
+assets/raw/gator_sheet_v2_1.png: 1672x941, alpha, 14 island(s) kept, 1 dust island(s) under 500 px dropped
+  #1 box [47, 78, 460, 419] area 88793 frame-edge 47 px
+  #2 box [577, 81, 228, 416] area 78953 frame-edge 81 px
+  #3 box [915, 81, 270, 423] area 86028 frame-edge 81 px
+  #4 box [1301, 135, 278, 245] area 47199 frame-edge 93 px
+  #5 box [75, 517, 212, 233] area 39455 frame-edge 75 px
+  #6 box [370, 539, 208, 178] area 28538 frame-edge 224 px
+  #7 box [1327, 568, 297, 140] area 28910 frame-edge 48 px
+  #8 box [652, 594, 298, 110] area 26778 frame-edge 237 px
+  #9 box [1014, 598, 270, 107] area 18012 frame-edge 236 px
+  #10 box [846, 762, 142, 129] area 14469 frame-edge 50 px
+  #11 box [1088, 762, 142, 128] area 14408 frame-edge 51 px
+  #12 box [1334, 772, 235, 117] area 23264 frame-edge 52 px
+  #13 box [115, 784, 227, 103] area 19270 frame-edge 54 px
+  #14 box [462, 786, 231, 102] area 19547 frame-edge 53 px
+  smallest pixel gap 35 px (#5/#13); smallest box gap 20 px (#1/#5); box overlaps: none; nearest frame edge 47 px
+  40 px rule (pixel gap >= 40, no box overlap, frame margin >= 40): FAIL
+
+$ node evidence/asset-gator-sheet/measure.mjs assets/raw/gator_sheet_v2_2.png
+assets/raw/gator_sheet_v2_2.png: 1672x941, alpha, 14 island(s) kept, 1 dust island(s) under 500 px dropped
+  #1 box [29, 33, 479, 436] area 96494 frame-edge 29 px
+  #2 box [564, 44, 228, 426] area 82010 frame-edge 44 px
+  #3 box [906, 44, 273, 431] area 89815 frame-edge 44 px
+  #4 box [1304, 122, 309, 245] area 51933 frame-edge 59 px
+  #5 box [58, 496, 240, 245] area 45324 frame-edge 58 px
+  #6 box [362, 522, 214, 183] area 28823 frame-edge 236 px
+  #7 box [1327, 550, 313, 146] area 30407 frame-edge 32 px
+  #8 box [645, 574, 304, 120] area 30320 frame-edge 247 px
+  #9 box [1013, 579, 280, 115] area 20941 frame-edge 247 px
+  #10 box [831, 763, 144, 132] area 14523 frame-edge 46 px
+  #11 box [1078, 763, 138, 132] area 14238 frame-edge 46 px
+  #12 box [1341, 780, 219, 114] area 21320 frame-edge 47 px
+  #13 box [110, 786, 226, 107] area 20018 frame-edge 48 px
+  #14 box [452, 787, 228, 106] area 20083 frame-edge 48 px
+  smallest pixel gap 35 px (#7/#9); smallest box gap 27 px (#1/#5); box overlaps: none; nearest frame edge 29 px
+  40 px rule (pixel gap >= 40, no box overlap, frame margin >= 40): FAIL
+
+$ node evidence/asset-gator-sheet/measure.mjs assets/raw/gator_hero_v1_1.png
+assets/raw/gator_hero_v1_1.png: 1536x1024, alpha, 1 island(s) kept, 0 dust island(s) under 500 px dropped
+  #1 box [192, 28, 1160, 973] area 497255 frame-edge 23 px
+  smallest pixel gap Infinity px (undefined); smallest box gap Infinity px (undefined); box overlaps: none; nearest frame edge 23 px
+  40 px rule (pixel gap >= 40, no box overlap, frame margin >= 40): FAIL
+
+$ node evidence/asset-gator-sheet/measure.mjs assets/raw/gator_hero_v1_2.png
+assets/raw/gator_hero_v1_2.png: 1536x1024, no alpha (magenta key), 1 island(s) kept, 0 dust island(s) under 500 px dropped
+  #1 box [223, 64, 1093, 926] area 451508 frame-edge 34 px
+  smallest pixel gap Infinity px (undefined); smallest box gap Infinity px (undefined); box overlaps: none; nearest frame edge 34 px
+  40 px rule (pixel gap >= 40, no box overlap, frame margin >= 40): FAIL
+
