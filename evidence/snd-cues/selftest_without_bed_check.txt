@@ -1,0 +1,8 @@
+    lampClickHome@36.5s, lampClickMarston@100.5s, lampClickFreshman@164s; 24000 samples each (±0.1 s), peak 0.5645
+ok  three lamp clicks are sample-identical in out/audio/stems/foley.wav
+ok  (scratch copy: bed-span check removed so the rest can run)
+ok  voices and foley are deterministic and finite
+ok  every foley sound renders, deterministic and finite
+    max diff vs lampClickMarston [0,0,0] LSB over 14400 samples each, peak 26736 LSB
+ok  three lamp clicks are identical within ±1 LSB in out/audio/mix.wav (over the click's own samples)
+wrote /Users/ericzhang/.worktrees/looming/snd-cues/out/audio/solo/{lampclick,piano_c4}.wav (19200, 146400 samples)
