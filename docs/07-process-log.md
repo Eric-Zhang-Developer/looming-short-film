@@ -135,3 +135,11 @@ The first full-rig composite (`evidence/lookdev-composite/`) proved the mechanic
 ## 2026-10-15 · Wave 2 merged (#2)
 
 All modules verified and the lookdev passes the rig. Two look passes fixed every code-side problem the composite exposed. What still reads as vector is the art: navy props on a navy wall. That goes back to the director at G1. Sound is ahead of schedule: score, foley and a linear master with identical lamp clicks. Wave 3 (`wave/3-assets`) starts with `mod-film` in flight and G1 plus 8 story questions open.
+
+## 2026-10-15 · G1 and Q1–Q9 decided
+
+Director, verbatim: "G1: make style tile v3 with the value-contrast rule (+4 generations). Q1–Q9: go with every recommendation."
+- **G1:** no v2 is frozen. A v3 style tile is painted under a value-contrast rule (props in cream, kraft, green, amber or red; navy only for walls and sky), and the style_tile cap rises from 8 to 12.
+- **Q1–Q9:** every recommendation stands. Most were already built as the "(current)" option. Two need work:
+  - **Q7:** the Exam becomes matte ink with one painted highlight and a visible stain.
+  - **Q4:** doc 03's red rule now reads "only on the calendar circles".

@@ -39,7 +39,7 @@ Separate **paper stocks** (the color of things) from **light colors** (the color
 | Light | Lamp Amber | `#F0A84A` |
 | Ink | Exam Black | `#0A0A0F` |
 
-The dawn rose is **lamp amber mixed into cream through tissue**, not a new color. Red appears exactly once: the circle on the calendar.
+The dawn rose is **lamp amber mixed into cream through tissue**, not a new color. Red appears only on the calendar circles: the first exam, and the new circled date at the end (director, Q4).
 
 ### Color script
 

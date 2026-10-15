@@ -1,5 +1,7 @@
 # Director questions (from sb-reconcile)
 
+> **Answered 2026-10-15.** Director: "Q1–Q9: go with every recommendation." Each question below is decided as its **Recommend** line. Q2 = (b), seen not heard. Q7 = (b), matte ink with one painted highlight and a visible stain. Every other question = (a).
+
 Each one changes a story beat, a character's design, the palette or a film-wide rule, so these are one-way doors. The specs are built to the **recommendation** until you answer. Everything reversible was resolved in the specs and logged in `done/sb-reconcile.md`.
 
 **Q1 · What may move in a quiet shot?** Doc 03 says "only light and boil move". Doc 02 has the shadow "slowly breathe" in Quiet 1 and has him sit back while the blob climbs into his pocket in Quiet 2.
