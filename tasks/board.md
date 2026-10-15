@@ -29,12 +29,13 @@
 - contract-puppet · builder · `src/puppet.js`, `lab/puppet.js`, `docs/contracts.md` §puppet · verified (merged) · evidence/contract-puppet/boil_strip.jpg
 - look-pass-1 · builder · `src/paper.js`, `src/post.js`, `src/lights.js`, `lab/lookdev.*`, contracts §paper/§post/§lights · verified (merged; 2 rig gaps → look-pass-2) · evidence/look-pass-1/before_after.jpg
 - look-pass-2 · builder · `src/material.js`, `src/blob.js`, `src/lights.js`, contracts §material/§blob/§lights · in-progress · —
+- snd-score-reveal · builder · `src/audio/score.js` · in-progress · —
 
 ### parallel track: storyboard (docs)
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · built (merged) · done/sb-act1.md
 - sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · built (merged) · done/sb-act2.md
 - sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · built (merged) · done/sb-act3.md
-- sb-reconcile · builder (docs) · `docs/shots/`, `docs/assets.md`, `src/timeline.js` (additive beats) · in-progress · —
+- sb-reconcile · builder (docs) · `docs/shots/`, `docs/assets.md`, `src/timeline.js` (additive beats) · built (merged) · docs/shots/QUESTIONS.md
 - snd-engine · builder · `src/audio/`, `tools/mix.mjs` · verified (merged) · evidence/snd-engine/loudness.txt
 
 ### wave 3, started early
