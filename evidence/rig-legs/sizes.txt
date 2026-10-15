@@ -1,0 +1,8 @@
+$ node evidence/rig-legs/sizes.mjs   # with the scratch fake frozen calendar in place
+gator_sheet.body     proxy  bitmap 191×276 px  sizes 33.57 × 48.52 mm  drawn 27.51 × 45.48 mm  PIECES 30.00 × 45.00 mm  long axis off 1.1 %
+gator_sheet.leg_r    proxy  bitmap 148×276 px  sizes 18.50 × 34.50 mm  drawn 16.51 × 32.38 mm  PIECES 16.00 × 32.00 mm  long axis off 1.2 %
+desk_lamp.shade      proxy  bitmap 276×244 px  sizes 17.25 × 15.25 mm  drawn 16.14 × 14.00 mm  PIECES 16.00 × 14.00 mm  long axis off 0.9 %
+calendar.sheet1      frozen bitmap 108×128 px  sizes 108.00 × 128.00 mm  drawn 101.38 × 121.38 mm  PIECES 100.00 × 120.00 mm  long axis off 1.1 %
+reach_lift near arm: drawn tip x 48.18 mm, gator.hand x 48.06 mm, off 0.11 mm
+before (HEAD assets.js): gator_sheet.body     proxy  bitmap 191×276 px  sizes 30.00 × 45.00 mm  drawn 25.52 × 42.19 mm  PIECES 30.00 × 45.00 mm  long axis off 6.3 %
+(before: the same script on HEAD's src/assets.js, stopped at leg_r, which HEAD lacks; the margin made the body 6.3 % short)

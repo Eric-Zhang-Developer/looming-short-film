@@ -12,11 +12,11 @@ A sheet is one generation with several cut pieces (doc 08), and it counts as one
 
 | # | Name | Type | Pieces | Shots | Group | Notes |
 |---|---|---|---|---|---|---|
-| 1 | `gator_sheet` | character | Turnaround (side, front, back, 3/4 head) and parts: body, head, upper jaw/snout, lower jaw, arm_l, arm_r, tail, pocket | s02–s12, s14–s18 | 2 | Close-up in s06, s15, s18 H: one sheet at the largest size, nothing else on it |
+| 1 | `gator_sheet` | character | Turnaround (side, front, back, 3/4 head) and parts: body, head, upper jaw/snout, lower jaw, arm_l, arm_r, leg_l, leg_r (short, stubby, foot forward), tail, pocket | s02–s12, s14–s18 | 2 | Close-up in s06, s15, s18 H: one sheet at the largest size, nothing else on it |
 | 2 | `face_sheet` | face | Eyes: open, closed, tired, gasp, worried, side. Mouths: neutral, smile, o, line | s02–s18 | 3 | Shared, scaled, by the roommates and the Freshman; must also read from above in s13 |
 | 3 | `roommates_sheet` | character | roommate_tall (split for a walk cycle), roommate_round | s05 | 4 | Merges `roommate_tall` + `roommate_round`: both appear only in s05, medium-wide and background |
 | 4 | `custodian_sheet` | character | custodian (body, head, cap, 2 arms, tail), custodian_cart (frame, tray, bucket), mop | s14 | 4 | Merges `custodian_cart`, as doc 08 already pairs them. His tiny blob is code |
-| 5 | `freshman_sheet` | character | The Freshman's side-view parts at 0.85× the Student, oversized backpack | s18 | 4 | Also the reference for the Freshman's top view in `top_figures_sheet` |
+| 5 | `freshman_sheet` | character | The Freshman's side-view parts at 0.85× the Student (leg_l, leg_r among them), oversized backpack | s18 | 4 | Also the reference for the Freshman's top view in `top_figures_sheet` |
 | 6 | `skyline_sheet` | set | skyline_far (low rooftops, one clock-tower silhouette, no signage), skyline_near (rooftops and oak canopies) | s01 | 5 | Merges 2 strips; both are backlit silhouettes with lit rims |
 | 7 | `apt_exterior` | set | Apartment facade, one window hole painted in the key color | s01 | 5 | Single: it fills the frame at the end of the push |
 | 8 | `foliage_sheet` | set | oak_branch (with tissue moss), campus_trees (tree-line strip), hedge | s01, s09 | 5 | Merges 3; all three are backlit or defocused |

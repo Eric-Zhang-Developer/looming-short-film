@@ -5,7 +5,7 @@ import { PALETTE } from './core/palette.js';
 
 // name → piece → [w, h (m), shape, PALETTE key]. Names from docs/assets.md; rough sizes from the shot specs
 // (desk unit README §2, s01, s05, s09, s10, s13, s14, s15, s18). Shot specs win over these numbers.
-// Shapes: gator (side silhouette), torso, head, taper, limb, rect, round (rounded rect), ellipse.
+// Shapes: gator (side silhouette), torso, head, taper, limb, leg (shin with a foot toward +x), rect, round (rounded rect), ellipse.
 const G = 'gator', C = 'cream', K = 'kraft', N = 'navy', I = 'ink';
 export const PIECES = {
   gator_sheet: {
@@ -13,6 +13,7 @@ export const PIECES = {
     turn_head34: [0.03, 0.025, 'head', G], body: [0.03, 0.045, 'torso', G], head: [0.03, 0.022, 'head', G],
     snout: [0.022, 0.008, 'taper', G], jaw: [0.02, 0.006, 'taper', G], arm_l: [0.032, 0.007, 'limb', G],
     arm_r: [0.032, 0.007, 'limb', G], tail: [0.05, 0.012, 'taper', G], pocket: [0.014, 0.008, 'round', C],
+    leg_l: [0.016, 0.032, 'leg', G], leg_r: [0.016, 0.032, 'leg', G],
   },
   face_sheet: {
     eyes_open: [0.008, 0.004, 'eyes', C], eyes_closed: [0.008, 0.0015, 'rect', I], eyes_tired: [0.008, 0.003, 'eyes', C],
@@ -35,6 +36,7 @@ export const PIECES = {
     body: [0.026, 0.038, 'torso', G], head: [0.026, 0.019, 'head', G], snout: [0.019, 0.007, 'taper', G],
     jaw: [0.017, 0.005, 'taper', G], arm_l: [0.027, 0.006, 'limb', G], arm_r: [0.027, 0.006, 'limb', G],
     tail: [0.043, 0.01, 'taper', G], backpack: [0.04, 0.045, 'round', N],
+    leg_l: [0.0136, 0.0272, 'leg', G], leg_r: [0.0136, 0.0272, 'leg', G],
   },
   skyline_sheet: { skyline_far: [1.8, 0.28, 'rect', N], skyline_near: [1.8, 0.2, 'rect', N] },
   apt_exterior: { facade: [0.4, 0.5, 'rect', K] },
@@ -90,26 +92,46 @@ export function load(name) {
 }
 
 async function loadUncached(name) {
-  const table = PIECES[name];
-  const sizes = Object.fromEntries(Object.entries(table).map(([p, [w, h]]) => [p, [w, h]]));
+  const table = PIECES[name], pieces = {};
   const boxes = await fetch(`/assets/cut/${name}.boxes.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const frozen = boxes && (await fetch(`/assets/frozen/${name}.png`, { method: 'HEAD' }).then((r) => r.ok, () => false));
   if (frozen) {
-    const pieces = {};
     await Promise.all(Object.keys(boxes).map(async (key) => {
       const img = new Image(); img.src = `/assets/cut/${key}.png`; await img.decode();
       pieces[key.startsWith(name + '_') ? key.slice(name.length + 1) : key] = await createImageBitmap(img);
     }));
-    return { pieces, sizes, proxy: false };
+  } else {
+    for (const [p, [w, h, shape, col]] of Object.entries(table)) pieces[p] = await createImageBitmap(proxy(w, h, shape, PALETTE[col]));
   }
-  const pieces = {};
-  for (const [p, [w, h, shape, col]] of Object.entries(table)) pieces[p] = await createImageBitmap(proxy(w, h, shape, PALETTE[col]));
-  return { pieces, sizes, proxy: true };
+  // Proxy margins and cut padding are transparent, so each size is the whole bitmap's, scaled so its opaque box is the
+  // PIECES size along the PIECES long axis, at the bitmap's own aspect (makePaper never stretches art, so this is
+  // exactly the sheet it makes).
+  const visible = Object.fromEntries(Object.entries(pieces).map(([p, bmp]) => [p, opaqueBox(bmp)]));
+  const sizes = Object.fromEntries(Object.entries(table).map(([p, [w, h]]) => {
+    const bmp = pieces[p];
+    if (!bmp) return [p, [w, h]];
+    const [u0, v0, u1, v1] = visible[p], k = w >= h ? w / (u1 - u0) / bmp.width : h / (v1 - v0) / bmp.height;
+    return [p, [bmp.width * k, bmp.height * k]];
+  }));
+  return { pieces, sizes, visible, proxy: !frozen };
+}
+
+// [u0, v0, u1, v1]: the box around pixels with alpha ≥ 128 (paper.js cuts at the same 0.5), in uv, v down.
+function opaqueBox(bmp) {
+  const W = bmp.width, H = bmp.height, g = Object.assign(document.createElement('canvas'), { width: W, height: H }).getContext('2d');
+  g.drawImage(bmp, 0, 0);
+  const a = g.getImageData(0, 0, W, H).data;
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (a[(y * W + x) * 4 + 3] < 128) continue;
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  return x1 < 0 ? [0, 0, 1, 1] : [x0 / W, y0 / H, (x1 + 1) / W, (y1 + 1) / H];
 }
 
 // A flat silhouette at the piece's aspect, 256 px on the long edge (makePaper resamples it to its own res), inside a
 // transparent margin of 4 % of the long edge (min 8 px) so makePaper has an edge to tear on every side. The bitmap is
-// bigger than the shape; `sizes` stays the shape's size from PIECES.
+// bigger than the shape, and `sizes` is bigger by the same factor, so the shape itself lands at the PIECES size.
 function proxy(w, h, shape, color) {
   const L = 256, M = Math.max(8, Math.round(L * 0.04));
   const W = Math.max(8, Math.round(w >= h ? L : L * w / h)), H = Math.max(8, Math.round(w >= h ? L * h / w : L));
@@ -129,6 +151,7 @@ function proxy(w, h, shape, color) {
     case 'head': ell(W * 0.35, H * 0.5, W * 0.33, H * 0.48); round(W * 0.35, H * 0.3, W * 0.65, H * 0.4, H * 0.2); break;
     case 'taper': g.moveTo(0, 0); g.quadraticCurveTo(W * 0.6, H * 0.2, W, H * 0.5); g.quadraticCurveTo(W * 0.6, H * 0.8, 0, H); g.closePath(); break;
     case 'limb': round(0, 0, W, H, Math.min(W, H) / 2); break;
+    case 'leg': round(0, 0, W * 0.62, H, W * 0.3); round(0, H * 0.74, W, H * 0.26, H * 0.13); break;
     case 'eyes': ell(W * 0.25, H / 2, W * 0.23, H * 0.48); ell(W * 0.75, H / 2, W * 0.23, H * 0.48); break;
     case 'round': round(0, 0, W, H, Math.min(W, H) * 0.25); break;
     case 'ellipse': ell(W / 2, H / 2, W / 2, H / 2); break;

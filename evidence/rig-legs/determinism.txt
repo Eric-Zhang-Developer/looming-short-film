@@ -1,0 +1,15 @@
+$ node tools/determinism.mjs --page=lab/characters.html --t=39,53,2000.125
+t=39  1b157d0c8ca781c0 1b157d0c8ca781c0 1b157d0c8ca781c0  PASS
+t=53  254fa1704de264e9 254fa1704de264e9 254fa1704de264e9  PASS
+t=2000.125  d35d0938223a88ef d35d0938223a88ef d35d0938223a88ef  PASS
+determinism: PASS
+$ node tools/determinism.mjs --page=index.html --t=0.5,10,95
+t=0.5  83aa3a471f4c0fe5 83aa3a471f4c0fe5 83aa3a471f4c0fe5  PASS
+t=10  4407c6bd89b1cd04 4407c6bd89b1cd04 4407c6bd89b1cd04  PASS
+t=95  53e1915dd0d401c9 53e1915dd0d401c9 53e1915dd0d401c9  PASS
+determinism: PASS
+$ node tools/determinism.mjs --page=evidence/rig-legs/lab.html --t=32,54,2000.25
+t=32  bc35f9d334921486 bc35f9d334921486 bc35f9d334921486  PASS
+t=54  c85b8ad3a2bad267 c85b8ad3a2bad267 c85b8ad3a2bad267  PASS
+t=2000.25  d612a4622eefe831 d612a4622eefe831 d612a4622eefe831  PASS
+determinism: PASS

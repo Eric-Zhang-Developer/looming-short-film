@@ -57,15 +57,19 @@ export async function buildRig(ctx, { name, seed = 0, scale = 1, green, res = 51
     const [asset, piece] = p.from, a = loaded[asset];
     let art = a.pieces[piece];
     if (!art) throw new Error(`${name}: ${asset} has no piece "${piece}"`);
-    if (p.turn === 'mirror' || (p.turn === 'mirrorProxy' && a.proxy)) art = mirror(art);
-    if (p.turn === 'rot90') art = rot90(art);
+    // size and pivot are the visible shape's (a.visible: its box inside the bitmap's transparent margin)
+    let [u0, v0, u1, v1] = a.visible?.[piece] ?? [0, 0, 1, 1];
+    if (p.turn === 'mirror' || (p.turn === 'mirrorProxy' && a.proxy)) { art = mirror(art); [u0, u1] = [1 - u1, 1 - u0]; }
+    if (p.turn === 'rot90') { art = rot90(art); [u0, v0, u1, v1] = [1 - v1, u0, 1 - v0, u1]; }
     if (green && PIECES[asset]?.[piece]?.[3] === 'gator') art = tint(art, green);
+    const fw = u1 - u0, fh = v1 - v0;
     let size = p.size && s(p.size), pivot = p.pivot;
     if (p.reach) {  // exact reach: the joint sits at the round end's center, the tip is `reach` away
-      const asp = art.width / art.height, L = p.reach * scale;
+      const asp = (art.width * fw) / (art.height * fh), L = p.reach * scale;
       if (asp >= 1) { const w = L / (1 - 0.5 / asp); size = [w, w / asp]; pivot = [0.5 / asp, 0.5]; }
       else { const h = L / (1 - 0.5 * asp); size = [h * asp, h]; pivot = [0.5, 0.5 * asp]; }
     }
+    size = [size[0] / fw, size[1] / fh]; pivot = [u0 + pivot[0] * fw, v0 + pivot[1] * fh];
     const key = `${id}-${p.name}`, weight = p.weight ?? 'cardstock';
     defs.push({ name: p.name, parent: p.parent, pivot, at: s(p.at), z: (p.z ?? 0) * scale,
       sheet: (sd) => makePaper({ art, size, key, weight, res, seed: sd }) });
@@ -103,12 +107,22 @@ async function makeFaces(ctx, { id, scale, res }) {
 }
 
 // ---------- the Student ----------
-// Side layout at scale 1 (m). Body pivot = hip at the body's bottom; head pivot = neck.
+// Side layout at scale 1 (m). Body pivot = hip at the body's bottom; head pivot = neck. Both legs hang from one pivot
+// at the hip; a plumb leg's sole is HIP below it, which stands him 8 cm (the hip to head top is 0.0505).
 const SHOULDER = [0.013, 0.030], ARM = 0.032;
+export const HIP = 0.032 * 0.92;  // leg piece height × (1 − pivot v): 0.02944
+// The foot in the leg's frame (hip at the origin): a sole with round heel and toe of radius R, centred at x = SOLE.
+// hipHeight(pose) is how high the root must sit for the lower foot to touch the floor, from the legs' world angles
+// (body + leg). ponytail: SOLE and R are the proxy foot's; re-measure them from the cut leg_l when art lands.
+const SOLE = [-0.0008, 0.0069], R = 0.0042;
+const drop = (a) => R + Math.max(...SOLE.map((x) => (HIP - R) * Math.cos(a) - x * Math.sin(a)));
+export const hipHeight = (p) => Math.max(drop((p.body ?? 0) + (p.leg_r ?? 0)), drop((p.body ?? 0) + (p.leg_l ?? 0)));
 export function sideParts(sheet, { pocket = true, backpack = false, head34 = false } = {}) {
   const P = (piece) => [sheet, piece];
   return [
     { name: 'body', from: P('body'), size: [0.03, 0.045], pivot: [0.45, 0.95], at: [0, 0] },
+    { name: 'leg_l', from: P('leg_l'), parent: 'body', size: [0.016, 0.032], pivot: [0.31, 0.08], at: [0.001, 0], z: -0.003 },
+    { name: 'leg_r', from: P('leg_r'), parent: 'body', size: [0.016, 0.032], pivot: [0.31, 0.08], at: [0.001, 0], z: -0.001 },
     { name: 'tail', from: P('tail'), parent: 'body', size: [0.05, 0.012], pivot: [0.92, 0.5], at: [-0.010, 0.004], z: -0.002, turn: 'mirrorProxy' },
     ...(backpack ? [{ name: 'backpack', from: P('backpack'), parent: 'body', size: [0.047, 0.053], pivot: [0.7, 0.45], at: [-0.010, 0.024], z: -0.007 }] : []),
     { name: 'arm_l', from: P('arm_l'), parent: 'body', reach: ARM, at: SHOULDER, z: -0.004 },
@@ -128,16 +142,17 @@ export async function makeGator(ctx, { seed = 0, scale = 1, green, res = 512, fa
   const G = (piece) => ['gator_sheet', piece];
   let parts;
   if (facing === 'side') parts = sideParts('gator_sheet', { head34: true });
-  // The turnarounds are sized to the side rig's standing height (hip to head top, ~0.053), so s09's side → back
-  // swap holds the figure's size. They're whole figures; turn_front is painted without arms (the rig adds them).
+  // The turnarounds are whole figures sized to the side rig standing (8 cm, sole to head top), so s09's side → back
+  // swap holds the figure's size; shoulders, eyes and arm length match the side rig's. turn_front is painted without
+  // arms (the rig adds them).
   else if (facing === 'front') parts = [  // root at the feet; the arms hang (rot90), so 0 = down
-    { name: 'body', from: G('turn_front'), size: [0.027, 0.053], pivot: [0.5, 1], at: [0, 0] },
-    { name: 'arm_l', from: G('arm_l'), parent: 'body', reach: 0.022, turn: 'rot90', at: [0.0115, 0.034], z: 0.002 },
-    { name: 'arm_r', from: G('arm_r'), parent: 'body', reach: 0.022, turn: 'rot90', at: [-0.0115, 0.034], z: 0.002 },
-    { name: 'eyes', from: null, parent: 'body', at: [0, 0.045], z: 0.001 },
-    { name: 'mouth', from: null, parent: 'body', at: [0, 0.039], z: 0.001 },
+    { name: 'body', from: G('turn_front'), size: [0.04, 0.08], pivot: [0.5, 1], at: [0, 0] },
+    { name: 'arm_l', from: G('arm_l'), parent: 'body', reach: ARM, turn: 'rot90', at: [0.0175, HIP + 0.030], z: 0.002 },
+    { name: 'arm_r', from: G('arm_r'), parent: 'body', reach: ARM, turn: 'rot90', at: [-0.0175, HIP + 0.030], z: 0.002 },
+    { name: 'eyes', from: null, parent: 'body', at: [0, HIP + 0.041], z: 0.001 },
+    { name: 'mouth', from: null, parent: 'body', at: [0, HIP + 0.035], z: 0.001 },
   ];
-  else if (facing === 'back') parts = [{ name: 'body', from: G('turn_back'), size: [0.027, 0.053], pivot: [0.5, 1], at: [0, 0] }];
+  else if (facing === 'back') parts = [{ name: 'body', from: G('turn_back'), size: [0.04, 0.08], pivot: [0.5, 1], at: [0, 0] }];
   else throw new Error(`makeGator: unknown facing "${facing}"`);
   const rig = await buildRig(ctx, { name: `gator-${facing}`, seed, scale, green, res, parts, faces: facing === 'back' ? null : FACES });
   rig.facing = facing;

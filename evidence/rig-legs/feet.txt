@@ -1,0 +1,10 @@
+$ node evidence/rig-legs/feet.mjs
+k 0 contact  hip  26.93  lift   0.00  near foot  -0.12  far foot  -0.02 mm  both down  ok
+k 1          hip  28.90  lift   1.97  near foot   0.88  far foot   0.03 mm  swing clears by 0.85 mm  ok
+k 2          hip  29.44  lift   2.51  near foot   0.63  far foot  -0.12 mm  swing clears by 0.75 mm  ok
+k 3          hip  30.16  lift   3.23  near foot   0.13  far foot  -0.07 mm  swing clears by 0.20 mm  ok
+k 4 contact  hip  26.93  lift   0.00  near foot  -0.07  far foot   0.08 mm  both down  ok
+k 5          hip  28.90  lift   1.97  near foot  -0.07  far foot   0.98 mm  swing clears by 1.05 mm  ok
+k 6          hip  29.44  lift   2.51  near foot  -0.27  far foot   0.73 mm  swing clears by 1.00 mm  ok
+k 7          hip  30.16  lift   3.23  near foot  -0.22  far foot   0.23 mm  swing clears by 0.45 mm  ok
+feet: PASS

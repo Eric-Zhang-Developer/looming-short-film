@@ -285,6 +285,17 @@ export const PIECES   // { name: { pieceName: [w, h, shape, paletteKey] } }: the
 - `sizes` comes from `PIECES` either way: rough sizes in meters seeded from the shot specs. A shot's own spec numbers win over it.
 - Every piece goes straight into `makePaper({ art: pieces.x, size, key, weight, seed })`.
 
+Added by `rig-legs` (additive; everything above still holds):
+
+```js
+load(name)  // → { pieces, sizes, visible, proxy }
+  // visible: { pieceName: [u0, v0, u1, v1] }: the box around the bitmap's opaque pixels (alpha ≥ 128), in uv, v down
+```
+
+- **`sizes[piece]` puts the visible shape at the PIECES size,** for proxies and frozen art alike. Bitmaps carry a transparent border (the proxy margin, `cut.mjs`'s `--pad`), so `sizes` is the whole bitmap's size, scaled so its opaque box spans the PIECES size along the PIECES long axis. It has the bitmap's own aspect, because `makePaper` never stretches art: it is exactly the sheet `makePaper` makes. The short axis follows the art (the torso proxy is drawn 0.9 of its box wide). Checked in `evidence/rig-legs/sizes.txt`: torn shapes within 1.4 % of PIECES on the long axis, proxy and fake frozen piece (the tear's own wobble), against 6.3 % short before.
+- A rig or shot placing a pivot in the visible shape maps it into the bitmap with `visible`: `u = u0 + u_shape · (u1 − u0)`, the same for v. `characters/` does this for every part.
+- `s01` pads its proxies locally on top of this; its final pass should drop that pad.
+
 ## `src/characters/` (task `char-rigs`)
 
 One rig per character, so every shot poses the same gator the same way. Every rig is built from `ctx.assets.load(...)` pieces, so it works on proxies today and on frozen art with no code change. Every builder returns a contract **Puppet** (§puppet): call `boil(t, rate)` and `face(...)` every frame, and `pose()` after `blend()` overrides.
@@ -368,11 +379,32 @@ export function walk(t, { set = 'side', step = 1/3, t0 = 0, rise = 0.003 })  // 
 | Standing | `stand` (s07, s09 `stand_side`, s18), `look_up`, `sigh` (s09), `nod` (s07) |
 | Curtains (s07) | `drill_a`, `drill_b`, `blow`, `crouch`, `lift_rod`, `tug`, `pull_curtain` |
 | Floor | `prone`, `prone_flick` (s07, s08), `yawn` (s08) |
-| Walks | `walk_side_a`, `walk_side_pass`, `walk_side_b` (s09, s18); `stand_front`, `walk_front_a`, `walk_front_pass`, `walk_front_b` — front (s10); `stand_back`, `walk_back_a`, `walk_back_pass`, `walk_back_b` — back (s09) |
+| Walks | `walk_side_a`, `walk_side_pass`, `walk_side_b`, `walk_side_pass_b` (s09, s18); `stand_front`, `walk_front_a`, `walk_front_pass`, `walk_front_b` — front (s10); `stand_back`, `walk_back_a`, `walk_back_pass`, `walk_back_b` — back (s09) |
 | Freshman (s18) | `freeze`, `glance_up` — freshman |
 | Roommates (s05) | `round_mash_a`, `round_mash_b`, `round_cheer_antic`, `round_cheer` — round; `tall_mash_a`, `tall_mash_b`, `tall_lean`, `tall_stand`, `walk_tall_a`, `walk_tall_pass`, `walk_tall_b` — tall |
 | Custodian (s14) | `walk_stoop_a`, `walk_stoop_pass`, `walk_stoop_b` (s14's `stoop_walk_a/b`), `mop_a`, `mop_b` — custodian |
 | Crowd (s16, s17) | `crowd_hunch`, `crowd_look_up`, `crowd_knob`, `crowd_write` — neighbor; `crowd_sleep` — sleeper |
 | Top view (s13) | `top_head_down`, `top_head_up`, `top_look_l`, `top_look_r`, `top_look_back` — heroTop |
+
+Added by `rig-legs` (Q9 (a), additive; where it differs from the text above, this wins):
+
+```js
+// gator.js
+export const HIP              // 0.02944: standing hip height, the root above the soles when the near leg is plumb (× scale)
+export function hipHeight(pose)  // → the root's height above the floor that puts the lower foot on it (scale 1, × scale),
+                                 //   from the pose's body + leg_r / leg_l angles (the proxy foot: round heel and toe)
+// poses.js
+export function specPose({ ..., leg, farLeg = leg })  // leg / farLeg: the near / far leg's WORLD angle in degrees,
+                                                      //   0 = straight down, + = foot forward (toward +x). Unset = not posed.
+walk(t, opts)  // → { keys, lift, hip } for the side set: hip = the root's height above the floor for this drawing
+               //   (× scale); lift = hip − its contact value; rise is unused. Other sets: { keys, lift } as before.
+```
+
+- **The Student and the Freshman have legs.** `gator_sheet` and `freshman_sheet` gain `leg_l` (far) and `leg_r` (near): short and stubby, a shin with a foot toward +x. Both hang from one pivot at the hip, behind the body (z −0.003 far, −0.001 near). Side rig parts are now: body (root), leg_l, leg_r, tail, arm_l, pocket, head, head34, snout, jaw, eyes, mouth, arm_r; the Freshman's the same with backpack and without pocket and head34.
+- **He stands 8 cm.** The root stays the hip, so s15's numbers (shoulder +0.030, eye +0.042, the K-path) are unchanged; standing, place the root `HIP × scale` above the floor (or `hipHeight(POSES[name]) × scale` for any floor pose). Measured on drawn pixels: 79.8 mm sole to head top (`evidence/rig-legs/height.txt`). The blob ratio (README §1) holds again.
+- **The turnarounds** (`facing: 'front' | 'back'`) are now 0.04 × 0.08, root still at the feet, with shoulders at HIP + 0.030, eyes at HIP + 0.041 and arm reach 0.032, matching the side rig.
+- **Leg angles by stance** (poses.js): seated poses tuck the legs forward (near 60°, far 54°), clear of the floor at s15's seat; kneels fold them back (−90°) with the hip 0.011 above the floor (s04's 0.06 kneeling height); standing poses have the near leg plumb and the far foot 8° ahead; `crouch` puts both feet ahead (hip 2.9 mm down, s07's −3 mm); `prone`, `prone_flick` and `yawn` lay them flat behind.
+- **The side walk has real foot contacts.** Contact: trailing leg −45° on its toe, leading leg +27.7° on its heel, both on the floor and 0.024 apart (s18's step length; move the root 0.024 × scale per step and the planted foot doesn't skate). The swing leg stays back (−36°) through the pass, so the set has a second pass, **`walk_side_pass_b`** (new pose; the walk is a → pass → b → pass_b). Place the root at `walk().hip × scale`. `evidence/rig-legs/feet.txt`: every drawing has the stance foot on the floor (±0.5 mm) and the swing foot above it; both feet down on contact.
+- Art convention for the cutter: legs vertical, hip end up, foot pointing +x. `hipHeight` uses the proxy foot's shape; re-measure it from the cut `leg_l` when art lands.
 
 A shot whose numbers differ from a named pose builds its own with `specPose` (the specs' numbers win). New poses go into `poses.js` through this task's owner or a `contract-characters` task.
