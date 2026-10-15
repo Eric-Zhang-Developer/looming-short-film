@@ -34,9 +34,10 @@
 ### wave 4 prep
 - mod-film · builder · `index.html`, `src/film.js`, `src/assets.js`, `src/shots/`, contracts §film/§assets/§shots · verified (merged) · evidence/mod-film/film_sheet.jpg
 - char-rigs · builder · `src/characters/`, `lab/characters.*`, contracts §characters · in-progress · —
+- proxy-margin · builder · `src/assets.js` · in-progress · —
 
 ### wave 4 · animatic (brief: `tasks/anim-shot.md`)
-- anim-s01 · builder · `src/shots/s01.js` · in-progress · —
+- anim-s01 · builder · `src/shots/s01.js` · verified (merged) · evidence/anim-s01/sheet.jpg
 - anim-s13 · builder · `src/shots/s13.js` · in-progress · —
 
 ### parallel track: storyboard (docs)
