@@ -1,0 +1,8 @@
+t=3  23f454ca6da23fe0 23f454ca6da23fe0 23f454ca6da23fe0  PASS
+t=52  359574da21f602af 359574da21f602af 359574da21f602af  PASS
+t=57  484c73b6aea8b21d 484c73b6aea8b21d 484c73b6aea8b21d  PASS
+t=92  1a1a99ce1e5135cd 1a1a99ce1e5135cd 1a1a99ce1e5135cd  PASS
+t=1000  364110cc0c91c59e 364110cc0c91c59e 364110cc0c91c59e  PASS
+t=2000.125  d80dbde6a4eddba5 d80dbde6a4eddba5 d80dbde6a4eddba5  PASS
+t=2000.5  ffde71ca01ffa219 ffde71ca01ffa219 ffde71ca01ffa219  PASS
+determinism: PASS

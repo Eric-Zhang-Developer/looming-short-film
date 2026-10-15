@@ -268,3 +268,95 @@ export const PIECES   // { name: { pieceName: [w, h, shape, paletteKey] } }: the
 - **Proxies** otherwise: a flat silhouette in the asset's palette colour on a transparent background, at the piece's rough proportions (a gator-ish shape for gator parts, rectangles, rounded rectangles, ellipses or tapers for the rest). `proxy` is true, and that flag is the label: a proxy carries no text.
 - `sizes` comes from `PIECES` either way: rough sizes in meters seeded from the shot specs. A shot's own spec numbers win over it.
 - Every piece goes straight into `makePaper({ art: pieces.x, size, key, weight, seed })`.
+
+## `src/characters/` (task `char-rigs`)
+
+One rig per character, so every shot poses the same gator the same way. Every rig is built from `ctx.assets.load(...)` pieces, so it works on proxies today and on frozen art with no code change. Every builder returns a contract **Puppet** (§puppet): call `boil(t, rate)` and `face(...)` every frame, and `pose()` after `blend()` overrides.
+
+```js
+// gator.js: the Student (gator_sheet + face_sheet)
+export async function makeGator(ctx, { seed = 0, scale = 1, green, res = 512, facing = 'side' } = {})
+  // → Puppet + { hand, hands, head34(on), facing, scale }
+  // ctx: anything with ctx.assets (the shot ctx). seed salts the paper keys, so two rigs never share a tear.
+  // green: a CSS colour that tints the green pieces (default: the art as painted). res: paper px on the long edge (1024 for close-ups).
+  // facing 'side' parts: body (root), tail, arm_l (far), pocket, head, head34 (hidden), snout, jaw, eyes, mouth, arm_r (near)
+  // facing 'front' (turn_front) parts: body, arm_l, arm_r, eyes, mouth.   facing 'back' (turn_back) parts: body
+export function greenVariant(i)          // → a CSS colour: the i-th green, mixed from PALETTE (crowds, roommates, custodian)
+
+// freshman.js
+export async function makeFreshman(ctx, { seed = 0, scale = 0.85, green, res = 512 } = {})
+  // freshman_sheet, the side rig at 0.85×: body, tail, backpack, arm_l, head, snout, jaw, eyes, mouth, arm_r (no pocket, no head34)
+
+// roommates.js (s05)
+export async function makeRoommateTall(ctx, { seed = 0, scale = 1, green = greenVariant(2), res = 512 } = {})
+  // body (root at the hip), leg_l, leg_r, tail, arm_l, head, eyes, mouth, arm_r. Standing feet are 0.027 × scale below the hip.
+export async function makeRoommateRound(ctx, { seed = 0, scale = 1, green = greenVariant(3), res = 512 } = {})
+  // body (one piece, root at its bottom), arm_l, arm_r, eyes, mouth
+
+// custodian.js (s14)
+export async function makeCustodian(ctx, { seed = 0, scale = 1, green = greenVariant(4), res = 512 } = {})
+  // body (root at the feet), tail, arm_l, mop (pivot at the handle top), head, cap, arm_r
+export async function makeCart(ctx, { seed = 0, scale = 1, res = 512 } = {})
+  // frame (root at its bottom center), tray, bucket
+
+// crowd.js (s13, s16, s17)
+export async function makeCrowd(ctx, who, { seed = 0, scale = 1, green, res = 512 } = {})
+  // who: 'neighbor' | 'sleeper' (crowd_sheet, side view): body (root at the hip), head, arm_r. green defaults per who.
+export async function makeHeroTop(ctx, { seed = 0, scale = 1, res = 512 } = {})
+  // top_figures_sheet hero_top, seen from above: body (root at its center), tail, backpack, head, eyes, arms
+export async function makeSeated(ctx, n, { seed = 0, scale = 1, green = greenVariant(n), res = 512 } = {})
+  // n 1..6: top_figures_sheet seated_n as a one-part Puppet (part body, pivot at its center)
+
+// exam.js: the hero's blob. Q5 (a): the body stays 0.012 and shrinks only in s16. Change the numbers here and only here.
+export const EXAM_R                       // 0.012 (docs/shots/README.md §1)
+export const SHRINK                       // [0.012, 0.0105, 0.009, 0.008, 0.007, 0.006, 0.005]: r after n problems solved
+export const BLOB_R                       // { freshman: 0.012, neighbor: 0.013, custodian: 0.004, sleeper17: 0.006 }
+export function examRadius(shot, solved = 0)   // → r: SHRINK[solved] in s16, 0.005 in s17 and s18, else EXAM_R
+export function makeExam({ shot, seed = 1 })   // → createBlob({ radius: examRadius(shot), seed }) + { radius, scaleAt(solved) }
+  // scaleAt(n) = examRadius(shot, n) / radius: multiply it into the mesh scale for s16's shrink steps
+
+// poses.js
+export const POSES        // { name: { part: radians } }: every named pose below, plain objects for Puppet.blend/pose
+export const POSE_INFO    // { name: { rig, shots: ['s06', ...] } }: which rig takes it and which shots use it
+                          // rig: gator | front | back | freshman | tall | round | custodian | neighbor | sleeper | heroTop
+export function specPose({ lean = 0, arm = -70, far = arm - 10, head = 0, jaw = 0, tail = 0 })  // degrees → joint radians
+export function pressKeys(t0 = 0)                  // → blend keys for s15's K0–K7 hand path, starting at t0
+export function walk(t, { set = 'side', step = 1/3, t0 = 0, rise = 0.003 })  // → { keys, lift }
+```
+
+**The s15 convention** (`specPose`, every side rig). `lean` is the body's rotation about the hip in degrees, + forward (toward +x). `arm` is the near arm's **world** angle, 0 = +x, − = down; `far` is the far arm's. `head` is the head joint's angle on the body, + = snout up. `jaw` + = open. `tail` + = tip up. At scale 1 the shoulder is hip + (0.013, 0.030) rotated by the lean, and shoulder to fingertip is exactly 0.032, so the specs' fingertip tables hold: at s15's hip, `rest` (K0) puts `hand` at (−0.0511, −0.0121) against the spec's (−0.051, −0.012); every K-path tip lands within 0.6 mm (`evidence/char-rigs/tips.txt`). `specPose` only sets the parts it names, and `far: null` drops `arm_l` (one-armed crowd rigs).
+
+**Rig rules.**
+- Every rig faces **+x** (the top-view rigs face +y). A shot that needs it facing −x sets `group.scale.x = -1` and keeps the unmirrored angles (s18's `180° − angle` is what the mirror does for you). Rigs never touch their own `group` transform, so the shot owns its position, mirror and scale.
+- **Root** = the hip for seated side rigs, which is also the feet when standing: `gator_sheet` has no legs, so standing he is about 0.053 tall (hip to head top), not 8 cm. The front and back turnarounds are sized to match. Place the group at s15's hip (−0.075, −0.012) at the desk, on the floor when standing, and 0.012 above the floor for `prone` (a pose can't carry translation).
+- **z** (desk unit, README §2): body 0, pocket +0.003, near arm +0.012, far arm −0.004, all × scale. Put the group at the body plane (z 0.074 at the desk).
+- `hand` is a `THREE.Group` at the near fingertip (`hands.arm_l` is the far one). Add a phone or pen to it.
+- `head34(on)` swaps the side head, snout and jaw for `turn_head34` (s14). It's stateful: call it every frame in a shot that uses it.
+- `facing: 'front'` arms hang at 0; + swings the tip toward +x, so in s10 `arm_r` swung out is −25°.
+- Faces: every take of a slot is padded to one slot size, so `face()` never throws on size. Eyes `open, closed, tired, gasp, worried, side`; mouths `neutral, smile, o, line` (the hero top has eyes only, the custodian, cart, crowd and seated figures none).
+- `walk()` loops pose keys `<set>_a → <set>_pass → <set>_b → <set>_pass` with one step per `step` seconds, so `blend()` draws contact, down, pass and up on 2s. `lift` is the root's rise for this drawing (+`rise` on the pass, × your scale is on you). Sets: `side` (`walk_side_*`), `front`, `back`, `tall`, `stoop`. Feed `keys` to `blend(POSES, keys, t)`; walk poses carry their own tail swing, so don't `follow('tail')` while walking.
+
+**Art conventions for the cutter** (so frozen art drops in): side-view pieces as seen facing +x; arms horizontal, shoulder end left; tails pointing −x, root right; legs and the mop vertical, top end up; `hero_tail` pointing down. `turn_front` is painted **without arms** (the rig adds them).
+
+**Poses.** `name — rig — shots`. Gator side rig unless noted; numbers are in `poses.js`.
+
+| Group | Poses (shots) |
+|---|---|
+| Lamp press (K0–K7) | `rest` (s06, s15, s17), `reach_antic`, `reach_lift`, `reach`, `touch`, `press` (s06, s15; s18 mirrors them standing) |
+| Startle | `recoil` (s06), `lean_away` (s06) |
+| Sitting | `sit` (s11 `sit_upright`, s14 `sit_watch`, s15), `sit_screen` (s11), `sit_back` (s17), `slump` (s02, s03), `shrug` (s03), `head_down` (s12), `exhale` (s15) |
+| Phone | `grab` (s06, s15), `grip` (s06, s11, s15), `lift_phone` (s03, s11), `scroll` (s03, s05, s06, s11 `sit_phone_hunch`), `scroll_flick` (s03, s05, s06) |
+| Laptop | `lid_reach`, `lid_lift` (s11) |
+| Writing | `write_a`, `write_b`, `write_c` (s15, s16, s17), `poise` (s15, s16), `uncap`, `uncap_pull` (s15), `brace`, `solve`, `think`, `flip` (s16) |
+| Kneeling (s04) | `kneel_reach`, `kneel_antic`, `inspect`, `place`, `shake_a`, `shake_b`, `sit_heels` |
+| Standing | `stand` (s07, s09 `stand_side`, s18), `look_up`, `sigh` (s09), `nod` (s07) |
+| Curtains (s07) | `drill_a`, `drill_b`, `blow`, `crouch`, `lift_rod`, `tug`, `pull_curtain` |
+| Floor | `prone`, `prone_flick` (s07, s08), `yawn` (s08) |
+| Walks | `walk_side_a`, `walk_side_pass`, `walk_side_b` (s09, s18); `stand_front`, `walk_front_a`, `walk_front_pass`, `walk_front_b` — front (s10); `stand_back`, `walk_back_a`, `walk_back_pass`, `walk_back_b` — back (s09) |
+| Freshman (s18) | `freeze`, `glance_up` — freshman |
+| Roommates (s05) | `round_mash_a`, `round_mash_b`, `round_cheer_antic`, `round_cheer` — round; `tall_mash_a`, `tall_mash_b`, `tall_lean`, `tall_stand`, `walk_tall_a`, `walk_tall_pass`, `walk_tall_b` — tall |
+| Custodian (s14) | `walk_stoop_a`, `walk_stoop_pass`, `walk_stoop_b` (s14's `stoop_walk_a/b`), `mop_a`, `mop_b` — custodian |
+| Crowd (s16, s17) | `crowd_hunch`, `crowd_look_up`, `crowd_knob`, `crowd_write` — neighbor; `crowd_sleep` — sleeper |
+| Top view (s13) | `top_head_down`, `top_head_up`, `top_look_l`, `top_look_r`, `top_look_back` — heroTop |
+
+A shot whose numbers differ from a named pose builds its own with `specPose` (the specs' numbers win). New poses go into `poses.js` through this task's owner or a `contract-characters` task.

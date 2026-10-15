@@ -1,0 +1,4 @@
+poses 92 missing from contract: none
+exports missing: none
+no clocks or Math.random
+git diff --numstat cf6fa59 -- docs/contracts.md → 92 added, 0 removed

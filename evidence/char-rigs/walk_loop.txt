@@ -1,0 +1,6 @@
+gator      odd-frame changes 0/17  loop mismatches 0/18  distinct drawings per cycle 7  PASS
+front      odd-frame changes 0/17  loop mismatches 0/18  distinct drawings per cycle 7  PASS
+back       odd-frame changes 0/17  loop mismatches 0/18  distinct drawings per cycle 7  PASS
+tall       odd-frame changes 0/17  loop mismatches 0/18  distinct drawings per cycle 7  PASS
+custodian  odd-frame changes 0/17  loop mismatches 0/18  distinct drawings per cycle 7  PASS
+walk loop: PASS
