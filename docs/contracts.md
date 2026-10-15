@@ -32,7 +32,8 @@ export const PALETTE                     // { navy, cream, gator, kraft, phone, 
 
 // stage.js: one renderer, scene and camera per page
 export function createStage({ width = 1920, height = 1080, fov = 20 } = {})
-  // → { renderer, scene, camera, onFrame(fn), renderFrame(t), ready: Promise }
+  // → { renderer, scene, camera, onFrame(fn), renderFrame(t), setRender(fn), ready: Promise }
+  // setRender(fn) replaces the final draw call (default: renderer.render(scene, camera)); post.js uses it.
   // renderFrame(t) runs every onFrame(fn) callback with t, renders synchronously, then returns.
   // The renderer uses preserveDrawingBuffer, PCFShadowMap, sRGB output and NoToneMapping (doc 03 grades color in post, not via tone mapping).
 export function exposeForRender(stage, { duration, fps = 24 })
