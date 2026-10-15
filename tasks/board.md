@@ -32,7 +32,7 @@
 - snd-score-reveal · builder · `src/audio/score.js` · verified (merged) · evidence/snd-score-reveal/timeline.png
 
 ### wave 4 prep
-- mod-film · builder · `index.html`, `src/film.js`, `src/assets.js`, `src/shots/`, contracts §film/§assets/§shots · in-progress · —
+- mod-film · builder · `index.html`, `src/film.js`, `src/assets.js`, `src/shots/`, contracts §film/§assets/§shots · verified (merged) · evidence/mod-film/film_sheet.jpg
 
 ### parallel track: storyboard (docs)
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · built (merged) · done/sb-act1.md
