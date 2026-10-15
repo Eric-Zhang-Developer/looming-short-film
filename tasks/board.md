@@ -31,7 +31,7 @@
 - sb-act1 · builder (docs) · `docs/shots/` (s01–s08) · in-progress · —
 - sb-act2 · builder (docs) · `docs/shots/` (s09–s14) · in-progress · —
 - sb-act3 · builder (docs) · `docs/shots/` (s15–s18) · in-progress · —
-- snd-engine · builder · `src/audio/`, `tools/mix.mjs` · in-progress · —
+- snd-engine · builder · `src/audio/`, `tools/mix.mjs` · verified (merged) · evidence/snd-engine/loudness.txt
 
 ### wave 3, started early
 - asset-style-tile · painter · `assets/prompts/style_tile.v2.md`, `assets/specs.json` (style_tile), `tools/gen.mjs` (fixes), `assets/raw/thumbs/`, `evidence/asset-style-tile/`, `done/asset-style-tile.md` · in-progress · —
