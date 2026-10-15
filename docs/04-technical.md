@@ -121,7 +121,7 @@ Marston extras are `InstancedMesh` silhouettes cut from 4–6 generated poses, e
 ## Timeline and shots
 
 - `timeline.js` is the single source of truth: an ordered list of shots, each with `start`, `duration` and named beats (`{ lampClickHome: 0.36 }` in local time). Sound cues reference beat names.
-- One file per shot in `src/shots/`, exporting `build(scene)` and `update(scene, tLocal)`.
+- One file per shot in `src/shots/`, exporting `build(ctx) → { update(tLocal), dispose?() }` (contract: `docs/contracts.md` §shots).
 - `tools/check_timeline.mjs` (port from KnightHacks): no gaps, no overlaps, total 3:00 ±5 s, every cue resolves.
 
 ## Rendering
