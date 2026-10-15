@@ -85,4 +85,4 @@
 - contract-sensor · builder · `src/lights.js` (sensorLight), `src/timeline.js` renames, cues/foley · verified (merged) · evidence/contract-sensor/sensor_strip.jpg
 - spec-blob-meter · builder (docs) · doc 02/03/05 blob parts, shots README/QUESTIONS/s01–s18 · in-progress · —
 - asset-face-sheet · painter · `assets/prompts/face_sheet.v1.md`, specs face_sheet · in-progress · —
-- reel-s15 · builder · `src/shots/s15.js` (sensor turn: pen trips the light) · in-progress · —
+- reel-s15 · builder · `src/shots/s15.js` (sensor turn: pen trips the light) · built (merged, v1 reel) · evidence/reel-s15/sheet.jpg
