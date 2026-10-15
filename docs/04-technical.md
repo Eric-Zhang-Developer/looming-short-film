@@ -75,7 +75,7 @@ Extend `MeshLambertMaterial` with `onBeforeCompile`:
 |---|---|---|
 | Phone | `SpotLight`, wide angle (~70°), short `distance`, `decay` 2, cyan | A spot, not a point light: one shadow map instead of six. Placed low and close to the blob. |
 | Desk lamp | `SpotLight`, narrow (~35°), amber, soft `penumbra` | Paired with a vellum cone mesh and 20–40 dust specks |
-| Fluorescent | `RectAreaLight` for color plus a dim `DirectionalLight` for shadows | Flicker driven by a seeded noise curve on `t` |
+| Fluorescent | One dim `DirectionalLight` (RectAreaLight has no effect on Lambert paper in r186) | Flicker driven by a seeded noise curve on `t` |
 | Dawn / window | `DirectionalLight`, color animated cold to gold | One large soft shadow |
 | Ambient | `HemisphereLight`, very low | Navy above, kraft below |
 
