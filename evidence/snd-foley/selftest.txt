@@ -1,0 +1,28 @@
+range 0:180 s  premix -21.48 LUFS, -4.83 dBTP  →  loudnorm dynamic
+mix.wav  integrated -14.5 LUFS  true peak -1.2 dBTP (ebur128)  /  -14.49 LUFS, -1.50 dBTP (loudnorm pass 2)  target -14 LUFS, ≤ -1 dBTP
+2bf282f1a525dbccad079661e196274de4c98162a9f4b22a6ce6ef5086fc73aa  /Users/ericzhang/.worktrees/looming/snd-foley/out/audio/mix.wav
+--- selftest
+    lampClickHome@36.5s, lampClickMarston@100.5s, lampClickFreshman@164s; 24000 samples each (±0.1 s), peak 0.5645
+ok  three lamp clicks are sample-identical in out/audio/stems/foley.wav
+ok  voices and foley are deterministic and finite
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+AssertionError [ERR_ASSERTION]: Missing expected exception.
+    at file:///Users/ericzhang/.worktrees/looming/snd-foley/src/audio/selftest.js:35:59
+    at ok (file:///Users/ericzhang/.worktrees/looming/snd-foley/src/audio/selftest.js:15:28)
+    at file:///Users/ericzhang/.worktrees/looming/snd-foley/src/audio/selftest.js:35:1
+    at ModuleJob.run (node:internal/modules/esm/module_job:413:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:660:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: undefined,
+  expected: /not implemented/,
+  operator: 'throws',
+  diff: 'simple'
+}
+
+Node.js v24.13.0
+exit 1
