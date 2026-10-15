@@ -89,6 +89,7 @@ export function makePaper({
   key,          // stable string for caching, e.g. 'wall-apt'
   seed = 0,     // boil seed: pass boilSeed(t, rate)
   res = 1024,   // texture px on the long edge
+  rim = 'auto', // 'auto' | 'none' | 'broken' (look-pass-1); see below
 })  // → PaperSheet { map, alphaMap, thickness, size: [w, h], key, seed }
 
 export function boilSeed(t, rate = 10)     // floor(t * rate); quiet shots pass rate = 4
@@ -96,6 +97,8 @@ export function clearPaperCache()
 ```
 
 What it does: it builds the silhouette from the art's alpha (or `path`), tears the edge along its normals with layered noise scaled by weight, adds a pale fiber rim and grain, and caches by `(key, seed, res)`. Painted art keeps its colors; only the edge and grain are added.
+
+Rim (look-pass-1): no rim is ever a constant-width band around a whole shape. `'broken'` adds a thin near-white fiber rim whose width wanders and which has long, irregular breaks. `'none'` adds no rim; if the art already has a painted pale rim (measured once per asset: an edge clearly lighter than the body), that rim is thinned and broken the same way by resampling the painting from further in. `'auto'` is `'none'` on art with a painted pale rim and `'broken'` otherwise. The cache key includes `rim`. A plain `path` fill also gets large mottling and dry-brush streaks scaled by the weight's grain. The sheet cache is an LRU capped by texels (256 M), sized so a held 10 s shot of 8 sheets at 1024 px fits and a second pass hits.
 
 ## `src/material.js` (task `mod-material`)
 
@@ -111,9 +114,10 @@ The paper material is Lambert plus a back-light translucency term (doc 04) and a
 ## `src/lights.js` (task `mod-lights`)
 
 ```js
-export function phoneLight({ color = PALETTE.phone, intensity, angle = 1.2, distance = 0.6 } = {})  // → SpotLight, shadow on
-export function lampLight({ color = PALETTE.lamp, intensity, angle = 0.6, penumbra = 0.5 } = {})
+export function phoneLight({ color = PALETTE.phone, intensity, angle = 1.2, distance = 0.6, penumbra = 0.45 } = {})  // → SpotLight, shadow on
+export function lampLight({ color = PALETTE.lamp, intensity, angle = 0.6, penumbra = 0.5, reach = 2.5 } = {})
   // → { light: SpotLight, cone: Mesh (vellum cone), dust: Points (20–40 specks), update(t) }
+  //   the cone runs reach × the light→target distance, so the surface the light lands on cuts it off at the pool
 export function dawnLight()                    // → { light: DirectionalLight, update(t, k) }  k: 0 = cold night, 1 = gold
 export function fluorescent({ flickerSeed })   // → { light, update(t) }  seeded flicker
 export function ambient()                      // → HemisphereLight, very low (navy above, kraft below)
@@ -177,6 +181,8 @@ export function loadLUT(name)  // → texture for the per-act color grade (doc 0
 ```
 
 There's no bloom pass.
+
+The `night` grade (look-pass-1) is a bright picture-book night: navy stays a saturated colour and only cast shadows go near-black. It keeps doc 03's intent: cool, not grey.
 
 ## `src/audio/` (task `snd-engine`)
 

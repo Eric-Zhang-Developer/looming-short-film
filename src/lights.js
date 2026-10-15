@@ -67,20 +67,24 @@ export function aim(spot, target) {
 // ---------- rigs ----------
 
 // Low, close, wide cyan wedge. Shadow on. Place it with placeForScale, then aim it at the subject.
-export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle = 1.2, distance = 0.6 } = {}) {
-  return shadowed(new THREE.SpotLight(c, intensity, distance, angle, 0.45, 2), { bias: -0.0004 });
+// penumbra near 1 turns the hard fan on the desk into a soft fall-off.
+export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle = 1.2, distance = 0.6, penumbra = 0.45 } = {}) {
+  return shadowed(new THREE.SpotLight(c, intensity, distance, angle, penumbra, 2), { bias: -0.0004 });
 }
 
 // Overhead amber spot with a vellum cone and drifting dust. update(t) re-fits the cone and dust
 // to the light's current position and target, so move/aim the light first, then update.
+// The cone runs `reach` × the light→target distance, well past the target, so whatever the light lands on
+// (desk, floor) cuts it off by depth where the pool is: the vellum meets its own pool, even when the cone
+// is slanted. With no receiver it softens out over its last 30% instead of ending in a hard disc.
 // Add light, light.target, cone and dust to the scene root (dust is in world space).
-export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.6, penumbra = 0.5, seed = 1 } = {}) {
+export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.6, penumbra = 0.5, seed = 1, reach = 2.5 } = {}) {
   const light = shadowed(new THREE.SpotLight(c, intensity, 0, angle, penumbra, 2), { radius: 2, bias: -0.0003 });
 
   // Unit cone: apex at the origin, opening down −Y, length 1. Scaled to the light→target distance.
   const geo = new THREE.ConeGeometry(1, 1, 64, 1, true).translate(0, -0.5, 0);
   const cone = new THREE.Mesh(geo, new THREE.ShaderMaterial({
-    uniforms: { uColor: { value: new THREE.Color() }, uStrength: { value: 0.07 } },
+    uniforms: { uColor: { value: new THREE.Color() }, uStrength: { value: 0.1 }, uReach: { value: reach } },
     vertexShader: /* glsl */`
       varying vec2 vUv; varying vec3 vN; varying vec3 vV;
       void main() {
@@ -90,14 +94,20 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
         gl_Position = projectionMatrix * mv;
       }`,
     fragmentShader: /* glsl */`
-      uniform vec3 uColor; uniform float uStrength;
+      uniform vec3 uColor; uniform float uStrength, uReach;
       varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+      float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y); }
       void main() {
         float along = 1.0 - vUv.y;                                   // 0 at the apex, 1 at the open end
         float rim = 1.0 - abs(dot(normalize(vN), normalize(vV)));    // frosted vellum catches light at its edges
-        float fade = smoothstep(0.0, 0.12, along) * (1.0 - smoothstep(0.45, 1.0, along));  // gone by the target
-        float folds = 0.85 + 0.15 * sin(vUv.x * 6.2831853 * 9.0);   // faint folds in the sheet
-        gl_FragColor = vec4(uColor * uStrength * fade * folds * (0.25 + 0.75 * rim * rim), 1.0);
+        float a = along * uReach;                                    // 0 at the apex, 1 at the target
+        float fade = smoothstep(0.0, 0.15, a) * (1.0 - smoothstep(0.7 * uReach, uReach, a));  // full strength to the target and well past it
+        float folds = 0.88 + 0.12 * sin(vUv.x * 6.2831853 * 7.0 + 0.6 * sin(vUv.y * 9.0));  // soft, slightly bent folds
+        float frost = 0.7 + 0.3 * vn(vec2(vUv.x * 60.0, vUv.y * 24.0)) + 0.15 * vn(vec2(vUv.x * 220.0, vUv.y * 90.0)) - 0.075;  // vellum fibre
+        float edge = 0.45 + 0.55 * rim * rim - 0.5 * smoothstep(0.9, 1.0, rim);  // bright toward the sides, soft right at the silhouette
+        gl_FragColor = vec4(uColor * uStrength * fade * folds * frost * edge, 1.0);
         #include <colorspace_fragment>
       }`,
     transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
@@ -131,7 +141,7 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
   function update(t) {
     cone.visible = dust.visible = light.visible;
     light.getWorldPosition(apex); light.target.getWorldPosition(tip);
-    const len = apex.distanceTo(tip);
+    const len = apex.distanceTo(tip) * reach;
     const rad = Math.tan(light.angle * (1 - 0.5 * light.penumbra));
     axis.subVectors(tip, apex).normalize();
     cone.position.copy(apex);
@@ -142,7 +152,7 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
     b1.set(1, 0, 0).applyQuaternion(cone.quaternion); b2.set(0, 0, 1).applyQuaternion(cone.quaternion);
     const pos = dustGeo.attributes.position, col = dustGeo.attributes.color;
     specks.forEach((s, i) => {
-      const h = (s.h + 0.04 * Math.sin(s.w * t + s.ph)) * len;   // along the axis, inside the lit part
+      const h = (s.h + 0.04 * Math.sin(s.w * t + s.ph)) * len / reach;   // along the axis, above the target
       const th = s.th + s.spin * t;
       const r = s.rho * h * rad * (1 + 0.08 * Math.sin(0.7 * s.w * t + 2 * s.ph));
       p.copy(apex).addScaledVector(axis, h).addScaledVector(b1, Math.cos(th) * r).addScaledVector(b2, Math.sin(th) * r);

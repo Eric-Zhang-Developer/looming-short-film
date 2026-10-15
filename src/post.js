@@ -10,7 +10,7 @@ import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 
 // Doc 03 color script as grades on display-referred (sRGB) color. gain tints the highlights, lift tints the shadows.
 const GRADES = {
-  night:   { gain: [0.74, 0.86, 1.06], lift: [0.02, 0.035, 0.09], sat: 0.92, contrast: 1.08, gamma: 1.12 }, // navy night, first cyan
+  night:   { gain: [0.86, 0.94, 1.08], lift: [0.03, 0.045, 0.11], sat: 1.06, contrast: 1.0, gamma: 0.86 }, // picture-book night: navy reads as a colour, cool not grey
   marston: { gain: [0.86, 1.02, 0.90], lift: [0.00, 0.035, 0.018], sat: 0.55, contrast: 1.14, gamma: 1.18 }, // fluorescent green-white, drained and heavy
   amber:   { gain: [1.14, 0.98, 0.72], lift: [0.045, 0.015, 0.00], sat: 1.08, contrast: 1.05, gamma: 0.95 }, // act 3: lamp amber takes the frame
   dawn:    { gain: [1.08, 1.00, 0.84], lift: [0.015, 0.03, 0.06], sat: 0.95, contrast: 0.90, gamma: 0.92 },  // gold highlights, cold shadows, soft

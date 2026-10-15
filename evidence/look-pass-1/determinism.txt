@@ -1,0 +1,35 @@
+$ node tools/determinism.mjs --page=lab/lookdev.html --t=1,4.95,5,7.45,9.5
+t=1  bb258b3893a76add bb258b3893a76add bb258b3893a76add  PASS
+t=4.95  c5ec2753497ceca5 c5ec2753497ceca5 c5ec2753497ceca5  PASS
+t=5  5a9f39975c33f199 5a9f39975c33f199 5a9f39975c33f199  PASS
+t=7.45  baaaf04734121f35 baaaf04734121f35 baaaf04734121f35  PASS
+t=9.5  c1d1bad9273f96ec c1d1bad9273f96ec c1d1bad9273f96ec  PASS
+determinism: PASS
+exit 0
+
+$ node tools/determinism.mjs --page=lab/paper.html --t=0.5,12,33,55
+t=0.5  674acd8b4affd4e5 674acd8b4affd4e5 674acd8b4affd4e5  PASS
+t=12  fa1c8f108c5bc38a fa1c8f108c5bc38a fa1c8f108c5bc38a  PASS
+t=33  5daac742163cf232 5daac742163cf232 5daac742163cf232  PASS
+t=55  f335f2d627fd4246 f335f2d627fd4246 f335f2d627fd4246  PASS
+determinism: PASS
+exit 0
+
+$ node tools/determinism.mjs --page=lab/post.html --t=1,4,6.5
+t=1  8a5887c0ca9a20e7 8a5887c0ca9a20e7 8a5887c0ca9a20e7  PASS
+t=4  ef11570f57341a47 ef11570f57341a47 ef11570f57341a47  PASS
+t=6.5  c66bc2d58d74922b c66bc2d58d74922b c66bc2d58d74922b  PASS
+determinism: PASS
+exit 0
+
+$ node tools/determinism.mjs --page=lab/lights.html --t=1,3,5,7.5
+t=1  a967c8d5be4a0f77 a967c8d5be4a0f77 a967c8d5be4a0f77  PASS
+t=3  172937e7120f48e8 172937e7120f48e8 172937e7120f48e8  PASS
+t=5  fe7c2c8c2ed7ae91 fe7c2c8c2ed7ae91 fe7c2c8c2ed7ae91  PASS
+t=7.5  1019ff07186b8c14 1019ff07186b8c14 1019ff07186b8c14  PASS
+determinism: PASS
+exit 0
+
+$ grep -nE "Math.random|Date.now|performance.now" src/paper.js src/post.js src/lights.js lab/lookdev.js
+src/paper.js:71:// ---------- noise (seeded through core/rng's hash; no Math.random) ----------
+exit 0 (1 = no matches)

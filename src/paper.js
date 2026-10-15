@@ -6,8 +6,11 @@
 // noise read along the rim at q becomes streaks that run across the edge, like fibers.
 //   cut = wobble (smooth, seeded by key only, so the silhouette holds still) + jag (linear-interpolated value
 //   noise, so it has corners instead of lumps; re-seeded by the boil seed).
-// The fiber rim is a pale band just inside the cut, plus a few hairs poking out past it. Only the band near the
-// edge is recomputed per boil seed; the SDF, fill and grain are built once per (key, res).
+// The rim (opts.rim) is never a constant band: 'broken' adds a thin near-white fiber rim that wanders in width and
+// has gaps; 'none' adds nothing, and if the art already has a painted pale rim it thins that one and opens gaps in it
+// (pixels near the edge resample the painting from further in). 'auto' is 'none' for art with a painted pale rim,
+// else 'broken'. A few hairs poke out past the cut either way. Only the band near the edge is recomputed per boil
+// seed; the SDF, fill, grain and painted-rim measurement are built once per (key, res).
 import * as THREE from 'three';
 import { hash, mulberry32, seedOf } from './core/rng.js';
 import { PALETTE } from './core/palette.js';
@@ -24,33 +27,43 @@ export const WEIGHTS = Object.freeze({
 // floor(t * rate); the epsilon keeps frame times like 7/10 from landing a hair under the step.
 export const boilSeed = (t, rate = 10) => Math.floor(t * rate + 1e-6);
 
-const CAP = 300;
-const sheets = new Map();  // `${key}|${seed}|${res}` → PaperSheet, in least-recently-used order
+const RIMS = ['auto', 'none', 'broken'];
+// The sheet cache is an LRU capped by texels, not entries, so a shot's worth of boil steps fits whatever the res:
+// a held 10 s shot of 8 sheets at 1024 px is 40 steps × ~5.7 M texels ≈ 230 M (evidence/look-pass-1/timing.txt).
+// A sequential replay through an LRU smaller than the shot misses every time, so the cap must hold the whole shot.
+// ponytail: memory grows with the cap (that 10 s shot, fully cached, measured 1.0 GB Chrome RSS); a 25 s held shot
+// at 4 Hz (~575 M texels) won't fit and replays cold. Store the alpha as one channel, or clear per shot, if that bites.
+const CAP_TEXELS = 256 * 1024 * 1024;
+let texels = 0;
+const area = (s) => s.map.image.width * s.map.image.height;
+const sheets = new Map();  // `${key}|${seed}|${res}|${rim}` → PaperSheet, in least-recently-used order
 const bases = new Map();   // `${key}|${res}` → per-asset work shared by every boil seed
 // ponytail: bases is unbounded (one ~10 MB entry per asset at 1024 px); add an LRU if a scene loads dozens of assets.
 export function clearPaperCache() {
   for (const s of sheets.values()) { s.map.dispose(); s.alphaMap.dispose(); }
-  sheets.clear(); bases.clear();
+  sheets.clear(); bases.clear(); texels = 0;
 }
 
-export function makePaper({ art, path, color, weight = 'cardstock', size, key, seed = 0, res = 1024 } = {}) {
+export function makePaper({ art, path, color, weight = 'cardstock', size, key, seed = 0, res = 1024, rim = 'auto' } = {}) {
   if (!key) throw new Error('makePaper: key is required (it names the cache entry)');
   if (!art && !path) throw new Error('makePaper: pass art or path');
   if (!size) throw new Error('makePaper: size [w, h] in meters is required');
   const W8 = WEIGHTS[weight];
   if (!W8) throw new Error(`makePaper: unknown weight "${weight}"`);
-  const id = `${key}|${seed}|${res}`;
+  if (!RIMS.includes(rim)) throw new Error(`makePaper: unknown rim "${rim}"`);
+  const id = `${key}|${seed}|${res}|${rim}`;
   if (sheets.has(id)) { const s = sheets.get(id); sheets.delete(id); sheets.set(id, s); return s; }  // LRU touch
 
   const bid = `${key}|${res}`;
   if (!bases.has(bid)) bases.set(bid, makeBase({ art, path, color, W8, size, key, res }));
   const b = bases.get(bid);
-  const sheet = { ...tear(b, W8, seedOf(key, seed)), thickness: W8.thickness, size: b.size, key, seed };
+  const mode = rim === 'auto' ? (b.paintedRim ? 'none' : 'broken') : rim;
+  const sheet = { ...tear(b, W8, seedOf(key, seed), mode), thickness: W8.thickness, size: b.size, key, seed };
 
-  sheets.set(id, sheet);
-  if (sheets.size > CAP) {
+  sheets.set(id, sheet); texels += area(sheet);
+  while (texels > CAP_TEXELS && sheets.size > 1) {
     const [oldId, old] = sheets.entries().next().value;
-    sheets.delete(oldId); old.map.dispose(); old.alphaMap.dispose();
+    sheets.delete(oldId); texels -= area(old); old.map.dispose(); old.alphaMap.dispose();
   }
   return sheet;
 }
@@ -138,7 +151,10 @@ function makeBase({ art, path, color, W8, size, key, res }) {
   if (art) for (let i = 3; i < px.length; i += 4) px[i] = 255;  // map is opaque; alpha lives in alphaMap
   const gs = seedOf(key, 'grain');
   for (let y = 0, i = 0; y < H; y++) for (let x = 0; x < W; x++, i += 4) {
-    const g = 1 + W8.grain * (0.6 * vnoise(x / k, y / k, gs, false) + 0.4 * vnoise(x / (5 * k), y / (5 * k), gs + 9, true));
+    let g = 1 + W8.grain * (0.6 * vnoise(x / k, y / k, gs, false) + 0.4 * vnoise(x / (5 * k), y / (5 * k), gs + 9, true));
+    // A plain stock fill also gets mottling and long dry-brush streaks, big enough to survive distance and mipmaps
+    // (painted art brings its own).
+    if (!art) g += 1.6 * W8.grain * (0.55 * vnoise(x / (48 * k), y / (48 * k), gs + 21, true) + 0.45 * vnoise(x / (110 * k), y / (6 * k), gs + 23, true));
     px[i] *= g; px[i + 1] *= g; px[i + 2] *= g;
   }
 
@@ -168,17 +184,43 @@ function makeBase({ art, path, color, W8, size, key, res }) {
   });
   // Painted art already has its own silhouette, so it gets less of the large wobble (it would distort the drawing).
   const wob = art ? 0.4 : 1;
-  return { W, H, size: sz, k, px, sdf, band: Int32Array.from(band), nx, ny, alpha, wob, wobSeed: seedOf(key, 'wobble') };
+  return { W, H, size: sz, k, px, sdf, band: Int32Array.from(band), nx, ny, alpha, wob, wobSeed: seedOf(key, 'wobble'),
+    paintedRim: art ? measureRim(px, sdf, band, nx, ny, W, H, reach) : 0 };
+}
+
+// Width (px) of a pale rim painted into the art's edge, or 0. At each edge pixel, walk inward along the normal: a
+// painted rim is an edge clearly lighter than the body half the tear band further in, and it's as wide as the walk
+// stays above the halfway luminance. It counts only if most of the edge has it, so art that is merely pale in places
+// along its edge (a cream hoodie on a green gator) doesn't qualify.
+function measureRim(px, sdf, band, nx, ny, W, H, reach) {
+  const deep = Math.floor(reach / 2), lum = (x, y) => {
+    const o = (Math.min(H - 1, Math.max(0, Math.round(y))) * W + Math.min(W - 1, Math.max(0, Math.round(x)))) * 4;
+    return (0.2126 * px[o] + 0.7152 * px[o + 1] + 0.0722 * px[o + 2]) / 255;
+  };
+  let edges = 0; const widths = [];
+  band.forEach((i, j) => {
+    if (!(sdf[i] >= 1 && sdf[i] < 2)) return;
+    const x = i % W, y = (i / W) | 0, at = (d) => lum(x + nx[j] * (d - sdf[i]), y + ny[j] * (d - sdf[i]));
+    const edge = at(1.5), body = at(deep);
+    edges++;
+    if (!(edge > body + 0.12)) return;
+    let w = 2;
+    while (w < deep && at(w) > (edge + body) / 2) w++;
+    widths.push(w);
+  });
+  if (widths.length < 0.6 * edges) return 0;
+  return widths.sort((a, b) => a - b)[widths.length >> 1];
 }
 
 // ---------- per boil seed: cut, rim, hairs ----------
-const RIM = rgb(PALETTE.cream).map((v) => v + (255 - v) * 0.45);  // the paper's white core, a touch warm
-function tear(b, W8, s) {
+const RIM = rgb(PALETTE.cream).map((v) => v + (255 - v) * 0.75);  // torn white fibre: cream lifted most of the way to white
+function tear(b, W8, s, mode) {
   const { W, H, k, sdf, band } = b;
   const px = b.px.slice(), alpha = b.alpha.slice();
   const [wobA, jagA] = W8.tearAmp.map((v) => v * k), [wobF, jagF] = W8.tearFreq.map((v) => v / 1024);
-  const [rimLo, rimHi] = W8.rimPx.map((v) => v * k), hairLen = 0.5 * rimHi + 0.4 * jagA;
+  const [rimLo, rimHi] = W8.rimPx.map((v) => 0.6 * v * k), hairLen = 0.5 * rimHi + 0.4 * jagA;
   const white = 0.4 + 0.6 * W8.thickness;  // thin stock is dyed through, so its torn core shows less white
+  const pr = mode === 'none' ? b.paintedRim : 0, gapSeed = b.wobSeed + 13;
   for (let j = 0; j < band.length; j++) {
     const i = band[j], x = i % W, y = (i / W) | 0, d = sdf[i];
     const qx = (x - b.nx[j] * d) / k, qy = (y - b.ny[j] * d) / k;  // nearest edge point, in 1024-px units
@@ -187,10 +229,24 @@ function tear(b, W8, s) {
     const streak = 0.5 + 0.5 * vnoise(qx / 2.2, qy / 2.2, s + 7, true);
     const hair = hairLen * Math.max(0, vnoise(qx / 3, qy / 3, s + 11, false) - 0.6) / 0.4;
     alpha[i] = 255 * Math.min(1, Math.max(0, e + hair + 0.5));
-    // Rim width wanders slowly between min and max, its inner edge is jagged, and fibers streak across it.
+    // 0 = full rim, 1 = none. A medium noise thins and thickens it; a slow one opens long, irregular breaks (both
+    // seeded by key, so the breaks hold still); a little boil on top.
+    const thin = 0.3 + 1.3 * fbm(qx / 22, qy / 22, gapSeed, 2, true), brk = 3 * (fbm(qx / 90, qy / 90, gapSeed + 1, 2, true) - 0.12);
+    const gap = Math.min(1, Math.max(0, Math.max(thin, brk) + 0.2 * vnoise(qx / 6, qy / 6, s + 17, false)));
+    if (pr && d < pr + 1) {
+      // Thin the painted rim: read the painting `shift` px further in, so the pale band narrows and, at gap = 1, goes.
+      const shift = (pr + 1) * gap;
+      if (shift > 0.5) {
+        const back = Math.max(d, 1.5) + shift - d, sx = Math.round(x + b.nx[j] * back), sy = Math.round(y + b.ny[j] * back);
+        const src = (Math.min(H - 1, Math.max(0, sy)) * W + Math.min(W - 1, Math.max(0, sx))) * 4;
+        for (let c = 0; c < 3; c++) px[i * 4 + c] = b.px[src + c];
+      }
+    }
+    if (mode !== 'broken') continue;
+    // Rim width wanders slowly between min and max, its inner edge is jagged, fibers streak across it, and it breaks.
     const wide = Math.min(1, Math.max(0, 0.5 + 0.9 * fbm(qx / 24, qy / 24, s + 5, 2, true)));
     const rimW = (rimLo + (rimHi - rimLo) * wide) * (0.75 + 0.5 * streak) + 0.5 * jagA * fbm(qx / 4, qy / 4, s + 3, 2, false);
-    const m = (e < 0 ? 1 : Math.min(1, Math.max(0, rimW - e + 0.5))) * white * (0.45 + 0.55 * streak);
+    const m = (e < 0 ? 1 : Math.min(1, Math.max(0, rimW - e + 0.5))) * white * (0.45 + 0.55 * streak) * (1 - gap);
     if (m > 0) for (let c = 0; c < 3; c++) px[i * 4 + c] += (RIM[c] * (0.94 + 0.06 * streak) - px[i * 4 + c]) * m;
   }
   const mapC = canvas(W, H), aC = canvas(W, H);

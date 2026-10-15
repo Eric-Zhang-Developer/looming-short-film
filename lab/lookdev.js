@@ -2,6 +2,7 @@
 // An apartment corner in three depth layers: navy wall + calendar (z 0), desktop with lamp, laptop, gator and the
 // blob (z 0.05–0.2), painted desk front (z 0.32). 0–5 s phone light (blob shadow ~3x on the wall); 5 s the lamp
 // clicks on and the phone goes dark; 6–10 s hold, the blob blinks, dust drifts. Post: DOF on the blob, night LUT, grain.
+// look-pass-1: a cool navy-hue fill so the wall reads as a colour everywhere, a soft-edged phone, a weaker warm bounce.
 // Art: assets/cut/style_tile_v2_4_{1..6}.png (unfrozen, gitignored), made with
 //   node tools/cut.mjs --in=<main checkout>/assets/raw/style_tile_v2_4.png --auto --out=assets/cut/
 import * as THREE from 'three';
@@ -18,6 +19,12 @@ const stage = createStage();
 const { scene, camera } = stage;
 scene.background = new THREE.Color(PALETTE.navy).multiplyScalar(0.5);
 scene.add(ambient());
+// Picture-book night (doc 03: cool, not grey): a fill in navy's own hue, so the navy stock reads as a colour across
+// the whole frame and only cast shadows go dark. Cool all round (no warm bounce greying the wall), and weaker from
+// straight above so the kraft desktop stays brown instead of going lavender.
+const NIGHT = new THREE.Color(PALETTE.navy), nightHue = NIGHT.clone().multiplyScalar(1 / Math.max(NIGHT.r, NIGHT.g, NIGHT.b));
+const night = new THREE.HemisphereLight(nightHue.clone().multiplyScalar(0.4), nightHue, 0.8);
+scene.add(night);
 camera.position.set(0.02, 0.2, 1.2);
 camera.lookAt(0, 0.1, 0.15);
 
@@ -58,7 +65,7 @@ async function splitLamp(img) {
 
 // ---------- lights ----------
 const BLOB_C = BLOB.clone().setY(0.022);  // the blob's middle, the point the rule is measured from
-const phone = phoneLight({ intensity: 0.3, distance: 0 });
+const phone = phoneLight({ intensity: 0.9, angle: 1.35, distance: 0, penumbra: 0.95 });  // soft fall-off, not a hard fan
 phone.position.copy(placeForScale({ subjectPos: BLOB_C, wallZ: 0, scale: 3, height: -0.014, side: -0.035 }));
 scene.add(phone, phone.target);
 
@@ -66,7 +73,7 @@ const lamp = lampLight({ intensity: 0.35, angle: 0.35, penumbra: 0.4 });
 scene.add(lamp.light, lamp.light.target, lamp.cone, lamp.dust);
 const bulb = new THREE.PointLight(PALETTE.lamp, 0.04, 0.1, 2);  // inside the shade: back-lights the tissue only
 scene.add(bulb);
-const bounce = new THREE.HemisphereLight(PALETTE.lamp, PALETTE.kraft, 0.35);  // the lamp's pool bouncing off the desk: fill only, no shadow
+const bounce = new THREE.HemisphereLight(PALETTE.lamp, PALETTE.kraft, 0.2);  // the lamp's pool bouncing off the desk: fill only, no shadow
 scene.add(bounce);
 
 const post = createPost(stage, { aperture: 0.09, maxblur: 0.01, lut: 'night', grain: 0.04 });
