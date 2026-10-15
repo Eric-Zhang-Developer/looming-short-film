@@ -19,7 +19,7 @@
 
 ## Stack
 
-- **three.js** (pin an exact version in `package.json`), plain ES modules, no framework.
+- **three.js** pinned at `0.186.1` (r186, chosen in wave 1), plain ES modules, no framework.
 - **Vite** for the dev preview page, with a time scrubber.
 - **Puppeteer** (puppeteer-core plus local Chrome) steps time and captures frames.
 - **ffmpeg** for encoding and muxing.
@@ -36,7 +36,7 @@
 
 Claude drives Codex `image_gen` through `codex exec` with long, layered prompts and reference images. Rejects are kept as evidence, and the director picks what gets frozen. **The full workflow, prompt templates and generation order are in [doc 08](08-image-pipeline.md).** The technical constraints that matter here:
 
-- Output is opaque RGB, so every generation uses a flat chroma-key background (`#00FF00`, or `#FF00FF` for green subjects).
+- Ask for a transparent background. In wave 1, Codex returned real alpha with clean edges even when green was requested. Keep the chroma key (`#00FF00`, or `#FF00FF` for green subjects) only as a fallback.
 - Art must be flat-lit with no baked shadows, because three.js does all the lighting.
 - At least 2048 px on the long edge for anything that can fill more than half the frame.
 - Frozen picks live in `assets/frozen/` and are recorded in `assets/generated/manifest.json` (prompt file, reference hashes, model, date, sha256). They're never generated at render time.
@@ -67,7 +67,7 @@ Extend `MeshLambertMaterial` with `onBeforeCompile`:
 - **Edge catch:** a small boost where alpha is near the edge and the light is behind. This makes torn rims glow when backlit.
 - `side: DoubleSide`, `alphaTest: 0.5` (crisp cutouts, no sorting problems).
 
-**Shadows from cutouts (important gotcha).** Shadow maps ignore `alphaMap` by default, so every cutout would cast a rectangle. Give each paper mesh a `customDepthMaterial` (and a `customDistanceMaterial` for point lights) that samples the same `alphaMap` and discards below 0.5. Without this the film doesn't work.
+**Shadows from cutouts (important gotcha).** Without alpha-aware depth, every cutout casts a rectangle. Give each paper mesh a `customDepthMaterial` (and a `customDistanceMaterial` for point lights) that samples the same `alphaMap` and discards below 0.5. Wave 1 proved this works: torn edge and eye holes both show in the shadow. r186 may handle alpha-tested shadows on its own, but that hasn't been tested, so keep the custom depth material until a test shows it's redundant.
 
 ## Lights (`lights.js`)
 
@@ -80,7 +80,7 @@ Extend `MeshLambertMaterial` with `onBeforeCompile`:
 | Ambient | `HemisphereLight`, very low | Navy above, kraft below |
 
 **Shadow settings:**
-- `PCFSoftShadowMap`.
+- `PCFShadowMap`. r186 removed `PCFSoftShadowMap`, so softness comes from `light.shadow.radius` and the spotlight `penumbra`.
 - Hero light map at 2048–4096.
 - Tune `bias` and `normalBias` per light: watch for shadow acne on planes and shadows detaching from cutouts.
 - Shadow camera frustums fit tightly to the set.

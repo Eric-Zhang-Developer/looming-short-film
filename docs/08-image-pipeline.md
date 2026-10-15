@@ -16,14 +16,17 @@ Codex never sees the film and never touches code. It gets one asset brief at a t
 Claude runs Codex non-interactively from the repo root:
 
 ```bash
-codex exec -s workspace-write \
+codex exec -C "$RUN" -s workspace-write --json \
   -i assets/frozen/style_tile.png -i assets/frozen/gator_sheet.png \
   - < assets/prompts/roommate_tall.v1.md
 ```
 
 - `-i` attaches reference images (the approved style tile and any approved character sheets).
 - The prompt file is piped on stdin, so long prompts are versioned files, not shell strings.
-- `-s workspace-write` lets Codex copy its output into `assets/raw/`. Its image skill saves to `~/.codex/generated_images/` first, then copies into the workspace with versioned names (never overwrites).
+- **Run Codex in an empty scratch folder (`$RUN`), not the repo root.** Codex reads `AGENTS.md` and the docs it finds in its workspace. In wave 1 that cost about 190k input tokens for a single image, and it means Codex might try to follow rules written for Claude's subagents. `gen.mjs` makes a fresh temp folder per call, and Claude copies the output into `assets/raw/`.
+- `-s workspace-write` lets Codex copy its output into that folder. Its image skill saves to `~/.codex/generated_images/` first, then copies into the workspace.
+- The `image_gen` call doesn't appear in `--json` events, so the model name and image cost aren't reported. The sidecar records `"model": "unknown (Codex image_gen)"` and the token usage from `turn.completed`.
+- **Resolution:** wave 1's 5-piece sheet came back at 1983×793, about 400 px per piece. That's fine for distant props, but anything that fills a lot of the frame needs **one piece per image** at the largest size.
 - `tools/gen.mjs` wraps the call:
   - runs it N times for variants
   - finds each new file
@@ -55,9 +58,9 @@ What it is, the camera view, the layout, and exact parts. Example for the gator 
 
 ### 4. Technical block (identical in every prompt)
 
-> Background: perfectly flat solid pure green #00FF00 everywhere, no gradient, no texture, no shadow on it. No green anywhere in the artwork itself. Highest available resolution, landscape. No text, letters, numbers, labels, logos, watermarks or borders anywhere.
+> Background: fully transparent (real alpha channel), with clean edges and no halo. If transparency isn't possible, use perfectly flat solid pure green #00FF00 instead, with no gradient, no texture and no shadow on it, and no green anywhere in the artwork. Highest available resolution, landscape. No text, letters, numbers, labels, logos, watermarks or borders anywhere.
 
-(For green characters, swap the key color to magenta `#FF00FF` in both the asset and technical blocks.)
+(For green characters, make the fallback key magenta `#FF00FF` in both the asset and technical blocks. Wave 1: Codex returned real alpha even when asked for green, so expect alpha and treat the key as a fallback.)
 
 ### 5. Notes block (only on revisions)
 
