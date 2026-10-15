@@ -44,9 +44,10 @@
 - anim-s01 · builder · `src/shots/s01.js` · verified (merged) · evidence/anim-s01/sheet.jpg
 - anim-s13 · builder · `src/shots/s13.js` · verified (merged) · evidence/anim-s13/strip.jpg
 - anim-s15 · builder · `src/shots/s15.js` · in-progress · —
+- contract-light-key · builder · `src/lights.js`, `src/blob.js`, contracts §lights/§blob · in-progress · —
 - anim-s09 · builder · `src/shots/s09.js` · in-progress · —
 - anim-s04 · builder · `src/shots/s04.js` · in-progress · —
-- anim-s03 · builder · `src/shots/s03.js` · in-progress · —
+- anim-s03 · builder · `src/shots/s03.js` · verified (merged) · evidence/anim-s03/sheet.jpg
 - anim-s02 · builder · `src/shots/s02.js` · in-progress · —
 
 ### parallel track: storyboard (docs)
