@@ -34,6 +34,33 @@ function lampClick(seed = 1) {
   return scale(out, 0.9);
 }
 
+// The ceiling fluorescent's motion sensor waking (docs/05-sound.md, README §3), 0.65 s. The wake's strikes are at +0.042, +0.167
+// and +0.292: a relay clack on the beat (lampClick's snap, pitched down, with a short metallic tail), a faint tick on each of the
+// first two strikes, a glassy ping as the third catches, and the tube's 120 Hz hum rising under it over ~0.3 s to the bed's level
+// (cues.js: fluorescentHum at 0.15 / this cue's 0.8), so it hands over to the bed at +0.65. Both wakes use the one seed.
+function sensorWake(seed = 1) {
+  const out = new Float32Array(Math.ceil(0.65 * SR));
+  const snap = (at, g, s) => {
+    mixInto(out, decay(bandpass(noise(s, 0.02), 2400, 0.9), 0.0018), at, g);
+    mixInto(out, gen(0.05, (t) => Math.sin(TAU * 1100 * t) * Math.exp(-t / 0.005)), at, g * 0.45);
+    mixInto(out, gen(0.05, (t) => Math.sin(TAU * 520 * t) * Math.exp(-t / 0.008)), at, g * 0.3);
+  };
+  snap(0, 1, seed);
+  snap(0.014, 0.4, seed + 1);
+  mixInto(out, gen(0.15, (t) => (Math.sin(TAU * 3170 * t) + 0.6 * Math.sin(TAU * 4410 * t)) * Math.min(1, t / 0.001) * Math.exp(-t / 0.03)), 0.004, 0.12);  // metal tail
+  mixInto(out, decay(highpass(noise(seed + 2, 0.01), 3000), 0.001), 0.042, 0.18);
+  mixInto(out, decay(highpass(noise(seed + 3, 0.01), 3000), 0.001), 0.167, 0.15);
+  mixInto(out, gen(0.4, (t) => (Math.sin(TAU * 2480 * t) + 0.5 * Math.sin(TAU * 3720 * t) + 0.25 * Math.sin(TAU * 5900 * t)) * Math.min(1, t / 0.001) * Math.exp(-t / 0.12)), 0.292, 0.3);  // ping
+  norm(out, 0.5);                                            // the clack stays a little under lampClick's 0.57, the film's loudest transient
+  const w = TAU * 120 / SR;                                  // fluorescentHum's waveform, unfaded, phase from the wake frame
+  mixInto(out, gen(0.65, (t, i) => {
+    const k = Math.min(1, Math.max(0, (t - 0.08) / 0.3)), rise = k * k * (3 - 2 * k), buzz = Math.tanh(2.5 * Math.sin(w * i)) * 0.5;
+    const ev = 0.25 * Math.sin(2 * w * i) + 0.12 * Math.sin(4 * w * i + 1) + 0.06 * Math.sin(8 * w * i + 2);
+    return (buzz * 0.6 + ev + 0.1 * Math.sin(w * i / 2)) * 0.25 * (0.15 / 0.8) * rise;
+  }), 0);
+  return out;
+}
+
 // Pen cap: a soft friction slide, then a crisp pop of air with a little upward pitch.
 function penUncap(seed = 1) {
   const out = new Float32Array(Math.ceil(0.25 * SR));
@@ -397,7 +424,7 @@ function cardTap(seed = 1) {
 }
 
 export const FOLEY = {
-  lampClick, penUncap, inkDrip, paperRustle, fluorescentHum,
+  lampClick, sensorWake, penUncap, inkDrip, paperRustle, fluorescentHum,
   penScratch, phoneHum, inkRoll, shadowGrowth, fridgeHum, controllerClick, drill,
   fluorescentFlicker, mopOnTile, paperBoil, dawnBirds, roomTone, nightHum, shadowBreath,
   thumbFlick, scrollTick, jarClink, cartonSlosh, tvBloops, roommateStep, winJingle, ladderCreak, rodSnap, curtainSwish, cardTap,

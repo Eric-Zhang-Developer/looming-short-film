@@ -173,6 +173,69 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
   return { light, cone, dust, update };
 }
 
+// ---------- the Marston motion-sensor zone (docs/shots/README.md §3) ----------
+
+// Wake keys: an intensity multiplier on 1s, STEPPED (no easing). [seconds after the wake frame, level]. Three strikes
+// (+0.042, +0.167, +0.292); the third catches and settles at 1. Every wake in the film uses these, so they read as one event.
+// The README's times are these frames of a 24 fps film (1, 2, 4, 5, 7, 9) rounded to ms; the exact fractions keep a frame
+// that lands on a key on that key.
+export const SENSOR_WAKE = [[0, 0], [1 / 24, 0.9], [2 / 24, 0.1], [4 / 24, 1.0], [5 / 24, 0.2], [7 / 24, 1.15], [9 / 24, 1.0]];
+const EPS = 1e-6;   // t arrives as a difference of floats; a frame that lands on a key or a frame edge must not fall just short
+// s11's death as built: a seeded on/off chatter per 24 fps frame for 0.8 s under a ceiling falling 1 → 0.3, first frame a drop,
+// dead after. Every timeout (s11, s14) uses s11's seed.
+export const SENSOR_SEED = seedOf('s11', 'tableLightDies') % 65536;
+const TIMEOUT = 0.8;
+
+// The zone's level at time t (any clock, as long as wake/timeoutAt are on the same one). Pure: no state, no clocks.
+//   wake      time of the relay clack, or undefined. With a wake, the zone is dark before it.
+//   timeoutAt time the chatter starts, or undefined. Without one the zone never times out.
+// No wake: lit (1) until timeoutAt. Wake and timeout may both be given (s14: woken at 1.0, times out at 4.2).
+export function sensorLevel(t, { wake, timeoutAt, seed = SENSOR_SEED } = {}) {
+  if (wake !== undefined) {
+    if (t < wake) return 0;
+    if (t < wake + SENSOR_WAKE.at(-1)[0] - EPS) return SENSOR_WAKE.findLast(([dt]) => t - wake >= dt - EPS)[1];
+  }
+  if (timeoutAt === undefined || t < timeoutAt) return 1;
+  if (t >= timeoutAt + TIMEOUT - EPS) return 0;
+  const ceil = 1 - 0.7 * (t - timeoutAt) / TIMEOUT;
+  return t - timeoutAt < 1 / 24 - EPS || hash2(seed, Math.floor(t * 24 + EPS)) < 0.45 ? 0.08 * ceil : ceil;
+}
+
+// The ceiling fluorescent over a Marston desk unit: a SpotLight at the tube plus the louvred `sensor_trough` that hangs
+// it (cardstock housing, 5 louvres, 2 rods, a vellum tube whose colour follows the level). Add `group`, `light` and
+// `light.target` to the scene. update(t, { wake, timeoutAt }) sets the light and the tube, and returns the level, so a
+// shot can drive the phone's outshone rule from it (≥ 0.5 → phone spot 0.2). Mirrored units: pass `at` and `aimAt`.
+// intensity 0.8 is s15's lamp pool at the blob: LAMP_I 0.16 × (0.136 / 0.060)² (tube→blob over shade→blob distances).
+export function sensorLight({ at = [0, 0.127, 0.040], aimAt = [0, 0, 0.098], intensity = 0.8, angle = 0.8, penumbra = 0.5, seed = SENSOR_SEED } = {}) {
+  const tone = mix('cream', 'gator', 0.15), dull = mix('cream', 'kraft', 0.35).multiplyScalar(0.55);
+  const light = shadowed(new THREE.SpotLight(tone, intensity, 0, angle, penumbra, 2), { radius: 2, bias: -0.0003 });
+  light.position.set(...at);
+  aim(light, new THREE.Vector3(...aimAt));
+
+  const group = new THREE.Group(), card = new THREE.MeshLambertMaterial({ color: color('kraft') });
+  const part = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = false; group.add(m); return m; };
+  const L = 0.060, D = 0.016, H = 0.006, T = 0.0006, cy = at[1] + 0.001;   // housing centre y 0.128, bottom 0.125
+  part(new THREE.BoxGeometry(L, T, D), card, 0, cy + H / 2 - T / 2, 0);                                  // top
+  for (const s of [-1, 1]) part(new THREE.BoxGeometry(L, H, T), card, 0, cy, s * (D / 2 - T / 2));       // front and back walls
+  for (const s of [-1, 1]) part(new THREE.BoxGeometry(T, H, D), card, s * (L / 2 - T / 2), cy, 0);       // end caps
+  for (let i = 0; i < 5; i++) part(new THREE.BoxGeometry(T, H * 0.8, D), card, -L / 2 + L * (i + 0.5) / 5, cy - H * 0.1, 0);  // louvres
+  for (const s of [-1, 1]) part(new THREE.CylinderGeometry(0.0004, 0.0004, 0.25, 6), card, s * L * 0.4, cy + H / 2 + 0.125, 0);  // rods to the ceiling
+  const tubeMat = new THREE.MeshBasicMaterial({ color: dull, side: THREE.DoubleSide });
+  const tube = part(new THREE.PlaneGeometry(0.056, 0.004), tubeMat, 0, 0, 0);
+  tube.rotation.x = Math.PI / 2; tube.position.y = at[1] - 0.0005;   // faces down, inside the housing
+  group.position.set(at[0], 0, at[2]);                               // children carry their own y; x/z from `at`
+  light.position.set(...at);
+
+  function update(t, opts = {}) {
+    const level = sensorLevel(t, { seed, ...opts });
+    light.intensity = intensity * level;
+    tubeMat.color.copy(dull).lerp(tone, Math.min(1, level)).multiplyScalar(0.55 + 0.45 * Math.min(1.15, level));
+    return level;
+  }
+  update(0);
+  return { light, group, tube, update, level: (t, opts) => sensorLevel(t, { seed, ...opts }) };
+}
+
 // Window light, cold night (k = 0) to gold (k = 1): low and blue, then warmer, brighter and a little higher.
 // One large soft shadow. Add light and light.target; move light.target to recentre the set.
 // t is unused for now: the ramp is driven by k so shots can key it to beats.

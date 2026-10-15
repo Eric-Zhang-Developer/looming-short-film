@@ -76,6 +76,8 @@ export const DURATION            // 180
 
 Shot modules are wired into `index.html` later (wave 4). The timeline only holds data.
 
+Added by `contract-sensor`: three beats were renamed, times unchanged, because Marston's light is a motion-sensor zone, not a lamp: `lampClickMarston` → `sensorWakeMarston` (s15 0.5), `lampClickNeighbor` → `sensorWakeNeighbor` (s16 15), `lampClickFreshman` → `sensorWakeFreshman` (s18 4). `lampClickHome`, `lampOffHome` and `tableLightDies` (a zone timing out) keep their names. No `src/shots/*.js` named the old beats; the cues and the score did. Shot docs `docs/shots/s15`, `s16`, `s18` still use the old names until a doc pass.
+
 ## `src/paper.js` (task `mod-paper`)
 
 ```js
@@ -138,6 +140,24 @@ aim(spot, target, { nearest })   // nearest: optional, m, the closest caster to 
 ```
 
 `aim()`'s shadow-camera `near` is now `min(0.004, d/20)` (d = light→target) instead of half of d, so a caster a few cm from the light, such as a blob 5 cm from the phone, stays inside the shadow frustum. Evidence: `evidence/contract-light-key/near_before.jpg`, `near_after.jpg`.
+
+Added by `contract-sensor` (docs/shots/README.md §3):
+
+```js
+export const SENSOR_WAKE   // [[dt, level], ...] at 0, 1, 2, 4, 5, 7, 9 frames of 24 fps: 0, 0.9, 0.1, 1, 0.2, 1.15, 1; stepped
+export const SENSOR_SEED   // seedOf('s11', 'tableLightDies') % 65536: s11's timeout chatter, used by every timeout
+export function sensorLevel(t, { wake, timeoutAt, seed = SENSOR_SEED } = {})   // → level multiplier on 1s, pure
+export function sensorLight({ at = [0, 0.127, 0.040], aimAt = [0, 0, 0.098], intensity = 0.8, angle = 0.8, penumbra = 0.5, seed } = {})
+  // → { light: SpotLight, group: Group (the sensor_trough), tube: Mesh, update(t, { wake, timeoutAt }) → level, level(t, opts) → level }
+```
+
+A ceiling fluorescent on a motion sensor over a Marston desk. Add `group`, `light` and `light.target` to the scene; `at` is the tube centre and `aimAt` the blob mark's foot in the shot's coordinates (mirrored units pass their own). The light is fluorescent-toned `lerp(cream, gator, 0.15)`, `castShadow` on, aimed with `aim()`; the housing, 5 louvres and 2 rods cast no shadow. `intensity` 0.8 is s15's lamp pool at the blob (0.16 × (0.136 / 0.060)²).
+
+`sensorLevel(t, { wake, timeoutAt })` is the level on 1s, a pure function of `t`; `wake` and `timeoutAt` are times on whatever clock the shot uses (local or global, the same for both):
+- **No `wake`:** lit (1) until `timeoutAt`, forever lit if it is also undefined. **With `wake`:** dark (0) before it.
+- **Stutter-on** from `wake`: the `SENSOR_WAKE` keys, stepped, no easing. A relay frame at 0, then three strikes (0.9 at +0.042, 1.0 at +0.167, 1.15 at +0.292), settled at 1 from +0.375. Every wake in the film uses these, so they read as one event.
+- **Time-out** from `timeoutAt`: s11's chatter as built, per 24 fps frame for 0.8 s. Each frame is `hash2(seed, floor(t * 24))` (the shot's own `t`, so use local time to reproduce s11's frames): below 0.45 it drops to 0.08 of a ceiling that falls 1 → 0.3, else it is at the ceiling. The first frame is always a drop. Dead (0) from +0.8. Wake and timeout combine (s14: woken at 1.0, times out at 4.2).
+- Randomness is the seeded hash only: no clocks, no state. `update` returns the level so a shot can drive the phone's outshone rule (`≥ 0.5` → phone spot 0.2, below it → back).
 
 The lamp's cone (look-pass-2) draws only its far wall, so anything standing in the light hides the vellum behind it instead of wearing an amber film over it. Its sides fade to nothing by view angle, over a width that wanders, so no side is a ruled line.
 
@@ -245,7 +265,7 @@ export function lowpass(buf, hz), highpass(buf, hz), env(buf, { a, d, s, r })
 export function mixInto(dest, src, atSec, gain = 1)
 
 // foley.js: named sounds from doc 05's foley table
-export const FOLEY   // { lampClick, penUncap, inkDrip, paperRustle, fluorescentHum, ... } → (seed, dur?) => Float32Array
+export const FOLEY   // { lampClick, sensorWake, penUncap, inkDrip, paperRustle, fluorescentHum, ... } → (seed, dur?) => Float32Array
                      // dur in seconds; beds and sized one-shots honour it, others ignore it; omitted → the sound's default length
 
 // cues.js
@@ -253,6 +273,10 @@ export const CUES    // [{ beat: 'lampClickHome', sound: 'lampClick', gain: 0.8 
 // optional per cue: offset (s, may be negative; starts at beat + offset, default 0), dur (s) or until: '<beatName>'
 // (length = beat(until) − start), stem ('foley' default | 'ambience' | 'music'), seed (default seedOf(sound))
 ```
+
+```
+
+Added by `contract-sensor`: `FOLEY.sensorWake(seed)` is the motion sensor's wake, 0.65 s: a relay clack on the beat (lampClick's snap pitched down, with a metallic tail), ticks at +0.042 and +0.167, a glassy ping at +0.292, and the tube's 120 Hz hum rising under it to the bed's level. Its peak is 0.5, under `lampClick`'s 0.57. It is cued once each on `sensorWakeMarston` (s15) and `sensorWakeFreshman` (s18), same seed and gain, so the two are sample-identical; there is none on `sensorWakeNeighbor`. `lampOffHome` now has the `lampClick` too, so the home lamp's two clicks are identical. Beds that stop for a click come back at +0.3 s, or at +0.65 s for a wake (the `ON()` helper in `cues.js`; the off click's window is 0.17 s). `src/audio/selftest.js` checks both pairs in `foley.wav` and `mix.wav`.
 
 ```
 node tools/mix.mjs [--range=a:b]   → out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav,

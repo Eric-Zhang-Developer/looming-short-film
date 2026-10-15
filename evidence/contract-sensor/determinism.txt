@@ -1,0 +1,17 @@
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=36.5  b37393b3015082e2 b37393b3015082e2 b37393b3015082e2  PASS
+t=100.5  28da6be194a28a71 28da6be194a28a71 28da6be194a28a71  PASS
+t=109.4  33ce8df6689e25a3 33ce8df6689e25a3 33ce8df6689e25a3  PASS
+determinism: PASS
+node tools/determinism.mjs --t=36.5,100.5,109.4  21.34s user 2.98s system 107% cpu 22.554 total

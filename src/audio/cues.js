@@ -1,6 +1,6 @@
 // Cue sheet: sounds placed by beat name (src/timeline.js), never by raw time. Moving a beat moves its sound.
 // stem: 'foley' (default) | 'ambience' | 'music'. seed: defaults to seedOf(sound) in tools/mix.mjs,
-// so the three lamp clicks share one seed and are sample-identical (doc 05).
+// so the two lamp clicks share one seed and are sample-identical, and so do the two sensor wakes (doc 05).
 // offset: seconds after the beat (may be negative, default 0); the cue starts at beat(beat) + offset.
 // Length (beds): dur in seconds, or until: '<beatName>' (runs from the cue's start to that beat). tools/mix.mjs passes it
 // as FOLEY[sound](seed, dur); with neither, the sound plays at its default length.
@@ -15,20 +15,23 @@ const bed = (sound, stem, from, to, gain, extra) => ({ beat: from[0], offset: fr
 const AMB = 'ambience';
 const START = ['inkDropForms', -beat('inkDropForms')];              // 0:00. s01 has no beat of its own
 const END = ['nextSemester', DURATION - beat('nextSemester')];      // 3:00
-// Doc 05: every lamp click is dry and exposed. Beds stop on the click and come back after its 0.3 s window (the music
-// stem does the same in score.js), which is also what keeps the three clicks identical in mix.wav.
-const ON = (b) => [b, 0.3];
+// Doc 05: every lamp click and sensor wake is dry and exposed. Beds stop on it and come back after its window (the music
+// stem does the same in score.js), which is also what keeps identical cues identical in mix.wav. A lamp click is 0.3 s;
+// a sensor wake is 0.65 s (its hum rises under it and hands over to the fluorescent bed). WAKE is sensorWake's length in foley.js.
+const WAKE = 0.65;
+const ON = (b) => [b, b.startsWith('sensorWake') ? WAKE : 0.3];
 // snd-foley-2's sounds, in one place so a level pass touches one table.
 const GAIN = { thumbFlick: 0.2, jarClink: 0.4, cartonSlosh: 0.5, tvBloops: 0.4, winJingle: 0.3, roommateStep: 0.4,
   ladderCreak: 0.2, rodSnap: 0.2, curtainSwish: 0.3, scrollTick: 0.25, cardTap: 0.4 };
 
 export const CUES = [
   // ───────── ambience beds ─────────
-  // Paper boil: throughout, very low (doc 05), broken only at the three clicks.
+  // Paper boil: throughout, very low (doc 05), broken only at the clicks and wakes (the off click's window is 0.17 s: the rustle follows it).
   bed('paperBoil', AMB, START, ['lampClickHome'], 1),
-  bed('paperBoil', AMB, ON('lampClickHome'), ['lampClickMarston'], 1),
-  bed('paperBoil', AMB, ON('lampClickMarston'), ['lampClickFreshman'], 1),
-  bed('paperBoil', AMB, ON('lampClickFreshman'), END, 1),
+  bed('paperBoil', AMB, ON('lampClickHome'), ['lampOffHome'], 1),
+  bed('paperBoil', AMB, ['lampOffHome', 0.17], ['sensorWakeMarston'], 1),
+  bed('paperBoil', AMB, ON('sensorWakeMarston'), ['sensorWakeFreshman'], 1),
+  bed('paperBoil', AMB, ON('sensorWakeFreshman'), END, 1),
   // Room tone: s01-s03 morning, then 3 dB down from phoneUp; s08 faint morning hush; s09 stands in for the outdoor night
   // bed; Quiet 2 and s18's home 0-2 s.
   bed('roomTone', AMB, START, ['phoneUp'], 1),
@@ -37,16 +40,16 @@ export const CUES = [
   bed('roomTone', AMB, ['marstonEnter'], ['stacksEnter'], 0.6),
   bed('roomTone', AMB, ['quiet2Start'], ['nextSemester', 2], 1),
   // Night hum: the Button, from 2.0 in s18. Stops for the Freshman's click.
-  bed('nightHum', AMB, ['nextSemester', 2], ['lampClickFreshman'], 1),
-  bed('nightHum', AMB, ON('lampClickFreshman'), END, 1),
+  bed('nightHum', AMB, ['nextSemester', 2], ['sensorWakeFreshman'], 1),
+  bed('nightHum', AMB, ON('sensorWakeFreshman'), END, 1),
   // Fridge: the whole of s04.
   bed('fridgeHum', AMB, ['fridge'], ['gameNight'], 0.4),
   // Fluorescent hum. s10-s11 full; once the table tube dies, the distant bed at -6 dB (s11-s13); s14-s16 a working tube
   // overhead, full (off for the Marston click); s17 at -12 dB.
   bed('fluorescentHum', AMB, ['stacksEnter'], ['tableLightDies', 0.8], 0.15),
   bed('fluorescentHum', AMB, ['tableLightDies', 0.8], ['custodianPass', -0.5], 0.075),
-  bed('fluorescentHum', AMB, ['custodianPass', -0.5], ['lampClickMarston'], 0.15),
-  bed('fluorescentHum', AMB, ON('lampClickMarston'), ['quiet2Start'], 0.15),
+  bed('fluorescentHum', AMB, ['custodianPass', -0.5], ['sensorWakeMarston'], 0.15),
+  bed('fluorescentHum', AMB, ON('sensorWakeMarston'), ['quiet2Start'], 0.15),
   bed('fluorescentHum', AMB, ['quiet2Start'], ['nextSemester'], 0.04),
   // Phone glow hum, whenever the phone is the key light.
   bed('phoneHum', AMB, ['phoneUp'], ['lampClickHome'], 0.3),                           // s03-s06, cut dead on the click
@@ -54,14 +57,14 @@ export const CUES = [
   bed('phoneHum', AMB, ['curtainsDone', 0.5], ['marstonEnter'], 0.3),                  // s07-s08
   bed('phoneHum', AMB, ['stacksEnter'], ['laptopOpen', -1], 0.3),                      // s10
   bed('phoneHum', AMB, ['phoneWake'], ['quiet1Start'], 0.3),                           // s11
-  bed('phoneHum', AMB, ['quiet1Start'], ['lampClickMarston'], 0.15),                  // s12-s14, "very faint"
-  bed('phoneHum', AMB, ON('lampClickMarston'), ['phoneFaceDown'], 0.075),             // s15, ducked -6 dB; stops on the face-down frame
+  bed('phoneHum', AMB, ['quiet1Start'], ['sensorWakeMarston'], 0.15),                  // s12-s14, "very faint"
+  bed('phoneHum', AMB, ON('sensorWakeMarston'), ['phoneFaceDown'], 0.075),             // s15, ducked -6 dB; stops on the face-down frame
   bed('phoneHum', AMB, ['headLift', 3.9], ['headLift', 4.6], 0.0189, { seed: 1 }),    // s13 generic wakes, -24 dB each
   bed('phoneHum', AMB, ['headLift', 4.3], ['headLift', 5.0], 0.0189, { seed: 2 }),
   bed('phoneHum', AMB, ['headLift', 4.7], ['headLift', 5.4], 0.0189, { seed: 3 }),
-  bed('phoneHum', AMB, ['lampClickNeighbor'], ['problemSolved6', 0.5], 0.03),         // s16 neighbour's phone, -20 dB, until 16.5
-  bed('phoneHum', AMB, ['nextSemester', 2], ['lampClickFreshman'], 0.15),             // s18 the Freshman's phone, faint
-  bed('phoneHum', AMB, ON('lampClickFreshman'), ['blobYawn'], 0.075),                 // ducked -6 dB after the click
+  bed('phoneHum', AMB, ['sensorWakeNeighbor'], ['problemSolved6', 0.5], 0.03),         // s16 neighbour's phone, -20 dB, until 16.5
+  bed('phoneHum', AMB, ['nextSemester', 2], ['sensorWakeFreshman'], 0.15),             // s18 the Freshman's phone, faint
+  bed('phoneHum', AMB, ON('sensorWakeFreshman'), ['blobYawn'], 0.075),                 // ducked -6 dB after the click
   // Quiet 1: the shadow's breathing (sub), s12 only. Starts on the shot so its 1.25/6.25 s breath peaks land.
   bed('shadowBreath', AMB, ['quiet1Start'], ['headLift', -0.5], 0.1),
   // Mop on tile: one swish every 0.5 s. s13's pre-lap from 6.0 at -12 dB (swishes at s13 6.0, 6.5, 7.0 = s14 0.0),
@@ -93,11 +96,13 @@ export const CUES = [
   { beat: 'gameNight', offset: 3.3, sound: 'controllerClick', gain: 0.35, seed: 8 },
   { beat: 'gameNight', offset: 5.4, sound: 'controllerClick', gain: 0.35, seed: 13 },
   { beat: 'gameNight', offset: 6.9, sound: 'controllerClick', gain: 0.35, seed: 21 },
-  // The three lamp clicks. Same seed and gain: do not touch (doc 05). No click for lampOffHome (three only) and none for
-  // lampClickNeighbor (QUESTIONS.md Q2, option b: seen, not heard).
+  // The home lamp's two clicks (on, off): the identical lampClick, same seed and gain. Do not touch (doc 05).
   { beat: 'lampClickHome', sound: 'lampClick', gain: 0.8 },
-  { beat: 'lampClickMarston', sound: 'lampClick', gain: 0.8 },
-  { beat: 'lampClickFreshman', sound: 'lampClick', gain: 0.8 },
+  { beat: 'lampOffHome', sound: 'lampClick', gain: 0.8 },
+  // The two sensor wakes (s15, s18): the identical sensorWake, same seed and gain. None for sensorWakeNeighbor
+  // (QUESTIONS.md Q2, option b: seen, not heard).
+  { beat: 'sensorWakeMarston', sound: 'sensorWake', gain: 0.8 },
+  { beat: 'sensorWakeFreshman', sound: 'sensorWake', gain: 0.8 },
   // s07: the drill's two windows, then (after the cut) the biggest growth of the film so far.
   bed('drill', 'foley', ['curtainsStart', 0.33], ['curtainsStart', 1.67], 0.1),
   bed('drill', 'foley', ['curtainsStart', 2.17], ['curtainsStart', 3.5], 0.1, { seed: 2 }),

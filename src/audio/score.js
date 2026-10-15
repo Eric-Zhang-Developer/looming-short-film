@@ -102,12 +102,12 @@ export const SCORE = [
     ev('nextSemester', k * 0.7, 'piano', HARM[k], { vel: 0.35, dur: 0.6 }),
   ]),
   ...THEME.slice(4).flatMap((m, k) => [
-    ev('lampClickFreshman', 1.5 + k * 0.7, 'piano', m, { vel: 0.45, dur: k === 2 ? 1.1 : 0.6, motif: 'theme' }),
-    ev('lampClickFreshman', 1.5 + k * 0.7, 'piano', k === 2 ? G7 : HARM[k + 4], { vel: 0.35, dur: k === 2 ? 1.1 : 0.6 }),
+    ev('sensorWakeFreshman', 1.5 + k * 0.7, 'piano', m, { vel: 0.45, dur: k === 2 ? 1.1 : 0.6, motif: 'theme' }),
+    ev('sensorWakeFreshman', 1.5 + k * 0.7, 'piano', k === 2 ? G7 : HARM[k + 4], { vel: 0.35, dur: k === 2 ? 1.1 : 0.6 }),
   ]),
-  ev('lampClickFreshman', 4.1, 'piano', 60, { vel: 0.45, dur: 5, motif: 'theme' }),
-  ev('lampClickFreshman', 4.1, 'piano', [36, 43, 52, 55], { vel: 0.38, dur: 5 }),
-  ev('lampClickFreshman', 4.1, 'pad', [48, 55, 64, 72], { dur: 7.5, attack: 2.5, release: 3.5, gain: 0.5 }),
+  ev('sensorWakeFreshman', 4.1, 'piano', 60, { vel: 0.45, dur: 5, motif: 'theme' }),
+  ev('sensorWakeFreshman', 4.1, 'piano', [36, 43, 52, 55], { vel: 0.38, dur: 5 }),
+  ev('sensorWakeFreshman', 4.1, 'pad', [48, 55, 64, 72], { dur: 7.5, attack: 2.5, release: 3.5, gain: 0.5 }),
   ...exam('blobYawn', 0.2, { vel: 0.28, dur: 1.4 }),
 ];
 
@@ -121,14 +121,15 @@ function fadeOut(buf, sec) {
 // Music sits under the foley: the lamp click (about -5 dBFS in the foley stem) stays the loudest transient.
 const LEVEL = 0.5;
 
-// Doc 05: every lamp click is dry and exposed, so the music stem is true zero across each click's own 0.3 s window.
+// Doc 05: every lamp click is dry and exposed, so the music stem is true zero across each click's own window.
 // Notes and their room tails ring through it (the groove's bar −1 stabs, 35.5 s, reach the home click), so the
 // gate fades the stem out over 40 ms before the click and back in 20 ms after the window. Beat-relative, like the notes.
-const CLICKS = ['lampClickHome', 'lampClickMarston', 'lampClickFreshman'], CLICK_LEN = 0.3, FADE_OUT = 0.04, FADE_IN = 0.02;
+// [beat, window]: a lamp click is 0.3 s, the off click's 0.17 s (the spring-back follows it), a sensor wake 0.65 s (cues.js WAKE).
+const CLICKS = [['lampClickHome', 0.3], ['lampOffHome', 0.17], ['sensorWakeMarston', 0.65], ['sensorWakeFreshman', 0.65]], FADE_OUT = 0.04, FADE_IN = 0.02;
 function gateClicks(out) {
   const at = (s) => Math.round(s * SR);
-  for (const b of CLICKS) {
-    const t = beat(b), a = at(t - FADE_OUT), z = at(t), y = at(t + CLICK_LEN), e = at(t + CLICK_LEN + FADE_IN);
+  for (const [b, len] of CLICKS) {
+    const t = beat(b), a = at(t - FADE_OUT), z = at(t), y = at(t + len), e = at(t + len + FADE_IN);
     for (let i = a; i < e && i < out.length; i++) out[i] *= i < z ? 1 - (i - a) / (z - a) : i < y ? 0 : (i - y) / (e - y);
   }
 }

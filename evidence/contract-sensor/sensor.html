@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>sensorLight strip</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+<script type="module">
+  // Minimal page for the stutter-on: the Marston desk unit (wall, desk, blob mark) under sensorLight, zone woken at t = 0.
+  // renderFrame(t), t in [0, 1]. Strip 0:0.5 = every 24 fps frame of the first half second of the wake.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import { sensorLight, ambient } from '/src/lights.js';
+  import { createBlob } from '/src/blob.js';
+
+  const stage = createStage(), { scene, camera } = stage;
+  scene.background = new THREE.Color(PALETTE.navy);
+  const plane = (w, h, c) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({ color: PALETTE[c] })); m.receiveShadow = true; scene.add(m); return m; };
+  plane(0.5, 0.3, 'cream').position.set(0, 0.15, 0);                       // the window wall
+  const desk = plane(0.5, 0.15, 'kraft'); desk.rotation.x = -Math.PI / 2; desk.position.set(0, 0, 0.075 + 0.03);
+  const BLOB = [0, 0, 0.0884];
+  const blob = createBlob({ radius: 0.012, seed: 1 });
+  blob.mesh.position.set(BLOB[0], 0.002, BLOB[2]); scene.add(blob.mesh);
+  const zone = sensorLight({ aimAt: BLOB });
+  scene.add(zone.group, zone.light, zone.light.target, ambient());
+  camera.position.set(0.0, 0.10, 0.55); camera.lookAt(0, 0.065, 0.06);
+  stage.onFrame((t) => { zone.update(t, { wake: 0 }); blob.update(t, { key: zone.light }); });
+  window.zone = zone;
+  exposeForRender(stage, { duration: 1 });
+</script>

@@ -19,10 +19,10 @@ export const SHOTS = [
   { id: 's12', start: 78,  duration: 10, beats: { quiet1Start: 0 } },             // 1:18
   { id: 's13', start: 88,  duration: 7,  beats: { headLift: 0.5, revealSleeper: 1.4, revealDrinks: 2.4, revealFreshman: 3.4 } }, // 1:28
   { id: 's14', start: 95,  duration: 5,  beats: { custodianPass: 0.5, tinyBlobSeen: 2.3 } }, // 1:35
-  { id: 's15', start: 100, duration: 14, beats: { lampClickMarston: 0.5, phoneFaceDown: 7.417, penUncap: 8, nameWritten: 10 } }, // 1:40 / 1:48 / 1:50
-  { id: 's16', start: 114, duration: 21, beats: { problemOneSolved: 3, problemSolved2: 8.5, problemSolved3: 11, problemSolved4: 13, problemSolved5: 14.5, lampClickNeighbor: 15, problemSolved6: 16 } }, // 1:54 + ~3 s
+  { id: 's15', start: 100, duration: 14, beats: { sensorWakeMarston: 0.5, phoneFaceDown: 7.417, penUncap: 8, nameWritten: 10 } }, // 1:40 / 1:48 / 1:50
+  { id: 's16', start: 114, duration: 21, beats: { problemOneSolved: 3, problemSolved2: 8.5, problemSolved3: 11, problemSolved4: 13, problemSolved5: 14.5, sensorWakeNeighbor: 15, problemSolved6: 16 } }, // 1:54 + ~3 s
   { id: 's17', start: 135, duration: 25, beats: { quiet2Start: 0, dawnBird1: 6, dawnBird2: 13.5, dawnBird3: 19 } }, // 2:15
-  { id: 's18', start: 160, duration: 20, beats: { nextSemester: 0, lampClickFreshman: 4, blobYawn: 14 } }, // 2:40 / 2:44 / 2:54
+  { id: 's18', start: 160, duration: 20, beats: { nextSemester: 0, sensorWakeFreshman: 4, blobYawn: 14 } }, // 2:40 / 2:44 / 2:54
 ];
 
 export function shotAt(t) {

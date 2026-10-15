@@ -1,5 +1,5 @@
 // node src/audio/selftest.js — run after a full `node tools/mix.mjs`. Exits non-zero on the first failure.
-// Checks the three lamp clicks are sample-identical in the foley stem and within ±1 LSB in mix.wav, a bed cue
+// Checks the two lamp clicks and the two sensor wakes are each sample-identical in the foley stem and within ±1 LSB in mix.wav, a bed cue
 // with dur/until fills its span, and voices and every foley sound are deterministic and finite. Writes solo WAVs to out/audio/solo/ for spectrograms.
 import assert from 'node:assert/strict';
 import { readFileSync, mkdirSync } from 'node:fs';
@@ -14,18 +14,46 @@ import { seedOf } from '../core/rng.js';
 const out = fileURLToPath(new URL('../../out/audio', import.meta.url));
 const ok = (name, fn) => { fn(); console.log(`ok  ${name}`); };
 
-ok('three lamp clicks are sample-identical in out/audio/stems/foley.wav', () => {
+// The off click is followed by the spring-back's rustle at +0.17 s (s06.md), so the lamp clicks are compared over their first
+// 0.17 s; what the buffer does after that is the tink's tail, which must stay under 1% of the click's peak (asserted below).
+// A sensor wake is compared over its whole 0.65 s: nothing else may sound in its window (cues.js WAKE).
+const CLICK_CMP = 0.17;
+const WAKE_ID = seedOf('sensorWake');
+const cuesOf = (sound) => CUES.filter((c) => c.sound === sound);
+const stemL = () => {
   const b = readFileSync(`${out}/stems/foley.wav`);
   const L = new Float32Array((b.length - 44) / 8).map((_, i) => b.readFloatLE(44 + i * 8)); // left channel
   assert.equal(L.length, DURATION * SR, 'run the full 180 s mix first');
-  const clicks = CUES.filter((c) => c.sound === 'lampClick');
-  assert.equal(clicks.length, 3);
-  const n = FOLEY.lampClick(seedOf('lampClick')).length;
-  const slices = clicks.map((c) => { const i0 = Math.round((beat(c.beat) + (c.offset ?? 0)) * SR); return L.slice(i0 - 4800, i0 + n + 4800); });
+  return L;
+};
+const sliceAt = (L, c, n) => { const i0 = Math.round((beat(c.beat) + (c.offset ?? 0)) * SR); return L.slice(i0 - 4800, i0 + n + 4800); };
+const peakOf = (x) => x.reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+
+ok('two lamp clicks (home on, home off) are sample-identical in out/audio/stems/foley.wav', () => {
+  const L = stemL(), clicks = cuesOf('lampClick');
+  assert.deepEqual(clicks.map((c) => c.beat), ['lampClickHome', 'lampOffHome']);
+  assert.ok(clicks.every((c) => c.seed === clicks[0].seed && c.gain === clicks[0].gain && !c.offset), 'one seed, one gain, on the beat');
+  const buf = FOLEY.lampClick(seedOf('lampClick')), n = Math.round(CLICK_CMP * SR);
+  const tail = peakOf(buf.slice(n)) / peakOf(buf);
+  assert.ok(tail < 0.01, `click tail past ${CLICK_CMP} s is ${(100 * tail).toFixed(2)}% of its peak`);
+  const slices = clicks.map((c) => sliceAt(L, c, n).slice(0, 4800 + n));
   for (const s of slices.slice(1)) assert.deepEqual(s, slices[0]);
-  const peak = slices[0].reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+  const peak = peakOf(slices[0]);
   assert.ok(peak > 0.1, `click present (peak ${peak})`);
-  console.log(`    ${clicks.map((c) => `${c.beat}@${beat(c.beat)}s`).join(', ')}; ${slices[0].length} samples each (±0.1 s), peak ${peak.toFixed(4)}`);
+  console.log(`    ${clicks.map((c) => `${c.beat}@${beat(c.beat)}s`).join(', ')}; ${slices[0].length} samples each (-0.1…+${CLICK_CMP} s), peak ${peak.toFixed(4)}, tail past ${CLICK_CMP} s ${(100 * tail).toFixed(3)}% of peak`);
+});
+ok('s15 and s18 sensor wakes are the same buffer: one cue seed and gain, sample-identical in foley.wav; none on the neighbor', () => {
+  const L = stemL(), wakes = cuesOf('sensorWake');
+  assert.deepEqual(wakes.map((c) => c.beat), ['sensorWakeMarston', 'sensorWakeFreshman']);
+  assert.ok(wakes.every((c) => c.seed === wakes[0].seed && c.gain === wakes[0].gain && !c.offset), 'one seed, one gain, on the beat');
+  assert.deepEqual(FOLEY.sensorWake(WAKE_ID), FOLEY.sensorWake(WAKE_ID));   // the buffer is the seeded synth's, whoever asks
+  assert.ok(!CUES.some((c) => c.beat === 'sensorWakeNeighbor' && c.stem !== 'ambience'), 'the neighbor wake is seen, not heard (Q2)');
+  const n = FOLEY.sensorWake(WAKE_ID).length, slices = wakes.map((c) => sliceAt(L, c, n));
+  assert.equal(n, Math.round(0.65 * SR), 'cues.js WAKE and foley.js disagree on the wake length');
+  assert.deepEqual(slices[1], slices[0]);
+  const peak = peakOf(slices[0]);
+  assert.ok(peak > 0.1, `wake present (peak ${peak})`);
+  console.log(`    ${wakes.map((c) => `${c.beat}@${beat(c.beat)}s`).join(', ')}; ${slices[0].length} samples each (-0.1…+0.65+0.1 s), peak ${peak.toFixed(4)}`);
 });
 ok('every bed cue with a length sounds at both ends of its own span', () => {
   // Checks each cue's own span, not the whole stem, so several beds can share a stem.
@@ -40,30 +68,32 @@ ok('every bed cue with a length sounds at both ends of its own span', () => {
 });
 ok('voices and foley are deterministic and finite', () => {
   const make = [() => feltPiano(60), () => musicBox(72.14), () => pad([60, 64, 67], { dur: 2 }), () => subSwell({ dur: 3 }),
-    ...['lampClick', 'penUncap', 'inkDrip', 'paperRustle', 'fluorescentHum'].map((k) => () => FOLEY[k](7))];
+    ...['lampClick', 'sensorWake', 'penUncap', 'inkDrip', 'paperRustle', 'fluorescentHum'].map((k) => () => FOLEY[k](7))];
   for (const f of make) { const x = f(), y = f(); assert.deepEqual(x, y); assert.ok(x.every(Number.isFinite)); assert.ok(x.some((v) => v !== 0)); }
 });
 ok('every foley sound renders, deterministic and finite', () => {
   for (const [k, f] of Object.entries(FOLEY)) { const x = f(7), y = f(7); assert.deepEqual(x, y, k); assert.ok(x.every(Number.isFinite) && x.some((v) => v !== 0), k); }
 });
 
-ok('three lamp clicks are identical within ±1 LSB in out/audio/mix.wav (over the click\'s own samples)', () => {
-  const b = readFileSync(`${out}/mix.wav`), d = b.indexOf('data') + 8;              // 16-bit stereo, 48 kHz
-  const L = (i) => b.readInt16LE(d + i * 4);
-  assert.equal((b.length - d) / 4, DURATION * SR, 'run the full 180 s mix first');
-  const n = FOLEY.lampClick(seedOf('lampClick')).length;
-  const at = CUES.filter((c) => c.sound === 'lampClick').map((c) => Math.round((beat(c.beat) + (c.offset ?? 0)) * SR));
-  let peak = 0;
-  for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(L(at[0] + i)));
-  const diff = at.map((a) => { let m = 0; for (let i = 0; i < n; i++) m = Math.max(m, Math.abs(L(a + i) - L(at[1] + i))); return m; });
-  console.log(`    max diff vs ${CUES.filter((c) => c.sound === 'lampClick')[1].beat} [${diff}] LSB over ${n} samples each, peak ${peak} LSB`);
-  assert.ok(peak > 3000, `click present (peak ${peak})`);
-  assert.ok(Math.max(...diff) <= 1, `clicks differ by up to ${Math.max(...diff)} LSB`);
-});
+for (const [sound, n, label] of [['lampClick', Math.round(CLICK_CMP * SR), 'lamp clicks'], ['sensorWake', FOLEY.sensorWake(WAKE_ID).length, 'sensor wakes']]) {
+  ok(`the two ${label} are identical within ±1 LSB in out/audio/mix.wav (over the first ${(n / SR).toFixed(2)} s)`, () => {
+    const b = readFileSync(`${out}/mix.wav`), d = b.indexOf('data') + 8;              // 16-bit stereo, 48 kHz
+    const L = (i) => b.readInt16LE(d + i * 4);
+    assert.equal((b.length - d) / 4, DURATION * SR, 'run the full 180 s mix first');
+    const cs = cuesOf(sound), at = cs.map((c) => Math.round((beat(c.beat) + (c.offset ?? 0)) * SR));
+    let peak = 0;
+    for (let i = 0; i < n; i++) peak = Math.max(peak, Math.abs(L(at[0] + i)));
+    const diff = at.map((a) => { let m = 0; for (let i = 0; i < n; i++) m = Math.max(m, Math.abs(L(a + i) - L(at[1] + i))); return m; });
+    console.log(`    max diff vs ${cs[1].beat} [${diff}] LSB over ${n} samples each, peak ${peak} LSB`);
+    assert.ok(peak > 3000, `${sound} present (peak ${peak})`);
+    assert.ok(Math.max(...diff) <= 1, `${label} differ by up to ${Math.max(...diff)} LSB`);
+  });
+}
 
 mkdirSync(`${out}/solo`, { recursive: true });
 const pad0 = (x) => { const y = new Float32Array(x.length + SR / 10); y.set(x, SR / 20); return y; };
 const click = pad0(FOLEY.lampClick(seedOf('lampClick'))), piano = pad0(feltPiano(60, { vel: 0.7, dur: 1.5 }));
 writeWav(`${out}/solo/lampclick.wav`, [click]);
+writeWav(`${out}/solo/sensorwake.wav`, [pad0(FOLEY.sensorWake(WAKE_ID))]);
 writeWav(`${out}/solo/piano_c4.wav`, [piano]);
-console.log(`wrote ${out}/solo/{lampclick,piano_c4}.wav (${click.length}, ${piano.length} samples)`);
+console.log(`wrote ${out}/solo/{lampclick,sensorwake,piano_c4}.wav (${click.length}, ${piano.length} samples)`);
