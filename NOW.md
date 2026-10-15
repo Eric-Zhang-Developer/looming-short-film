@@ -9,7 +9,6 @@
 | `mod-material` | batch 3 builder | batch 2 all merged |
 | `snd-foley`, `snd-score` | builders (wave 6, early) | `snd-engine` merged; full mix -14.5 LUFS |
 | `sb-act1`, `sb-act2`, `sb-act3` | storyboard (docs) | parallel track |
-| `tool-cut-fixes` | builder | despill, alpha clamp, real generation cap |
 | **G1** | director | style tile v2_1–v2_4 in `evidence/asset-style-tile/contact.jpg`; orchestrator recommends v2_4 |
 
 ## Plan
