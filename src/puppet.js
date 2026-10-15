@@ -6,6 +6,8 @@
 // texture space, as paper.js paths use it: u right, v DOWN, 0..1.
 // Face slots are ordinary parts named after a `faces` key ('eyes', 'mouth'); face() swaps their textures.
 // Every take in a slot must share the slot part's size: a swap changes textures, never geometry.
+// Boil: a part's sheet (or a face take) may be a function seed → PaperSheet. boil(t, rate) re-tears every such
+// part at boilSeed(t, rate) by swapping textures; plain sheets never change.
 //
 // Time: blend() and follow() sample at onTwos(t), so characters step at 12 fps while lights run at 24.
 // follow() lags a part behind its ancestors' blended rotation with a damped spring, the same response as
@@ -13,6 +15,7 @@
 // pure function of t and of the last blend() call's poses and keys.
 import { kf, onTwos } from './core/ease.js';
 import { paperMesh, updatePaperMesh } from './material.js';
+import { boilSeed } from './paper.js';
 import * as THREE from 'three';
 
 const DT = 1 / 240;  // follow() integration step (s)
@@ -21,6 +24,9 @@ export function definePuppet({ name, parts, faces = {} }) {
   const group = new THREE.Group();
   group.name = name;
   const joints = {}, meshes = {}, parentOf = {};
+  const src = {};  // part → what it shows now: a PaperSheet or seed → PaperSheet (face() changes it for face slots)
+  let seed = 0;
+  const at = (s) => (typeof s === 'function' ? s(seed) : s);
   for (const p of parts) {
     if (joints[p.name]) throw new Error(`puppet ${name}: duplicate part "${p.name}"`);
     const parent = p.parent ? joints[p.parent] : group;
@@ -29,12 +35,13 @@ export function definePuppet({ name, parts, faces = {} }) {
     joint.name = p.name;
     joint.position.set(p.at[0], p.at[1], p.z ?? (p.parent ? 0.003 : 0));
     joint.userData.base = 0;
-    const mesh = paperMesh(p.sheet);
-    const [w, h] = p.sheet.size, [u, v] = p.pivot;
+    const sheet = at(p.sheet);
+    const mesh = paperMesh(sheet);
+    const [w, h] = sheet.size, [u, v] = p.pivot;
     mesh.position.set((0.5 - u) * w, (v - 0.5) * h, 0);
     joint.add(mesh);
     parent.add(joint);
-    joints[p.name] = joint; meshes[p.name] = mesh; parentOf[p.name] = p.parent;
+    joints[p.name] = joint; meshes[p.name] = mesh; parentOf[p.name] = p.parent; src[p.name] = p.sheet;
   }
 
   function pose(angles) {
@@ -59,13 +66,23 @@ export function definePuppet({ name, parts, faces = {} }) {
 
   function face(takes) {
     for (const [slot, take] of Object.entries(takes)) {
-      const sheet = faces[slot]?.[take], mesh = meshes[slot];
-      if (!sheet) throw new Error(`puppet ${name}: no face ${slot}.${take}`);
+      const pick = faces[slot]?.[take], mesh = meshes[slot];
+      if (!pick) throw new Error(`puppet ${name}: no face ${slot}.${take}`);
       if (!mesh) throw new Error(`puppet ${name}: no part named "${slot}" to carry faces.${slot}`);
-      const [w, h] = mesh.userData.sheet.size;
+      const sheet = at(pick), [w, h] = mesh.userData.sheet.size;
       if (Math.abs(sheet.size[0] - w) > 1e-9 || Math.abs(sheet.size[1] - h) > 1e-9) throw new Error(`puppet ${name}: face ${slot}.${take} size differs from the slot`);
+      src[slot] = pick;
       updatePaperMesh(mesh, sheet);
     }
+  }
+
+  // Re-tears every function-sheet part (and the face take on show) when the boil seed changes. Call it every frame;
+  // order against face() doesn't matter, both resolve takes at the current seed.
+  function boil(t, rate = 10) {
+    const s = boilSeed(t, rate);
+    if (s === seed) return;
+    seed = s;
+    for (const [part, sh] of Object.entries(src)) if (typeof sh === 'function') updatePaperMesh(meshes[part], sh(seed));
   }
 
   // gain scales the lag (1 = the part holds its world angle at first, like a loose tail).
@@ -92,5 +109,5 @@ export function definePuppet({ name, parts, faces = {} }) {
     j.rotation.z = j.userData.base + off;
   }
 
-  return { name, group, joints, meshes, pose, blend, face, follow };
+  return { name, group, joints, meshes, pose, blend, face, follow, boil };
 }

@@ -1,0 +1,2 @@
+18	0	docs/contracts.md
+git show --numstat e8feb13: 18 added, 0 deleted, one hunk @@ -143,0 +144,18 @@ (inside §puppet, after its last line)

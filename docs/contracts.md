@@ -141,6 +141,24 @@ Puppet.follow(partName, t, { k, w }) // damped secondary motion (tail, pocket), 
 
 Poses live in the shot or character file as plain objects. A temporary test gator built from `paper.js` paths is fine until frozen art exists.
 
+Added by `contract-puppet` (additive; everything above still holds):
+
+```js
+// parts[].sheet and every faces take may also be a function (seed) => PaperSheet,
+//   e.g. (s) => makePaper({ art, key: 'gator-arm', seed: s }). Plain PaperSheets keep working and never boil.
+Puppet.boil(t, rate = 10)            // boilSeed(t, rate); when the seed changes, re-tears every function sheet
+                                     //   (and the face take on show) with updatePaperMesh: textures only, no new geometry
+Puppet.follow(partName, t, { k = 6, w = 18, gain = 1 })  // gain scales the lag (1 = the part holds its world angle at first)
+Puppet.joints                        // { partName: THREE.Group }: the joint at each pivot; rotation.z is the joint angle
+Puppet.meshes                        // { partName: THREE.Mesh }: each part's paperMesh
+Puppet.name
+```
+
+- **Face slots** are ordinary parts named `eyes` and `mouth` (a `faces` key), placed by the part list like any other part. `face()` swaps the slot part's textures, so every take in a slot must match the slot part's `size`; a mismatch throws.
+- **`pivot` is v-down:** `[u, v]` in the part's texture space, u right and v down, 0..1, the same as `paper.js` paths and image pixels.
+- **`pose()` after `blend()` overrides.** `blend()` sets every joint (joints not in any of its poses go to 0), so a manual angle must come after it in the frame.
+- **`face()` must be called every frame,** and so must `boil()`. Both are stateful: skip one and the take or tear from an earlier `t` stays on. Their order within a frame doesn't matter.
+
 ## `src/blob.js` (task `mod-blob`)
 
 ```js

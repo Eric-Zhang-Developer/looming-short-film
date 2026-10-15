@@ -2,6 +2,7 @@
 // standing on a kraft desk 3.5 cm in front of a cream wall. Frozen gator art replaces it in wave 3.
 // One 4 s action: neutral → anticipation → reach for the lamp (overshoot, settle, hold) → worried face (t = 2)
 // → relieved smile (t = 3). Tail and pocket follow on springs. The puppet steps on 2s; the lamp sways on 1s.
+// Every part and face take boils at rate 10 (gator.boil(t)), in every view.
 // window.renderFrame(t): t in [0, 4) is the action; [4, 8) joint stress poses; [8, 9) every face take. window.lab exposes the puppet and lamp for evidence/mod-puppet/twos.mjs.
 import * as THREE from 'three';
 import { createStage, exposeForRender } from '../src/core/stage.js';
@@ -45,12 +46,13 @@ const arc = (cx, cy, rx, ry, a0, a1, n = 24) => Array.from({ length: n + 1 }, (_
 });
 const D = Math.PI / 180;
 const RES = 512;
-const sheet = (name, [w, h], pts, color, weight = 'cardstock') =>
-  makePaper({ path: pts.map(([x, y]) => [x / w, y / h]), size: [w / 1000, h / 1000], color, weight, key: 'testgator-' + name, res: RES });
+// Every sheet is a function of the boil seed, so gator.boil(t) re-tears it.
+const sheet = (name, [w, h], pts, color, weight = 'cardstock') => (seed) =>
+  makePaper({ path: pts.map(([x, y]) => [x / w, y / h]), size: [w / 1000, h / 1000], color, weight, key: 'testgator-' + name, res: RES, seed });
 const fromArt = (name, [w, h], draw, weight = 'cardstock') => {  // faces: two colors, so drawn as art with alpha
   const s = 30, c = Object.assign(document.createElement('canvas'), { width: w * s, height: h * s }), g = c.getContext('2d');
   g.scale(s, s); g.lineCap = g.lineJoin = 'round'; draw(g);
-  return makePaper({ art: c, size: [w / 1000, h / 1000], weight, key: 'testgator-' + name, res: RES });
+  return (seed) => makePaper({ art: c, size: [w / 1000, h / 1000], weight, key: 'testgator-' + name, res: RES, seed });
 };
 
 const BODY = [36, 46], HEAD = [40, 26], JAW = [26, 8], ARM = [9, 28], TAIL = [44, 14], POCKET = [16, 10], EYES = [18, 12], MOUTH = [14, 7];
@@ -160,6 +162,7 @@ stage.onFrame((t) => {
   lamp.light.position.set(0.07 + 0.006 * Math.sin(t * 2.3), 0.15, 0.28 + 0.004 * Math.cos(t * 1.7));
   aim(lamp.light, AIM);
   lamp.update(t);
+  gator.boil(t);
   const ft = onTwos(t);
   if (t >= 8) {
     const i = Math.round((ft - 8) * 12);
