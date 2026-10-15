@@ -44,6 +44,7 @@
 - anim-s01 · builder · `src/shots/s01.js` · verified (merged) · evidence/anim-s01/sheet.jpg
 - anim-s13 · builder · `src/shots/s13.js` · verified (merged) · evidence/anim-s13/strip.jpg
 - anim-s15 · builder · `src/shots/s15.js` · in-progress · —
+- anim-s11 · builder · `src/shots/s11.js` · in-progress · —
 - anim-s05 · builder · `src/shots/s05.js` · verified (merged) · evidence/anim-s05/sheet.jpg
 - anim-s10 · builder · `src/shots/s10.js` · verified (merged) · evidence/anim-s10/sheet.jpg
 - anim-s08 · builder · `src/shots/s08.js` · built · `evidence/anim-s08/sheet.jpg`
