@@ -1,27 +1,32 @@
 # NOW
 
-**Wave:** 1 · Smoke tests · branch `wave/1-smoke` · **both tasks built and checked; wave PR open**
+**Wave:** 2 · Foundations · branch `wave/2-foundations` · **planned, waiting on the director to dispatch batch 1**
 **Updated:** 2026-10-15
 
-## In flight
-- Wave 1 PR to `main`, waiting on the director.
+## Plan
+`docs/contracts.md` fixes every module interface. 11 tasks in 4 dependency batches, at most 4–5 builders at once:
 
-## Results
-- `smoke-codex`: **pass.** Headless `codex exec` works (exit 0, 88 s, no prompt). Real alpha returned. Image cost unknown (not in events).
-- `smoke-paper`: **pass on every acceptance item.** Cutout-shaped shadows, 2.95x phone loom, small lamp pool, deterministic, ~10 ms/frame. Surfaces read as vector/3D, not paper.
+| Batch | Tasks | Needs |
+|---|---|---|
+| 1 | `mod-core`, `mod-render`, `mod-timeline`, `tool-gen` | nothing |
+| 2 | `mod-paper`, `mod-lights`, `mod-blob`, `mod-post` | `mod-core` merged |
+| 3 | `mod-material` | `mod-paper`, `mod-lights` |
+| 4 | `mod-puppet`, `lookdev-composite` | everything |
+
+Each batch's tasks are squash-merged into `wave/2-foundations` after the orchestrator checks the evidence. `lookdev-composite` is the real paper test: painted Codex pieces lit in the full rig.
 
 ## Blocked
 - none
 
 ## Next 3 moves
-1. Director merges the wave 1 PR.
-2. Write `docs/contracts.md` and plan wave 2 (foundations).
-3. Early look-dev task: composite the Codex style-tile pieces onto the smoke-paper light rig. That's the real paper test, since procedural surfaces didn't read as paper.
+1. Director approves batch 1. Dispatch 4 builders in worktrees.
+2. Check evidence, merge, dispatch batch 2.
+3. Batches 3–4, then the wave 2 PR with the lookdev result.
 
 ## Open director questions
+- Dispatch batch 1?
 - Final submission deadline (confirm on ProposalSpace).
-- Merge wave 1?
 
 ## Models
 - Orchestrator: claude-opus-5-5
-- Builders and painters: claude-opus-5-5
+- Builders: opus for paper, lights, blob, material, puppet, core, tool-gen and lookdev; sonnet for render, timeline and post (well-specified ports)

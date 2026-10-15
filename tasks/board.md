@@ -2,6 +2,27 @@
 
 `id · type · owns · state · evidence`
 
-## Wave 1 · Smoke tests
-- smoke-codex · painter · `assets/prompts/style_tile.v1.md`, `assets/raw/`, `evidence/smoke-codex/`, `done/smoke-codex.md` · built (orchestrator-checked) · evidence/smoke-codex/contact.jpg
-- smoke-paper · builder · `package.json`, `package-lock.json`, `smoke/paper/`, `evidence/smoke-paper/`, `done/smoke-paper.md` · built (orchestrator-checked) · evidence/smoke-paper/phone_t0.5.jpg, lamp_t4.0.jpg
+## Wave 1 · Smoke tests (merged in #1)
+- smoke-codex · painter · approved (wave 1 PR merged)
+- smoke-paper · builder · approved (wave 1 PR merged)
+
+## Wave 2 · Foundations · `wave/2-foundations`
+
+### batch 1 (no dependencies)
+- mod-core · builder · `src/core/`, `lab/core.html`, `lab/core.js`, `evidence/mod-core/`, `done/mod-core.md` · todo · —
+- mod-render · builder · `render.mjs`, `tools/determinism.mjs`, `tools/lib/`, `evidence/mod-render/`, `done/mod-render.md` · todo · —
+- mod-timeline · builder · `src/timeline.js`, `tools/check_timeline.mjs`, `evidence/mod-timeline/`, `done/mod-timeline.md` · todo · —
+- tool-gen · builder · `tools/gen.mjs`, `tools/cut.mjs`, `assets/specs.json`, `assets/prompts/_blocks/`, `evidence/tool-gen/`, `done/tool-gen.md` · todo · —
+
+### batch 2 (needs mod-core)
+- mod-paper · builder · `src/paper.js`, `lab/paper.html`, `lab/paper.js`, `evidence/mod-paper/`, `done/mod-paper.md` · todo · —
+- mod-lights · builder · `src/lights.js`, `lab/lights.html`, `lab/lights.js`, `evidence/mod-lights/`, `done/mod-lights.md` · todo · —
+- mod-blob · builder · `src/blob.js`, `lab/blob.html`, `lab/blob.js`, `evidence/mod-blob/`, `done/mod-blob.md` · todo · —
+- mod-post · builder · `src/post.js`, `lab/post.html`, `lab/post.js`, `assets/luts/`, `evidence/mod-post/`, `done/mod-post.md` · todo · —
+
+### batch 3 (needs mod-paper, mod-lights)
+- mod-material · builder · `src/material.js`, `lab/material.html`, `lab/material.js`, `evidence/mod-material/`, `done/mod-material.md` · todo · —
+
+### batch 4 (needs all modules)
+- mod-puppet · builder · `src/puppet.js`, `lab/puppet.html`, `lab/puppet.js`, `evidence/mod-puppet/`, `done/mod-puppet.md` · todo · —
+- lookdev-composite · builder · `lab/lookdev.html`, `lab/lookdev.js`, `evidence/lookdev-composite/`, `done/lookdev-composite.md` · todo · —
