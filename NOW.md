@@ -9,7 +9,8 @@
 | `mod-material` | batch 3 builder | batch 2 all merged |
 | `snd-foley`, `snd-score` | builders (wave 6, early) | `snd-engine` merged; full mix -14.5 LUFS |
 | `sb-act1`, `sb-act2`, `sb-act3` | storyboard (docs) | parallel track |
-| `asset-style-tile` | painter | first live `gen.mjs` run; ends at **G1** |
+| `tool-cut-fixes` | builder | despill, alpha clamp, real generation cap |
+| **G1** | director | style tile v2_1–v2_4 in `evidence/asset-style-tile/contact.jpg`; orchestrator recommends v2_4 |
 
 ## Plan
 | Batch | Tasks | Needs | State |
@@ -24,7 +25,7 @@
 
 ## Next 3 moves
 1. Merge `mod-material`, then dispatch batch 4 (`mod-puppet`, `lookdev-composite`).
-2. When the style tile lands, bring the variants to the director for **G1** (contact sheet over grey and navy).
+2. **Waiting on G1.** On the pick: freeze it to `assets/frozen/style_tile.png` (despilled), then dispatch the gator sheet painter (G2).
 3. Fold the storyboard asset lists into `assets/specs.json` for wave 3; batch 4, then the wave 2 PR.
 
 ## Carry-overs for wave 3
