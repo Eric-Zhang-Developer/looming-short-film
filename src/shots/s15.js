@@ -1,18 +1,20 @@
-// s15 · Lamp click, the look, pen, name (docs/shots/s15.md). The film's turn, and the master s06 copies:
-// Camera A, the desk unit, the K0–K7 hand path and the press at local 0.500 are the numbers in UNIT below.
+// s15 · The pen, the light, the look, the name (docs/shots/s15.md). The film's turn, and the master s06 copies:
+// Camera A, the desk unit, the K0–K7 timing and the press at local 0.500 are the numbers in UNIT below. Marston has no desk
+// lamp: the reach for the pen wakes the motion-sensor zone over the desk (README §3), on the press drawing.
 // Marston reading room at night, side view: desk top y 0, floor y −0.034, window wall z 0, the gator faces +x.
 // Characters (gator, blob, the props he handles) step on 2s; light and camera run at 24.
 import * as THREE from 'three';
 import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
-import { phoneLight, lampLight, fluorescent, ambient, aim, shadowScale } from '../lights.js';
+import { phoneLight, sensorLight, fluorescent, ambient, aim, shadowScale } from '../lights.js';
 import { kf, ease, clamp } from '../core/ease.js';
 import { mulberry32, seedOf } from '../core/rng.js';
 import { makeGator } from '../characters/gator.js';
-import { makeExam } from '../characters/exam.js';
+import { createBlob } from '../blob.js';
 import { POSES, specPose, pressKeys } from '../characters/poses.js';
 
 const ID = 's15', D = Math.PI / 180;
+const BLOB_R = 0.012;                                        // the Exam's radius here (README §1); the blob-meter pass changes this line
 const dr = (n) => n / 12;                                    // drawing n (12 fps) → local seconds
 const on2s = (t) => Math.floor(t * 12 + 1e-4) / 12;          // onTwos, but 100.0833 − 100 = 0.08333333333332860 floors to drawing 0 there (evidence/anim-s15/ontwos.txt)
 
@@ -22,24 +24,26 @@ export const UNIT = {
   camA: { pos: [-0.010, 0.118, 0.392], look: [-0.010, 0.0385, 0.080] },   // spec look y 0.030, tilted up 1.45° (loom fix)
   camB: { pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] },
   focus: [-0.024, 0.020, 0.086], aperture: 0.02, maxblur: 0.01,
-  lampZ: 0.078,
-  knob: [-0.0228, 0.0228], knobR: 0.001, knobZ: 0.0855,     // knobZ: see the note at the lamp below
-  knobPressed: [-0.0223, 0.0211],                            // K6 drawing only: +0.0005 x (spec) and down onto K6's tip (see done note)
-  shadeMouth: [0.004, 0.056], lampAim: [-0.008, 0, 0.096],     // spec z 0.102; back with the blob (loom fix)
-  blob: [0, 0.012, 0.0884], phone: [-0.010, 0.0015, 0.116], phoneLight: [-0.014, 0.006, 0.116],   // loom fix: 4.2x, see done note
-  press: 0.5,                                                // K6 = pressKeys(0)[6], drawing 6
+  fill: [-0.046, 0.040, 0.114],                             // character fill (README §10): before him, just above eye line
+  tube: [0, 0.127, 0.040],                                   // sensor_trough tube centre (README §3), above the frame in A and B
+  blob: [0, BLOB_R, 0.0884], phone: [-0.010, 0.0015, 0.116], phoneLight: [-0.014, 0.006, 0.116],   // loom fix: 4.2x, see done note
+  press: 0.5,                                                // K6, drawing 6: the pen's capped point meets the page = the sensor
+                                                             // wake time (lampClickMarston). Beat-locked: don't move it.
 };
 // Intensities (candela for spots/points, lux for the directional), tuned by eye on the animatic sheet.
-const PHONE_I = 1.0, LAMP_I = 0.16, BULB_I = 0.03, FLUOR_I = 1.0, AMB_K = 0.45;
-const PHONE_OUTSHONE = 0.05;   // README §4 says 0.2; 0.2 left the loom at 43% display contrast (see done note)
-const FILL_PHONE = 0.003, FILL_LAMP = 0.02;   // character fill (README §10), set against measure.txt's face/wall ratio
-const LAMP_KEYS = [[12 / 24, 0], [13 / 24, 1.15], [15 / 24, 0.95], [17 / 24, 1.0]];  // on 1s from the click frame
+const PHONE_I = 1.0, ZONE_I = 0.8, FLUOR_I = 1.0, AMB_K = 0.45;   // ZONE_I: lights.js's default, the old lamp pool at the blob
+const PHONE_OUTSHONE = 0.02;   // README §4 says 0.2. anim-s15 took 0.05 (0.2 left the loom at 43%); the zone doesn't reach the
+                               // wall as the lamp's cone did, so 0.05 still read as a face: 0.02 (reel-s15, by eye)
+const FILL_PHONE = 0.003, FILL_ZONE = 0.02;   // character fill (README §10), set against anim-s15's face/wall ratio
 
-// ---------- the hand: K0–K7 from poses.js, then the rest of s15's table ----------
+// ---------- the hand: K0–K3 from poses.js (shared with s06), K4–K7 down to the pen, then the rest of s15's table ----------
 const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });   // poses.js's seated legs
 const P = {
   ...POSES,
-  off_knob: seat({ lean: 10, arm: -10 }),     // 1.167
+  pen_reach: seat({ lean: 19, arm: -15 }),    // K4 0.333, hand 3 mm over the capped pen
+  pen_touch: seat({ lean: 21, arm: -19 }),    // K5 0.417, fingertip on the pen
+  pen_press: seat({ lean: 24, arm: -16 }),    // K6 0.500 = K7: the capped point on the name line (the wake)
+  let_go: seat({ lean: 10, arm: -10 }),       // 1.167
   settle: seat({ lean: 6, arm: -30 }),        // 1.333, tip (−0.031, 0.000): hand flat on the desk
   phone_antic: seat({ lean: 4, arm: -36 }),   // 7.000
   flip: seat({ lean: 30, arm: -4.5 }),        // 7.333, solved for the spec's tip (−0.017, 0.005)
@@ -48,8 +52,9 @@ const P = {
 };
 const WRITE = ['write_a', 'write_b', 'write_c'];
 const BODY = [
-  ...pressKeys(0),                                            // K0–K7: drawings 0–7, press on 6 (0.500)
-  [dr(12), 'touch'], [dr(14), 'off_knob'], [dr(16), 'settle'],
+  ...pressKeys(0).slice(0, 4),                                // K0–K3: drawings 0–3, identical to s06
+  [dr(4), 'pen_reach'], [dr(5), 'pen_touch'], [dr(6), 'pen_press'], [dr(7), 'pen_press'],   // K4–K7, press on 6 (0.500)
+  [dr(12), 'pen_press'], [dr(14), 'let_go'], [dr(16), 'settle'],
   [dr(83), 'settle'], [dr(84), 'phone_antic'], [dr(86), 'grab'], [dr(87), 'grip'], [dr(88), 'flip'], [dr(89), 'grip'],
   [dr(90), 'grip'], [dr(91), 'to_pen'], [dr(92), 'to_pen'], [dr(93), 'uncap'], [dr(95), 'uncap'], [dr(96), 'uncap_pull'],
   [dr(100), 'poise'], [dr(105), 'poise'],
@@ -67,17 +72,12 @@ const mouthAt = (t) => t < dr(60) || t >= dr(93) ? 'line' : 'neutral';
 // The blob's startle and flinch: spring()'s own damping (k 6, w 18) in cosine phase, so the kick peaks on the beat frame.
 const kick = (t, t0, a) => (t < t0 ? 0 : a * Math.exp(-6 * (t - t0)) * Math.cos(18 * (t - t0)));
 
-const visibleSize = (a, name) => {   // the visible shape's size in meters
-  const [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
-  return [w * (u1 - u0), h * (v1 - v0)];
-};
-
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const C = (k) => new THREE.Color(PALETTE[k]);
   scene.background = C('navy').lerp(C('ink'), 0.5);
   const V = (a) => new THREE.Vector3(...a);
 
-  const [furn, lampA, props] = await Promise.all(['marston_furniture_sheet', 'desk_lamp', 'study_props_sheet'].map((n) => assets.load(n)));
+  const [furn, props] = await Promise.all(['marston_furniture_sheet', 'study_props_sheet'].map((n) => assets.load(n)));
   const boiling = [];
   const sheet = (opts, parent = scene) => {
     const mesh = paperMesh(makePaper({ ...opts, seed: 0 }));
@@ -112,21 +112,6 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   cut(furn, 'chair', { weight: 'kraft' }).position.set(-0.076, -0.034 + 0.025, 0.071);           // feet on the floor
   cut(props, 'laptop_base').position.set(-0.0075, 0.0015, 0.060);                                  // closed, lid down
   cut(props, 'laptop_lid').position.set(-0.0075, 0.0045, 0.0601);
-
-  // desk_lamp, cutout plane z 0.078. Knob z: the spec puts it in the lamp plane, but the fingertip lives in the near-arm
-  // plane (z 0.086), and from Camera A that 8 mm of depth drops the fingertip ~21 px below a knob at 0.078: the press
-  // would visibly miss. The knob stands off the stem toward camera to just behind the arm plane, so finger and knob
-  // meet in world and on screen; it still projects onto the stem.
-  const LZ = UNIT.lampZ;
-  cut(lampA, 'base').position.set(-0.020, 0.002, LZ);
-  cut(lampA, 'stem').position.set(-0.020, 0.035, LZ);
-  const knob = cut(lampA, 'knob');
-  const arm = cut(lampA, 'arm'); arm.position.set(-0.008, 0.069, LZ); arm.rotation.z = Math.atan2(-0.002, 0.024);
-  const shade = cut(lampA, 'shade', { weight: 'tissue' });          // proxy taper points +x: turned up, wide mouth down
-  const [sw, sh] = visibleSize(lampA, 'shade'), sk = 0.016 / sh;    // mouth width 0.016
-  shade.rotation.z = Math.PI / 2; shade.scale.setScalar(sk);
-  shade.position.set(UNIT.shadeMouth[0], UNIT.shadeMouth[1] + sw * sk / 2, LZ + 0.0005);
-  shade.traverse((o) => { o.castShadow = false; });                 // the light sits at its mouth: it must not black out its own pool
 
   // ---------- props he handles ----------
   // exam_page lying flat, x −0.033…−0.008, z 0.080…0.110, plus an ink layer: glyph problem lines (proxy only; frozen
@@ -181,7 +166,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const hero = await makeGator({ assets }, { res: 1024 });
   hero.group.position.set(UNIT.hip[0], UNIT.hip[1], UNIT.bodyZ);
   scene.add(hero.group);
-  const exam = makeExam({ shot: ID, seed: 1 });
+  const exam = createBlob({ radius: BLOB_R, seed: 1 });
   exam.stain.position.set(UNIT.blob[0], 0.0004, UNIT.blob[2]);
   scene.add(exam.mesh, exam.stain);
 
@@ -194,17 +179,14 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const nearFix = (spot) => { spot.shadow.camera.near = 0.004; spot.shadow.camera.updateProjectionMatrix(); };   // README §11
   nearFix(phoneSpot);
   // Character fill (README §10, which also covers §4's face fill): shadowless, in front of him just above eye line, short
-  // range so it never reaches the wall. Cool under the phone, warm cream under the lamp.
+  // range so it never reaches the wall. Cool under the phone, the fluorescent tone under the zone.
   const fill = new THREE.PointLight(PALETTE.phone, 0, 0.07, 2);
-  fill.castShadow = false; fill.position.set(-0.046, 0.040, 0.114); scene.add(fill);
-  const FILL = { phone: C('phone').lerp(C('navy'), 0.35), lamp: C('cream').lerp(C('lamp'), 0.3) };
+  fill.castShadow = false; fill.position.set(...UNIT.fill); scene.add(fill);
+  const FILL = { phone: C('phone').lerp(C('navy'), 0.35), zone: C('cream').lerp(C('gator'), 0.15) };   // README §6 tone
 
-  const lamp = lampLight({ angle: 0.35, penumbra: 0.5, intensity: 0 });
-  lamp.light.position.set(UNIT.shadeMouth[0], UNIT.shadeMouth[1], LZ);
-  scene.add(lamp.light, lamp.light.target, lamp.cone, lamp.dust);
-  aim(lamp.light, V(UNIT.lampAim)); nearFix(lamp.light);
-  const bulb = new THREE.PointLight(PALETTE.lamp, 0, 0.02, 2);   // inside the shade: back-lights the tissue only
-  bulb.position.set(UNIT.shadeMouth[0], UNIT.shadeMouth[1] + 0.007, LZ - 0.003); scene.add(bulb);
+  // His desk zone (README §3): dead until the press, then the shared wake. The trough hangs above frame in A and B.
+  const zone = sensorLight({ at: UNIT.tube, aimAt: [UNIT.blob[0], 0, UNIT.blob[2]], intensity: ZONE_I });
+  scene.add(zone.group, zone.light, zone.light.target);
 
   const tubes = fluorescent({ intensity: FLUOR_I });   // flicker amplitude 0: its update() is never called
   scene.add(tubes.light);
@@ -226,7 +208,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     camera.position.set(...A.pos.map((v, i) => v + (B.pos[i] - v) * k));
     camera.lookAt(look.set(...A.look.map((v, i) => v + (B.look[i] - v) * k)));
     camera.getWorldDirection(dir);
-    fx.set({ focus: dir.dot(FOCUS.clone().sub(camera.position)), lut: t >= UNIT.press ? 'amber' : 'marston' });
+    const level = zone.update(t, { wake: UNIT.press }), lit = level >= 0.5;   // on 1s; README §4's outshone switch
+    fx.set({ focus: dir.dot(FOCUS.clone().sub(camera.position)), lut: lit ? 'amber' : 'marston' });
 
     // gator
     hero.boil(t, 10);
@@ -237,22 +220,24 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     hero.group.updateMatrixWorld(true);
     hero.hand.getWorldPosition(hand); hero.hands.arm_l.getWorldPosition(far);
 
-    // knob: pushed in on the press drawing only
-    knob.position.set(...(Math.abs(tc - dr(6)) < 1e-6 ? UNIT.knobPressed : UNIT.knob), UNIT.knobZ);
-
     // phone: flat to 7.25, on edge at 7.333, face-down from 7.417 (phoneFaceDown)
     const flip = tc >= dr(89) ? Math.PI : tc >= dr(88) ? Math.PI / 2 : 0;
     phone.rotation.x = flip;
     phone.position.y = UNIT.phone[1] + 0.0025 * Math.sin(flip);
 
     // pen and cap
-    const lying = tc < dr(92), level = tc >= dr(93) && tc < dr(97);
+    const pressing = tc >= dr(6) && tc < dr(14), held = tc >= dr(5) && tc < dr(14);   // K5 grab to the 1.167 let-go
+    const lying = !held && tc < dr(92), levelPen = tc >= dr(93) && tc < dr(97);
     if (lying) {   // on the page's front edge, x −0.028…−0.016
       pen.position.set(-0.016, 0.0006, 0.106); pen.rotation.set(-Math.PI / 2, 0, 0);
+    } else if (held && !pressing) {   // K5: on the fingertip, still lying flat (the flat-puppet cheat)
+      pen.position.set(hand.x + 0.006, 0.0006, 0.0868); pen.rotation.set(-Math.PI / 2, 0, 0);
+    } else if (pressing) {   // K6–1.0: tipped up 45° on the fingertip, the capped point on the name line
+      pen.position.set(hand.x, 0.0003, 0.0868); pen.rotation.set(0, 0, -Math.PI / 4);
     } else {       // tip on the fingertip: level for the uncap, else 45° down-forward; touching y 0 while writing
-      pen.rotation.set(0, 0, level ? 0 : -Math.PI / 4);
+      pen.rotation.set(0, 0, levelPen ? 0 : -Math.PI / 4);
       const writing = tc >= dr(106) && tc < dr(120), bob = writing ? (Math.round(tc * 12) % 2) * 0.0005 : 0;
-      pen.position.set(hand.x + (level ? 0.006 : 0), writing ? 0.0002 + bob : hand.y + 0.0003, 0.0868);
+      pen.position.set(hand.x + (levelPen ? 0.006 : 0), writing ? 0.0002 + bob : hand.y + 0.0003, 0.0868);
     }
     if (tc < dr(96)) {   // on the pen's tip end until the uncap
       cap.rotation.copy(pen.rotation);
@@ -269,33 +254,24 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       wobble: tc < UNIT.press ? 1.4 : tc >= 5 && tc < 7 ? 0 : 1,
       squash: kick(tc, UNIT.press, 0.3) + kick(tc, 10, 0.35),
       eyes: (tc >= dr(21) && tc < dr(23)) || (tc >= dr(138) && tc < dr(139)) ? 'closed' : tc >= 3.5 && tc < 7 ? 'side' : 'open',
-      look: -1,
+      look: -1, key: lit ? zone.light : phoneSpot,   // README §11: the face fill sits near the blob
     });
     exam.mesh.scale.set(1, tc >= 5 && tc < 7 ? 1 + 0.03 * Math.sin(2 * Math.PI * (tc - 5) / 1.6) : 1, 1);   // breathing
     exam.mesh.rotation.z = kf(tc, [[3.5, 0], [dr(44), 10], [4.5, 10], [dr(58), 0]]) * D;                   // tilts toward him
     exam.mesh.position.set(UNIT.blob[0] + kick(tc, 10, 0.002), Math.abs(tc - dr(45)) < 1e-6 ? 0.001 : 0, UNIT.blob[2]);
 
-    // light: phone is the key to the click, then the lamp (on 1s)
-    const ph = t < UNIT.press ? 1 : t < dr(89) ? PHONE_OUTSHONE : 0;
-    phoneSpot.intensity = PHONE_I * ph;
-    fill.color.copy(t < UNIT.press ? FILL.phone : FILL.lamp); fill.intensity = t < UNIT.press ? FILL_PHONE : FILL_LAMP;
+    // light: phone is the key until the wake; out-shone on every frame the zone is ≥ 0.5, so the loom flashes back on the
+    // stutter's dark frames; off once the screen is face-down (7.417).
+    phoneSpot.intensity = PHONE_I * (t >= dr(89) ? 0 : lit ? PHONE_OUTSHONE : 1);
+    fill.color.copy(lit ? FILL.zone : FILL.phone); fill.intensity = lit ? FILL_ZONE : FILL_PHONE;
     screen.material.color.setScalar(t < UNIT.press ? 1 : 0.6);
-    const lit = t >= UNIT.press, lk = kf(t, LAMP_KEYS, (x) => x);
-    lamp.light.visible = lit;
-    lamp.light.intensity = LAMP_I * lk;
-    bulb.intensity = lit ? BULB_I * lk : 0;
-    lamp.update(t);
-    // three sorts transparent objects by geometry.boundingSphere, computed once on first draw and never again. The dust
-    // moves in place, so its sort depth (and the additive blend order) depended on which t drew it first: up to 2/255
-    // off at t 109.4. Recompute it from this t. ponytail: belongs in lampLight's update (lights.js); see done note.
-    lamp.dust.geometry.computeBoundingSphere();
   }
 
   // For evidence/anim-s15/measure.html: the world points the acceptance checks project.
   const probe = () => ({
-    hand: hand.toArray(), head: hero.meshes.head.getWorldPosition(new THREE.Vector3()).toArray(), knob: knob.getWorldPosition(new THREE.Vector3()).toArray(),
+    hand: hand.toArray(), head: hero.meshes.head.getWorldPosition(new THREE.Vector3()).toArray(), pen: pen.getWorldPosition(new THREE.Vector3()).toArray(),
     wallScale: shadowScale(phoneSpot.position, BLOB_C, 0),
-    poolScale: lamp.light.position.y / (lamp.light.position.y - UNIT.blob[1]),
+    poolScale: zone.light.position.y / (zone.light.position.y - BLOB_R),
     joints: Object.fromEntries(Object.entries(hero.joints).map(([n, j]) => [n, j.rotation.z])),
   });
   return { update, probe };
