@@ -46,8 +46,10 @@ export function placeForScale({ subjectPos, wallZ, scale, height = 0, side = 0 }
 // bounding sphere: near just short of it, fov just around it. A caster's shadow subtends the same
 // angle from the light as the caster, so this frustum holds the whole shadow on any receiver.
 // Call it again whenever the light or the target moves.
+// near is tabletop-scale (min(4 mm, d/20)) so a caster just in front of the light is inside the frustum; pass
+// { nearest } (m, the closest caster to the light) to set it explicitly.
 const _box = new THREE.Box3(), _sphere = new THREE.Sphere(), _lp = new THREE.Vector3();
-export function aim(spot, target) {
+export function aim(spot, target, { nearest } = {}) {
   if (target.isObject3D) _box.setFromObject(target).getBoundingSphere(_sphere);
   else _sphere.set(_lp.copy(target), 0);
   const c = _sphere.center.clone(), r = _sphere.radius;
@@ -58,7 +60,7 @@ export function aim(spot, target) {
 
   const d = spot.getWorldPosition(_lp).distanceTo(c);
   const cam = spot.shadow.camera;
-  cam.near = Math.max(0.002, (d - r) * 0.5);       // room for casters between the light and the target
+  cam.near = nearest ?? Math.min(0.004, d / 20);   // a caster 5 cm from a phone is only 1 cm past this
   cam.far = spot.distance || 10 * (d + r);         // receivers up to ~10× farther (three uses distance when set)
   spot.shadow.focus = r > 0 ? clamp(1.15 * Math.asin(Math.min(1, r / d)) / spot.angle, 0.05, 1) : 1;
   cam.updateProjectionMatrix();                    // SpotLightShadow only does this when fov/far change

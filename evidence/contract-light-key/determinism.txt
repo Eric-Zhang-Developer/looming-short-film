@@ -1,0 +1,37 @@
+$ node tools/determinism.mjs --page=lab/lights.html --t=15.6,89.6,0.5
+t=15.6  9cf5aef9c24c9831 9cf5aef9c24c9831 9cf5aef9c24c9831  PASS
+t=89.6  9cf5aef9c24c9831 9cf5aef9c24c9831 9cf5aef9c24c9831  PASS
+t=0.5  749e8bd9fe082477 749e8bd9fe082477 749e8bd9fe082477  PASS
+determinism: PASS
+$ node tools/determinism.mjs --page=lab/blob.html --t=15.6,89.6,0.5
+t=15.6  94fed60e3fca59d2 94fed60e3fca59d2 94fed60e3fca59d2  PASS
+t=89.6  4a6834aad2145816 4a6834aad2145816 4a6834aad2145816  PASS
+t=0.5  28b2785e76b1c393 28b2785e76b1c393 28b2785e76b1c393  PASS
+determinism: PASS
+$ node tools/determinism.mjs --page=index.html --t=15.6,89.6,0.5
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=15.6  b73a569feccf0034 b73a569feccf0034 b73a569feccf0034  PASS
+t=89.6  98d9c6ecbfe0739e 98d9c6ecbfe0739e 98d9c6ecbfe0739e  PASS
+t=0.5  83aa3a471f4c0fe5 83aa3a471f4c0fe5 83aa3a471f4c0fe5  PASS
+determinism: PASS

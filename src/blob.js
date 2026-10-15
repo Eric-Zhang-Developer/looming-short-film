@@ -236,21 +236,43 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   const syncFloor = () => { uniforms.uFloor.value = stain.parent ? Math.min(0, (stain.getWorldPosition(a).y - mesh.getWorldPosition(b).y) / radius) : 0; };
   mesh.onBeforeShadow = syncFloor;
 
-  // Read the key light from the scene each frame: the brightest shadow-casting light, else the brightest light.
+  // Read the key light from the scene each frame: the light that contributes most at the blob (intensity × distance
+  // falloff × cone), or the Light passed to update(..., { key }).
   // ponytail: one key light only; a second light (phone vs lamp) adds no highlight. Add a second slot when a shot needs it.
-  const tmp = new THREE.Vector3(), tmpColor = new THREE.Color();
+  const tmp = new THREE.Vector3(), tmpColor = new THREE.Color(), at = new THREE.Vector3(), lp = new THREE.Vector3(), axis = new THREE.Vector3();
+  let keyOverride = null;
+  // Strength of light `o` at the blob, the way three's punctual lights attenuate (distance cutoff, decay, spot cone).
+  function contribution(o) {
+    let k = o.intensity * (o.color.r * 0.2126 + o.color.g * 0.7152 + o.color.b * 0.0722);
+    if (o.isDirectionalLight) return k;
+    o.getWorldPosition(lp);
+    const d = lp.distanceTo(at), cut = o.distance || 0, decay = o.decay ?? 2;
+    k /= Math.max(Math.pow(d, decay), 0.01);
+    if (cut > 0 && decay > 0) k *= Math.pow(Math.min(1, Math.max(0, 1 - Math.pow(d / cut, 4))), 2);
+    if (o.isSpotLight) {
+      axis.copy(o.target.getWorldPosition(tmp)).sub(lp).normalize();
+      const cos = tmp.copy(at).sub(lp).normalize().dot(axis);
+      const c0 = Math.cos(o.angle), c1 = Math.cos(o.angle * (1 - o.penumbra));
+      const x = Math.min(1, Math.max(0, (cos - c0) / (c1 - c0 || 1e-6)));
+      k *= x * x * (3 - 2 * x);
+    }
+    return k;
+  }
   mesh.onBeforeRender = (renderer, scene) => {
     syncFloor();
-    let key = null;
+    let key = null, best = -1;
+    mesh.getWorldPosition(at);
     uniforms.uAmb.value.setRGB(0, 0, 0);
     scene.traverseVisible((o) => {
       if (!o.isLight || o.intensity <= 0) return;
       if (o.isAmbientLight) uniforms.uAmb.value.add(tmpColor.copy(o.color).multiplyScalar(o.intensity));
       else if (o.isHemisphereLight) uniforms.uAmb.value.add(tmpColor.copy(o.color).lerp(o.groundColor, 0.5).multiplyScalar(o.intensity));
       else if (o.isSpotLight || o.isPointLight || o.isDirectionalLight) {
-        if (!key || (o.castShadow && !key.castShadow) || (o.castShadow === key.castShadow && o.intensity > key.intensity)) key = o;
+        const k = contribution(o);
+        if (k > best) { best = k; key = o; }
       }
     });
+    if (keyOverride && keyOverride.intensity > 0) key = keyOverride;
     uniforms.uLightKind.value = !key ? 0 : key.isSpotLight ? 1 : key.isPointLight ? 2 : 3;
     if (!key) return;
     uniforms.uLightColor.value.copy(key.color).multiplyScalar(key.intensity);
@@ -264,7 +286,8 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   const shaders = [mat, depth];
   let lidded = false;
 
-  function update(tLocal, { squash = 0, wobble = 1, eyes = 'open', look = 1 } = {}) {
+  function update(tLocal, { squash = 0, wobble = 1, eyes = 'open', look = 1, key = null } = {}) {
+    keyOverride = key;
     const t = onTwos(tLocal);   // a character: it moves on 2s like the puppets (doc 03 · Motion)
     const balls = [[0, 0.88 + 0.015 * wobble * Math.sin(6.283 * breath.f * t + breath.p), 2, 1]];
     for (const l of lobes) {

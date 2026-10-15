@@ -129,6 +129,14 @@ export function placeForScale({ subjectPos, wallZ, scale, height, side })  // �
 export function aim(spot, target)                          // points a spotlight and keeps its shadow camera tight
 ```
 
+Added by `contract-light-key`:
+
+```js
+aim(spot, target, { nearest })   // nearest: optional, m, the closest caster to the light; sets the shadow camera's near
+```
+
+`aim()`'s shadow-camera `near` is now `min(0.004, d/20)` (d = light→target) instead of half of d, so a caster a few cm from the light, such as a blob 5 cm from the phone, stays inside the shadow frustum. Evidence: `evidence/contract-light-key/near_before.jpg`, `near_after.jpg`.
+
 The lamp's cone (look-pass-2) draws only its far wall, so anything standing in the light hides the vellum behind it instead of wearing an amber film over it. Its sides fade to nothing by view angle, over a width that wanders, so no side is a ruled line.
 
 ## `src/puppet.js` (task `mod-puppet`)
@@ -192,6 +200,7 @@ blob.silhouette({ color = PALETTE.ink, soft = 0.1 } = {})  // → THREE.MeshBasi
 ```
 
 - **Eyes.** `tired` is a half-lid drooping to the outer corners, `gasp` is wide (1.35× and raised), `side` is a level half-lid with both eyes slid toward `look`. The shadow and any silhouette cut the same shapes as holes. Evidence: `evidence/contract-blob/eyes.jpg`.
+- **Key light** (`contract-light-key`) is the light that contributes most at the blob (intensity × colour luminance × distance falloff × spot cone), not the brightest by raw intensity, so a phone spot 5 cm away beats a dim window. `blob.update(t, { key: someLight })` forces a key (ignored while its intensity is 0). Evidence: `evidence/contract-light-key/s03_key_before.jpg`, `s03_key_after.jpg`, `key_auto.jpg`, `key_win.jpg`.
 - **Silhouette** is for shadows drawn without a light (s13's crowd). A shot with a real shadow-casting light needs nothing: the shadow pass already uses the same field.
 
 ## `src/post.js` (task `mod-post`)
