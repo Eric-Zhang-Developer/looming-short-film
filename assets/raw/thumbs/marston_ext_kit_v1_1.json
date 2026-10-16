@@ -1,0 +1,47 @@
+{
+  "output": "assets/raw/marston_ext_kit_v1_1.png",
+  "prompt_file": "assets/prompts/marston_ext_kit.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/marston_ext_kit.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    },
+    {
+      "file": "assets/frozen/home_kit.png",
+      "sha256": "afac7d678669486fe3300b96c70f3b9eb0db1ea7f1f99f11920047779226e718"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a142a7-1116-7483-a1a4-0e85976c1c9b",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a142a7-1116-7483-a1a4-0e85976c1c9b/exec-b10561d2-1b4d-475c-9c75-ee787b7f0ac9.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-zZIWgm",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 133626,
+    "cached_input_tokens": 108928,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2065,
+    "reasoning_output_tokens": 55
+  },
+  "timestamp_start_utc": "2026-10-16T03:00:06Z",
+  "timestamp_end_utc": "2026-10-16T03:01:59Z",
+  "output_sha256": "a7a049b7a616835b29e2879210e892aca7b98468dbe4a8eeea5619b6cda4644f",
+  "width": 1774,
+  "height": 887,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/marston_ext_kit_v1_1.jpg",
+  "screening": "pass: 14 islands, no text, no baked light. Facade window openings are ragged/blobby, brick reads red-brown rather than night-dark; night view has the tower centred between lampposts (best composed); lanterns good."
+}

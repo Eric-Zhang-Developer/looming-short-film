@@ -1,0 +1,45 @@
+# Marston interior kit · v1
+
+Blocks 1, 2 and 4 are the shared files in `assets/prompts/_blocks/`, inserted verbatim by `tools/gen.mjs` (block 4 with the magenta key from `assets/specs.json`). This file supplies block 3. Everything above `## 3.` is not sent to Codex.
+
+Task `asset-marston-kit`. Director: "I like this scene. I want it refined." The room is drawn from the director's own photos of the real Marston Science Library upper floors; those photos are NOT attached (they show real people), so the text below carries what they show. Attached: the style tile (the look), the frozen gator sheet (line weight, torn rim, flat colour), and the frozen home kit (the family look of a parts kit and its flat elevation style). Do NOT draw the gator.
+
+## 3. Asset
+
+A parts kit ("kit of separate cut-paper pieces") for a university library's upper study floor, to be assembled in code into a miniature paper diorama at night. It is NOT a scene: every piece stands alone on the empty background, nothing arranged into a room. Copy the style tile's torn-paper cardstock look, brushwork, paper grain and thin pale torn fibre rim, and the home kit's flat, simple, picture-book proportions.
+
+Every piece is a flat orthographic cut-out, like a piece of a theatre set seen straight on, with no perspective, no 3D top faces and no depth, front or side elevation as stated. Exceptions, stated per piece: the chairs in three-quarter and rear view, and plan-view (seen from directly above or below) strips. Flat simple geometric shapes with strong silhouettes that would read if filled solid black. No clutter, no tiny detail. Cardstock, kraft card and cream tissue only.
+
+Palette: night navy, cream, kraft brown (light maple is kraft lightened toward cream), a cool grey made by mixing cream with navy (fabric partitions, panels, carpet), charcoal navy for the chairs, gator green only on the exit sign and a few book spines, small touches of lamp amber (a book spine or two). No pink, purple, magenta, red, orange or blue-cyan.
+
+Layout: one sheet, landscape, four rows, the pieces evenly spaced, nothing touching or overlapping, every piece well clear of every other piece and of the frame edges. Each piece is one closed shape. Within each piece the proportions below (width : height) are exact. Pieces may be drawn at different sizes on the sheet so each is as large as the sheet allows, but keep big things bigger than small things in this order: column, bookshelf bay, cubicle, desk row, round table, chair, ring pendant.
+
+Row 1 (desks):
+1. CUBICLE_FRONT: a window-side study cubicle in front elevation. Two tall cool-grey perforated-panel side walls (the grey cardstock covered in a regular grid of tiny round holes drawn as small darker grey dots), a lower grey panel across the back, and a light maple desktop slab in front whose front edge is gently curved (a soft bow), carried on a thin dark leg at each end. The two side panels stand taller than the back panel. Open in the middle. Width : height 1.3 : 1.
+2. CUBICLE_SIDE: the same cubicle in SIDE profile, facing right: a tall cool-grey perforated panel (dotted hole grid) standing upright at the LEFT end, a slim light maple desktop slab running to the right with a softly rounded free end, a shorter grey perforated end panel under the far end acting as its leg. Width : height 1.6 : 1.
+3. DESK_ROW_FRONT: a long run of shared study desk in front elevation: a long light maple top slab with a slim dark leg-panel under each end and in the middle, and a low cool-grey fabric partition standing up along the back edge (about a third of the desk's height above the top), with a thin maple cap along the partition's top and a vertical seam every so often. Width : height 3 : 1.
+4. ROUND_TABLE: a round study table in side elevation: a thick light maple disc seen edge-on as a slab with rounded ends, on a squat BLACK (very dark navy) drum base, a plain cylinder with a slightly wider foot. Width : height 1.6 : 1.
+
+Row 2 (chairs, columns, shelves). The chair is the signature piece of this room: a mesh task chair with a webbed back whose frame is shaped like a letter Y. Charcoal navy frame, with a grey woven mesh membrane (drawn as a fine diagonal lattice of lines in grey on charcoal) stretched in the frame. The Y: a dark spine rises from the seat and forks into two curved arms that curve outward and up, holding the tall mesh back. A mesh seat pan, two slim curved armrests, a slim height-adjust post, and a five-star base of five dark legs each ending in a small round caster.
+5. CHAIR_SIDE: the chair in SIDE profile, facing right: the tall Y-forked mesh back leaning back slightly, the seat, an armrest, the post and the star base with two or three casters visible. Width : height 0.8 : 1.
+6. CHAIR_34: the same chair in THREE-QUARTER view, from the front-left, so the mesh back, seat and fork of the Y are all visible. Width : height 0.85 : 1.
+7. CHAIR_BACK: the same chair seen from directly BEHIND: the Y fork of the dark frame clearly visible against the mesh back, the seat edge, the post and the star base. Width : height 0.7 : 1.
+8. BOOKSHELF_BAY: one bay of a library shelf, front elevation: two tall dark steel (very dark navy-grey) uprights with a thin dark base plinth, five shelves of the same dark steel, filled edge-to-edge with rows of book spines in blocks of colour (cream, kraft, navy, grey, a few gator green, one or two amber) of varied heights, a couple leaning, a couple of gaps, no titles, no marks, no labels. Width : height 0.9 : 1.
+9. COLUMN: a square structural column in front elevation: a tall plain cream-white cardstock column, with a band of warm light maple wood around it near the top (about one eighth of the height), a very slightly wider dark base plinth at the foot. Width : height 0.22 : 1.
+
+Row 3 (lights and signs):
+10. RING_LIGHT_LIT: a large ring pendant light in side elevation: a wide shallow ring (a short horizontal band with slightly rounded ends, like a thin hoop seen from the side), hung from the ceiling by two thin dark rods that rise from its top edge to a small flat ceiling canopy plate at each rod's end. The band is painted in pale cream with a slightly brighter cream underside strip, to read as ON. No glow, no rays. Width : height 3 : 1.
+11. RING_LIGHT_UNLIT: exactly the same shape and size and rods as piece 10, but the band is painted in dull cool grey, to read as OFF. Width : height 3 : 1.
+12. STRIP_LIGHT: a long linear ceiling strip light in front elevation: a slim pale cream rectangular diffuser panel, set in a thin cool-grey housing with squared ends, with two short dark hanger rods at its ends. Width : height 9 : 1.
+13. RECESSED_PANEL: a square recessed ceiling light panel, face-on: a pale cream square diffuser inside a thin cool-grey frame, plain, no grid, no marks. Width : height 1 : 1.
+14. EXIT_SIGN: an emergency exit sign shape: a small rectangular box in gator green with a thin cream border, carrying only a plain cream pictogram of a running person beside a simple arrow. Absolutely no letters or words. Width : height 2 : 1.
+
+Row 4 (strips and the window wall):
+15. CEILING_STRIP: a strip of coffered ceiling in plan view (seen from directly below), a row of four square pyramid-shaped tiles side by side, each a plain cream square cut by thin seam lines into four equal triangular facets from its centre to its corners, ALL FOUR FACETS THE SAME FLAT CREAM (no shading to suggest depth). Every second tile has a small pale square recessed light panel with a thin grey frame at its centre. Straight left and right edges that line up so the strip tiles left to right. Width : height 4 : 1.
+16. CARPET_TILE: a strip of grey carpet in plan view, tileable: cool dark grey with a quiet pattern of short horizontal dashes and speckles in two lighter greys and navy, even all over, no border, no centre, straight edges that tile left to right and top to bottom. Width : height 2 : 1.
+17. RIBBON_WINDOW: a wide ribbon window band in front elevation: a long cream-grey frame with a header and a sill ledge, divided by thin vertical mullions into six equal tall panes. The panes are EMPTY: show the flat key background through them, because the night view and the glass are separate pieces. Width : height 6 : 1.
+18. WALL_STRIP: a strip of plain wall in front elevation: night navy cardstock with a thin cream baseboard band along the bottom, plain smooth surface, straight edges so it tiles left to right. Width : height 3 : 1.
+
+Each piece is finished with the thin pale torn fibre rim of the frozen style, a little ragged on the tissue-weight pieces (the light diffusers), tighter on the cardstock. No cast shadows, no inner shadows, no highlights. Nothing is lit by anything but its own flat paint.
+
+Banned: no text, letters, numbers or labels anywhere, not even tiny ones on books, signs or panels; no gator or any person; no plants; no pictures of a room under any piece; no ground line; no perspective except as stated for the chairs, no 3D boxes, no shading that implies depth.

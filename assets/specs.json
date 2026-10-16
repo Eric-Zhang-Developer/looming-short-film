@@ -262,5 +262,54 @@
       "no text, no gator, no scene, no baked light or shadow",
       "each appliance reads as what it is at small size"
     ]
+  },
+  {
+    "name": "marston_kit",
+    "purpose": "Marston upper-floor interior parts kit recognisable to a UF student (director's photos): cubicles, desk rows, round table, Y-back mesh chairs, ring/strip/recessed lights, coffered ceiling, column, carpet, shelf bay, exit sign, ribbon window. Painter task asset-marston-kit.",
+    "shots": "s10-s17 (Marston interior)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png",
+      "assets/frozen/home_kit.png"
+    ],
+    "prompt": "assets/prompts/marston_kit.v2.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size available, 18 separate pieces in 4 rows, every piece a separate alpha island with clear space around it; aspect per piece as prompted; the director's interior photos are described in text, not attached",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "every piece a separate island (cut.mjs --auto gives 18)",
+      "chairs show the Y-shaped mesh back in side, three-quarter and rear views",
+      "ring light lit and unlit read as one object in two states",
+      "flat elevation, torn paper look, palette of the style tile, no baked light or shadow, no text, no gator",
+      "ribbon window panes empty (key shows through)"
+    ]
+  },
+  {
+    "name": "marston_ext_kit",
+    "purpose": "Marston exterior parts kit: brick block with bronze bands, stepped bays, breezeway with Century Tower, lit ribbon windows, yellow lanterns, plus the night window view. Painter task asset-marston-kit.",
+    "shots": "s09, s11-s17 window view",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png",
+      "assets/frozen/home_kit.png"
+    ],
+    "prompt": "assets/prompts/marston_ext_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size available, 14 separate pieces in 4 rows, every piece a separate alpha island with clear space around it; aspect per piece as prompted; the director's interior photos are described in text, not attached",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "every piece a separate island (cut.mjs --auto gives 14)",
+      "facade window openings and breezeway opening empty",
+      "tower reads as Century Tower, no numerals, no text",
+      "flat elevation, torn paper look, palette, no baked light, no text, no gator"
+    ]
   }
 ]

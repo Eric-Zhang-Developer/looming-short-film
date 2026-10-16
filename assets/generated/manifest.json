@@ -76,5 +76,31 @@
     "frozen": "2026-10-15",
     "gate": "overnight rule",
     "approved": "Orchestrator under the director's overnight rule; painter ranked v1_1 first (flattest, most cut-paper). Alternatives v1_3, v1_2 in evidence/asset-home-kit/contact.jpg."
+  },
+  {
+    "name": "marston_kit",
+    "file": "assets/frozen/marston_kit.png",
+    "source": "assets/raw/marston_kit_v2_1.png",
+    "prompt": "assets/prompts/marston_kit.v2.md",
+    "sidecar": "assets/raw/thumbs/marston_kit_v2_1.json",
+    "variant": "v2_1",
+    "sha256": "328ccba6d628245410d40eefa781a130aeb590d1e7d7d6ba2c5b8bc22c4b1a1d",
+    "size": "1774x887",
+    "frozen": "2026-10-15",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter's #1. Alternatives v2_2, v1_2, v1_3, v1_1 in evidence/asset-marston-kit/contact.jpg."
+  },
+  {
+    "name": "marston_ext_kit",
+    "file": "assets/frozen/marston_ext_kit.png",
+    "source": "assets/raw/marston_ext_kit_v1_3.png",
+    "prompt": "assets/prompts/marston_ext_kit.v1.md",
+    "sidecar": "assets/raw/thumbs/marston_ext_kit_v1_3.json",
+    "variant": "v1_3",
+    "sha256": "ba2dc9818c1d2a85b74c369c7f6ca4cb3f8dcfc25669e0d2ef19e35c76f5593c",
+    "size": "1672x941",
+    "frozen": "2026-10-15",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter's #1. Alternatives v1_1, v1_2 in evidence/asset-marston-kit/contact.jpg."
   }
 ]
