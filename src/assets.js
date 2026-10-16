@@ -119,6 +119,16 @@ export const PIECES = {
     planter_hex: [0.1400, 0.0770, 'rect', K], sculpture_yellow: [0.2000, 0.1917, 'rect', K], lantern_post: [0.0612, 0.1650, 'rect', N],
     lantern_cluster: [0.0800, 0.0618, 'rect', N], lamppost_black: [0.0594, 0.2200, 'rect', N],
   },
+  // props_kit (G4, v2-home-a): sizes from evidence/asset-props-kit/scale_table.md, keys from assets/cut/props_kit.boxes.json.
+  // Pages and phone are the desk unit's sizes there; the home shots scale them to real size per shot.
+  props_kit: {
+    practice_1: [0.0227, 0.0300, 'rect', C], practice_2: [0.0221, 0.0300, 'rect', C], test_page: [0.0218, 0.0300, 'rect', C],
+    graded_test: [0.0221, 0.0300, 'rect', C], blank_page: [0.0221, 0.0300, 'rect', C], calendar: [0.1000, 0.1062, 'rect', C],
+    calc_exam_square: [0.0125, 0.0121, 'rect', C], red_circle: [0.0120, 0.0117, 'ellipse', C],
+    notification_card: [0.0135, 0.0043, 'round', C], red_x: [0.0120, 0.0137, 'rect', C], strike_line: [0.0120, 0.0012, 'rect', I],
+    phone_face_up: [0.0150, 0.0068, 'round', I], phone_face_down: [0.0150, 0.0068, 'round', N], pen: [0.0120, 0.0014, 'rect', N],
+    pen_cap: [0.0054, 0.0019, 'rect', N], backpack: [0.0194, 0.0250, 'round', K], ink_drop: [0.0042, 0.0060, 'ellipse', I],
+  },
 };
 
 const cache = new Map();  // name → Promise of the load result

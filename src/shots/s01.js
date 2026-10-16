@@ -1,4 +1,5 @@
-// s01 · Dawn skyline, push to the window (docs/shots/s01.md). Animatic blocking: proxies until art is frozen.
+// s01 · Dawn skyline, push to the window (docs/shots/s01.md). v2: the apartment is built from home_kit (frames, door,
+// glass) on a brick-kraft facade; skyline_sheet and foliage_sheet are not frozen, so the skyline and the oak stay proxies.
 // No characters. What moves: the camera push (1s), the boil (10/s), the dawn warming (1s), the oak branch sway (2s).
 import * as THREE from 'three';
 import { makePaper, boilSeed } from '../paper.js';
@@ -26,6 +27,7 @@ function tornArt(art, [w, h]) {
 const DEG = Math.PI / 180;
 const CAM = { pos: [[0, [0, 0.42, 2.5]], [6, [0.17, 0.33, 1.0]]], look: [[0, [0, 0.42, 0]], [6, [0.18, 0.32, 0.6]]] };
 const FACADE_Z = 0.6;
+const ROOM_I = 0.05, BOUNCE_I = 0.35;   // his room light behind the pane (cd), the street bounce on the facade
 
 // Proxy skyline: a rooftop line as a path (0..1, v down) with flat and pitched roofs, oak canopies and an optional
 // clock tower [u, half-width]. Real skyline_sheet art replaces it.
@@ -70,8 +72,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   scene.add(sky0);
   for (const [layer, color, y0, y1, z] of [
     ['sky-navy', PALETTE.navy, 0.30, 0.95, 0],
-    ['sky-mid', hex('navy', 'cream', 0.45), 0.10, 0.52, 0.004],
-    ['sky-low', hex('cream', 'lamp', 0.18), -0.05, 0.27, 0.008],
+    ['sky-mid', hex('navy', 'lamp', 0.42), 0.10, 0.52, 0.004],
+    ['sky-low', hex('cream', 'lamp', 0.4), -0.05, 0.27, 0.008],
   ]) sheet(layer, { ...torn(1.8, y1 - y0), color, weight: 'tissue' }, { at: [0, (y0 + y1) / 2, z], parent: sky0, tilt: false }).castShadow = false;
 
   // ---- Far (z 0.12) and mid (z 0.30): skyline_sheet. Proxy rooflines until the sheet is frozen.
@@ -84,26 +86,45 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   skyline('skyline_far', 0.12, -0.05, 0.23, { base: 0.27, jitter: 0.12, tower: [(0.9 - 0.35) / 1.8, 0.014] }).castShadow = false;
   skyline('skyline_near', 0.30, -0.05, 0.15, { base: 0.3, jitter: 0.25 });
 
-  // ---- Hero (z 0.60): apt_exterior with its window hole, and apt_window set in it, sharing the facade's tilt.
-  const ext = await assets.load('apt_exterior');
-  const art = ext.pieces.facade, { cv, size: facadeSize } = tornArt(art, [0.4, 0.5]), g = cv.getContext('2d');
-  // The proxy comes in kraft; the spec wants the front near Night Navy, so the proxy is restocked navy (real art keeps its paint).
-  if (ext.proxy) { g.globalCompositeOperation = 'source-in'; g.fillStyle = PALETTE.navy; g.fillRect(0, 0, cv.width, cv.height); g.globalCompositeOperation = 'source-over'; }
-  const m = (cv.width - art.width) / 2;
-  g.clearRect(m + 0.5 * art.width, m + 0.28 * art.height, 0.15 * art.width, 0.16 * art.height);  // hole 0.06 × 0.08 at (0.18, 0.32)
+  // ---- Hero (z 0.60): the apartment, built from home_kit (G4: "the house is really ugly"). A three-storey brick-kraft
+  // facade with cornice bands, a 3 × 3 grid of the kit's window frames (dark panes), the kit's door on the ground floor,
+  // and his window, the one lit pane, through a hole in the facade. Facade space: origin at the facade's centre.
+  const home = await assets.load('home_kit');
+  const FW = 0.40, FH = 0.54, COLS = [-0.09, 0.03, 0.15], ROWS = [-0.13, 0.05, 0.20];   // window centres (facade space)
+  const HERO = [0.03, 0.05], WIN = 0.075, HOLE = [0.054, 0.056];                         // hero = world (0.18, 0.32)
   const facade = new THREE.Group();
   facade.rotation.set(...tiltOf('facade'));
-  facade.position.set(0.15, 0.25, FACADE_Z);
+  facade.position.set(0.15, 0.27, FACADE_Z);
   scene.add(facade);
-  sheet('facade', { art: cv, size: facadeSize }, { at: [0, 0, 0], parent: facade, tilt: false });
-  // In facade space the window center is (0.03, 0.07). The pane runs a few mm past the hole so a torn hole edge never
-  // shows a gap; the hole sets what is seen. It glows by translucency only (tissue, 0.8), never emissive.
-  const win = (layer, opts, z, mat) => sheet(layer, opts, { at: [0.03, 0.07, z], parent: facade, tilt: false, ...mat });
-  // Tissue passes light, so the pane casts nothing: its hard shadow would black out the hole's lit torn rim.
-  win('window-pane', { path: RECT, color: PALETTE.cream, weight: 'tissue', size: [0.068, 0.088] }, -0.002, { translucency: 0.8 }).castShadow = false;
-  // The mullions are scissor-cut strips: straight, since a torn 4 mm strip pinches through at this tear.
-  win('window-mullion-v', { path: RECT, color: PALETTE.navy, size: [0.004, 0.088], res: 512 }, -0.001);
-  win('window-mullion-h', { path: RECT, color: PALETTE.navy, size: [0.068, 0.004], res: 512 }, -0.001);
+  const body = (() => {   // the stock, with the hero hole cut through it
+    const W = 1024, H = Math.round(W * FH / FW), c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
+    g.fillStyle = hex('kraft', 'navy', 0.5); g.fillRect(0, 0, W, H);
+    g.strokeStyle = hex('kraft', 'navy', 0.62); g.lineWidth = 2;                           // faint brick courses
+    for (let y = 0; y < H; y += 14) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
+    const px = (x) => (x / FW + 0.5) * W, py = (y) => (0.5 - y / FH) * H;
+    g.clearRect(px(HERO[0] - HOLE[0] / 2), py(HERO[1] + HOLE[1] / 2), HOLE[0] / FW * W, HOLE[1] / FH * H);
+    return tornArt(c, [FW, FH]);
+  })();
+  sheet('facade', { art: body.cv, size: body.size }, { at: [0, 0, 0], parent: facade, tilt: false });
+  // Cornice and floor bands, cream-kraft strips proud of the wall; a flat roof edge in navy.
+  for (const [i, y, h] of [[0, FH / 2 - 0.01, 0.02], [1, -0.04, 0.008], [2, 0.125, 0.008]])
+    sheet(`band${i}`, { ...torn(FW + (i ? 0 : 0.02), h), color: hex('kraft', 'cream', 0.35) }, { at: [0, y, 0.004], parent: facade, tilt: false });
+  // The kit's frames: navy panes behind the dark ones, the tissue glass behind his.
+  const cutPiece = (p, w, key, at, o = {}) => {
+    const [sw, sh] = home.sizes[p], [u0, v0, u1, v1] = home.visible[p], k = w / (sw * (u1 - u0));
+    const m = sheet(key, { art: home.pieces[p], size: [sw * k, sh * k], weight: o.weight ?? 'cardstock' }, { at, parent: facade, tilt: false, ...o.mat });
+    m.position.x += (0.5 - (u0 + u1) / 2) * sw * k; m.position.y += ((v0 + v1) / 2 - 0.5) * sh * k;
+    return m;
+  };
+  ROWS.forEach((y, r) => COLS.forEach((x, c) => {
+    const hero = x === HERO[0] && y === HERO[1];
+    if (r === 0 && c === 0) return;   // the door's bay
+    if (!hero) sheet(`pane${r}${c}`, { path: RECT, color: hex('navy', 'ink', 0.3), size: [WIN * 0.72, WIN * 0.66] }, { at: [x, y + 0.003, 0.001], parent: facade, tilt: false });
+    cutPiece('window_frame', WIN, `frame${r}${c}`, [x, y, 0.003]);
+  }));
+  cutPiece('door', 0.05, 'door', [COLS[0], -FH / 2 + 0.04, 0.003]);
+  // His pane: home_kit's glass, tissue, behind the hole. It glows by translucency (0.8), never emissive.
+  cutPiece('window_glass', HOLE[0] + 0.006, 'apt_window', [HERO[0], HERO[1] + 0.003, -0.002], { weight: 'tissue', mat: { translucency: 0.8 } }).castShadow = false;
 
   // ---- Foreground (z 0.95): foliage_sheet oak_branch as a small puppet, branch plus tissue moss, so the moss lags.
   const fol = await assets.load('foliage_sheet'), limb = tornArt(fol.pieces.oak_branch, [0.4, 0.25]);
@@ -136,7 +157,16 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   dawn.light.shadow.camera.updateProjectionMatrix();
   scene.add(dawn.light, dawn.light.target, ambient());
 
-  const fx = post({ focus: 1.9, lut: 'night' });
+  // His room's light is on behind the pane (he's up: s00's buzz), so the one window glows warm through the tissue.
+  const room = new THREE.PointLight(PALETTE.lamp, ROOM_I, 0.25, 2);
+  room.position.set(0.18, 0.32, FACADE_Z - 0.04);
+  room.castShadow = false;
+  // A faint warm bounce off the street onto the facade front, so the kit's frames and bands read (no shadow).
+  const bounce = new THREE.DirectionalLight(PALETTE.lamp, BOUNCE_I);
+  bounce.position.set(0.3, 0.2, 3);
+  scene.add(room, bounce);
+
+  const fx = post({ focus: 1.9, lut: 'dawn' });
   const pos = new THREE.Vector3(), look = new THREE.Vector3(), dir = new THREE.Vector3();
 
   return {

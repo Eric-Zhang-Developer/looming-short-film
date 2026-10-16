@@ -1,213 +1,133 @@
-// s03 · Phone up: the shadow climbs (docs/shots/s03.md). Animatic blocking on proxies until art is frozen.
-// The home desk unit (docs/shots/README.md §2), cut in on s02's axis. What moves: the Student on 2s (shrug, phone up,
-// hunch, thumb flicks), the Exam on 2s (glances, the 7 mm scoot), the phone light on 1s, the focus pull on 1s, boil 10/s.
-// The rule, first time: the phone spot sits at the phone and aims phone → blob, so the wall shadow is 2.33× at the lift,
-// 3.0× in the hunch and 3.33× after the scoot (evidence/sb-reconcile/geometry.txt), all by geometry.
+// s03 · The laptop: the shadow climbs (docs/shots/s03.md, G4). v2 on the real-scale home desk (s02.js's unit).
+// He shrugs off the blob's look, opens his laptop and plays. The screen is a low, close light (README §4: a spot at
+// the screen centre, aimed screen → blob → wall), so the blob's shadow climbs the wall at 3× (S = screenZ / (screenZ −
+// B.z) = 0.0225 / 0.0075) the moment the screen wakes, and swells to 3.75 units on gulp 1 (4.5), the first meter step.
+// Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
 import { phoneLight, dawnLight, ambient, aim } from '../lights.js';
-import { kf, ease, easeOut, spring, onTwos } from '../core/ease.js';
-import { mulberry32, seedOf } from '../core/rng.js';
+import { kf, ease } from '../core/ease.js';
+import { hash2 } from '../core/rng.js';
+import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
-import { makeExam } from '../characters/exam.js';
+import { DESK, B, tools, homeDesk, seatReach } from './s02.js';
 
-const DEG = Math.PI / 180;
-const F = (s) => Math.round(s * 12) / 12;  // spec times (0.17, 0.33, 3.67 ...) are 2s drawings: snap them to twelfths
-const HIP = [-0.075, -0.012, 0.074];
-const B = [0.040, 0, 0.060], B2 = [0.034, 0, 0.063];   // blob contact points (its centre is r above: the spec's y 0.012)
-const REST = [-0.010, 0.0015, 0.114], LIFT = [-0.015, 0.010, 0.105], L = [-0.012, 0.004, 0.090];
-const SPOT = 0.04;  // phone spot, cd at decay 2: a cream wall 10–15 cm away lands lit but below white (NoToneMapping)
-const CAM = { pos: [0.060, 0.090, 0.530], look: [0.060, 0.038, 0.060] };
-const FOCUS = [[1.5, 0.477], [2.5, 0.540]];             // blob → wall, eased, on 1s
+const ID = 's03', DEG = Math.PI / 180;
+const BLOB_R = { start: 0.012, gulp1: 0.015 };            // METER.birth → METER.gulp1 (README §1)
+const CAM = { pos: [0.028, 0.060, 0.33], look: [0.028, 0.036, 0.012] };
+const FOCUS = [[2.0, 0.318], [3.0, 0.33]];                 // blob → wall over 2–3, eased, on 1s
+const SPOT_I = 0.012, FILL_K = 0.15, SUN_K = 0.35, SUN_SCALE = 0.8 * 0.3;   // the window at 30% of s02's
+const FLICK = 0.05;                                        // ±5% game flicker per 2s drawing
+const FACE_I = 0.008;                                      // character fill (README §10): cyan-navy, no shadow, dies before the wall
+const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
+const TAPS = [2.33, 2.67, 3.17, 3.5, 4.0, 4.67, 5.17, 5.67].map((s) => Math.round(s * 12));
 
-// A path rectangle that fills its canvas has no edge to tear, so it's inset 4% and the size grown to keep [w, h] (as s01).
-function torn(w, h) {
-  const m = 0.04 * Math.max(w, h), W = w + 2 * m, H = h + 2 * m, u = m / W, v = m / H;
-  return { path: [[u, v], [1 - u, v], [1 - u, 1 - v], [u, 1 - v]], size: [W, H] };
-}
-
-// The Student as spec numbers (s15 convention, degrees), sampled per 2s drawing.
-// 0–0.17 anticipation (head −3°, shoulders sink 1.5 mm), 0.17–0.33 the shrug (POSES.shrug: arms +20°, head up),
-// 0.33–0.42 drop back, gaze down to the phone, 0.50 phoneUp (lean 16, arm −6: fingertip on the phone's left end),
-// 0.50–1.50 ease-out into the hunch (lean 24, arm −11: fingertip at L's left end), then hold with thumb flicks (+2°).
-const EARLY = [  // [t, lean, arm, far, head, shoulder drop (m)]
-  [0, 10, 35, -40, -8, 0], [F(0.17), 10, 35, -40, -11, -0.0015], [F(0.33), 8, 55, -20, 6, 0.0010], [F(0.42), 10, 35, -40, -10, 0],
-];
-const LATE = [[F(0.5), 16, -6, -40, -10, 0], [F(1.5), 24, -11, -40, -10, 0]];
-const FLICKS = [1.83, 2.33, 2.83, 3.33, 3.83, 4.33].map(F);
-function body(T) {
-  const keys = T < F(0.5) ? EARLY : LATE;
-  const [lean, arm, far, head, drop] = kf(T, keys.map(([t, ...r]) => [t, r]), T < F(0.5) ? ease : easeOut);
-  const flick = FLICKS.some((f) => Math.abs(T - f) < 1e-6) ? 2 : 0;
-  return { pose: specPose({ lean, arm: arm + flick, far, head, leg: 60, farLeg: 54 }), drop };
-}
-// The phone rides the same keys: at rest until the 0.50 drawing, then lifted and flipped, then eased to L.
-const phoneAt = (T) => (T < F(0.5) ? REST : kf(T, [[F(0.5), LIFT], [F(1.5), L]], easeOut));
-
-export async function build({ scene, camera, assets, PALETTE, post }) {
+export async function build(ctx) {
+  const { scene, camera, PALETTE, post } = ctx;
   scene.background = new THREE.Color(PALETTE.navy);
   camera.position.set(...CAM.pos);
   camera.lookAt(...CAM.look);
+  const T = tools(ctx, ID);
+  const set = await homeDesk(ctx, T);
+  const fx = post({ focus: FOCUS[0][1], aperture: 0.01, lut: 'dawn' });
 
-  // Small upright cutouts get s02's seeded ±1.5° tilt. Wall, desk top and apron stay true: the wall is the shadow's
-  // receiver at z 0, and a tilted 0.33 m apron would swing ±4 mm into the phone's rest spot 6 mm behind it.
-  const tiltOf = (layer) => { const r = mulberry32(seedOf('s02', layer)); return [(2 * r() - 1) * 1.5 * DEG, (2 * r() - 1) * 1.5 * DEG, 0]; };
-  const boiling = [];  // [mesh, seed => PaperSheet]
-  // One paper piece. `at` is where the VISIBLE shape's centre goes (asset bitmaps are padded; `vis` is the shape's
-  // uv box), `flat` lays it on the desk (normal +y), `tilt` applies the seeded tilt.
-  function piece(layer, opts, { at, flat = false, tilt = false, boil = true, rotZ = 0, vis = [0, 0, 1, 1], parent = scene, ...mat }) {
-    const make = (s) => makePaper({ ...opts, key: `s03-${layer}`, seed: s });
-    const sheet = make(0), mesh = paperMesh(sheet, mat), [w, h] = sheet.size;
-    mesh.position.set((0.5 - (vis[0] + vis[2]) / 2) * w, ((vis[1] + vis[3]) / 2 - 0.5) * h, 0);
-    const g = new THREE.Group();
-    g.add(mesh);
-    g.position.set(...at);
-    if (tilt) g.rotation.set(...tiltOf(layer));
-    if (flat) g.rotation.x = -Math.PI / 2;
-    g.rotation.z = rotZ;
-    parent.add(g);
-    if (boil) boiling.push([mesh, make]);
-    return mesh;
-  }
-  const art = (a, name, extra = {}) => ({ opts: { art: a.pieces[name], size: a.sizes[name], ...extra }, vis: a.visible?.[name] });
-
-  // ---- Wall (z 0): apt_wall, cream cardstock, x −0.40…0.45, y −0.034…0.40. Its edges are out of frame, so it doesn't
-  // boil (boil only re-tears edges); 2048 px keeps its tooth near 2.4 px/mm.
-  const wall = piece('apt_wall', { ...torn(0.85, 0.434), color: PALETTE.cream, res: 2048 }, { at: [0.025, 0.183, 0], boil: false });
-  wall.castShadow = false;
-  // Floor at y −0.034 (README §2), seen only at frame left under the chair.
-  piece('floor', { ...torn(0.6, 0.3), color: PALETTE.kraft, weight: 'kraft' }, { at: [0, -0.034, 0.15], flat: true, boil: false }).castShadow = false;
-
-  // ---- Calendar (z 0.006): sheet 1, centre (0.150, 0.100), 0.10 × 0.12. The proxy is a blank cream sheet, so it gets
-  // a faint glyph-free month grid and Friday's red circle (Ø 0.012 at (0.170, 0.095)) drawn on; real art has its own.
-  const cal = await assets.load('calendar');
-  {
-    const { opts, vis } = art(cal, 'sheet1');
-    if (cal.proxy) {
-      const src = opts.art, cv = Object.assign(document.createElement('canvas'), { width: src.width, height: src.height }), g = cv.getContext('2d');
-      g.drawImage(src, 0, 0);
-      const [u0, v0, u1, v1] = vis, X = (u) => (u0 + u * (u1 - u0)) * cv.width, Y = (v) => (v0 + v * (v1 - v0)) * cv.height;
-      g.strokeStyle = PALETTE.navy; g.globalAlpha = 0.25; g.lineWidth = cv.width * 0.004;
-      for (let i = 1; i < 7; i++) { g.beginPath(); g.moveTo(X(i / 7), Y(0.22)); g.lineTo(X(i / 7), Y(0.95)); g.stroke(); }
-      for (let j = 0; j < 6; j++) { const v = 0.22 + j * 0.146; g.beginPath(); g.moveTo(X(0.03), Y(v)); g.lineTo(X(0.97), Y(v)); g.stroke(); }
-      g.globalAlpha = 1; g.strokeStyle = PALETTE.calendarRed; g.lineWidth = cv.width * 0.012;
-      g.beginPath(); g.arc(X(0.7), Y(0.5417), 0.06 * (u1 - u0) * cv.width, 0, 2 * Math.PI); g.stroke();  // (0.170, 0.095) in sheet uv
-      opts.art = cv;
-    }
-    piece('calendar', opts, { at: [0.150, 0.100, 0.006], tilt: true, vis });
-  }
-
-  // ---- Desk: apt_desk top (y 0, z 0…0.120, x −0.033…0.300) and apron (z 0.120, y −0.034…0).
-  piece('desk_top', { ...torn(0.333, 0.120), color: PALETTE.kraft, weight: 'kraft' }, { at: [0.1335, 0, 0.060], flat: true }).castShadow = false;
-  piece('desk_apron', { ...torn(0.333, 0.034), color: PALETTE.kraft, weight: 'kraft' }, { at: [0.1335, -0.017, 0.120] });
-
-  // ---- Lamp, off (z 0.078): base x −0.028…−0.012, stem x −0.022…−0.018 to y 0.070, knob (−0.0228, 0.0228),
-  // arm (−0.020, 0.070)→(0.004, 0.068), tissue shade with its mouth centred at (0.004, 0.056).
-  const lamp = await assets.load('desk_lamp');
-  const lampPart = (name, at, extra = {}, rotZ = 0) => { const { opts, vis } = art(lamp, name, extra); return piece(`lamp_${name}`, opts, { at, vis, rotZ }); };
-  lampPart('base', [-0.020, 0.002, 0.078]);
-  lampPart('stem', [-0.020, 0.035, 0.0785]);
-  lampPart('knob', [-0.0228, 0.0228, 0.0795]);
-  lampPart('arm', [-0.008, 0.069, 0.0785], {}, Math.atan2(-0.002, 0.024));
-  lampPart('shade', [0.004, 0.063, 0.079], { weight: 'tissue' });
-
-  // ---- Props: exam_page flat on the desk (x −0.033…−0.008, z 0.080…0.110), and the phone.
-  const props = await assets.load('study_props_sheet');
-  { const { opts, vis } = art(props, 'exam_page'); piece('exam_page', opts, { at: [-0.0205, 0.0003, 0.095], flat: true, vis }); }
-  // The phone is a two-sided card lying flat: back (navy) up at rest, face (ink + a cyan screen) up once flipped.
-  // Nothing on it casts: the phone light sits inside it.
-  const phone = new THREE.Group();
-  scene.add(phone);
-  for (const [name, y, rx] of [['phone_back', 0.0003, -Math.PI / 2], ['phone_face', -0.0003, Math.PI / 2]]) {
-    const { opts, vis } = art(props, name);
-    const m = piece(name, opts, { at: [0, y, 0], vis, parent: phone });
-    m.parent.rotation.x = rx; m.castShadow = false;
-  }
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.0125, 0.0058), new THREE.MeshBasicMaterial({ color: PALETTE.phone }));
-  screen.rotation.x = Math.PI / 2; screen.position.y = -0.0006;  // on the face side, so it comes up with the flip
-  phone.add(screen);
-
-  // ---- Chair (z 0.071, marston chair art as the home chair), x −0.092…−0.060, standing on the floor.
-  const fur = await assets.load('marston_furniture_sheet');
-  {
-    const { opts, vis } = art(fur, 'chair'), k = 0.032 / (opts.size[0] * (vis[2] - vis[0]));
-    opts.size = opts.size.map((s) => s * k);
-    piece('chair', { ...opts, weight: 'kraft' }, { at: [-0.076, -0.034 + opts.size[1] * (vis[3] - vis[1]) / 2, 0.071], vis });
-  }
-
-  // ---- The Student: seated in profile facing +x, hip (−0.075, −0.012), body plane z 0.074.
-  const gator = await makeGator({ assets }, { res: 1024 });
-  gator.group.position.set(...HIP);
+  // ---- the Student and his hand targets (solved through this camera) ----
+  const gator = await makeGator(ctx, { seed: 2 });
+  gator.group.position.set(...DESK.hip);
   scene.add(gator.group);
-  // Every 2s drawing is its own blend key, so blend() lands exactly on the spec values and follow() has a track.
-  const POSE = {}, KEYS = [];
-  for (let i = 0; i <= 60; i++) { POSE[i] = body(i / 12).pose; KEYS.push([i / 12, String(i)]); }
+  const cam = new THREE.Vector3(...CAM.pos), wp = (o, x, y, z) => { set.laptop.updateMatrixWorld(true); return o.localToWorld(new THREE.Vector3(x, y, z)); };
+  set.setLid(0);
+  const lidEdge = (deg) => { set.setLid(deg); const p = wp(set.lid.g, 0, set.lid.size[1], 0); set.setLid(0); return p; };
+  const keys = wp(set.laptop, 0, 0.0008, 0.002);
+  const seat = (o) => specPose({ leg: 60, farLeg: 54, far: -40, ...o });
+  const at = (p, range, o = {}) => { const r = seatReach(cam, p, range); return seat({ lean: r.lean, arm: r.arm, ...o }); };
+  // [drawing, pose, shoulder drop (m)]. 0–0.17 anticipation, 0.17–0.33 the shrug, 0.42 back, 0.50 hand on the lid's
+  // front edge, 0.67 / 0.83 the lid at 30° / 60°, 1.00 hands on the keys (laptopUp), 2.00 settled into the hunch.
+  const P = {
+    slump: seat({ lean: 10, arm: 35, head: -8 }),
+    antic: seat({ lean: 10, arm: 35, head: -11 }),
+    shrug: seat({ lean: 8, arm: 55, far: -20, head: 6 }),
+    back: seat({ lean: 10, arm: 35, head: -10 }),
+    lid0: at(lidEdge(0), [6, 30], { head: -10 }),
+    lid30: at(lidEdge(30), [6, 30], { head: -8 }),
+    lid60: at(lidEdge(60), [6, 30], { head: -8 }),
+    keys: at(keys, [18, 30], { head: -10 }),
+    hunch: at(keys, [22, 34], { head: -14 }),
+  };
+  P.tap = { ...P.hunch, arm_r: P.hunch.arm_r + 2 * DEG };
+  const KEYS = [[0, 'slump'], [F(2), 'antic'], [F(4), 'shrug'], [F(5), 'back'], [F(6), 'lid0'], [F(8), 'lid30'], [F(10), 'lid60'],
+    [F(12), 'keys'], [F(24), 'hunch'], ...TAPS.flatMap((n) => [[F(n - 1), 'hunch'], [F(n), 'tap'], [F(n + 1), 'hunch']]), [6, 'hunch']];
 
-  // ---- The Exam at B, r 0.012, its stain under it.
-  const exam = makeExam({ shot: 's03', seed: 1 });
+  // ---- the Exam at B ----
+  const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
   scene.add(exam.mesh, exam.stain);
+  exam.mesh.position.fromArray(B);
+  exam.stain.position.set(B[0], 0.0003, B[2]);
 
-  // ---- Light. Key: the phone spot (README §4), aimed every frame along phone → blob to its wall hit. Face fill: an
-  // unshadowed cyan point at the phone + (−0.005, 0.008, 0), 15%. Window: s02's dawnLight at k 0.35, held at 30%.
-  const spot = phoneLight({ angle: 0.9, penumbra: 0.4, distance: 0.6, intensity: SPOT });
+  // ---- light. Key: the laptop screen (README §4). Fill: the window at 30%, ambient, a cyan face fill at the screen.
+  const L = set.screenCentre();
+  const spot = phoneLight({ angle: 0.9, penumbra: 0.4, distance: 0.6, intensity: 0 });
+  spot.position.copy(L);
   const fill = new THREE.PointLight(PALETTE.phone, 0, 0.06, 2);
-  const dawn = dawnLight();
-  dawn.light.target.position.set(0.06, 0.05, 0.06);
-  scene.add(spot, spot.target, fill, dawn.light, dawn.light.target, ambient());
+  fill.position.copy(L).add(new THREE.Vector3(-0.004, 0.004, 0));
+  const sun = dawnLight();
+  sun.light.target.position.set(0.01, 0.03, 0.01);
+  Object.assign(sun.light.shadow.camera, { left: -0.15, right: 0.15, top: 0.15, bottom: -0.15 });
+  sun.light.shadow.camera.updateProjectionMatrix();
+  sun.update(0, SUN_K);
+  sun.light.position.set(0.8, 0.6, 0.6);
+  sun.light.intensity *= SUN_SCALE;
+  const face = new THREE.PointLight(new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.navy), 0.4), 0, 0.07, 2);
+  face.position.set(-0.025, 0.035, 0.065);
+  scene.add(face);
+  scene.add(spot, spot.target, fill, sun.light, sun.light.target, ambient());
 
-  const fx = post({ focus: FOCUS[0][1], lut: 'night' });
-  const P = new THREE.Vector3(), C = new THREE.Vector3(), hit = new THREE.Vector3();
-
+  const C = new THREE.Vector3(), hit = new THREE.Vector3();
   return {
-    parts: { exam, spot, dawn, gator, phone },  // read by evidence/anim-s03/measure.html only
-    update(tLocal) {
-      const T = onTwos(tLocal);
+    exam, gator, spot,
+    update(t) {
+      T.boil(t);
+      const f = fr(t);
 
-      // Paper boils at 10/s; the Student on 2s.
-      const seed = boilSeed(tLocal, 10);
-      for (const [mesh, make] of boiling) updatePaperMesh(mesh, make(seed));
-      gator.boil(tLocal, 10);
-      gator.blend(POSE, KEYS, tLocal);
-      gator.follow('tail', tLocal, { k: 6, w: 18 });
-      gator.group.position.y = HIP[1] + body(T).drop;
-      gator.face({ eyes: T < F(0.17) ? 'side' : T < F(0.42) ? 'closed' : 'tired', mouth: T < F(2.0) ? 'line' : 'neutral' });
+      // The Student.
+      gator.boil(t, 10);
+      gator.blend(P, KEYS, t);
+      gator.follow('tail', t, { k: 6, w: 18 });
+      gator.group.position.y = DESK.hip[1] + (f >= 2 && f < 4 ? -0.0015 : 0);
+      const eyes = f < 2 ? 'side' : f < 5 ? 'closed' : 'tired';
+      const mouth = f < 24 ? 'line' : f >= 42 && f < 46 ? 'smile' : 'neutral';
+      gator.face({ eyes, mouth });
 
-      // The phone: rest (screen down) → the 0.50 drawing lifts and flips it, screen awake → eases to L.
-      const up = T >= F(0.5);
-      phone.position.fromArray(phoneAt(T));
-      phone.rotation.x = up ? Math.PI : 0;
-      screen.visible = up;
+      // The laptop: lid 30° at 0.67, 60° at 0.83, 110° on laptopUp (1.00), the screen awake on that frame.
+      set.setLid(f < 8 ? 0 : f < 10 ? 30 : f < 12 ? 60 : 110);
+      const on = t >= 1.0 - 1e-6;
+      set.glow.visible = on;
 
-      // The Exam: open on him, side toward the phone at 0.58, up-right at its own shadow at 2.50, back at 3.33.
-      // 3.50 squash (one drawing), 3.58 mid-hop, 3.67 lands at B2 and settles on a spring.
-      let eyes = 'open', look = 1;
-      if (T >= F(0.58) && T < F(3.33)) { eyes = 'side'; look = T < F(2.5) ? -1 : 1; }
-      const at = T < F(3.5) ? B : T >= F(3.67) ? B2 : [0.037, 0.002, 0.0615];
-      const squash = Math.abs(T - F(3.5)) < 1e-6 ? 0.2 : 0.2 * spring(T, F(3.67));
-      exam.mesh.position.fromArray(at);
-      exam.stain.position.set(at[0], 0.0003, at[2]);
-      exam.update(tLocal, { squash, wobble: 1, eyes, look });
+      // The Exam: open on him; side toward the screen at 1.08; up-right at its shadow at 3.0; back to him at 4.33.
+      // Gulp 1 (4.5): squash 0.3 eyes closed on 4.417, snap to 1.25× stretched on 4.5, settled by 4.75.
+      let eyesB = 'open', look = 1, squash = 0;
+      if (f >= 13 && f < 52) { eyesB = 'side'; look = f < 36 ? -1 : 1; }
+      if (f === 53) { squash = 0.3; eyesB = 'closed'; }
+      const grown = f >= 54;
+      if (f >= 54 && f < 57) squash = -0.2 * Math.exp(-6 * (F(f) - 4.5)) * Math.cos(18 * (F(f) - 4.5));   // settles by 4.75
+      const r = grown ? BLOB_R.gulp1 : BLOB_R.start;
+      exam.mesh.scale.setScalar(r / BLOB_R.start);
+      exam.update(t, { squash, wobble: f >= 54 && f < 66 ? 0.8 : 1, eyes: eyesB, look, key: on ? spot : sun.light });
 
-      // Light on 1s: dark until 0.50, full from that frame. Aimed along phone → blob centre, to its wall hit.
-      P.fromArray(phoneAt(T));
-      C.set(at[0], at[1] + exam.radius, at[2]);
-      hit.subVectors(C, P).multiplyScalar(-P.z / (C.z - P.z)).add(P);
-      spot.position.copy(P);
-      spot.intensity = tLocal >= 0.5 ? SPOT : 0;
-      aim(spot, hit);
-      // aim() puts the shadow camera's near plane at half the light→target distance (~6 cm here), behind the blob
-      // (5 cm from the phone), which would drop the blob from its own shadow map. Pull it in to just past the phone.
-      spot.shadow.camera.near = 0.004;
+      // Key on 1s: 0 before 1.00, full from that frame, ±5% flicker per drawing. Aimed screen → blob centre → wall.
+      const flick = 1 + FLICK * (2 * hash2(1303, f) - 1);
+      spot.intensity = on ? SPOT_I * flick : 0;
+      fill.intensity = FILL_K * spot.intensity;
+      face.intensity = on ? FACE_I : 0;
+      C.set(B[0], r, B[2]);
+      hit.subVectors(C, L).multiplyScalar(-L.z / (C.z - L.z)).add(L);
+      aim(spot, exam.mesh);
+      spot.shadow.camera.near = 0.002;
       spot.shadow.camera.updateProjectionMatrix();
-      fill.position.set(P.x - 0.005, P.y + 0.008, P.z);
-      fill.intensity = 0.15 * spot.intensity;
-      dawn.update(tLocal, 0.35);
-      dawn.light.position.set(0.8, 0.6, 0.6);
-      dawn.light.intensity *= 0.3;
+      spot.target.position.copy(hit);
+      spot.target.updateMatrixWorld();
 
-      fx.set({ focus: kf(tLocal, FOCUS, ease) });
+      fx.set({ focus: kf(t, FOCUS, ease) });
     },
   };
 }

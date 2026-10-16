@@ -1,0 +1,10 @@
+# v2-home-a checks, 73112e5 + s00 colour default
+$ node tools/check_timeline.mjs | tail -1
+ok (21 shots, 58 beats, 195.0s)
+$ node tools/determinism.mjs --t=1.5,7,15,24.5,43.6
+t=1.5  edb9eee7808890c2 edb9eee7808890c2 edb9eee7808890c2  PASS
+t=7  ef7decef3ba5181c ef7decef3ba5181c ef7decef3ba5181c  PASS
+t=15  6c47dc73ca4a4e62 6c47dc73ca4a4e62 6c47dc73ca4a4e62  PASS
+t=24.5  74cab23e1bd6fe6f 74cab23e1bd6fe6f 74cab23e1bd6fe6f  PASS
+t=43.6  9a4f935a4ec4dde5 9a4f935a4ec4dde5 9a4f935a4ec4dde5  PASS
+determinism: PASS
