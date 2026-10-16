@@ -129,6 +129,13 @@ export const PIECES = {
     phone_face_up: [0.0150, 0.0068, 'round', I], phone_face_down: [0.0150, 0.0068, 'round', N], pen: [0.0120, 0.0014, 'rect', N],
     pen_cap: [0.0054, 0.0019, 'rect', N], backpack: [0.0194, 0.0250, 'round', K], ink_drop: [0.0042, 0.0060, 'ellipse', I],
   },
+  // exam_room_kit (G4, v2-payoff): sizes from evidence/asset-props-kit/scale_table.md, keys from
+  // assets/cut/exam_room_kit.boxes.json. exam_desk_side is the tablet desk and its chair in one piece.
+  exam_room_kit: {
+    exam_desk_side: [0.0643, 0.0500, 'rect', K], wall_clock: [0.0140, 0.0138, 'ellipse', C], board: [0.1253, 0.0550, 'rect', N],
+    proctor: [0.0940, 0.1050, 'gator', N], door: [0.0598, 0.1100, 'rect', K], wall_strip: [0.2400, 0.0550, 'rect', C],
+    floor_strip: [0.2815, 0.0550, 'rect', K],
+  },
 };
 
 const cache = new Map();  // name → Promise of the load result
