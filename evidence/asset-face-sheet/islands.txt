@@ -1,0 +1,96 @@
+# islands vs pieces · face_sheet v1 (cut.mjs --auto --pad=0, scratch dir outside the repo, exit 0 for all three)
+# pieces per variant: 11 = 6 side eyes + 4 mouths + 1 front open pair. The pair is 2 islands by design (two eyes).
+# so a clean sheet is 12 islands. Islands are listed left to right as cut.mjs sorts them (by x0), with the piece each is.
+
+alpha in face_sheet_v1_1: 102462 px at alpha 250-254 clamped to 255
+12 alpha island(s): 12 kept, 0 dropped under 500 px
+face_sheet_v1_1_1: cleared 704 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_2: cleared 600 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_3: cleared 334 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_4: cleared 793 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_5: cleared 883 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_6: cleared 801 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_7: cleared 968 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_8: cleared 1150 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_9: cleared 202 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_10: cleared 1760 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_11: cleared 27 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_1_12: cleared 635 px (neighbouring islands, alpha<16 dust)
+  face_sheet_v1_1_1    [132,184,140,140]
+  face_sheet_v1_1_2    [240,761,180,31]
+  face_sheet_v1_1_3    [388,225,143,67]
+  face_sheet_v1_1_4    [572,748,212,52]
+  face_sheet_v1_1_5    [632,180,152,148]
+  face_sheet_v1_1_6    [689,488,127,128]
+  face_sheet_v1_1_7    [852,485,128,131]
+  face_sheet_v1_1_8    [892,180,152,152]
+  face_sheet_v1_1_9    [1016,732,60,84]
+  face_sheet_v1_1_10   [1128,144,176,184]
+  face_sheet_v1_1_11   [1312,768,120,20]
+  face_sheet_v1_1_12   [1404,184,140,140]
+
+alpha in face_sheet_v1_2: 133319 px at alpha 250-254 clamped to 255
+12 alpha island(s): 12 kept, 0 dropped under 500 px
+face_sheet_v1_2_1: cleared 690 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_2: cleared 179 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_3: cleared 361 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_4: cleared 803 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_5: cleared 867 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_6: cleared 1015 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_7: cleared 1132 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_8: cleared 947 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_9: cleared 289 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_10: cleared 1430 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_11: cleared 151 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_2_12: cleared 730 px (neighbouring islands, alpha<16 dust)
+  face_sheet_v1_2_1    [128,208,152,148]
+  face_sheet_v1_2_2    [192,748,200,36]
+  face_sheet_v1_2_3    [380,244,148,68]
+  face_sheet_v1_2_4    [556,720,224,68]
+  face_sheet_v1_2_5    [620,200,164,164]
+  face_sheet_v1_2_6    [668,460,140,144]
+  face_sheet_v1_2_7    [860,460,144,144]
+  face_sheet_v1_2_8    [880,200,168,168]
+  face_sheet_v1_2_9    [1004,708,84,108]
+  face_sheet_v1_2_10   [1132,196,180,172]
+  face_sheet_v1_2_11   [1328,748,136,28]
+  face_sheet_v1_2_12   [1396,208,148,152]
+
+alpha in face_sheet_v1_3: 99108 px at alpha 250-254 clamped to 255
+13 alpha island(s): 13 kept, 0 dropped under 500 px
+face_sheet_v1_3_1: cleared 334 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_2: cleared 568 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_3: cleared 408 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_4: cleared 550 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_5: cleared 497 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_6: cleared 603 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_7: cleared 642 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_8: cleared 683 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_9: cleared 145 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_10: cleared 626 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_11: cleared 653 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_12: cleared 6 px (neighbouring islands, alpha<16 dust)
+face_sheet_v1_3_13: cleared 474 px (neighbouring islands, alpha<16 dust)
+  face_sheet_v1_3_1    [124,176,136,132]
+  face_sheet_v1_3_2    [224,752,200,31]
+  face_sheet_v1_3_3    [372,208,140,59]
+  face_sheet_v1_3_4    [561,732,219,56]
+  face_sheet_v1_3_5    [632,172,139,140]
+  face_sheet_v1_3_6    [680,460,132,136]
+  face_sheet_v1_3_7    [864,460,132,136]
+  face_sheet_v1_3_8    [884,168,148,148]
+  face_sheet_v1_3_9    [976,709,60,91]
+  face_sheet_v1_3_10   [1132,177,44,63]
+  face_sheet_v1_3_11   [1176,176,136,136]
+  face_sheet_v1_3_12   [1268,752,151,16]
+  face_sheet_v1_3_13   [1420,176,131,132]
+
+## island -> piece
+v1_1 (12 islands, 11 pieces):  1 open, 2 neutral, 3 closed, 4 smile, 5 tired, 6+7 front pair, 8 gasp, 9 o, 10 worried (drops merged on cut.mjs's 4 px grid), 11 line, 12 side
+v1_2 (12 islands, 11 pieces):  1 open, 2 neutral, 3 closed, 4 smile, 5 tired, 6+7 front pair, 8 gasp, 9 o, 10 worried (drops touch the disc), 11 line, 12 side
+v1_3 (13 islands, 11 pieces):  1 open, 2 neutral, 3 closed, 4 smile, 5 tired, 6+7 front pair, 8 gasp, 9 o, 10 worried sweat drops (detached), 11 worried eye, 12 line, 13 side
+
+Every --auto island is a whole piece or part of one; nothing is merged across pieces and nothing was dropped under 500 px.
+The pair (all three) and v1_3's drops need a hand-written boxes file: one box per piece keeps every island wholly inside it.
+Tested on v1_3: cut.mjs --boxes with 11 named boxes (face_sheet_eyes_open ... face_sheet_mouth_line, face_sheet_eyes_front_open), exit 0,
+eyes_worried carries its drops and eyes_front_open both eyes (pieces composited in on_head.jpg).

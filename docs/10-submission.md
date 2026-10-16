@@ -91,7 +91,7 @@ It also contributes a working example of AI used transparently in art. Nothing h
 ## Accessibility & Pluralism
 > Please share speculations, designs, and insights on the potential, or if not why, of enabling technologies or other opportunities for expanded use.
 
-- **Wordless by design:** no dialogue and no legible text anywhere, so it plays the same in any language.
+- **No dialogue:** the story is told in pictures and sound. A handful of on-screen words (the exam, the math, the grade) are the only text, so it travels across languages almost unchanged. [now: director 2026-10-15 allowed sparse text]
 - **Captions for sound:** the key sounds (the lamp click, the sensor relay, the music-box motif) carry story, so a captioned version describes them for Deaf and hard-of-hearing viewers. [planned]
 - **Contrast and safety:** key story moments are held in high contrast, and the flickering lights are kept under photosensitivity thresholds. No strobing. [planned: verify with a flash-analysis check]
 - **Open and reproducible:** anyone with a laptop can re-render it, change it or translate its look. No paid software or GPU farm is needed. [now]

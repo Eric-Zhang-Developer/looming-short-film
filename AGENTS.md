@@ -13,7 +13,7 @@ Every subagent reads this page first. The docs and your brief are the source of 
 - **Only change your `owns`.** Contract files (`docs/09-orchestration.md` lists them) change only in a `contract-*` task. If you need one changed, say so under Gaps and finish what you can.
 - **Every frame is a pure function of `t`.** No `Date.now()`, `performance.now()` or `Math.random()`. Use the seeded RNG.
 - **Never generate images at render time.** Generated art comes only from `assets/frozen/`.
-- **No legible text in any frame.** Calendars, pages and screens use glyphs and scribbles only.
+- **Text is rare and deliberate.** No dialogue. On-screen words appear only where a shot spec calls for them (e.g. "Calc 2 exam" on the calendar, the math on the practice sheet, the grade), short and hand-lettered in the paper style. Everything else uses glyphs and scribbles. Director, 2026-10-15: "remove that rule, but use text very sparingly."
 - **Evidence, not claims.** "Looks good" or "tested" means nothing without the sheet, strip or command output that shows it.
 - **Report honestly.** Anything skipped, failed, faked or unverified goes under Gaps. A partial result labeled partial is fine. A partial result labeled done is not.
 - **Tell the story.** Every done note ends with a `## Story` section (see the template): how the work really went, false starts included, in prose someone could read aloud. These become the making-of the judges and the director read, so they matter as much as the checklist. True events only, linked to evidence.

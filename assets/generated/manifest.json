@@ -37,5 +37,18 @@
     "frozen": "2026-10-15",
     "gate": "G2",
     "approved": "Director: \"G2: freeze gator sheet v2_1 and hero_1.\""
+  },
+  {
+    "name": "face_sheet",
+    "file": "assets/frozen/face_sheet.png",
+    "source": "assets/raw/face_sheet_v1_3.png",
+    "prompt": "assets/prompts/face_sheet.v1.md",
+    "sidecar": "assets/raw/thumbs/face_sheet_v1_3.json",
+    "variant": "v1_3",
+    "sha256": "1905ab0207d4b58753c221db24565158f5c06b0f385cfae94da5f61bdff84c33",
+    "size": "1672x941",
+    "frozen": "2026-10-15",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule (most cut-paper, simplest); painter and orchestrator both ranked v1_3 first. Overrulable in docs/notes/morning-picks.md."
   }
 ]

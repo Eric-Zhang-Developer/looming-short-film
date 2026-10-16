@@ -141,5 +141,77 @@
       "nothing touching the frame edge; no text or artifacts; on palette",
       "cut.mjs --auto gives one island"
     ]
+  },
+  {
+    "name": "face_sheet",
+    "purpose": "Every eye and mouth swap from doc 03 Face set, at one size and line weight, so the swaps drop onto the frozen gator head (gator_sheet v2_1) with no in-betweens. Shared, scaled, by the roommates and the Freshman; must read from above in s13.",
+    "shots": "s02-s18",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/face_sheet.v1.md",
+    "variants": 3,
+    "cap": 8,
+    "target": "landscape at the frozen gator_sheet pixel scale (1672 x 941): open eye disc 59 px (measured on gator_sheet turn_side: 59 x 60 px at centre (298.5, 130), pupil 37 x 38 px at (309.5, 131)); 11 pieces in three rows, >= 80 px apart",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "parts": {
+      "eyes_open": {
+        "rig": "eyes slot, take open (side rig head, at [0.010, 0.010])",
+        "face": "cream disc 59 px, pupil 37 px toward +x, one highlight dot"
+      },
+      "eyes_closed": {
+        "rig": "eyes slot, take closed (side rig head, at [0.010, 0.010])",
+        "face": "content: a dark green upward arc, no disc"
+      },
+      "eyes_tired": {
+        "rig": "eyes slot, take tired (side rig head, at [0.010, 0.010])",
+        "face": "open eye with a green lid over the top half"
+      },
+      "eyes_gasp": {
+        "rig": "eyes slot, take gasp (side rig head, at [0.010, 0.010])",
+        "face": "disc ~65 px, small ~20 px pupil"
+      },
+      "eyes_worried": {
+        "rig": "eyes slot, take worried (side rig head, at [0.010, 0.010])",
+        "face": "pupil down and back, slanted lid sliver, two cream sweat drops touching the disc"
+      },
+      "eyes_side": {
+        "rig": "eyes slot, take side (side rig head, at [0.010, 0.010])",
+        "face": "pupil at the -x (back) edge"
+      },
+      "eyes_front_open": {
+        "rig": "not consumed yet: the front rig (facing front) shares the side eyes slot; needs a char-rigs change",
+        "face": "two 59 px discs ~95 px apart, pupils centred, looking at camera"
+      },
+      "mouth_neutral": {
+        "rig": "mouth slot, take neutral (side rig head, at [0.022, -0.002])",
+        "face": "near-straight dark green line ~60 px, 7 px thick"
+      },
+      "mouth_smile": {
+        "rig": "mouth slot, take smile",
+        "face": "the frozen smile line, ~70 px, curving up toward +x"
+      },
+      "mouth_o": {
+        "rig": "mouth slot, take o",
+        "face": "dark green oval ~22 px, slightly taller than wide"
+      },
+      "mouth_line": {
+        "rig": "mouth slot, take line",
+        "face": "straight flat line ~40 px"
+      }
+    },
+    "acceptance": [
+      "10 pieces (6 side eyes, 4 mouths) plus the front open pair",
+      "open eye disc within 5% of the frozen head eye (59.5 px), measured",
+      "every piece at the same line weight and scale (one stroke thickness, one disc size except gasp)",
+      "keeps the approved look: one big round eye, small highlight, simple smile line, friendly read",
+      "no baked-in light or shadow; background alpha or flat magenta",
+      "parts not touching; no text or artifacts; on palette (cream, black pupils, gator green lids, one dark green line colour)",
+      "cut.mjs --auto islands accounted for against pieces"
+    ]
   }
 ]

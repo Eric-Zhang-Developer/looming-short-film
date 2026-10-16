@@ -205,3 +205,6 @@ The director's notes are in full in `docs/notes/g4-2026-10-15.md`. Orchestrator'
 - **Ending:** the exam date is crossed off, the blob shrinks to an ink dot and is absorbed by the calendar. Tag: a new date, a small drop, and he uncaps his pen. This replaces the pocket.
 - **Runtime 3:00 → about 3:15** (the rules set no limit). The v1/v3 comparison aligns by scene, as doc 11 allows when G4 changes the story.
 - **Overnight authority:** the orchestrator freezes art itself (most cut-paper, most Marston, simplest), listing each freeze with its alternatives for the morning. No public actions. No story changes beyond these notes.
+
+## 2026-10-15 · Text rule relaxed: sparse words allowed
+Director, during the overnight start: "I think the no legible text rule … We don't have to have it. … Let's remove that rule, but use text very sparingly. I would like to add a few scenes, just small scenes like that." This overrules the ∫-only recommendation from the G4 entry. The calendar and notification may say the exam ("Calc 2 exam"), the practice sheet and test carry real Calc 2 math, and the grade is shown. Words stay few and hand-lettered in the paper style, with no dialogue. Updated AGENTS.md, doc 02's story rules, README and the living submission draft; `docs/10b` stays as sent.

@@ -97,7 +97,7 @@ Four dodges that escalate. Each one makes the shadow bigger, each look-away make
 
 ## Story rules
 
-- **No legible text, anywhere.** Calendars, pages and screens use glyphs and scribbles only.
+- **Text, sparingly.** No dialogue. A few hand-lettered words where they make the story explicit (the exam on the calendar and notification, the Calc 2 math, the grade); everything else stays glyphs and scribbles. (Director, 2026-10-15, superseding "no legible text".)
 - **The hero takes the first step himself.** Nobody rescues him. Others can show it's possible; only he can do it.
 - **The blob is never evil.** It's never attacked, chased off or destroyed.
 - **It grows only by gulps and shrinks only by solved problems.** Each step snaps on a beat; it never slowly morphs. No text or thought bubble explains it, and the exam itself never gets a face. It still fits in his pocket at the end.
