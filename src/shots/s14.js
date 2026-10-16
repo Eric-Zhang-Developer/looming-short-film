@@ -1,10 +1,9 @@
-// s14 · The Custodian passes (docs/shots/s14.md). Locked wide side view of the Marston hero desk unit: the aisle in front
-// of his desk is lit by a working fluorescent (the Custodian's light), his own desk is shaded and keyed by his phone.
-// The desk set and every position the cut into s15 shows come from s15's UNIT (done/anim-s15.md), not the spec's older numbers.
+// s14 · The Custodian passes (docs/shots/s14.md, G4). v2 on the frozen Marston kits: s11's desk set (marstonDesk), every
+// position s15 opens on. Locked wide side view: the aisle in front of his desk is lit by a working fluorescent (the
+// Custodian's light); his own desk is keyed by his phone, and the cart wakes his zone (the ring pendant, in frame at the
+// top) for three seconds before it times out. The Custodian and his cart are still custodian_sheet proxies (not frozen).
 // Characters (student, Custodian, cart, both blobs) step on 2s; light and focus run at 24.
 import * as THREE from 'three';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
 import { phoneLight, sensorLight, fluorescent, ambient, aim, shadowScale } from '../lights.js';
 import { kf, onTwos } from '../core/ease.js';
 import { seedOf } from '../core/rng.js';
@@ -12,11 +11,14 @@ import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { makeCustodian, makeCart } from '../characters/custodian.js';
 import { POSES, walk } from '../characters/poses.js';
-import { UNIT } from './s15.js';
+import { UNIT, BLOB_AT, PHONE, PHONE_L, PAGE, practiceSheet, SHEET_INK } from './s15.js';
+import { kitTools, marstonDesk, noCast } from './s11.js';
 
 const ID = 's14', D = Math.PI / 180;
-const BLOB_R = 0.012;                        // the Exam's radius here (README §1); the blob-meter pass changes this line
+const BLOB_R = { start: 0.030 };             // METER.gulp5 (README §1), at s15's mark (BLOB_AT)
+const LAPTOP_Z = 0.078;                      // in front of the grown blob (README §2)
 const TINY_R = 0.004;                        // the Custodian's blob
+const ROLL = [0.014, 0.016];                 // paper-towel roll behind the tiny blob (w, h)
 const WAKE = 1.0, TIMEOUT = 4.2;             // the cart trips the hero's zone; he stays still, so it times out (Q11 option a)
 const ZONE_I = 0.8, PHONE_OUTSHONE = 0.02;   // s15's numbers: zone pool at the blob, and the phone's out-shone level
 const CUST = { x0: 0.27, v: 0.11, t0: 0.5, z: 0.233, cartZ: 0.228, cartDx: -0.07, floor: -0.034 };
@@ -36,12 +38,9 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   scene.background = C('navy').lerp(C('ink'), 0.5);
   const V = (a) => new THREE.Vector3(...a);
 
-  const [furn, props] = await Promise.all(['marston_furniture_sheet', 'study_props_sheet'].map((n) => assets.load(n)));
-  const boiling = [];
-  const sheet = (opts, parent = scene) => {
-    const mesh = paperMesh(makePaper({ ...opts, seed: 0 }));
-    boiling.push({ mesh, opts }); parent.add(mesh); return mesh;
-  };
+  const tools = kitTools(ID), { sheet, boil } = tools;
+  const { pendant } = await marstonDesk({ scene, assets, PALETTE, tools, ID });
+  const [props, kitp] = await Promise.all(['study_props_sheet', 'props_kit'].map((n) => assets.load(n)));
   const cut = (a, name, { weight, res = 512, parent = scene } = {}) => {   // origin = centre of the piece's visible shape
     const holder = new THREE.Group(), [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [w, h], key: `${ID}-${name}`, weight, res }, holder);
@@ -51,44 +50,29 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const flat = (g) => { g.rotation.x = -Math.PI / 2; return g; };
   const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
 
-  // ---------- set: s15's desk unit ----------
-  const WALL = [0.9, 0.394], PX = 2048 / WALL[0], WINDOWS = [-0.51, -0.31, -0.11, 0.09, 0.29, 0.49];
-  const wallArt = Object.assign(document.createElement('canvas'), { width: 2048, height: Math.round(WALL[1] * PX) });
-  { const g = wallArt.getContext('2d'); g.fillStyle = PALETTE.navy; g.fillRect(0, 0, wallArt.width, wallArt.height);
-    for (const cx of WINDOWS) g.clearRect((cx - 0.05 + 0.45) * PX, (0.36 - 0.300) * PX, 0.10 * PX, (0.300 - 0.066) * PX); }
-  sheet({ art: wallArt, size: WALL, key: `${ID}-marston_window_wall`, res: 2048 }).position.set(0, (0.36 - 0.034) / 2, 0);
-  const paneCol = '#' + C('navy').lerp(C('ink'), 0.35).getHexString();
-  for (const cx of WINDOWS.filter((x) => Math.abs(x) < 0.4)) {   // window_tissue: unlit night, casts nothing
-    const m = sheet({ path: RECT, color: paneCol, weight: 'tissue', size: [0.11, 0.245], key: `${ID}-pane${cx}`, res: 256 });
-    m.position.set(cx, 0.183, -0.001); m.castShadow = false;
-  }
-  // marston_floor, extended forward to z 0.418: the aisle (spec x ±0.5; the camera sees ±0.15 there)
-  flat(sheet({ path: RECT, color: PALETTE.kraft, weight: 'kraft', size: [0.8, 0.418], key: `${ID}-marston_floor`, res: 512 }))
-    .position.set(0, -0.034, 0.209);
-  flat(cut(furn, 'desk_top', { weight: 'kraft', res: 1024 })).position.set(0.0585, 0, 0.075);
-  cut(furn, 'desk_apron', { weight: 'kraft', res: 1024 }).position.set(0.0585, -0.017, 0.120);
-  cut(furn, 'chair', { weight: 'kraft' }).position.set(-0.076, -0.034 + 0.025, 0.071);
-  cut(props, 'laptop_base').position.set(-0.0075, 0.0015, 0.060);
-  cut(props, 'laptop_lid').position.set(-0.0075, 0.0045, 0.0601);
-
-  // page, pen and cap at rest, phone face up (all s15's positions)
-  flat(cut(props, 'exam_page', { res: 1024 })).position.set(-0.0205, 0.0003, 0.095);
+  // ---------- set: s11's desk unit (its carpet reaches z 0.45, the aisle), and what s15 opens on ----------
+  { const b = cut(props, 'backpack_side'); b.position.set(-0.145, -0.034 + 0.02, 0.028); }
+  cut(props, 'laptop_base').position.set(-0.0075, 0.0015, LAPTOP_Z);   // closed
+  cut(props, 'laptop_lid').position.set(-0.0075, 0.0045, LAPTOP_Z + 0.0001);
+  // page (problem 1's practice sheet, nothing written yet), pen and cap at rest, phone face up: s15's props
+  practiceSheet({ props: kitp, sheet, which: 'practice_1', at: PAGE, key: `${ID}-page`, parent: scene }).draw([[SHEET_INK.practice_1.problem, 0, 1]]);
   const pen = new THREE.Group(); scene.add(pen);
-  cut(props, 'pen', { parent: pen }).position.x = -0.006;
+  { const p = cut(kitp, 'pen', { parent: pen }); p.position.x = -0.006; p.scale.x = -1; }
   pen.position.set(-0.016, 0.0006, 0.106); pen.rotation.set(-Math.PI / 2, 0, 0);
-  const cap = cut(props, 'pen_cap'); cap.position.set(-0.016 - 0.002, 0.0006 + 0.0002, 0.106 + 0.0002); cap.rotation.set(-Math.PI / 2, 0, 0);
-  const phone = new THREE.Group(); phone.position.set(...UNIT.phone); scene.add(phone);
-  flat(cut(props, 'phone_face', { parent: phone })).position.y = 0.0004;
+  const cap = cut(kitp, 'pen_cap'); cap.scale.x = -1; cap.position.set(-0.016 - 0.002, 0.0006 + 0.0002, 0.106 + 0.0002); cap.rotation.set(-Math.PI / 2, 0, 0);
+  const phone = new THREE.Group(); phone.position.set(...PHONE); scene.add(phone);
+  flat(cut(kitp, 'phone_face_up', { parent: phone })).position.y = 0.0004;
   const SCR = Object.assign(document.createElement('canvas'), { width: 120, height: 64 });
   { const g = SCR.getContext('2d'); g.fillStyle = PALETTE.phone; g.fillRect(0, 0, 120, 64); g.fillStyle = PALETTE.navy;
     [[14, 12, 70], [14, 28, 88], [14, 44, 52]].forEach(([x, y, w]) => { g.beginPath(); g.roundRect(x, y, w, 8, 4); g.fill(); }); }
   const scrTex = new THREE.CanvasTexture(SCR); scrTex.colorSpace = THREE.SRGBColorSpace;
-  const screen = flat(new THREE.Mesh(new THREE.PlaneGeometry(0.0125, 0.0064), new THREE.MeshBasicMaterial({ map: scrTex })));
+  const screen = flat(new THREE.Mesh(new THREE.PlaneGeometry(0.0128, 0.0054), new THREE.MeshBasicMaterial({ map: scrTex })));
   screen.position.y = 0.00045; phone.add(screen);
+  noCast(phone);
 
   // ceiling_header: out of frame over his desk, so the aisle tube never reaches it. Wider than the spec's z 0.03–0.15 because the
   // tube is tilted 15° toward camera: its rays reach the desk's front edge through z 0.17 at y 0.20.
-  const header = flat(sheet({ path: RECT, color: PALETTE.kraft, weight: 'kraft', size: [0.40, 0.17], key: `${ID}-ceiling_header`, res: 256 }));
+  const header = flat(sheet({ path: RECT, color: PALETTE.kraft, weight: 'kraft', size: [0.40, 0.17], key: `${ID}-ceiling_header`, res: 256 }, scene));
   header.position.set(0, 0.20, 0.115);
 
   // ---------- aisle: the Custodian, his cart, the tiny blob ----------
@@ -100,8 +84,13 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const tiny = createBlob({ radius: TINY_R, seed: seedOf('custodianBlob') });
   tiny.mesh.castShadow = false;               // its pool is the decal below (see done note)
   scene.add(tiny.mesh);
-  const trayTop = flat(sheet({ path: RECT, color: PALETTE.kraft, weight: 'kraft', size: [0.05, 0.016], key: `${ID}-tray_top`, res: 128 }));
+  const trayTop = flat(sheet({ path: RECT, color: PALETTE.kraft, weight: 'kraft', size: [0.05, 0.016], key: `${ID}-tray_top`, res: 128 }, scene));
   trayTop.castShadow = false;
+  // A paper-towel roll standing on the tray just behind the tiny blob: a lit cream card it reads against. Without it the
+  // sleeping ink blob (eyes closed, no cream showing) vanished into the dark desk behind it at sheet size.
+  const roll = sheet({ path: [[0, 0.1], [0.1, 0], [0.9, 0], [1, 0.1], [1, 0.9], [0.9, 1], [0.1, 1], [0, 0.9]], color: PALETTE.cream,
+    size: ROLL, key: `${ID}-towel_roll`, res: 128 }, scene);
+  roll.castShadow = false;
   const pool = new THREE.Mesh(tiny.mesh.geometry, tiny.silhouette());   // 1.0×: the blob's own outline, laid on the tray toward camera
   pool.rotation.x = Math.PI / 2; pool.scale.set(1, 0.5, 1); scene.add(pool);
 
@@ -109,21 +98,23 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const hero = await makeGator({ assets }, { res: 1024 });
   hero.group.position.set(UNIT.hip[0], UNIT.hip[1], UNIT.bodyZ);
   scene.add(hero.group);
-  const exam = createBlob({ radius: BLOB_R, seed: 1 });
-  exam.stain.position.set(UNIT.blob[0], 0.0004, UNIT.blob[2]);
+  const M = BLOB_AT(BLOB_R.start), BLOB_C = new THREE.Vector3(M[0], BLOB_R.start, M[2]);
+  const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
+  exam.stain.position.set(M[0], 0.0004, M[2]);
   scene.add(exam.mesh, exam.stain);
 
   // ---------- light ----------
   // Rival: his phone, s15's rig (4.2×), dimmed to the spec's 0.6. Its cone points at the wall, away from the aisle.
   const phoneSpot = phoneLight({ angle: 0.9, penumbra: 0.4, intensity: PHONE_I });
-  phoneSpot.position.copy(V(UNIT.phoneLight));
+  phoneSpot.position.copy(V(PHONE_L));
   scene.add(phoneSpot, phoneSpot.target);
-  aim(phoneSpot, V(UNIT.blob)); phoneSpot.shadow.camera.near = 0.004; phoneSpot.shadow.camera.updateProjectionMatrix();
+  aim(phoneSpot, BLOB_C); phoneSpot.shadow.camera.near = 0.004; phoneSpot.shadow.camera.updateProjectionMatrix();
   const fill = new THREE.PointLight(C('phone').lerp(C('navy'), 0.35), FILL_PHONE, 0.07, 2);   // README §10 character fill, s15's
   fill.castShadow = false; fill.position.set(-0.046, 0.040, 0.114); scene.add(fill);
   // His desk zone (README §3): dead, then the cart wakes it at 1.0; it times out at 4.2 because he doesn't move.
-  const zone = sensorLight({ at: UNIT.tube, aimAt: [UNIT.blob[0], 0, UNIT.blob[2]], intensity: ZONE_I });
-  scene.add(zone.group, zone.light, zone.light.target);
+  // Its fixture is s11's ring pendant, in frame at the top; the procedural trough isn't added.
+  const zone = sensorLight({ at: UNIT.tube, aimAt: [0, 0, 0.098], intensity: ZONE_I });
+  scene.add(zone.light, zone.light.target);
   const FILL_ZONE = 0.06, FILL_COLS = { phone: fill.color.clone(), zone: C('cream').lerp(C('gator'), 0.15) };
   // Key: the aisle tube, steady (its update() is never called), tilted 15° toward camera.
   const tube = fluorescent({ flickerSeed: seedOf(ID, 1), intensity: FLUOR_I });
@@ -144,11 +135,11 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   camera.lookAt(0, 0.033, 0);
   const fx = post({ focus: 0.63, aperture: 0.025, maxblur: 0.01, lut: 'marston' });   // spec LUT act2b doesn't exist; s13 and s15 use marston
 
-  let lastSeed = null;
   function update(t) {
-    const tc = onTwos(t), seed = boilSeed(t, 10);
-    if (seed !== lastSeed) { lastSeed = seed; for (const p of boiling) updatePaperMesh(p.mesh, makePaper({ ...p.opts, seed })); }
+    const tc = onTwos(t);
+    boil(t, 10);
     const level = zone.update(t, { wake: WAKE, timeoutAt: TIMEOUT }), lit = level >= 0.5;   // on 1s; README §4's outshone rule
+    pendant(level);
     fx.set({ focus: kf(t, FOCUS) });
 
     // Custodian: root on 2s, a step every 0.25 s, the mop's stroke ends at 0.5 + 0.5n
@@ -164,6 +155,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     tiny.mesh.scale.setScalar(1 + 0.05 * Math.sin(2 * Math.PI * tc / 3));
     trayTop.position.set(x + CUST.cartDx, TRAY_Y - 0.0002, CUST.cartZ + 0.003 + 0.004);
     pool.position.set(x + CUST.cartDx, TRAY_Y + 0.0001, CUST.cartZ + 0.003);
+    roll.position.set(x + CUST.cartDx + 0.002, TRAY_Y + ROLL[1] / 2, CUST.cartZ - 0.002);
 
     // student: sits, notices, follows the cart, looks back along the desk; the 3/4 head is on one drawing 2.8–4.4
     hero.boil(t, 10);
@@ -177,7 +169,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     // his blob: eyes follow the tiny one from 2.3 to 4.0; a small startle as the light comes
     const kick = tc < WAKE ? 0 : 0.2 * Math.exp(-6 * (tc - WAKE)) * Math.cos(18 * (tc - WAKE));
     exam.update(t, { wobble: 1, squash: kick, eyes: t >= 2.3 - 1e-6 && t < 4.0 ? 'side' : 'open', look: -1, key: lit ? zone.light : phoneSpot });
-    exam.mesh.position.set(...UNIT.blob);
+    exam.mesh.position.set(...M);
     phoneSpot.intensity = PHONE_I * (lit ? PHONE_OUTSHONE : 1);
     fill.color.copy(lit ? FILL_COLS.zone : FILL_COLS.phone); fill.intensity = lit ? FILL_ZONE : FILL_PHONE;
     screen.material.color.setScalar(lit ? 0.6 : 1);
@@ -186,7 +178,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const probe = () => ({
     h34: hero.meshes.head34.visible, tinyZ: tiny.mesh.position.z, tinyW: new THREE.Box3().setFromObject(tiny.mesh).getSize(new THREE.Vector3()).x, poolW: new THREE.Box3().setFromObject(pool).getSize(new THREE.Vector3()).x,
     x: cust.group.position.x, cartX: cart.group.position.x, custHead: cust.joints.head.rotation.z, head: hero.meshes.head.getWorldPosition(new THREE.Vector3()).toArray(),
-    wallScale: shadowScale(phoneSpot.position, V(UNIT.blob), 0),
+    wallScale: shadowScale(phoneSpot.position, BLOB_C, 0),
     joints: Object.fromEntries(Object.entries(hero.joints).map(([k, j]) => [k, j.rotation.z])),
   });
   return { update, probe };

@@ -1,4 +1,7 @@
-// s13 · Everyone has one (docs/shots/s13.md). One locked top-down shot of the Marston reading room.
+// s13 · Everyone has one (docs/shots/s13.md, G4). v2: one locked top-down shot of the Marston reading room. The carpet is
+// marston_kit's, the phones, pages, pen and backpack are props_kit's (seen from above), and his blob is the 2.5× peak
+// with its 7.1-unit decal. Desk tops, figures, textbooks, laptops and cans are still top_props_sheet / top_figures_sheet
+// proxies: no top-view art is frozen. The hero's head carries a top-view eye pair built from face_sheet's eyes.
 // This shot only: the floor is z = 0 and z is height above it; +Y is north (up the frame).
 // He lifts his head and looks at three desks as their phones light; every occupied desk gets the same rig as his:
 // a phone glow decal and an ink shadow decal cut from its blob's own field (doc 04 Crowds: decals, not lights).
@@ -10,6 +13,7 @@ import { ambient } from '../lights.js';
 import { createBlob } from '../blob.js';
 import { kf, clamp, easeOut, onTwos } from '../core/ease.js';
 import { mulberry32, seedOf } from '../core/rng.js';
+import { carpetCanvas } from './s11.js';
 
 const ID = 's13', DEG = Math.PI / 180;
 const XS = [-0.32, -0.16, 0, 0.16, 0.32], YS = [0.13, 0, -0.13];   // desk centers; d1 is top-left, row-major
@@ -33,6 +37,9 @@ export const CROWD = {
 const PROP_AT = { page: [0.026, 0.010, 8], pen: [0.016, -0.004, -30], textbook: [-0.024, -0.008, -6], laptop: [0.028, 0.010, 4],
   backpack: [0, -0.088, 12] };
 const PHONE_AT = [0.030, -0.020], BLOB_AT = [0, 0.005], SEAT_AT = [0, -0.050];
+const HERO = { r: 0.030, S: 2.84 };                    // METER.gulp5 (README §1) and its decal: 2.84 × 2.5× = 7.1 units (s12's)
+const EYE_PAIR = { w: 0.0125, h: 0.0062, gap: 0.55 }; // top-view eyes (m): both eyes in one sheet, centres gap × w apart
+const FROZEN_PROPS = new Set(['page', 'pen', 'backpack']);   // drawn from props_kit; the rest stay top_props_sheet proxies
 
 // Hero head (relative to his body, deg, + = clockwise from camera) and body turn, keyed on his action table.
 const HEAD_ROT = [[0.5, -70], [1.0, 0], [1.6, 0], [1.8, -42], [2.6, -42], [2.8, 42], [3.6, 42], [3.9, 65], [5.0, 65], [5.3, 0]];
@@ -63,7 +70,9 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   amb.position.set(0, 0, 1);  // sky is above in this shot
   scene.add(amb);
 
-  const [figs, props, face] = await Promise.all(['top_figures_sheet', 'top_props_sheet', 'face_sheet'].map((n) => assets.load(n)));
+  const [figs, props, face, kitp, mkit] = await Promise.all(['top_figures_sheet', 'top_props_sheet', 'face_sheet', 'props_kit', 'marston_kit'].map((n) => assets.load(n)));
+  const KP = { page: 'blank_page', pen: 'pen', backpack: 'backpack' };
+  const prop = (p, key) => (FROZEN_PROPS.has(p) ? art(kitp, KP[p], key) : art(props, p, key));
   const boiling = [];
   const piece = (opts, parent = scene) => {
     const mesh = paperMesh(makePaper({ ...opts, seed: 0 }));
@@ -72,22 +81,14 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const art = (sheet, name, key, extra = {}) => ({ art: sheet.pieces[name], size: sheet.sizes[name], key, res: 128, ...extra });
   const place = (m, x, y, z, rot = 0) => { m.position.set(x, y, z); m.rotation.z = rot; return m; };
 
-  // ---------- floor: marston_floor, procedural tile with a scribbled grid ----------
+  // ---------- floor: marston_kit's carpet, laid tile by tile (s10–s12's), seen from above ----------
   const rng = mulberry32(seedOf(ID, 'set'));
+  // On a backing of the tile's own colour: the tiles' rounded corners leave pinholes that read as rows of dots from above.
   const floorArt = (() => {
-    const c = Object.assign(document.createElement('canvas'), { width: 1200, height: 700 }), g = c.getContext('2d');
-    g.fillStyle = hex(tone(PALETTE.navy, PALETTE.cream, 0.1)); g.fillRect(0, 0, 1200, 700);
-    g.strokeStyle = hex(tone(PALETTE.navy, PALETTE.ink, 0.55)); g.lineCap = 'round';
-    const line = (x0, y0, x1, y1) => {   // two loose passes, like a pencil going over a ruled line
-      for (let p = 0; p < 2; p++) {
-        g.lineWidth = 1.5 + rng() * 2; g.beginPath(); g.moveTo(x0 + (rng() - 0.5) * 6, y0 + (rng() - 0.5) * 6);
-        g.quadraticCurveTo((x0 + x1) / 2 + (rng() - 0.5) * 10, (y0 + y1) / 2 + (rng() - 0.5) * 10, x1 + (rng() - 0.5) * 6, y1 + (rng() - 0.5) * 6);
-        g.stroke();
-      }
-    };
-    for (let x = 30; x < 1200; x += 60) line(x, 0, x, 700);   // 0.06 m tiles
-    for (let y = 20; y < 700; y += 60) line(0, y, 1200, y);
-    return c;
+    const tiles = carpetCanvas(mkit, [1.2, 0.7]), c = Object.assign(document.createElement('canvas'), { width: tiles.width, height: tiles.height });
+    const g = c.getContext('2d'), t = mkit.pieces.carpet_tile;
+    g.drawImage(t, t.width / 2 - 8, t.height / 2 - 8, 16, 16, 0, 0, c.width, c.height);   // the tile's middle, stretched: its colour
+    g.drawImage(tiles, 0, 0); return c;
   })();
   piece({ art: floorArt, size: [1.2, 0.7], key: `${ID}-marston_floor`, res: 1024 });
 
@@ -112,7 +113,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     const at = ([x, y]) => [cx + f * x, cy + f * y];   // occupant frame → world (f = −1 turns the desk round)
     const [px, py] = at([ph * PHONE_AT[0], PHONE_AT[1]]), [bx, by] = at(BLOB_AT);
     const phoneRot = f < 0 ? Math.PI : 0;
-    place(piece(art(props, 'phone', `${ID}-${key}-phone`)), px, py, 0.033, phoneRot);
+    place(piece(art(kitp, 'phone_face_up', `${ID}-${key}-phone`)), px, py, 0.033, phoneRot + Math.PI / 2);   // painted landscape
     const screen = place(flat(0.0062, 0.0125, new THREE.MeshBasicMaterial({ color: PALETTE.phone, transparent: true, depthWrite: false })), px, py, 0.0335, phoneRot);
     const glow = place(flat(0.08, 0.08, new THREE.MeshBasicMaterial({ color: PALETTE.phone, map: glowTex, transparent: true,
       blending: THREE.AdditiveBlending, depthWrite: false })), px, py, 0.0332);
@@ -145,7 +146,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     d.props.forEach((p, j) => {
       if (p === 'can') { const [x, y] = at([0.006 + 0.0085 * j, 0.014]); return place(piece(art(props, 'can', `${ID}-${key}-can${j}`)), x, y, 0.033); }
       const [ox, oy, deg] = PROP_AT[p], [x, y] = at([ox, oy]);
-      place(piece(art(props, p, `${ID}-${key}-${p}`)), x, y, p === 'backpack' ? 0.045 : 0.033, facing + deg * DEG);
+      place(piece(prop(p, `${ID}-${key}-${p}`)), x, y, p === 'backpack' ? 0.045 : 0.033, facing + deg * DEG);
     });
     cast.push({ who: d.who, pose: d.pose, mirror: !!d.mir, turnDeg: +(rot / DEG).toFixed(1), scale: d.sc });
     deskRig({ key, who: d.who, cx, cy, f, ph: d.ph, r: d.r, S: d.S, wake: d.wake, strength: 0.35 });
@@ -161,11 +162,19 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   ];
   const neck = new THREE.Group(); hero.add(neck);   // the neck pivot; the head sits just in front of it
   green.push(place(piece(art(figs, 'hero_head', `${ID}-hero-head`), neck), 0, 0.006, 0));
+  // A top-view eye pair per take: face_sheet's eye drawn twice side by side (the right one mirrored), so from above he
+  // has two eyes on the top of his head, not one disc (done/cut-gator.md).
+  const pair = (img) => {
+    const c = Object.assign(document.createElement('canvas'), { width: 256, height: 128 }), g = c.getContext('2d');
+    const s = Math.min(128 / img.height, 256 * (1 - EYE_PAIR.gap) / img.width) * 0.95, w = img.width * s, h = img.height * s;
+    for (const k of [-1, 1]) { g.save(); g.translate(128 + k * 128 * EYE_PAIR.gap, 64); if (k > 0) g.scale(-1, 1); g.drawImage(img, -w / 2, -h / 2, w, h); g.restore(); }
+    return c;
+  };
   const eyes = Object.fromEntries(['open', 'closed', 'gasp', 'worried'].map((e) =>
-    [e, place(piece(art(face, `eyes_${e}`, `${ID}-hero-eyes-${e}`), neck), 0, 0.013, 0.001)]));   // forward on the head, so they show where he looks
+    [e, place(piece({ art: pair(face.pieces[`eyes_${e}`]), size: [EYE_PAIR.w, EYE_PAIR.h], key: `${ID}-hero-eyes-${e}`, res: 256 }, neck), 0, 0.011, 0.001)]));   // forward on the head, so they show where he looks
   place(piece(art(figs, 'hero_backpack', `${ID}-hero-backpack`)), -0.042, -0.072, 0.010, -15 * DEG);
   place(piece(art(props, 'desk_lamp', `${ID}-hero-lamp`)), 0.04, 0.02, 0.034);   // unlit
-  deskRig({ key: 'd8', who: 'hero', cx: 0, cy: 0, f: 1, r: 0.012, S: 7.1, wake: -1, strength: 1.0 });
+  deskRig({ key: 'd8', who: 'hero', cx: 0, cy: 0, f: 1, r: HERO.r, S: HERO.S, wake: -1, strength: 1.0 });
 
   // Desaturation: paper keeps its painting, so tint it with the multiplier that takes gator green to saturation s.
   const g0 = new THREE.Color(PALETTE.gator), L = 0.2126 * g0.r + 0.7152 * g0.g + 0.0722 * g0.b;

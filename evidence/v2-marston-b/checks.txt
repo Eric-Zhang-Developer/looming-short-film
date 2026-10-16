@@ -1,0 +1,9 @@
+$ node tools/check_timeline.mjs  (last line)
+ok (21 shots, 58 beats, 195.0s)
+
+$ node tools/determinism.mjs --t=98.9,105.3,116.05,127.25  (one time per shot: s13 s14 s15 s16)
+t=98.9  f5bfbac3d963f2e6 f5bfbac3d963f2e6 f5bfbac3d963f2e6  PASS
+t=105.3  925a723ff4e6f2b9 925a723ff4e6f2b9 925a723ff4e6f2b9  PASS
+t=116.05  8a145b6014ef2711 8a145b6014ef2711 8a145b6014ef2711  PASS
+t=127.25  ae4656036ea05add ae4656036ea05add ae4656036ea05add  PASS
+determinism: PASS
