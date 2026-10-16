@@ -9,6 +9,8 @@ Everything the orchestrator froze or decided without the director, under his ove
 | Kitchen kit | v1_1 | Best fibre and rim; the appliances are unmistakable | v1_3 (simplest fridge), v1_2 (teapot-like kettle) |
 | Marston interior kit | v2_1 | Bold Y-back chairs, curved perforated cubicle, best bookshelf | v2_2, v1_2, v1_3, v1_1 · `evidence/asset-marston-kit/contact.jpg` |
 | Marston exterior kit (and night window view) | v1_3 | Cleanest openings, stepped bay with mullions, best Century Tower | v1_1, v1_2 |
+| Props kit (calendar, notification, Calc 2 sheets, test, graded 94) | v1_1 | 7-column calendar; every lettered and math piece checked correct (integration by parts with a struck sign error; Σ n/2ⁿ by the ratio test) | v1_2, v1_3 · `evidence/asset-props-kit/contact.jpg` |
+| Exam room kit | v1_1 | Desk and chair in one piece; cleanest | v1_2, v1_3 |
 | Face sheet | v1_3 | The painter and orchestrator both ranked it first: closest line weight and colour to the frozen head, the most even and friendly set | v1_1, v1_2 (`evidence/asset-face-sheet/contact.jpg`) |
 
 ## Decided overnight

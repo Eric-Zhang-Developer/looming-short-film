@@ -1,0 +1,18 @@
+== props_kit_v1_1
+17 alpha island(s): 17 kept, 0 dropped under 500 px
+evidence/asset-props-kit/props_kit_v1_1.named.json: 17 named, min box gap 16 px, min edge margin 24 px
+== props_kit_v1_2
+17 alpha island(s): 17 kept, 0 dropped under 500 px
+evidence/asset-props-kit/props_kit_v1_2.named.json: 17 named, min box gap 4 px, min edge margin 33 px
+== props_kit_v1_3
+17 alpha island(s): 17 kept, 0 dropped under 500 px
+evidence/asset-props-kit/props_kit_v1_3.named.json: 17 named, min box gap 0 px, min edge margin 42 px
+== exam_room_kit_v1_1
+7 alpha island(s): 7 kept, 0 dropped under 500 px
+evidence/asset-props-kit/exam_room_kit_v1_1.named.json: 7 named, min box gap 12 px, min edge margin 16 px
+== exam_room_kit_v1_2
+7 alpha island(s): 7 kept, 0 dropped under 500 px
+evidence/asset-props-kit/exam_room_kit_v1_2.named.json: 7 named, min box gap 0 px, min edge margin 20 px
+== exam_room_kit_v1_3
+8 alpha island(s): 8 kept, 0 dropped under 500 px
+(not named: 8 islands, the chair is separate from the desk)

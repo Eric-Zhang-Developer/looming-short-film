@@ -1,0 +1,47 @@
+{
+  "output": "assets/raw/props_kit_v1_1.png",
+  "prompt_file": "assets/prompts/props_kit.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/props_kit.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    },
+    {
+      "file": "assets/frozen/home_kit.png",
+      "sha256": "afac7d678669486fe3300b96c70f3b9eb0db1ea7f1f99f11920047779226e718"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a142b5-301d-7a53-b094-daafe54598d8",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a142b5-301d-7a53-b094-daafe54598d8/exec-6bd35ff8-015e-4b1b-bb48-bf9ab2001ed8.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-3HFM7p",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 287312,
+    "cached_input_tokens": 260352,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2660,
+    "reasoning_output_tokens": 224
+  },
+  "timestamp_start_utc": "2026-10-16T03:15:32Z",
+  "timestamp_end_utc": "2026-10-16T03:17:55Z",
+  "output_sha256": "d488239f66e68e00c0dfe8b1cbd42cfd06e484510b725c3a7291dcd2b5510099",
+  "width": 1536,
+  "height": 1024,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/props_kit_v1_1.jpg",
+  "screening": "PASS (all pieces exact, see evidence/asset-props-kit/text_check.md); 17 alpha islands; flat background; no baked light; palette ok, red only on badge, circle, X, checks and 94; no gator. Picked 1st: 7-column calendar with one empty Friday cell, cleanest page lettering. Flaws: 1536x1024 sheet (smallest), ink drop only 48x68 px, red circle has a tiny gap, one calendar cell scribble reads as 8 or B."
+}

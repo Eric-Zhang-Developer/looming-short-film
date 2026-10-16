@@ -311,5 +311,54 @@
       "tower reads as Century Tower, no numerals, no text",
       "flat elevation, torn paper look, palette, no baked light, no text, no gator"
     ]
+  },
+  {
+    "name": "props_kit",
+    "purpose": "G4 story props: wall calendar, phone, notification card, practice sheets, test and graded pages, red marks, pen, backpack, ink drop. Lettering and math painted, hand-lettered, and screened for exactness; painter task asset-props-kit.",
+    "shots": "s00, s02, s15, s16, s17b, s17c, s18",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png",
+      "assets/frozen/home_kit.png"
+    ],
+    "prompt": "assets/prompts/props_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size, 17 separate pieces in three rows, every bounding box >= 60 px from every other and the frame edge; lettered pieces drawn as large as possible",
+    "key": {
+      "name": "green",
+      "hex": "#00FF00"
+    },
+    "acceptance": [
+      "every piece a separate island (cut.mjs --auto gives 17; the red circle and X are single strokes)",
+      "every lettered or math piece transcribed from the image in text_check.md and exactly right, else the variant is rejected",
+      "only the listed pieces carry letters or digits; calendar grid cells are scribbles",
+      "red only on the badge, circle, X, checks and the 94",
+      "flat elevation or plan view, torn paper look, palette, no baked light, no gator"
+    ]
+  },
+  {
+    "name": "exam_room_kit",
+    "purpose": "G4 exam room parts: exam desk with attached chair, wall clock, board, proctor silhouette, door, wall and floor strips; painter task asset-props-kit.",
+    "shots": "s17b, s17c",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png",
+      "assets/frozen/home_kit.png"
+    ],
+    "prompt": "assets/prompts/exam_room_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size, 7 separate pieces in three rows, every bounding box >= 60 px from every other and the frame edge",
+    "key": {
+      "name": "green",
+      "hex": "#00FF00"
+    },
+    "acceptance": [
+      "every piece a separate island (cut.mjs --auto gives 7)",
+      "clock has tick marks only, board has scribbles only, no text anywhere",
+      "door slit and clock are clean; proctor reads as a standing adult gator silhouette",
+      "flat elevation, torn paper look, palette, no baked light, no red, no green, no gator student"
+    ]
   }
 ]

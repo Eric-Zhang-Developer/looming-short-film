@@ -102,5 +102,31 @@
     "frozen": "2026-10-15",
     "gate": "overnight rule",
     "approved": "Orchestrator under the director's overnight rule; painter's #1. Alternatives v1_1, v1_2 in evidence/asset-marston-kit/contact.jpg."
+  },
+  {
+    "name": "props_kit",
+    "file": "assets/frozen/props_kit.png",
+    "source": "assets/raw/props_kit_v1_1.png",
+    "prompt": "assets/prompts/props_kit.v1.md",
+    "sidecar": "assets/raw/thumbs/props_kit_v1_1.json",
+    "variant": "v1_1",
+    "sha256": "d488239f66e68e00c0dfe8b1cbd42cfd06e484510b725c3a7291dcd2b5510099",
+    "size": "1536x1024",
+    "frozen": "2026-10-15",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter's #1; lettering and math checked by the orchestrator from crops. Alternatives v1_2, v1_3 (6-column calendars)."
+  },
+  {
+    "name": "exam_room_kit",
+    "file": "assets/frozen/exam_room_kit.png",
+    "source": "assets/raw/exam_room_kit_v1_1.png",
+    "prompt": "assets/prompts/exam_room_kit.v1.md",
+    "sidecar": "assets/raw/thumbs/exam_room_kit_v1_1.json",
+    "variant": "v1_1",
+    "sha256": "4161587661d3659667576431fcf8ced886500272dde5cbaa4258ba968bb4998e",
+    "size": "2043x770",
+    "frozen": "2026-10-15",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter's #1; lettering and math checked by the orchestrator from crops. Alternatives v1_2, v1_3 (chair split from desk)."
   }
 ]

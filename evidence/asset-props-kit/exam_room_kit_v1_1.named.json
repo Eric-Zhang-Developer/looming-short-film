@@ -1,0 +1,44 @@
+{
+ "exam_room_kit_exam_desk_side": [
+  56,
+  68,
+  432,
+  336
+ ],
+ "exam_room_kit_wall_clock": [
+  576,
+  120,
+  264,
+  260
+ ],
+ "exam_room_kit_board": [
+  896,
+  76,
+  720,
+  316
+ ],
+ "exam_room_kit_proctor": [
+  1640,
+  16,
+  376,
+  420
+ ],
+ "exam_room_kit_door": [
+  56,
+  416,
+  176,
+  324
+ ],
+ "exam_room_kit_wall_strip": [
+  304,
+  536,
+  768,
+  176
+ ],
+ "exam_room_kit_floor_strip": [
+  1132,
+  536,
+  860,
+  168
+ ]
+}
