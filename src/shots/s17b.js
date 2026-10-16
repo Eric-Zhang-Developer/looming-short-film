@@ -17,14 +17,16 @@ import { tools } from './s02.js';
 
 const ID = 's17b', DEG = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;          // examRoom 0, testRecognise 3, testSmile 4.5, testSolved 8.5
-const CUT_T2 = 2, CUT_T3 = 4, CUT_BACK = 5.5;
+const CUT_T2 = 2, CUT_T3 = 4, CUT_BACK = 5.5, HOLD_HERO = 0.75;
 
 // ---------- tunables ----------
 const BLOB_R = { start: 0.005, testSolved: 0.004 };      // SHRINK[6] → SHRINK[7] (README §1; exam.js has no SHRINK ladder yet)
 const OTHER_R = [0.004, 0.007];                           // the room's blobs, seeded in this range (never cloned)
 const ROOM = { table: 0.041, rows: [0.25, 0.19, 0.13, 0.07], x: [-0.32, 0.32], depth: 0.022 };   // 75 cm tables at 0.055 m/m
 const SEATED_DROP = 0.022, SEAT_BACK = 0.024;                                // the standing back figure lowered to a seated height
-const FLUOR_I = 1.6, WIN_I = 0.3, AMB_K = 0.9;           // T1 (window fill ≤ 30% of the fluorescent)
+const FLUOR_I = 0.8, WIN_I = 0.15, AMB_K = 0.6;          // T1 (window fill ≤ 30% of the fluorescent); v3: the room is dim, he is the lit one
+const CROWD_DIM = 0.45, HERO_I = 3.2;                    // the crowd is tinted toward navy; his spot (cold viewer v2: "a lecture hall of frogs")
+const CAM_HERO = { pos: [0.0, 0.115, 0.42], look: [0.004, 0.05, 0.093] };   // the establishing beat: on him, then the room
 const SPOT_I = 0.2, AMB_P = 0.45, FILL_T3 = 0.006;        // T2/T3: the overhead spot, ambient, T3 character fill
 const ARM_LEN = 0.020;                                    // the flat near arm in the insert (gator_sheet arm_r at insert scale)
 
@@ -39,7 +41,26 @@ export const LINES = [
   { x: 46, y: 363, runs: [['= (x/2) e'], ['2x', 1], [' − ¼ e'], ['2x', 1], [' + C']] },
 ];
 export const WRITE = [[5.5, 6.5], [6.5, 7.5], [7.5, 8.4]];   // local times per line (s17b's table)
-const FONT = 19, FONT_FACE = '"Noteworthy", "Bradley Hand", "Chalkboard SE", cursive', INK = 'rgb(30, 42, 63)';
+// The hand is Caveat (SIL OFL 1.1, assets/fonts/OFL-Caveat.txt), bundled so a render never depends on the machine's fonts.
+// It has no integral sign, so the ∫ is a stroked path (INT) rather than a system fallback glyph.
+const FONT = 22, FONT_FACE = 'LoomingHand', INK = 'rgb(30, 42, 63)';
+let handLoad = null;
+export const loadHand = () => handLoad ??= new FontFace(FONT_FACE, `url(${new URL('assets/fonts/Caveat.ttf', document.baseURI)})`, { weight: '400 700' })
+  .load().then((f) => { document.fonts.add(f); });
+export const handFont = (px) => `500 ${px}px ${FONT_FACE}`;
+// One text run as drawable parts: text pieces (measured in the hand) and integral signs.
+export function runParts(g, s, px, x0) {
+  const out = []; let x = x0;
+  s.split(/(∫)/).forEach((q) => { if (!q) return; g.font = handFont(px);
+    const w = q === '∫' ? px * 0.42 : g.measureText(q).width; out.push({ s: q, w, x }); x += w; });
+  return out;
+}
+export function drawInt(g, x, y, px) {   // baseline y; a slanted stem with a hook at each end
+  const h = px, w = px * 0.3;
+  g.beginPath(); g.moveTo(x + 0.02 * w, y + 0.2 * h); g.quadraticCurveTo(x + 0.35 * w, y + 0.32 * h, x + 0.55 * w, y + 0.02 * h);
+  g.lineTo(x + 0.95 * w, y - 0.72 * h); g.quadraticCurveTo(x + 1.2 * w, y - 1.0 * h, x + 1.55 * w, y - 0.8 * h);
+  g.lineWidth = px * 0.075; g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK; g.stroke();
+}
 export const BLOB_AT = [-0.002, 0.098];                   // the page-corner mark (x, z): 2 mm in from 0.000 so it sits on the exam desk's top
 // Camera P: high over the lower page (problem 3 and the working), tilted 18° off vertical toward camera so the blob,
 // which stands on the page, still shows its face. Cap height 11 px of art ≈ 0.0009 m → ≈ 45 px at 1080p.
@@ -60,11 +81,13 @@ export function drawLines(g, K, f) {
     const k = clamp(f[i] ?? 0);
     if (k <= 0) return;
     let x = L.x;
-    const parts = L.runs.map(([s, sup]) => { g.font = `${sup ? FONT * 0.62 : FONT}px ${FONT_FACE}`; const w = g.measureText(s).width; const p = { s, sup, x, w }; x += w; return p; });
+    const parts = L.runs.flatMap(([s, sup]) => { const px = sup ? FONT * 0.62 : FONT, r = runParts(g, s, px, x).map((p) => ({ ...p, px, sup })); x = r.length ? r.at(-1).x + r.at(-1).w : x; return r; });
     const end = L.x + (x - L.x) * k;
     g.save(); g.beginPath(); g.rect(L.x - 2, L.y - FONT * 1.4, end - L.x + 2, FONT * 2); g.clip();
-    g.strokeStyle = INK; g.lineWidth = 0.7; g.lineJoin = 'round';
-    for (const p of parts) { g.font = `${p.sup ? FONT * 0.62 : FONT}px ${FONT_FACE}`; const y = L.y - (p.sup ? FONT * 0.42 : 0); g.fillText(p.s, p.x, y); g.strokeText(p.s, p.x, y); }
+    g.strokeStyle = INK; g.lineWidth = 0.35; g.lineJoin = 'round';
+    for (const p of parts) { const y = L.y - (p.sup ? FONT * 0.42 : 0);
+      if (p.s === '∫') { drawInt(g, p.x, y, p.px); continue; }
+      g.font = handFont(p.px); g.fillText(p.s, p.x, y); g.strokeText(p.s, p.x, y); }
     g.restore();
     if (k < 1) tip = [end, L.y];
   });
@@ -95,7 +118,7 @@ export function pageWithInk(T, art, piece, key, { parent }) {
     return page.mesh.localToWorld(out.copy(v.set((px / W - 0.5) * sw, (0.5 - py / H) * sh, 0))); };
   // the line's full width in art px (for the pen's travel)
   const meas = cv.getContext('2d');
-  const widths = LINES.map((L) => L.runs.reduce((a, [s, sup]) => { meas.font = `${sup ? FONT * 0.62 : FONT}px ${FONT_FACE}`; return a + meas.measureText(s).width; }, 0));
+  const widths = LINES.map((L) => L.runs.reduce((a, [s, sup]) => a + runParts(meas, s, sup ? FONT * 0.62 : FONT, 0).reduce((b, p) => b + p.w, 0), 0));
   return { ...page, setInk, toWorld, widths };
 }
 
@@ -122,6 +145,7 @@ export function overheadSpot(intensity) {
 }
 
 export async function build(ctx) {
+  await loadHand();
   const { scene, camera, assets, PALETTE, post } = ctx;
   const C = (k) => new THREE.Color(PALETTE[k]);
   scene.background = C('navy').lerp(C('cream'), 0.15);
@@ -176,13 +200,13 @@ export async function build(ctx) {
     top.children[0].receiveShadow = true;
     strip(`apron${ri}`, PALETTE.kraft, [ROOM.x[1] - ROOM.x[0], 0.004], [0, ROOM.table - 0.002, z + ROOM.depth / 2], { weight: 'kraft' });
     strip(`seats${ri}`, seatCol, [ROOM.x[1] - ROOM.x[0], SEAT_BACK], [0, SEAT_BACK / 2, z + ROOM.depth / 2 + 0.019], {});
-    const xs = ri === 2 ? [-0.20, 0.0, 0.21] : ri === 0 ? [-0.24, -0.06, 0.12, 0.27] : [-0.27, -0.10, 0.08, 0.25];
+    const xs = ri === 3 ? [-0.20, 0.0, 0.21] : ri === 0 ? [-0.24, -0.06, 0.12, 0.27] : [-0.27, -0.10, 0.08, 0.25];   // v3: he sits front and centre
     for (const x0 of xs) {
-      const hero = ri === 2 && x0 === 0;
+      const hero = ri === 3 && x0 === 0;
       const x = hero ? 0 : x0 + (rng() - 0.5) * 0.03;
-      const fig = await makeGator(ctx, { facing: 'back', seed: 30 + gi, res: hero ? 512 : 256, green: hero ? undefined : greenVariant(gi) });
+      const fig = await makeGator(ctx, { facing: 'back', seed: 30 + gi, res: hero ? 512 : 256, green: hero ? undefined : '#' + new THREE.Color(greenVariant(gi)).lerp(C('navy'), CROWD_DIM).getHexString() });
       fig.group.position.set(x, -SEATED_DROP, z + ROOM.depth / 2 + 0.012);
-      fig.group.scale.setScalar(hero ? 1 : 0.94 + 0.1 * rng());
+      fig.group.scale.setScalar(hero ? 1.1 : 0.94 + 0.1 * rng());
       t1.add(fig.group); figures.push(fig);
       if (hero) figures.hero = fig; else if (bobbers.length < 2 && rng() < 0.5) bobbers.push(fig);
       // their page and their blob on the table, to the figure's right
@@ -206,7 +230,10 @@ export async function build(ctx) {
   tubes.light.shadow.mapSize.set(4096, 4096);
   const win = new THREE.DirectionalLight(C('lamp').lerp(C('cream'), 0.5), WIN_I); win.position.set(0, 0.3, -1); win.target.position.set(0, 0, 0.2);
   const amb1 = ambient(); amb1.intensity *= AMB_K;
-  t1.add(tubes.light, tubes.light.target, win, win.target, amb1);
+  // His pool: a narrow warm spot from over the camera onto him, his page and his blob; nothing else in the room gets one.
+  const heroSpot = new THREE.SpotLight(C('lamp').lerp(C('cream'), 0.55), HERO_I, 0, 0.13, 0.9, 2);
+  heroSpot.position.set(0.02, 0.36, 0.55); heroSpot.target.position.set(0.012, 0.045, 0.093);
+  t1.add(tubes.light, tubes.light.target, win, win.target, amb1, heroSpot, heroSpot.target);
 
   // ================= the desk unit (T2 and T3) =================
   const page = pageWithInk(T, props, 'test_page', 'test_page', { parent: unit });
@@ -278,8 +305,11 @@ export async function build(ctx) {
       exam.update(t, { squash, wobble: 0.6, eyes, look: look1, key: spot });
 
       if (inT1) {
-        camera.position.set(...CAM_T1.pos); camera.lookAt(look.set(...CAM_T1.look));
-        fx.set({ focus: camera.position.distanceTo(look.set(0, 0.06, 0.15)), aperture: 0.006 });
+        // 0–0.75 held on him; then it eases out to the wide (the room, with him still front and centre). On 1s.
+        const k = ease(clamp((t - HOLD_HERO) / (CUT_T2 - HOLD_HERO)));
+        camera.position.set(...CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k)));
+        camera.lookAt(look.set(...CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k))));
+        fx.set({ focus: camera.position.distanceTo(hp.set(0, 0.05, 0.093)), aperture: lerp(0.004, 0.009, k) });
         for (const fig of figures) fig.boil(t, 10);
         // he reads: 2 more degrees of head-down at 1.5, a hair lower on the figure; two pens bob on 2s
         figures.hero.group.position.y = -SEATED_DROP - (tc >= 1.5 ? 0.0006 : 0);

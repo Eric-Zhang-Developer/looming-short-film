@@ -10,7 +10,7 @@ import { ambient } from '../lights.js';
 import { easeOut, ease, clamp, lerp } from '../core/ease.js';
 import { createBlob } from '../blob.js';
 import { tools } from './s02.js';
-import { PAGE, CAM_P, BLOB_AT, pageWithInk, flatHand, overheadSpot } from './s17b.js';
+import { PAGE, CAM_P, BLOB_AT, pageWithInk, flatHand, overheadSpot, loadHand } from './s17b.js';
 
 const ID = 's17c', DEG = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;          // gradeSlide 0.5, gradeReveal 2.0
@@ -22,6 +22,7 @@ const PAGE_H = PAGE.w * 366 / 263;                        // the page's paper he
 const SLIDE_FROM = 0.045, SKID = 0.001;                   // the slide starts above frame (−z), overshoots 1 mm, settles
 const NINETY_FOUR = [214, 58];                            // the circled 94 on graded_test, art px (measured on the cut PNG)
 
+const STILL = 3.917, WIDE = 4.167, SMILE = 4.417;          // the 94's landing: stillness, wide eyes, the smile
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
 
 // The paper per drawing: [z offset from the page position, flip angle about its far edge (deg; 180 = face-down there,
@@ -37,6 +38,7 @@ function paperAt(f) {
 }
 
 export async function build(ctx) {
+  await loadHand();
   const { scene, camera, assets, PALETTE, post } = ctx;
   const C = (k) => new THREE.Color(PALETTE[k]);
   scene.background = C('navy').lerp(C('cream'), 0.15);
@@ -103,12 +105,16 @@ export async function build(ctx) {
       }
       hand.hand.visible = hv;
 
-      // The Exam: waiting; startles as the paper slides past; looks down at the 94; content, settles lower.
-      let squash = 0, eyes = 'open', look = -1;
+      // The Exam: waiting; startles as the paper slides past; looks down at the 94 and watches the tap. v3: the 94 gets a
+      // beat of stillness once the hand is gone (3.92–4.17: eyes on it, no wobble), then eyes go wide (4.17), then the
+      // content smile (4.42) with one small rise and settle, and it holds to the cut.
+      let squash = 0, eyes = 'open', look = -1, wobble = 0.6;
       if (tc >= B.gradeSlide && tc < 1.0) squash = 0.2 * Math.exp(-6 * (tc - B.gradeSlide)) * Math.cos(18 * (tc - B.gradeSlide));
       if (tc >= B.gradeReveal) { eyes = 'side'; look = -1; }
-      if (tc >= 2.75) { eyes = 'closed'; squash = 0.15; }
-      exam.update(t, { squash, wobble: 0.6, eyes, look, key: spot });
+      if (tc >= STILL) wobble = 0.1;
+      if (tc >= WIDE) { eyes = 'gasp'; squash = -0.12; }
+      if (tc >= SMILE) { eyes = 'closed'; wobble = 0.5; squash = 0.15 + 0.25 * Math.exp(-7 * (tc - SMILE)) * Math.cos(16 * (tc - SMILE)); }
+      exam.update(t, { squash, wobble, eyes, look, key: spot });
 
       // Light on 1s: the window fill warms over the reveal (the theme enters resolved here).
       win.intensity = lerp(WARM[0], WARM[1], ease((t - B.gradeReveal) / 1.0));
