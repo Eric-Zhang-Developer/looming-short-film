@@ -8,18 +8,19 @@ import { PALETTE } from './core/palette.js';
 // Shapes: gator (side silhouette), torso, head, taper, limb, leg (shin with a foot toward +x), rect, round (rounded rect), ellipse.
 const G = 'gator', C = 'cream', K = 'kraft', N = 'navy', I = 'ink';
 export const PIECES = {
+  // gator_sheet and face_sheet: the frozen art's opaque boxes at the side rig's fit (characters/gator.js: K, FACE).
   gator_sheet: {
-    turn_side: [0.10, 0.08, 'gator', G], turn_front: [0.04, 0.08, 'torso', G], turn_back: [0.04, 0.08, 'torso', G],
-    turn_head34: [0.03, 0.025, 'head', G], body: [0.03, 0.045, 'torso', G], head: [0.03, 0.022, 'head', G],
-    snout: [0.022, 0.008, 'taper', G], jaw: [0.02, 0.006, 'taper', G], arm_l: [0.032, 0.007, 'limb', G],
-    arm_r: [0.032, 0.007, 'limb', G], tail: [0.05, 0.012, 'taper', G], pocket: [0.014, 0.008, 'round', C],
-    leg_l: [0.016, 0.032, 'leg', G], leg_r: [0.016, 0.032, 'leg', G],
+    turn_side: [0.1057, 0.0962, 'gator', G], turn_front: [0.0522, 0.0958, 'torso', G], turn_back: [0.0619, 0.0976, 'torso', G],
+    turn_head34: [0.0497, 0.0437, 'head', G], body: [0.0485, 0.0533, 'torso', G], head: [0.0433, 0.0370, 'head', G],
+    snout: [0.0471, 0.0172, 'taper', G], jaw: [0.0433, 0.0170, 'taper', G], arm_l: [0.0411, 0.0183, 'limb', G],
+    arm_r: [0.0411, 0.0183, 'limb', G], tail: [0.0449, 0.0210, 'taper', G], pocket: [0.014, 0.0069, 'round', C],
+    leg_l: [0.0181, 0.0164, 'leg', G], leg_r: [0.0181, 0.0164, 'leg', G],
   },
   face_sheet: {
-    eyes_open: [0.008, 0.004, 'eyes', C], eyes_closed: [0.008, 0.0015, 'rect', I], eyes_tired: [0.008, 0.003, 'eyes', C],
-    eyes_gasp: [0.009, 0.005, 'eyes', C], eyes_worried: [0.008, 0.004, 'eyes', C], eyes_side: [0.008, 0.004, 'eyes', C],
-    mouth_neutral: [0.008, 0.0012, 'rect', I], mouth_smile: [0.008, 0.002, 'ellipse', I],
-    mouth_o: [0.003, 0.003, 'ellipse', I], mouth_line: [0.008, 0.0008, 'rect', I],
+    eyes_open: [0.01368, 0.01379, 'ellipse', C], eyes_closed: [0.01453, 0.00583, 'rect', I], eyes_tired: [0.0141, 0.01442, 'ellipse', C],
+    eyes_gasp: [0.01516, 0.01538, 'ellipse', C], eyes_worried: [0.01845, 0.014, 'ellipse', C], eyes_side: [0.01347, 0.01357, 'ellipse', C],
+    mouth_neutral: [0.02089, 0.00286, 'rect', I], mouth_smile: [0.0228, 0.00551, 'ellipse', I],
+    mouth_o: [0.00594, 0.00912, 'ellipse', I], mouth_line: [0.01548, 0.00148, 'rect', I],
   },
   roommates_sheet: {
     tall_body: [0.035, 0.07, 'torso', G], tall_head: [0.035, 0.025, 'head', G], tall_leg_l: [0.008, 0.03, 'limb', G],
@@ -97,8 +98,9 @@ async function loadUncached(name) {
   const frozen = boxes && (await fetch(`/assets/frozen/${name}.png`, { method: 'HEAD' }).then((r) => r.ok, () => false));
   if (frozen) {
     await Promise.all(Object.keys(boxes).map(async (key) => {
-      const img = new Image(); img.src = `/assets/cut/${key}.png`; await img.decode();
-      pieces[key.startsWith(name + '_') ? key.slice(name.length + 1) : key] = await createImageBitmap(img);
+      const img = new Image(); img.src = `/assets/cut/${key}.png`;
+      await img.decode().catch(() => { throw new Error(`assets: ${img.src} is missing: run node tools/cut.mjs --in=assets/frozen/${name}.png`); });
+      pieces[key.startsWith(name + '_') ? key.slice(name.length + 1) : key] = await createImageBitmap(despill(img));
     }));
   } else {
     for (const [p, [w, h, shape, col]] of Object.entries(table)) pieces[p] = await createImageBitmap(proxy(w, h, shape, PALETTE[col]));
@@ -114,6 +116,34 @@ async function loadUncached(name) {
     return [p, [bmp.width * k, bmp.height * k]];
   }));
   return { pieces, sizes, visible, proxy: !frozen };
+}
+
+// Codex paints a soft fringe outside each piece (alpha < 128) in the colour it was painted against, a yellow-green,
+// and paper.js resamples every piece, which mixes that fringe into the edge it keeps (alpha >= 128). So each fringe
+// pixel takes the colour of its nearest kept one (a breadth-first fill outward), and alpha < 16 dust goes. The kept
+// pixels, the painted cream rim among them, and all alpha >= 16 are untouched, so the silhouette paper.js cuts at 0.5
+// doesn't move. evidence/cut-gator/halo.jpg.
+function despill(img) {
+  const W = img.width, H = img.height, c = Object.assign(document.createElement('canvas'), { width: W, height: H });
+  const g = c.getContext('2d');
+  g.drawImage(img, 0, 0);
+  const d = g.getImageData(0, 0, W, H), p = d.data, seen = new Uint8Array(W * H);
+  let q = [];
+  for (let i = 0; i < W * H; i++) if (p[i * 4 + 3] >= 128) { seen[i] = 1; q.push(i); }
+  while (q.length) {
+    const next = [];
+    for (const i of q) {
+      const x = i % W;
+      for (const n of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) {
+        if (n < 0 || n >= W * H || seen[n] || !p[n * 4 + 3]) continue;
+        seen[n] = 1; p[n * 4] = p[i * 4]; p[n * 4 + 1] = p[i * 4 + 1]; p[n * 4 + 2] = p[i * 4 + 2]; next.push(n);
+      }
+    }
+    q = next;
+  }
+  for (let i = 3; i < p.length; i += 4) if (p[i] < 16) p[i] = 0;
+  g.putImageData(d, 0, 0);
+  return c;
 }
 
 // [u0, v0, u1, v1]: the box around pixels with alpha ≥ 128 (paper.js cuts at the same 0.5), in uv, v down.
