@@ -16,3 +16,6 @@
 - s16: the six-step shrink is hard to follow in the wide shot. Hold each step, or cut closer.
 - s13: very dark.
 - Custodian, cart, neighbour and top-view figures: still proxies (no sheets painted). Paint one small cast kit if time allows.
+- s17b/s17c/s18: the handwriting is the Noteworthy system font (machine-dependent). Use the painted props where possible, or bundle a font file.
+- s18: the lamp is in front of its shade; the ink and gator cast no shadows; the cross-off reach shows his legs over the desk.
+- s17: the blob is tiny in the wide. Make sure the shrink reads.
