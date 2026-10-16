@@ -8,3 +8,7 @@
 - s12: the giant shadow is mostly cropped at the top of the frame. Reframe, or lower the light, so the loom reads.
 - s09–s12: the blob's eyes aren't level with the gator's (README §1 after his new 9.3 cm height). The blob's z mark (0.074) and s15's UNIT (0.0884) disagree.
 - exam.js has no METER, so each shot hard-codes blob radii. Centralise them for v3.
+- s03: the laptop game's shadow on the wall is pale and medium-sized. It should loom (dread meter s03 = 1.25×).
+- s06: the real-scale lamp had to be 120 cm to clear his head. Restage, or use a desk lamp from the kit.
+- s01: the skyline and oaks are proxies. Use the marston_ext_kit oak canopy and night layers.
+- Docs: README §2, assets.md and the s18 spec still describe the old desk unit.
