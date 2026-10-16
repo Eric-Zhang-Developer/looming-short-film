@@ -12,11 +12,12 @@ import { makeGator } from '../characters/gator.js';
 import { makeCustodian, makeCart } from '../characters/custodian.js';
 import { POSES, walk } from '../characters/poses.js';
 import { UNIT, BLOB_AT, PHONE, PHONE_L, PAGE, practiceSheet, SHEET_INK } from './s15.js';
-import { kitTools, marstonDesk, noCast } from './s11.js';
+import { kitTools, marstonDesk, noCast, idle } from './s11.js';
 
 const ID = 's14', D = Math.PI / 180;
 const BLOB_R = { start: 0.030 };             // METER.gulp5 (README §1), at s15's mark (BLOB_AT)
 const LAPTOP_Z = 0.078;                      // in front of the grown blob (README §2)
+const CUST_SCALE = 1.1;                      // v3: custodian_sheet's tortoise at 1.1× (0.056 body+head stooped, against his 0.095)
 const TINY_R = 0.004;                        // the Custodian's blob
 const ROLL = [0.014, 0.016];                 // paper-towel roll behind the tiny blob (w, h)
 const WAKE = 1.0, TIMEOUT = 4.2;             // the cart trips the hero's zone; he stays still, so it times out (Q11 option a)
@@ -76,11 +77,11 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   header.position.set(0, 0.20, 0.115);
 
   // ---------- aisle: the Custodian, his cart, the tiny blob ----------
-  const cust = await makeCustodian({ assets }, { res: 512 });
+  const cust = await makeCustodian({ assets }, { res: 512, scale: CUST_SCALE });   // v3: the tortoise, drawn as painted, a little taller than the sheet
   const cart = await makeCart({ assets }, { res: 512 });
   for (const r of [cust, cart]) { r.group.scale.x = -1; scene.add(r.group); }   // rigs face +x; he walks −x
   cart.group.position.set(0, CUST.floor, CUST.cartZ);
-  const TRAY_Y = CUST.floor + 0.05 + 0.002;   // the rig's tray: centre 0.05 above the floor, 4 mm thick
+  const TRAY_Y = CUST.floor + 0.048 + 0.0035;   // the rig's tray: centre 0.048 above the floor, 7 mm thick (the art's own aspect)
   const tiny = createBlob({ radius: TINY_R, seed: seedOf('custodianBlob') });
   tiny.mesh.castShadow = false;               // its pool is the decal below (see done note)
   scene.add(tiny.mesh);
@@ -162,6 +163,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     hero.blend(POSES, BODY, tc + 1e-6);
     const head = kf(tc, HEAD) * D;
     hero.pose({ head, head34: head });
+    idle(hero, t, { sway: 0.05 });
     hero.head34(tc >= 2.8 && tc < 4.4);
     hero.face({ eyes: eyesAt(tc), mouth: tc < 4.4 ? 'neutral' : 'line' });
     hero.group.position.y = UNIT.hip[1];

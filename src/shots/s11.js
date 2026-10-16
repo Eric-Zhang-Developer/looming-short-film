@@ -34,6 +34,10 @@ const HINGE = [0.015, 0.002], LID_LEN = 0.035;
 // Intensities (cd for spots/points, lux for the directional), by eye on the key-moment sheet.
 const FLUOR_I = 0.6, PHONE_I = 1.0, LAPTOP_I = 0.15, FILL_I = 0.3 * 0.03, AMB_K = 0.4, CHAR_FILL_I = 0.008;
 
+// v3: his eyes at the hunch were 0.040 above the desk after the 9.3 cm rig (measured on the rig's eye joint), 7 mm over the
+// peak blob's 0.0324 (1.08 × r 0.030). Lean 30, head −15 puts them at 0.0333, so the gulp at 5.25 meets him eye to eye
+// (spec: level within 3 mm); the arm drops to −2° so the fingertip still lands on the phone from the lower shoulder.
+const HUNCH = [30, -2, -15];
 // The Student in the s15 convention: [t, lean, arm, head]. Every key is a 2s drawing.
 const seat = (lean, arm, head = 0) => specPose({ lean, arm, head, leg: 60, farLeg: 54 });
 const BODY = [
@@ -47,7 +51,7 @@ const BODY = [
   [dr(37), -2, -50, -8],                                // anticipation: shoulders drop
   [dr(40), 30, -12, -10], [dr(41), 30, -12, -10],       // grip: fingertip on the phone's left end
   [dr(43), 23, -5, -10],                                // lift_phone
-  [dr(53), 22, -6, -15], [6, 22, -6, -15],              // sit_phone_hunch
+  [dr(53), HUNCH[0], HUNCH[1], HUNCH[2]], [6, HUNCH[0], HUNCH[1], HUNCH[2]],   // sit_phone_hunch
 ];
 const LID = [[dr(12), 0], [dr(14), 20], [dr(16), 75], [dr(17), 96], [dr(18), 100]];   // degrees, swings on by itself
 const PHONE = [[dr(41), REST], [dr(43), LIFT], [dr(53), SETTLE]];
@@ -65,6 +69,14 @@ export const crop = (img, x0, y0, x1, y1) => {   // a pixel box of a cut piece a
 // metres per pixel of a loaded piece at the kit's scale-table size
 export const mppOf = (a, name) => a.sizes[name][0] / a.pieces[name].width;
 export const noCast = (g) => { g.traverse((o) => { o.castShadow = false; }); return g; };
+
+// Idle life (v3-fix-marston), a pure function of t on the drawing's 2s: a breath is the body joint's y scale about the hip
+// (the head rises under a millimetre), a tail sway is added to the pose's tail angle. Call it after blend() each frame.
+export const idle = (rig, t, { breath = 0.012, period = 3.2, sway = 0.06, swayPeriod = 2.6, phase = 0 } = {}) => {
+  const T = Math.floor(t * 12 + 1e-4) / 12;
+  rig.joints.body.scale.y = 1 + breath * Math.sin(2 * Math.PI * (T / period + phase));
+  if (rig.joints.tail) rig.joints.tail.rotation.z += sway * Math.sin(2 * Math.PI * (T / swayPeriod + phase));
+};
 
 // Paper bookkeeping: every sheet re-tears on the boil; a lit fixture's glow (emissiveMap) follows its map.
 export function kitTools(ID) {
@@ -279,6 +291,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     const [lean, arm, head] = kf(T, BODY.map(([k, ...v]) => [k, v]));
     hero.boil(t, 10);
     hero.blend({ now: seat(lean, arm, head) }, [[0, 'now']], 0);
+    idle(hero, t, { breath: 0.01, sway: 0.04 });
     hero.face({ eyes: eyesAt(T), mouth: mouthAt(T) });
 
     // Laptop lid (on 2s) and its screen: on at 1.5, asleep at 5.0.

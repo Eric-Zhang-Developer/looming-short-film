@@ -11,7 +11,7 @@ import { mulberry32, seedOf } from '../core/rng.js';
 import { makeGator, hipHeight } from '../characters/gator.js';
 import { POSES, specPose, walk } from '../characters/poses.js';
 import { createBlob } from '../blob.js';
-import { kitTools, mppOf, crop, noCast } from './s11.js';
+import { kitTools, mppOf, crop, noCast, idle } from './s11.js';
 
 const ID = 's09';
 const BLOB_R = { start: 0.024 };                        // METER.gulp4, 2× (README §1): half his height, too big to ride
@@ -26,6 +26,10 @@ const SKY_Z = 0, TREE_Z = 0.08, TOWER_Z = 0.10, FACADE_Z = 0.20, BREEZE_Z = 0.39
 const BUILD_K = 0.8;                                     // facade and bay at 0.8 of the kit's distance-layer size
 const WINDOW_I = 0.06;                                   // each lit window's lamp, cd: a glow, not a hole
 const TOWER_H = 0.25, CANOPY_K = 0.6, PLANTER_K = 0.6;
+// v3 (v3-fix-marston): the night read as black at phone brightness. A cool moon from camera left and above lifts the
+// brick, the tower and the plaza; the gator's fill is stronger. Still night: nothing here is warmer than the windows.
+const MOON_I = 1.3, MOON_K = 0.45, AMB_K = 0.9, FILL_I = 0.16;   // moon lux, its blend toward cream, hemisphere scale, his fill cd
+const CAM_Z = [[0, 1.72], [6, 1.58]];                              // was 1.90 → 1.80: the gator was 18% of the frame
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const col = (k) => new THREE.Color(PALETTE[k]);
@@ -144,11 +148,14 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   spot.shadow.camera.updateProjectionMatrix();
   // Character fill (README §10): shadowless, cool, in front of him just above eye line; off from the turn (4.6) on, so
   // the doorway beat stays a backlit silhouette.
-  const fill = new THREE.PointLight(col('phone').lerp(col('navy'), 0.4), 0.06, 0.06, 2);
+  const fill = new THREE.PointLight(col('phone').lerp(col('navy'), 0.4), FILL_I, 0.09, 2);
   scene.add(fill);
   const amb = ambient();
-  amb.intensity *= 0.5;
+  amb.intensity *= AMB_K;
   scene.add(amb);
+  const moon = new THREE.DirectionalLight(col('phone').lerp(col('cream'), MOON_K), MOON_I);   // no shadows: the lobby spot stays the only caster
+  moon.position.set(-0.6, 1.0, 1.6);
+  scene.add(moon, moon.target);
 
   const fx = post({ focus: 1.5, aperture: 0.015, maxblur: 0.008, lut: 'night' });
   const INHALE = specPose({ lean: -3, arm: -95, far: -95, head: 10, leg: 0, farLeg: 8 });  // 4.3: shoulders up, still looking
@@ -157,7 +164,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   return {
     update(tLocal) {
       // Camera on 1s: a 0.10 m eased push, no tilt. Focus tracks the gator plane.
-      const cz = kf(tLocal, [[0, 1.90], [6, 1.80]], ease);
+      const cz = kf(tLocal, CAM_Z, ease);
       camera.position.set(0, kf(tLocal, [[0, 0.140], [6, 0.135]], ease), cz);
       camera.rotation.set(0, 0, 0);
       fx.set({ focus: cz - WALK_Z });
@@ -178,8 +185,9 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
           side.blend(P, [[3.75, 'walk_side_b'], [3.917, 'stand'], [4.0, 'stand'], [4.3, 'inhale'], [4.6, 'look_up']], tLocal);
           y = kf(t, [[3.75, STOP], [3.917, STAND - 0.002], [4.0, STAND]]);
         }
+        idle(side, tLocal, { breath: t < 3.8 ? 0 : 0.014, sway: t < 3.8 ? 0.03 : 0.07 });   // standing he breathes; the tail follows him
         side.group.position.set(x0(t), y, WALK_Z);
-        fill.intensity = 0.06;
+        fill.intensity = FILL_I;
         fill.position.set(x0(t) + 0.02, y + 0.06, WALK_Z + 0.035);
         side.face({ eyes: t < 4.0 ? 'tired' : 'open', mouth: t < 4.3 ? 'line' : 'neutral' });
       } else {

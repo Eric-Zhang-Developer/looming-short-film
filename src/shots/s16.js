@@ -15,7 +15,7 @@ import { BLOB_R as OTHER_R } from '../characters/exam.js';
 import { POSES, specPose } from '../characters/poses.js';
 import { SHOTS } from '../timeline.js';
 import { UNIT, BLOB_AT, PHONE, PAGE, CAM_B2, practiceSheet, SHEET_INK, penLine } from './s15.js';
-import { kitTools, marstonDesk, mppOf, noCast } from './s11.js';
+import { kitTools, marstonDesk, mppOf, noCast, idle } from './s11.js';
 
 const ID = 's16', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;
@@ -35,6 +35,12 @@ const WAKE = B.sensorWakeNeighbor;                     // 20.0
 const FLIPS = [10, 15.5, 21.5];                        // page to the stack
 const CUTS = { P: [1, 7], P2: [11, 13.5], D: [10, 24] };
 const CAM_D = { pos: [0.168, 0.230, 1.010], look: [0.168, 0.040, 0.080], focus: [0.168, 0.020, 0.086] };
+// v3 (v3-fix-marston): the six-step shrink was hard to follow in the wide (blob 2.3 cm wide at best, 1 cm at the end, in a
+// 58 cm frame). Each solve from #2 now cuts to Camera E, a close two-shot of the blob on its mark with the page corner and
+// the pen beside it, from a quarter second before the solve (the old size) to a second after, then back to D. #5's cutaway
+// ends at 19.95 so the neighbor's wake (20.0) and his stretch still play in the wide. Cuts: [in, out, solve number].
+const CUTAWAYS = [[13.5, 14.5, 2], [15.75, 16.85, 3], [17.75, 18.85, 4], [19.25, 19.95, 5], [20.75, 21.85, 6]];
+const E_DIST = 0.17, E_DX = 0.004, E_Y = [0.030, 0.012];   // camera distance from the mark's plane, x offset, then eye and look heights
 // Camera P: straight down on the page from 0.075 (README §8), centred on the written lines (sheet rows 38–298)
 const CAM_P = { pos: [-0.0205, 0.0753, 0.0934], look: [-0.0205, 0.0003, 0.0934] };
 const PHONE_I = 1.0, ZONE_I = 0.8, FLUOR_I = 0.25, AMB_K = 0.45, FILL_PHONE = 0.003, FILL_ZONE = 0.02;   // s15's
@@ -46,8 +52,9 @@ const STAND = [0.175, 0.080];                          // x in the gap; z 6 mm i
                                                        // at the desk's end (z 0.076) stands behind him, not across his legs
 const FLOOR = -0.034;
 const VIEW_GLOW = [0.3, 0.45];
-const INSERT_EXPOSURE = 0.45;                          // P and P2 sit inside the zone's core: its light × this, or the page clips
-const INSERT_ARM = [0.026, -35, -0.008];              // the insert's sleeve: reach (m), turn (deg), fingertip behind the pen tip (m)                         // the night view behind the ribbon, brightening toward pre-dawn (10–24)
+const INSERT_TINT = [0.62, 0.85, 0.9];
+const INSERT_EXPOSURE = 0.18;                          // P and P2 sit inside the zone's core: its light × this, or the page clips
+const INSERT_ARM = [0.030, -35, -0.006, 0.0014, 0.0022];   // the insert's sleeve: reach (m), turn (deg), hand behind the nib (m), arm height, pen height (m)
 
 // ---------- the hero ----------
 const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
@@ -215,9 +222,10 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // runs back toward him (−x) and toward the wall (−z), INSERT_ARM's turn off the lines; the hand holds it 8 mm up.
   const ihand = new THREE.Group(); ihand.rotation.y = INSERT_ARM[1] * D; scene.add(ihand);
   { const ip = art(kitp.pieces.pen, 'insert-pen', { mpp: mppOf(kitp, 'pen'), sx: -1, anchor: [6, kitp.pieces.pen.height / 2], parent: ihand });
-    ip.rotation.x = -Math.PI / 2; ip.position.y = 0.0006; }
+    ip.rotation.x = -Math.PI / 2; ip.position.y = INSERT_ARM[4]; }   // the pen over the hand, so the hand reads as gripping it
   { const arm = gsheet.pieces.arm_r, ia = art(arm, 'insert-arm', { mpp: INSERT_ARM[0] / arm.width, anchor: [arm.width - 10, arm.height / 2], parent: ihand });
-    ia.rotation.x = -Math.PI / 2; ia.position.set(INSERT_ARM[2], 0.0012, 0.0004); }
+    ia.rotation.x = -Math.PI / 2; ia.position.set(INSERT_ARM[2], INSERT_ARM[3], 0.0004);
+    ia.children[0].material.color.setRGB(...INSERT_TINT); }   // the amber grade and the zone's glare turned the felt lime; this pulls it back to gator green
 
   // ---------- characters ----------
   const hero = await makeGator({ assets }, { res: 1024 });
@@ -252,10 +260,14 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     const tc = on2s(t);
     boil(t, 10);
     const inP = t >= CUTS.P[0] && t < CUTS.P[1], inP2 = t >= CUTS.P2[0] && t < CUTS.P2[1], insert = inP || inP2;
-    const camD = t >= CUTS.D[0] && !inP2;
+    const cutaway = CUTAWAYS.find(([a, b]) => t >= a && t < b), camD = t >= CUTS.D[0] && !inP2 && !cutaway;
 
     // camera: B′ / P / B′ / D / P2 / D, each locked
-    const cam = insert ? { ...CAM_P, focus: CAM_P.look } : camD ? CAM_D : { ...CAM_B2, focus: UNIT.focus };
+    let cam = insert ? { ...CAM_P, focus: CAM_P.look } : camD ? CAM_D : { ...CAM_B2, focus: UNIT.focus };
+    if (cutaway) {   // Camera E: straight at the blob's mark, midway between its old and new size's marks
+      const M1 = markOf(radiusAfter(cutaway[2])), M0 = markOf(radiusAfter(cutaway[2] - 1)), x = (M0[0] + M1[0]) / 2 + E_DX;
+      cam = { pos: [x, E_Y[0], M1[2] + E_DIST], look: [x, E_Y[1], M1[2]], focus: [x, E_Y[1], M1[2]] };
+    }
     camera.up.set(0, insert ? 0 : 1, insert ? -1 : 0);
     camera.position.set(...cam.pos); camera.lookAt(look.set(...cam.look)); camera.getWorldDirection(dir);
     fx.set({ focus: dir.dot(focus.set(...cam.focus).sub(camera.position)) });
@@ -266,6 +278,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     hero.boil(t, 10);
     hero.blend(P, BODY, tc + 1e-6);
     hero.pose({ head: headAt(tc) * D });
+    idle(hero, t, { breath: 0.01, sway: standing ? 0 : 0.04 });
     hero.face({ eyes: eyesAt(tc), mouth: mouthAt(tc) });
     if (standing) hero.group.position.set(STAND[0], FLOOR + hipHeight(P[pop]), STAND[1]);
     else hero.group.position.set(UNIT.hip[0], UNIT.hip[1] - (tc < dr(3) ? 0.001 : 0), UNIT.bodyZ);   // s15's exhale drop, then shoulders up
@@ -333,6 +346,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     // the neighbor
     nbr.boil(t, 10);
     nbr.blend(NP, held(NPOPS), tc + 1e-6);
+    idle(nbr, t, { breath: 0.008, sway: 0, phase: 0.37 });   // frozen at their phone, still breathing
     nBlob.update(t, { key: nLit ? nZone.light : nPhone, squash: kick(tc, WAKE, 0.3), wobble: tc >= WAKE + 0.5 ? 0 : 1 });
 
     // window: the night view brightens a little toward pre-dawn over 10–24 (no light reaches the room)

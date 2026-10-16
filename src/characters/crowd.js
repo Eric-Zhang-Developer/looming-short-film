@@ -4,17 +4,20 @@
 // Doc 03: never clone a figure. Every call takes its own seed (paper tears) and green.
 import { buildRig, greenVariant } from './gator.js';
 
+// v3 (v3-fix-marston): the painter's pieces came back off the PIECES aspect ratios (bodies about 1.0 wide where 0.67 was asked,
+// asset-cast-kit/aspect_table.md) and the old sizes squeezed them to it. Sizes keep each piece's own visible aspect, with
+// the long side set to the Student's (a 9.3 cm gator's body is 0.053 high, his head 0.043 wide), so the neighbours are peers.
 const SIDE = {
-  neighbor: { green: 5 },
-  sleeper: { green: 6 },
+  neighbor: { green: 5, body: [0.043, 0.048], head: [0.036, 0.0248] },   // 275×308 and 448×308 visible px
+  sleeper: { green: 6, body: [0.052, 0.047], head: [0.036, 0.0220] },    // 334×302 and 451×275
 };
 export function makeCrowd(ctx, who, { seed = 0, scale = 1, green, res = 512 } = {}) {
   if (!SIDE[who]) throw new Error(`makeCrowd: unknown figure "${who}"`);
   const P = (piece) => ['crowd_sheet', `${who}_${piece}`];
   return buildRig(ctx, { name: who, seed, scale, green: green ?? greenVariant(SIDE[who].green), res, parts: [
-    { name: 'body', from: P('body'), size: [0.03, 0.045], pivot: [0.45, 0.95], at: [0, 0] },
-    { name: 'head', from: P('head'), parent: 'body', size: [0.03, 0.022], pivot: [0.3, 0.75], at: [0.004, 0.034], z: 0.003 },
-    { name: 'arm_r', from: P('arm'), parent: 'body', reach: 0.032, at: [0.013, 0.030], z: 0.012 },
+    { name: 'body', from: P('body'), size: SIDE[who].body, pivot: [0.45, 0.95], at: [0, 0] },
+    { name: 'head', from: P('head'), parent: 'body', size: SIDE[who].head, pivot: [0.3, 0.75], at: [0.004, 0.036], z: 0.003 },
+    { name: 'arm_r', from: P('arm'), parent: 'body', reach: 0.032, at: [0.013, 0.032], z: 0.012 },
   ] });
 }
 

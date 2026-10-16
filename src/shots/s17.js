@@ -29,7 +29,11 @@ const NB_BLOB = [NB, 0.098], NB_PHONE = [NB + 0.010, 0.0015, 0.114], NB_HIP = [N
 const FG = { z: 0.354, head: [0.120, 0.035], blob: [0.150, 0.360] };   // the foreground sleeper
 // Camera: the spec's distance and angle (1.02 m, 12° down), aimed 2 cm lower, because s11's ribbon window is one low
 // band (panes y 0.078–0.132), not the spec's 0.066–0.300 openings: at the spec's aim the top of the frame was bare wall.
-const CAM = { pos: [0.050, 0.272, 1.058], look: [0.050, 0.060, 0.060] }, FOCUS = [0.000, 0.010, 0.098];
+// v3 (v3-fix-marston): the blob (r 0.005, 1.1 cm wide) was 32 px in a 60 cm frame. The wide moves in to 0.95 m and re-centres on
+// his desk (the empty desk is cut by the left edge: it only has to read as empty), and the blob's one look at him (7.0–8.5)
+// gets Camera E, a close two-shot of the blob on the page corner and his face above it, so the size he shrank to reads next to him.
+const CAM = { pos: [0.100, 0.250, 0.950], look: [0.100, 0.058, 0.062] }, FOCUS = [0.000, 0.010, 0.098];
+const CAM_E = { pos: [-0.030, 0.028, 0.338], look: [-0.030, 0.028, 0.098], focus: [0.000, 0.010, 0.098] }, E_WINDOW = [6.75, 8.75];
 const GOLD_AT = 16;                                     // elevation, k, panes and grade ramps end here, then hold
 const ZONE_I = 0.35, FLUOR_I = 0.35, AMB_K = 0.45, FILL_I = 0.02, DAWN_K = 9;   // DAWN_K: dawn overtakes the zones by ~14 s (by eye)
 const PANE = { cold: 0.06, gold: 0.9 };                 // window tissue glow, grey dawn → gold
@@ -150,9 +154,12 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   fill.position.set(-0.046, 0.040, 0.114); scene.add(fill);
 
   // ---------- camera (locked), post, grade crossfade act 3 (amber) → Quiet 2 (dawn) over 0–16 ----------
-  camera.position.set(...CAM.pos); camera.lookAt(...CAM.look); camera.updateMatrixWorld(true);
-  const dir = camera.getWorldDirection(new THREE.Vector3());
-  const fx = post({ focus: dir.dot(new THREE.Vector3(...FOCUS).sub(camera.position)), aperture: 0.02, maxblur: 0.01 });
+  const dir = new THREE.Vector3(), V3 = new THREE.Vector3();
+  const aimCam = ({ pos, look, focus }) => {   // sets the camera and returns the focus distance along its axis
+    camera.position.set(...pos); camera.lookAt(...look); camera.updateMatrixWorld(true);
+    return camera.getWorldDirection(dir).dot(V3.set(...focus).sub(camera.position));
+  };
+  const fx = post({ focus: aimCam({ ...CAM, focus: FOCUS }), aperture: 0.02, maxblur: 0.01 });
   const LA = loadLUT('amber').image, LB = loadLUT('dawn').image;
   const lut = new THREE.Data3DTexture(new Uint8Array(LA.data.length), LA.width, LA.height, LA.depth);
   Object.assign(lut, { format: THREE.RGBAFormat, type: THREE.UnsignedByteType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
@@ -171,6 +178,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     update(t) {
       const tc = onTwos(t);
       boil(t, RATE);
+      fx.set({ focus: aimCam(t >= E_WINDOW[0] && t < E_WINDOW[1] ? CAM_E : { ...CAM, focus: FOCUS }) });   // the cut to E and back, on 1s
       for (const p of [gator, nb, fg]) p.boil(t, RATE);
 
       // the hero, on 2s: still, puts the pen down, sits back; looks at the blob; eyes closed from 9.0

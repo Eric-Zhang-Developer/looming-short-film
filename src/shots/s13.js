@@ -52,6 +52,9 @@ const eyesAt = (t) => (t < 0.5 ? 'closed' : t < 1.6 ? 'open' : t < 3.6 ? 'gasp' 
 // Phone fills (candela at FILL_Z): the hero's carries s12's dim, the crowd's are nearly as strong so each wake visibly
 // opens up its own patch. Each hangs over its own shadow (phone + 0.4 of the shadow's length) and reaches just past
 // it, so the far end, where the eye holes are, is lit too: the phone's light read as a low wedge (doc 03 rule 2).
+const HOODIE_K = 0.8;                                 // v3: the hero's hoodie (green[0]), as a multiplier
+const BREATH = 0.012;                                 // v3 seated breath, as a scale
+const ROOM_I = 0.9, ROOM_K = 0.5;                    // v3 room light: lux, and its blend from phone cyan toward cream
 const FILL_HERO = 0.16, FILL_CROWD = 0.14, FILL_Z = 0.2;
 // The drop's silhouette is ~0.91 as tall as it is wide (evidence/anim-s13/measure.txt), so this gives length = 1.5 × width.
 const LONG = 1.5 / 0.91;
@@ -69,6 +72,12 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   amb.intensity *= 0.3;
   amb.position.set(0, 0, 1);  // sky is above in this shot
   scene.add(amb);
+  // v3: the hemisphere's sky is navy, so it lit nothing and the room read black until a phone woke. A dim cool light from
+  // straight above (the dead ceiling's leak, no shadows) holds the carpet, desks and figures at about a quarter before
+  // the first phone, and every phone still opens its own patch on top of it.
+  const ROOM = new THREE.DirectionalLight(tone(PALETTE.phone, PALETTE.cream, ROOM_K), ROOM_I);
+  ROOM.position.set(0, 0, 2);
+  scene.add(ROOM, ROOM.target);
 
   const [figs, props, face, kitp, mkit] = await Promise.all(['top_figures_sheet', 'top_props_sheet', 'face_sheet', 'props_kit', 'marston_kit'].map((n) => assets.load(n)));
   const KP = { page: 'blank_page', pen: 'pen', backpack: 'backpack' };
@@ -136,13 +145,15 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // ---------- the crowd ----------
   const figRng = mulberry32(seedOf(ID, 'crowd'));
   let n = 0;
+  const breathers = [];
   const cast = [];   // (who, pose, mirror, turn, scale): read by evidence/anim-s13/measure.html for acceptance 4
   for (const [key, d] of Object.entries(CROWD)) {
     const i = Number(key.slice(1)) - 1, cx = XS[i % 5], cy = YS[Math.floor(i / 5)], f = d.f;
     const at = ([x, y]) => [cx + f * x, cy + f * y], facing = f < 0 ? Math.PI : 0;
     const [sx, sy] = at(SEAT_AT), rot = facing + (figRng() * 16 - 8) * DEG;
-    place(piece(art(figs, d.pose, `${ID}-${key}-${d.pose}`)), sx, sy, 0.048 + 0.002 * n++, rot)
-      .scale.set(d.mir ? -d.sc : d.sc, d.sc, 1);
+    const fig = place(piece(art(figs, d.pose, `${ID}-${key}-${d.pose}`)), sx, sy, 0.048 + 0.002 * n++, rot);
+    fig.scale.set(d.mir ? -d.sc : d.sc, d.sc, 1);
+    breathers.push({ m: fig, sx: d.mir ? -d.sc : d.sc, sy: d.sc, ph: figRng(), slow: d.who === 'sleeper' });   // v3: a breath each, none in step
     d.props.forEach((p, j) => {
       if (p === 'can') { const [x, y] = at([0.006 + 0.0085 * j, 0.014]); return place(piece(art(props, 'can', `${ID}-${key}-can${j}`)), x, y, 0.033); }
       const [ox, oy, deg] = PROP_AT[p], [x, y] = at([ox, oy]);
@@ -193,8 +204,13 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       neck.rotation.z = -kf(tc, HEAD_ROT) * DEG;
       const e = eyesAt(tLocal);
       for (const [k, m] of Object.entries(eyes)) m.visible = k === e;
+      for (const b of breathers) {   // v3 secondary motion: a seated breath on 2s, the Sleeper's slower and deeper
+        const k = 1 + (b.slow ? BREATH * 1.6 : BREATH) * Math.sin(2 * Math.PI * (tc / (b.slow ? 4.2 : 3.2) + b.ph));
+        b.m.scale.set(b.sx * k, b.sy * k, 1);
+      }
+      hero.scale.setScalar(1 + BREATH * Math.sin(2 * Math.PI * tc / 3.6));
       const tint = satTint(kf(tLocal, SAT));
-      for (const m of green) m.material.color.copy(tint);
+      green.forEach((m, i) => m.material.color.copy(tint).multiplyScalar(i === 0 ? HOODIE_K : 1));   // v3: the cream hoodie clipped to white under his phone
 
       // Desks: the phone lights over 2 frames at wake, the shadow springs up from 1× over 0.5 s (light on 1s).
       for (const g of rigs) {
