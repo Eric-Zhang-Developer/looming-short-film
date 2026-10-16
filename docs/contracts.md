@@ -6,7 +6,7 @@ The interfaces every shot is built on. Wave 2 builders implement exactly these. 
 
 - **Units:** meters. It's a tabletop diorama: a gator is about 8 cm tall and a wall is about 1.6 × 0.9 m.
 - **Axes:** +Y up. The camera looks down −Z. The main wall of a set is usually the plane z = 0, with things in front at z > 0.
-- **Time:** `t` is global seconds from 0 to 180. Shot code gets `tLocal`, seconds since its shot started. Every function that changes over time takes time as an argument and never reads a clock.
+- **Time:** `t` is global seconds from 0 to 195 (3:15 since G4). Shot code gets `tLocal`, seconds since its shot started. Every function that changes over time takes time as an argument and never reads a clock.
 - **Determinism:** randomness comes only from `src/core/rng.js`. The same `t` always draws the same pixels.
 - **Colors:** hex strings from doc 03. They're exported once as `PALETTE` in `src/core/palette.js`, so nobody types a hex code anywhere else.
 - **Modules:** plain ES modules in `src/`. They import three as `import * as THREE from 'three'`, resolved by an import map in each HTML page to `/node_modules/three/build/three.module.js`. Pages that use `post.js` (or any three addon) also map `"three/examples/jsm/": "/node_modules/three/examples/jsm/"`.
@@ -60,7 +60,7 @@ The default page is `index.html` (the film). The default fps comes from `window.
 
 ```
 node tools/determinism.mjs --page=<html> --t=0.5,4     renders each t twice, prints sha256s and pass/fail
-node tools/check_timeline.mjs                          gaps, overlaps, total 180 s ±5, every beat/cue resolves
+node tools/check_timeline.mjs                          gaps, overlaps, total 195 s ±5, every beat/cue resolves
 node tools/gen.mjs --asset=<name> [--variants=3]       doc 08 loop: fresh temp dir, codex exec, copy to assets/raw/, thumb + sidecar
 node tools/cut.mjs --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.json   → assets/cut/<part>.png
 ```
@@ -71,7 +71,7 @@ node tools/cut.mjs --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.js
 export const SHOTS   // [{ id: 's01', start, duration, beats: { name: tLocal } }, ...] from doc 06's shot list
 export function shotAt(t)        // → { shot, tLocal }
 export function beat(name)       // → global t of a named beat (names unique across the film)
-export const DURATION            // 180
+export const DURATION            // 195
 ```
 
 Shot modules are wired into `index.html` later (wave 4). The timeline only holds data.
