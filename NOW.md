@@ -3,6 +3,18 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-15
 
+## OVERNIGHT RUN (2026-10-15 → 16): director asleep. Read this first.
+Brief: G4 notes in `docs/notes/g4-2026-10-15.md`; decisions in doc 07 ("G4 on v1-animatic"). Goal: **v2 complete, then v3 close to complete**, both rendered (1080p, chunked), by morning. 4K stays Saturday.
+**Authority:** freeze art by rule (most cut-paper, most Marston, simplest), and log every freeze plus its alternatives in `docs/notes/morning-picks.md`. No public actions (no tags, releases or PRs to main). No story changes beyond G4. The director does not review between v2 and v3.
+**Machine:** at most 2 Chromes; render with `--w ≤ 960` except final renders; full renders chunked (the script is in the making-of ch 10; the render script is in the session scratchpad). Stop builders if free disk < 3 GB or swap > 12 GB.
+**Plan:**
+1. **Wave 5a (no Chrome):**
+   - Orchestrator: story doc 02 + shot specs for the new and changed scenes (s00 notification, s01/s02 calendar zoom with ∫, home laptop game, blinds made causal, Calc 2 practice, test day, grade back, calendar dissolve + tag replacing the pocket), the timeline extended to ~3:15 (`contract-timing`), and the cue sheet.
+   - Painters (max 2 Codex at once): `cut-gator` (cut the frozen sheet, refit the rig, faces scaled 2.2–2.5× down, face sheet v1_3), `asset-home-kit` (bedroom + kitchen, scale-checked against the gator), `asset-marston-kit` (from the director's photos: maple desks, perforated cubicles facing ribbon windows, mesh Y-back chairs, ring pendants, linear strips), `asset-props-kit` (laptop, calendar, Calc 2 sheet/test with math glyphs, graded paper, blinds), `asset-boil-kit`.
+2. **Wave 5b, v2:** rebuild shots with the frozen kits and the new scenes; blob dread meter; sound re-timed, new cues, loudness to -16 LUFS / -4 dBFS. Render `out/v2_rough_cut.mp4`. A cold-viewer subagent judges the frames and writes a fix list.
+3. **Wave 5c, v3:** fixes plus polish (motion, secondary motion, light, colour, final mix). Render `out/v3_draft.mp4`.
+4. **Chronicler** after each wave. Every done note has a `## Story` section.
+
 ## In flight
 | Task | Kind | Notes |
 |---|---|---|

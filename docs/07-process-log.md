@@ -193,3 +193,15 @@ Director: "The final version should be as high fidelity as possible." `v3-final`
 
 ## 2026-10-15 · Deadline clarified: final due Sunday, Oct 18
 The director spoke to the organisers. Today needs only an incomplete draft. The final is due Sunday at 11:59 PM, and a YouTube link and the GitHub repo can be submitted. About 70 proposals are in progress and 30–50 submissions are expected. The roadmap (doc 11) is compressed to Sunday: tonight the draft, then the rough reel (v1-animatic), story lock, look lock and final art, with the 4K master rendered overnight Saturday into Sunday.
+
+## 2026-10-15 · G4 on v1-animatic: story notes, and two polish passes overnight
+The director's notes are in full in `docs/notes/g4-2026-10-15.md`. Orchestrator's decisions, given to the director before the overnight run:
+- **Keep:** the sound's odd, animated voice; the library and its lighting. **New rule: everything is cut paper except the dread.** The blob stays ink: smooth, too alive, not paper ("It's more animated and less paper-cut, which makes it unnatural. I think you should keep it that way").
+- **Home and kitchen** are repainted as Codex kits, each piece sized against the gator (the "massive table" was unscaled placeholder).
+- **Home avoidance becomes a laptop game.** A low screen still casts the big shadow, and the phone stays for Marston.
+- **The blinds stay, and are made causal:** each blind down removes daylight, and the blob's shadow steps up.
+- **The opening is explicit:** a phone buzz, a generic school notification (no Canvas branding), and a zoom to the calendar date. Math, not words: ∫ … dx marks the exam, which keeps the film wordless. The director may overrule this in favour of literal words.
+- **Payoff, about 15–20 s:** a Calc 2 practice sheet (∫x·eˣ dx, a series), test day with a problem he recognises, then the graded paper (checks and a circled score).
+- **Ending:** the exam date is crossed off, the blob shrinks to an ink dot and is absorbed by the calendar. Tag: a new date, a small drop, and he uncaps his pen. This replaces the pocket.
+- **Runtime 3:00 → about 3:15** (the rules set no limit). The v1/v3 comparison aligns by scene, as doc 11 allows when G4 changes the story.
+- **Overnight authority:** the orchestrator freezes art itself (most cut-paper, most Marston, simplest), listing each freeze with its alternatives for the morning. No public actions. No story changes beyond these notes.
