@@ -102,6 +102,23 @@ export const PIECES = {
     jar: [0.0071, 0.0110, 'round', C], backsplash_strip: [0.1874, 0.0275, 'rect', C], wall_strip: [0.1650, 0.0550, 'rect', C],
     floor_strip: [0.2807, 0.0550, 'rect', K],
   },
+  // marston_kit and marston_ext_kit (G4): sizes from evidence/asset-marston-kit/scale_table_{int,ext}.md (1 real m =
+  // 0.055 film m against the 0.096 m gator; exterior pieces are distance-layer sizes), keys from assets/cut/<kit>.boxes.json.
+  marston_kit: {
+    cubicle_front: [0.1182, 0.0770, 'rect', C], cubicle_side: [0.1000, 0.0770, 'rect', C], desk_row_front: [0.2223, 0.0578, 'rect', K],
+    round_table: [0.0871, 0.0413, 'round', K], chair_side: [0.0369, 0.0550, 'rect', N], chair_34: [0.0433, 0.0550, 'rect', N],
+    chair_back: [0.0425, 0.0550, 'rect', N], bookshelf_bay: [0.0981, 0.1155, 'rect', N], column: [0.0446, 0.1650, 'rect', C],
+    ring_light_lit: [0.1100, 0.0389, 'round', C], ring_light_unlit: [0.1100, 0.0394, 'round', C], strip_light: [0.1320, 0.0215, 'rect', C],
+    recessed_panel: [0.0330, 0.0330, 'rect', C], exit_sign: [0.0192, 0.0099, 'rect', G], ceiling_strip: [0.2640, 0.0709, 'rect', C],
+    carpet_tile: [0.0660, 0.0305, 'rect', N], ribbon_window: [0.3438, 0.0825, 'rect', C], wall_strip: [0.5657, 0.1650, 'rect', N],
+  },
+  marston_ext_kit: {
+    facade_block: [1.2000, 0.3086, 'rect', K], stepped_bay: [0.4000, 0.2495, 'rect', K], breezeway_frame: [0.4009, 0.3300, 'rect', K],
+    century_tower: [0.1158, 0.5000, 'rect', C], night_view: [0.5000, 0.2511, 'rect', N], oak_canopy: [0.8000, 0.2601, 'rect', N],
+    lit_window_strip: [0.8500, 0.1913, 'rect', C], brick_strip: [0.4357, 0.0750, 'rect', K], band_strip: [0.2265, 0.0300, 'rect', K],
+    planter_hex: [0.1400, 0.0770, 'rect', K], sculpture_yellow: [0.2000, 0.1917, 'rect', K], lantern_post: [0.0612, 0.1650, 'rect', N],
+    lantern_cluster: [0.0800, 0.0618, 'rect', N], lamppost_black: [0.0594, 0.2200, 'rect', N],
+  },
 };
 
 const cache = new Map();  // name → Promise of the load result
