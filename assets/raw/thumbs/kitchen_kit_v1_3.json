@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/kitchen_kit_v1_3.png",
+  "prompt_file": "assets/prompts/kitchen_kit.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/kitchen_kit.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a1429a-6ac3-7162-8ff7-57d1464cbb03",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a1429a-6ac3-7162-8ff7-57d1464cbb03/exec-5eb38613-16d0-4428-ac55-c13e3135cdd6.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-fjLz9m",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 123499,
+    "cached_input_tokens": 101504,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1912,
+    "reasoning_output_tokens": 158
+  },
+  "timestamp_start_utc": "2026-10-16T02:46:17Z",
+  "timestamp_end_utc": "2026-10-16T02:47:59Z",
+  "output_sha256": "968a027ec70b9d83f0378dcd0d229befa786ad9a27cf1f869e6af3535e154381",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/kitchen_kit_v1_3.jpg",
+  "screening": "PASS, rank 2. 16 islands, 1672x941 alpha. Everything present and separate; no text. Flattest and simplest: navy kickplates and two amber taps are a nice palette echo, cleanest fridge. Weaker fibre texture than v1, fridge body and door differ by a few px, wall_strip almost touches the jar (4 px, padded boxes)."
+}

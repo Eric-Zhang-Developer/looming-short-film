@@ -213,5 +213,54 @@
       "parts not touching; no text or artifacts; on palette (cream, black pupils, gator green lids, one dark green line colour)",
       "cut.mjs --auto islands accounted for against pieces"
     ]
+  },
+  {
+    "name": "home_kit",
+    "purpose": "Student bedroom parts kit that reads as a room: furniture at real proportion to the gator (G4: 'massive table', 'doesn't look like a room'). One sheet of 21 separate flat pieces; painter task asset-home-kit.",
+    "shots": "s02-s08 (home set)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/home_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size available, 21 separate pieces in four rows, every bounding box >= 60 px from every other and from the frame edge; aspect ratios per piece as prompted, sheet scale is not shared (film sizes come from the scale table in done/asset-home-kit.md)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "every piece is a separate island (cut.mjs --auto gives 21 islands, a piece that has parts such as laptop screen vs base counts as separate islands)",
+      "flat orthographic elevation, no perspective or 3D top faces",
+      "torn paper look and palette of the style tile, no baked light or shadow",
+      "no text anywhere, no gator, no scene",
+      "window_glass, laptop_screen, blind_up/blind_down are separate pieces",
+      "each piece reads as what it is at small size"
+    ]
+  },
+  {
+    "name": "kitchen_kit",
+    "purpose": "Apartment kitchen parts kit that reads as a kitchen (G4: 'doesn't really look like a kitchen', 'furniture is weird'). One sheet of 16 separate flat pieces, fridge door separate so it opens; painter task asset-home-kit.",
+    "shots": "s02-s08 (kitchen, s05)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/kitchen_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size available, 16 separate pieces in three rows, every bounding box >= 60 px from every other and from the frame edge; aspect ratios per piece as prompted",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "every piece is a separate island (cut.mjs --auto gives 16 intended)",
+      "fridge body and fridge door are separate pieces",
+      "flat orthographic elevation, torn paper look, palette of the style tile",
+      "no text, no gator, no scene, no baked light or shadow",
+      "each appliance reads as what it is at small size"
+    ]
   }
 ]

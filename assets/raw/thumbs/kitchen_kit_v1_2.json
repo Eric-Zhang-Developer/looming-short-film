@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/kitchen_kit_v1_2.png",
+  "prompt_file": "assets/prompts/kitchen_kit.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/kitchen_kit.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a14298-ec02-7ab3-97ea-4083a908c49f",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a14298-ec02-7ab3-97ea-4083a908c49f/exec-c620da19-6fe8-4136-9df6-52f4e92e5d1b.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-DInOQW",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 116075,
+    "cached_input_tokens": 96000,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1802,
+    "reasoning_output_tokens": 46
+  },
+  "timestamp_start_utc": "2026-10-16T02:44:40Z",
+  "timestamp_end_utc": "2026-10-16T02:46:17Z",
+  "output_sha256": "b68aaa32e0b547285aae22dd1b1089e60c324a9742d08a6193e491441bf31879",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/kitchen_kit_v1_2.jpg",
+  "screening": "PASS, rank 3. 16 islands, 1672x941 alpha. Everything present and separate; no text. Kettle drawn with its handle on the left and a long spout, reads a little like a teapot; stove burner rings are white outlines; sheet crops pieces smaller. Flatter and cleaner than v1 but least charming."
+}

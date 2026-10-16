@@ -1,0 +1,93 @@
+== home_kit_v1_1
+alpha in home_kit_v1_1: 533077 px at alpha 250-254 clamped to 255
+21 alpha island(s): 21 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-home-kit/evidence/asset-home-kit/home_kit_v1_1.boxes.json
+home_kit_v1_1_1: cleared 3933 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_2: cleared 1947 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_3: cleared 4767 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_4: cleared 2579 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_5: cleared 1338 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_6: cleared 15428 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_7: cleared 2864 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_8: cleared 2662 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_9: cleared 3441 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_10: cleared 4637 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_11: cleared 2609 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_12: cleared 3823 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_13: cleared 2791 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_14: cleared 4220 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_15: cleared 3012 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_16: cleared 1725 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_17: cleared 3067 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_18: cleared 3630 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_19: cleared 4162 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_20: cleared 2710 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_1_21: cleared 3054 px (neighbouring islands, alpha<16 dust)
+1672,941,rgba
+== home_kit_v1_2
+alpha in home_kit_v1_2: 504756 px at alpha 250-254 clamped to 255
+21 alpha island(s): 21 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-home-kit/evidence/asset-home-kit/home_kit_v1_2.boxes.json
+home_kit_v1_2_1: cleared 1728 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_2: cleared 2828 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_3: cleared 4936 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_4: cleared 3142 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_5: cleared 2133 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_6: cleared 18718 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_7: cleared 1856 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_8: cleared 2812 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_9: cleared 1616 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_10: cleared 4250 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_11: cleared 1933 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_12: cleared 2286 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_13: cleared 2005 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_14: cleared 4962 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_15: cleared 2333 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_16: cleared 606 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_17: cleared 2529 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_18: cleared 2287 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_19: cleared 4306 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_20: cleared 2512 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_2_21: cleared 2278 px (neighbouring islands, alpha<16 dust)
+1672,941,rgba
+== home_kit_v1_3
+alpha in home_kit_v1_3: 495759 px at alpha 250-254 clamped to 255
+21 alpha island(s): 21 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-home-kit/evidence/asset-home-kit/home_kit_v1_3.boxes.json
+home_kit_v1_3_1: cleared 1308 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_2: cleared 876 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_3: cleared 7037 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_4: cleared 2638 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_5: cleared 983 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_6: cleared 17780 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_7: cleared 1587 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_8: cleared 2723 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_9: cleared 3155 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_10: cleared 2682 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_11: cleared 2066 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_12: cleared 2727 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_13: cleared 3327 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_14: cleared 2503 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_15: cleared 5126 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_16: cleared 1633 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_17: cleared 2532 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_18: cleared 2741 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_19: cleared 4403 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_20: cleared 2044 px (neighbouring islands, alpha<16 dust)
+home_kit_v1_3_21: cleared 2741 px (neighbouring islands, alpha<16 dust)
+1672,941,rgba
+== kitchen_kit_v1_1
+alpha in kitchen_kit_v1_1: 719040 px at alpha 250-254 clamped to 255
+16 alpha island(s): 16 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-home-kit/evidence/asset-home-kit/kitchen_kit_v1_1.boxes.json
+1774,887,rgba
+== kitchen_kit_v1_2
+alpha in kitchen_kit_v1_2: 696487 px at alpha 250-254 clamped to 255
+16 alpha island(s): 16 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-home-kit/evidence/asset-home-kit/kitchen_kit_v1_2.boxes.json
+1672,941,rgba
+== kitchen_kit_v1_3
+alpha in kitchen_kit_v1_3: 644355 px at alpha 250-254 clamped to 255
+16 alpha island(s): 16 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-home-kit/evidence/asset-home-kit/kitchen_kit_v1_3.boxes.json
+1672,941,rgba

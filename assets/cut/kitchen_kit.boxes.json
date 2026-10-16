@@ -1,0 +1,98 @@
+{
+ "kitchen_kit_fridge_body": [
+  44,
+  20,
+  196,
+  376
+ ],
+ "kitchen_kit_fridge_door": [
+  288,
+  16,
+  196,
+  380
+ ],
+ "kitchen_kit_stove": [
+  536,
+  44,
+  256,
+  352
+ ],
+ "kitchen_kit_sink": [
+  832,
+  60,
+  296,
+  336
+ ],
+ "kitchen_kit_counter_run": [
+  1160,
+  172,
+  576,
+  224
+ ],
+ "kitchen_kit_upper_cabinets": [
+  44,
+  420,
+  460,
+  168
+ ],
+ "kitchen_kit_microwave": [
+  556,
+  428,
+  252,
+  160
+ ],
+ "kitchen_kit_kettle": [
+  852,
+  420,
+  204,
+  176
+ ],
+ "kitchen_kit_dish_rack": [
+  1100,
+  424,
+  332,
+  164
+ ],
+ "kitchen_kit_fruit_bowl": [
+  1480,
+  404,
+  244,
+  192
+ ],
+ "kitchen_kit_backsplash_strip": [
+  40,
+  608,
+  736,
+  108
+ ],
+ "kitchen_kit_wall_strip": [
+  796,
+  608,
+  324,
+  108
+ ],
+ "kitchen_kit_floor_strip": [
+  1144,
+  608,
+  592,
+  116
+ ],
+ "kitchen_kit_cereal_box": [
+  656,
+  724,
+  116,
+  152
+ ],
+ "kitchen_kit_mug": [
+  836,
+  748,
+  140,
+  124
+ ],
+ "kitchen_kit_jar": [
+  1012,
+  724,
+  100,
+  156
+ ]
+}

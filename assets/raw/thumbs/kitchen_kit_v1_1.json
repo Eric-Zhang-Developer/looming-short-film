@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/kitchen_kit_v1_1.png",
+  "prompt_file": "assets/prompts/kitchen_kit.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/kitchen_kit.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a14297-19c7-7e80-8bb2-2640594c7f9b",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a14297-19c7-7e80-8bb2-2640594c7f9b/exec-27267355-6b24-4642-866a-b3fa333ba818.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-Rabodb",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 171918,
+    "cached_input_tokens": 143104,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2089,
+    "reasoning_output_tokens": 130
+  },
+  "timestamp_start_utc": "2026-10-16T02:42:41Z",
+  "timestamp_end_utc": "2026-10-16T02:44:39Z",
+  "output_sha256": "a492abc954cf6c41a0f531150449e3a305db1082ca0ad657f1464d029100c76a",
+  "width": 1774,
+  "height": 887,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/kitchen_kit_v1_1.jpg",
+  "screening": "PASS, rank 1. 16 islands, 1774x887 alpha. Fridge body (open cavity) and door separate and the same size; stove, sink with curved faucet, counter run, upper cabinets, microwave, kettle, dish rack, fruit bowl, backsplash, small props all read. Most visible paper fibre and rim, kraft kickplate ties to the counter. No text. Weak: fridge cavity is grey rather than cream; min box gap 8 px (padded)."
+}

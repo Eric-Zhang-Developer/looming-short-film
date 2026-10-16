@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/home_kit_v1_2.png",
+  "prompt_file": "assets/prompts/home_kit.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/home_kit.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a14294-08d9-7522-b3bf-db9dc97d2330",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a14294-08d9-7522-b3bf-db9dc97d2330/exec-320bc99b-2639-4bfe-9add-16b8edd7343c.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-PyQeHb",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 120286,
+    "cached_input_tokens": 98816,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1958,
+    "reasoning_output_tokens": 24
+  },
+  "timestamp_start_utc": "2026-10-16T02:39:19Z",
+  "timestamp_end_utc": "2026-10-16T02:41:02Z",
+  "output_sha256": "23ddc3fb382d026b166959496bfa58285510f191104e98b5ad3a1fcb99180d1d",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/home_kit_v1_2.jpg",
+  "screening": "PASS, rank 2. 21 islands, 1672x941 alpha. Same checks as v1. Slimmer lamp and a rounder bed frame; laundry pile is messier and darker; poster_a stripe sits low. Slightly less cut-paper flat than v1. Min box gap 12 px (desk / laptop_screen)."
+}

@@ -50,5 +50,31 @@
     "frozen": "2026-10-15",
     "gate": "overnight rule",
     "approved": "Orchestrator under the director's overnight rule (most cut-paper, simplest); painter and orchestrator both ranked v1_3 first. Overrulable in docs/notes/morning-picks.md."
+  },
+  {
+    "name": "home_kit",
+    "file": "assets/frozen/home_kit.png",
+    "source": "assets/raw/home_kit_v1_1.png",
+    "prompt": "assets/prompts/home_kit.v1.md",
+    "sidecar": "assets/raw/thumbs/home_kit_v1_1.json",
+    "variant": "v1_1",
+    "sha256": "afac7d678669486fe3300b96c70f3b9eb0db1ea7f1f99f11920047779226e718",
+    "size": "1672x941",
+    "frozen": "2026-10-15",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter ranked v1_1 first (flattest, most cut-paper). Alternatives v1_2, v1_3 in evidence/asset-home-kit/contact.jpg."
+  },
+  {
+    "name": "kitchen_kit",
+    "file": "assets/frozen/kitchen_kit.png",
+    "source": "assets/raw/kitchen_kit_v1_1.png",
+    "prompt": "assets/prompts/kitchen_kit.v1.md",
+    "sidecar": "assets/raw/thumbs/kitchen_kit_v1_1.json",
+    "variant": "v1_1",
+    "sha256": "a492abc954cf6c41a0f531150449e3a305db1082ca0ad657f1464d029100c76a",
+    "size": "1774x887",
+    "frozen": "2026-10-15",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter ranked v1_1 first (flattest, most cut-paper). Alternatives v1_3, v1_2 in evidence/asset-home-kit/contact.jpg."
   }
 ]
