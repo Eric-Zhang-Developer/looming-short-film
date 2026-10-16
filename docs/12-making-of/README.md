@@ -39,6 +39,14 @@ Times are Eastern (EDT), from git commit times and session transcripts.
 | 14:45 | s18 merges. All 18 shots are in, and the full render starts. | [10](10-rough-first-then-final.md), `0a912fb` |
 | 14:49–14:50 | Eric asks the agents to tell their stories, "from the first day". | [10](10-rough-first-then-final.md), `c82ae7c` |
 | 14:52–14:57 | The render dies at frame ~864 in s06, gets a fix and restarts. | [10](10-rough-first-then-final.md), `993b169` |
+| Oct 15, 22:00 | The director's G4 notes on v1 are recorded, with the overnight plan: v2 complete, then v3 close to complete. | [11](11-the-overnight-run.md), `3670600` |
+| 22:01 | The text rule is relaxed to "sparingly". Face sheet v1_3 is frozen. | [11](11-the-overnight-run.md), `e8a4e32` |
+| 22:35–22:41 | The real gator replaces the proxy rig. The G4 specs make a 3:15, 21-shot film. | [11](11-the-overnight-run.md), `f2bcd22`, `428a0ac` |
+| 22:51–00:36 | Home, kitchen, Marston, props and cast kits are painted and frozen by rule. | [11](11-the-overnight-run.md), `aa7cef1`, `413c299`, `d654322`, `89e75b3` |
+| 23:05 | The sound follows the 3:15 cut. Nobody has listened. | [11](11-the-overnight-run.md), `ea0dead` |
+| 23:43–00:44 | The v2 shot batches land on the frozen kits. | [11](11-the-overnight-run.md), `b9e7eec`, `331c5db`, `c75dc33` |
+| Oct 16, 01:29–01:32 | v2 renders (3:15). A cold viewer can't say what the shadow's rule is and sees no turning point. | [11](11-the-overnight-run.md), `4b7df3b` |
+| 01:30–01:49 | The v3 polish passes land. v3-readability is still in progress. | [11](11-the-overnight-run.md), `a9378c5`, `f25e8f8`, `6f45587` |
 
 ## Chapters
 
@@ -52,9 +60,10 @@ Times are Eastern (EDT), from git commit times and session transcripts.
 8. [The machine fights back](08-the-machine-fights-back.md): GPU memory, swap and a full disk, twice
 9. [The dread meter](09-the-dread-meter.md): watching Act 1, and the story not reading
 10. [Rough first, then final](10-rough-first-then-final.md): the real deadline, the reel, and this record
+11. [The overnight run](11-the-overnight-run.md): the director's notes, five kits by rule, v2, a cold viewer, and v3
 
 ## How this stays current
 
 Since Oct 15, every done note ends with a `## Story` section (`templates/done-note.md`, `AGENTS.md`). It's 150–300 words of prose on how the task really went, false starts included, linked to evidence. A docs-only **Chronicler** subagent (role row in `docs/09-orchestration.md`) reads those sections, `docs/07-process-log.md` and the evidence after each wave, and weaves them into these chapters. It invents no drama, quotes or numbers, and it states what it couldn't verify.
 
-The first edition (this one) was written on the evening of Oct 15. No done note had a Story section yet, so it was built from the git log, the done notes' checklists and gaps, doc 07 and the session transcripts.
+Chapters 1–10 were the first edition, written on the evening of Oct 15. No done note had a Story section yet, so it was built from the git log, the done notes' checklists and gaps, doc 07 and the session transcripts. Chapter 11 is the first built from the Story sections.
