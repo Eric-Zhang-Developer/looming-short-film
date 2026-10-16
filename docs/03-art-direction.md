@@ -18,7 +18,13 @@ The film's conflict should be visible in its materials before anyone understands
 | **Kraft / textured card** | Desks, floors, bookshelves | Warm brown with a visible fiber texture. |
 | **Tissue** | Curtains, lampshade, window glass | Translucent and glows when backlit. Ragged, uneven edge. |
 | **Vellum** | Light cones, the dawn haze | Mostly transparent, frosted. Catches light along its edges. |
-| **Ink** | **The Exam only** | Glossy liquid black with a wet highlight. Soaks a faint stain into the paper beneath it. Its shadow is the only true black in the film. |
+| **Ink** | **The Exam only** | Matte liquid black with one painted cream highlight (Q7 b). Soaks a faint stain into the paper beneath it. Its shadow is the only true black in the film. |
+
+**Everything is cut paper except the dread** (G4, 2026-10-15). The director on v1's blob: "It's more animated and less paper-cut, which makes it unnatural. I think you should keep it that way." So the contrast is a rule, not an accident:
+- **Paper** is torn, grained, boiled and posed: it moves pose to pose and its edges shimmer.
+- **The Exam** is the one thing that isn't: a smooth outline that never tears or boils, no paper grain, liquid squash, stretch and wobble. It should look a little too alive for the world it's in.
+- **Words and marks are paper, not ink.** The notification, the calendar's lettering and its X, his handwriting and math, the red checks and circles: all are matte lines drawn on the sheet, part of the paper, even where the story says "pen". Nothing but the Exam is wet, glossy or liquid, so the eye never confuses a pen line with the dread.
+- **Where ink meets paper** it stains: under the blob, along its first run (s02), and at the circle where it soaks back in (s18). The stain is the only ink-on-paper mark in the film.
 
 Rules:
 - **Vary the tear by paper weight.** Identical edge noise on every shape reads as a filter, which was the reference video's biggest flaw.

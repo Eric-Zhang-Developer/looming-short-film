@@ -33,20 +33,47 @@ Two sounds carry the light, and they are the most important sounds in the film.
 - **The sensor wake (Marston only).** Heard twice: when he reaches for the pen (s15) and when he walks past the Freshman (s18). One buffer, `sensorWake`, timed to the wake's light keys (`docs/shots/README.md` §3): a dry relay *clack* from the ceiling on the beat, a faint tick on each of the first two strikes (+0.042, +0.167 s), a small glassy fluorescent *ping* as the third strike catches (+0.292 s), then the tube's 120 Hz hum rising under it over about 0.3 s. Build the clack's transient from the lamp click's, pitched down with a short metallic tail, so the ear links the two. The two wakes must be identical.
 - **Every other zone change is seen, not heard:** the Custodian's passing in s14 (the mop covers it) and the neighbor's zone in s16 (Q2: under the montage's theme). A timeout is heard as the fluorescent crackle (s11, and s14 under the mop), never as the wake.
 
-| Sound | Where | Notes |
+Cues hang on beat names (`src/timeline.js`); the times are the G4 cut's (3:15) and move with the beats. **New** marks a G4 cue; a new sound name is a new `foley.js` voice for the sound pass.
+
+| Sound | Where (beat, global time) | Notes |
 |---|---|---|
-| Lamp click | 0:36, 0:39 | Home only. See above |
-| Sensor wake | 1:40, 2:44 | Marston, his own movement only. See above |
-| Pen uncap | 1:48 | Small, crisp. Followed by a held silence. |
-| Pen scratch | 1:48–2:15 | Granular noise shaped by stroke speed |
-| Phone glow hum | Whenever the phone is the key light | A very faint high sine, so the phone "sounds" cold |
-| Ink drip / roll | 0:10, blob movement | Filtered noise blip plus a pitch drop; wet |
-| Shadow growth | Every dodge | The sub swell plus a soft paper rustle |
-| Fridge hum, game controller clicks, drill | Act 2a | Comic and slightly exaggerated |
-| Fluorescent hum and flicker | Marston | A 120 Hz buzz with harmonics; crackles when lights flicker or a zone times out. The nearby tube's hum drops out when his zone dies (s11) and returns with the wake (s15) |
-| Mop on tile | Custodian | Slow, rhythmic |
+| **Phone buzz** (`phoneBuzz`) · new | `notifyBuzz` 0:00.5, and +1.5 | The film's first sound, over black. A short buzz with the phone rattling on wood, 0.33 s. Physical, not a UI chime |
+| Lamp click | `lampClickHome` 0:42.5, `lampOffHome` 0:45 | Home only. See above |
+| Sensor wake | `sensorWakeMarston` 1:48.5 | Marston, his own movement only. **Heard once since G4** (the Freshman's wake in s18 is cut) |
+| **Game blips** (`gameBlip`) · new | `laptopUp` 0:21 (a two-note boot), then his key taps: s03, s05 (under the TV, quieter and higher), s06 (cut on the click, back at `lampOffHome` + 0.17), s07 4.0–5.5 and from 9.0, s08 | The laptop game's voice: small, cheerful square-wave blips, very low (−24 to −18 dB), seeded per tap. Never on a gulp's frame |
+| Screen glow hum (`phoneHum`) | Whenever a screen is the key light: the laptop from `laptopUp` (0:21) through s08, except the lamp's window in s06; the phone at Marston (s10–s15); the neighbor's in s16 | A very faint high sine, so the screen "sounds" cold. In s07 it steps up with each blind (masked by the room before `blind1`) |
+| **Blind rattle** (`blindRattle`) · new | `blind1` 0:56, `blind2` 0:58 | A fast ratcheting roll-down, about 0.2 s, ending in the bottom bar's soft clack on the beat. One buffer, identical both times. Everything cuts on the second clack |
+| Ink drip / roll | `inkDropForms` 0:15 and the birth's hops; a swallow under every gulp; a blip under every shrink; s18's hop and run (3:01.5–3:02) | Filtered noise blip plus a pitch drop; wet |
+| Gulp (score) | `gulp1` 0:24.5, `gulp2` 0:46, `gulp3` 0:56.5, `gulp4` 0:58.5, `gulp5` 1:25.25 | The motif's first two notes, −1 to −5 semitones (Leitmotifs). G4 moved gulp 2 from the fridge to the lamp beat and gave the blinds gulps 3 and 4; the count is still five |
+| Shadow growth | Every dodge: `laptopUp`, `fridge` (+2.33, +5.33 as it scoots), `gameNight`, `lampOffHome` + 0.17, `blind1`, and the biggest at `gulp4` | The sub swell plus a soft paper rustle |
+| Fridge hum, game controller clicks, drill | `fridge` 0:26–0:34; `gameNight` 0:34–0:42; `blindsStart` + 0.33–1.67 (0:50.3–0:51.7) | Comic and slightly exaggerated |
+| Fluorescent hum and flicker | Marston, `marstonEnter` 1:08 to `examRoom` 2:44 | A 120 Hz buzz with harmonics; crackles when lights flicker or a zone times out. The nearby tube's hum drops out when his zone dies (s11) and returns with the wake (s15) |
+| Mop on tile | `custodianPass` 1:43.5 | Slow, rhythmic |
+| Pen uncap | `penUncap` 1:56; **`tagPenUncap` 3:11.5, the same buffer** | Small, crisp. Followed by a held silence (s15) or one held piano note into the fade (s18) |
+| Pen scratch | `penUncap` + 0.833 → `nameWritten` (1:56.8–1:58); the practice insert 2:03–2:08.6, with a stop and **one pen tap at 2:06.85**; the montage under each writing pose; the test, `testSolved` − 3.0 → − 0.1 (2:49.5–2:52.4), steady with no gaps; s18's X, two strokes ending on `examCrossedOff` (2:59.5, 2:59.8) | Granular noise shaped by stroke speed. The practice is the closest and most present pen in the film |
+| **Crossing-out** · new | `crossOut` 2:07.1 | One quick, harder `penScratch` stroke, 0.15 s. A fix, not anger |
+| Shrink answer (score) | `problemOneSolved` 2:09 … `problemSolved6` 2:23; **`testSolved` 2:52.5 (+2); `examCrossedOff` 3:00 (+3)** | The motif's two notes falling, a semitone higher each time; G4 adds the test and the cross-off after s16's six |
+| Dawn birds | `dawnBird1` 2:30, `dawnBird2` 2:36, `dawnBird3` 2:41 (Quiet 2) | Two or three synthesized chirps, far off, sparse |
+| **Exam-room hush** (`examHush`) · new | `examRoom` 2:44 to `gradeSlide` 2:53.5, then −12 dB under s17c | A large quiet room: distant page turns, far pens, one soft cough, a wall clock ticking at 1 Hz. **−6 dB for one second at `testRecognise` (2:47)**, the world narrowing; the tick goes on. A felt-piano note at `testSmile` (2:48.5), s15's first-step note recalled |
+| **Paper slide** (`paperSlide`) · new | `gradeSlide` 2:53.5, then a short `paperRustle` flip at + 0.83 | A dry slide of paper on a table, 0.5 s, ending on a skid. No grader is ever heard or seen |
+| Theme, resolved (score) | `gradeReveal` 2:55 to the end | Felt piano, carrying through s18. It rests (a held chord) on `blobAbsorbed` and ends on one held note after `tagPenUncap` |
+| **The dissolve** (`inkSoak`) · new | `blobAbsorbed` 3:03.5 | A soft, short wet soak: a filtered-noise swell that closes on a tiny dry tick, as if the paper drank it. With it, the Exam motif's last note once on the music box at its birth pitch |
+| **Marker** (`markerScratch`) · new | `newDate` − 2.0 → 0 (3:05.5–3:07.5) | A felt-tip squeak for the letters of "Final", then one round stroke for the circle, ending on the beat |
+| **Tag motif reprise** (score) · new | `dropQuivers` 3:09 → `tagPenUncap` 3:11.5 | The Exam motif's first two notes on the music box at its birth pitch, softer than at `inkDropForms`, with a faint trembling vibrato that **stops on the uncap's frame** |
 | Paper boil | Throughout, very low | A faint crinkle bed that makes the world sound like paper |
-| Dawn birds | Quiet 2 | Two or three synthesized chirps, far off, sparse |
+| The fade | 3:14–3:15 | Everything fades with the picture to digital silence at 195.0 |
+
+**Beat renames for `src/audio/cues.js` and `score.js`** (G4; until they land, neither resolves: `evidence/spec-g4/dropped_beat_refs.txt`):
+
+| Old name | New beat | Note |
+|---|---|---|
+| `phoneUp` | `laptopUp` | s03; same moment, the laptop's screen |
+| `curtainsStart` | `blindsStart` | s07 @ 0 |
+| `curtainsDone` | `blind2` | s07 @ 8.0, the last blind (was 8.0, the last gap) |
+| `scrollStart` | `sunriseGame` | s08 @ 0 |
+| `nextSemester` | none | Old s18's tear. The ending's cues hang on `gradeReveal`, `examCrossedOff`, `blobAbsorbed`, `newDate`, `dropQuivers`, `tagPenUncap` |
+| `sensorWakeFreshman` | none | Cut with the Freshman's scene. The beds that stopped on it end at `examRoom` (Marston's hum) or `gradeReveal` |
+| `blobYawn` | none | The pocket is cut; the music-box tag moves to `dropQuivers` |
 
 ## Structure by section
 

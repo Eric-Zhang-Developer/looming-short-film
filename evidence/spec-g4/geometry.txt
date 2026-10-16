@@ -1,0 +1,73 @@
+## The ladder (r / birth)
+birth   0.0120  1.00×
+gulp1   0.0150  1.25×
+gulp2   0.0180  1.50×
+gulp3   0.0210  1.75×
+gulp4   0.0240  2.00×
+gulp5   0.0300  2.50×
+SHRINK[0]  0.0300  2.50×
+SHRINK[1]  0.0240  2.00×
+SHRINK[2]  0.0180  1.50×
+SHRINK[3]  0.0120  1.00×
+SHRINK[4]  0.0090  0.75×
+SHRINK[5]  0.0070  0.58×
+SHRINK[6]  0.0050  0.42×
+SHRINK[7]  0.0040  0.33×
+SHRINK[8]  0.0015  0.13×
+
+## Home shots after the G4 re-ladder (gulp2 moves s04 → s06, gulps 3 and 4 are the two blinds)
+s03 laptop S  3.00  units 1×  3.00  → gulp1  3.75
+s03 shadow centre on wall (1×)  0.127  0.028
+s04 zB  0.19  S  3.20  units  4.0
+s04 zB  0.2  S  3.62  units  4.5
+s04 zB  0.21  S  4.17  units  5.2
+s05 S  5.33  units at 1.25×  6.7
+s05 re-solved laptop z  0.4148  S  6.40  units  8.00
+s06 S  4.06  units 1.25×  5.1  → gulp2 1.5×  6.1
+s06 lamp pool 1.25×  1.37   x_m 1.25×  0.0034   x_m 1.5×  0.0069
+s07 S  10.0  units 1.5×  15.0  → blind 1 1.75×  17.5  → blind 2 2×  20.0
+s07 sun elev  12°  patch z  0.193  …  0.447
+s07 sun elev  13°  patch z  0.178  …  0.411
+s07 sun elev  14°  patch z  0.164  …  0.381
+s08 S  6.3  units 2×  12.6
+
+## Overhead pools (sensor tube 0.127 above the desk)
+r  0.0300  pool  1.31×
+r  0.0240  pool  1.23×
+r  0.0180  pool  1.17×
+r  0.0120  pool  1.10×
+r  0.0090  pool  1.08×
+r  0.0070  pool  1.06×
+r  0.0050  pool  1.04×
+r  0.0040  pool  1.03×
+home lamp at s18 (shade mouth 0.056), r 0.004:  1.08×
+
+## Runtime budget (s)
+s00      0  →     4
+s01      4  →    10
+s02     10  →    20
+s03     20  →    26
+s04     26  →    34
+s05     34  →    42
+s06     42  →    50
+s07     50  →    62
+s08     62  →    68
+s09     68  →    74
+s10     74  →    80
+s11     80  →    86
+s12     86  →    96
+s13     96  →   103
+s14    103  →   108
+s15    108  →   122
+s16    122  →   146
+s17    146  →   164
+s17b   164  →   173
+s17c   173  →   178
+s18    178  →   195
+total  195  = 3:15
+
+## The math on screen (checked numerically; h = 1e-5 central differences)
+∫ x eˣ dx = x eˣ − eˣ + C   ok: d/dx matches x eˣ at  -2, -0.5, 0, 0.7, 1.3, 2.5
+crossed-out x eˣ + eˣ        wrong: its derivative is x eˣ + 2eˣ, e.g. at 1:  8.1548  vs  2.7183
+Σ n/2ⁿ: ratio (n+1)/2n at n = 1, 10, 100, 1000:  1.0000, 0.5500, 0.5050, 0.5005  → ½ < 1, converges (partial sum to 200:  2.000000000000)
+∫ x e²ˣ dx = (x/2)e²ˣ − ¼e²ˣ + C   ok: d/dx matches x e²ˣ at  -2, -0.5, 0, 0.7, 1.3, 2.5

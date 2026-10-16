@@ -1,5 +1,6 @@
 // node tools/check_timeline.mjs [--file=path/to/timeline.js]
-// Fails on gaps, overlaps, total outside 180 ±5 s, duplicate beat names, beats outside their shot.
+// Fails on gaps, overlaps, total outside TARGET ±5 s, duplicate beat names, beats outside their shot.
+// TARGET is the director's runtime: 3:15, inside his 3:10–3:20 (G4, 2026-10-15; was 180).
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -11,6 +12,7 @@ const errs = [];
 const seen = new Map();
 const rows = [];
 const E = 1e-6;
+const TARGET = 195;
 let end = 0;
 for (const s of SHOTS) {
   if (s.start > end + E) errs.push(`gap: ${end}s to ${s.start}s before ${s.id}`);
@@ -24,7 +26,7 @@ for (const s of SHOTS) {
     rows.push(`        ${name.padEnd(20)} local ${tl.toFixed(1).padStart(5)}  global ${(s.start + tl).toFixed(1).padStart(6)}`);
   }
 }
-if (Math.abs(end - 180) > 5) errs.push(`total ${end}s is outside 180 ±5 s`);
+if (Math.abs(end - TARGET) > 5) errs.push(`total ${end}s is outside ${TARGET} ±5 s`);
 if (DURATION !== end) errs.push(`DURATION ${DURATION} does not match end of last shot ${end}`);
 
 console.log(rows.join('\n'));
