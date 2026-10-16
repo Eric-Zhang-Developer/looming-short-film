@@ -6,6 +6,9 @@
 ## OVERNIGHT RUN (2026-10-15 → 16): director asleep. Read this first.
 Brief: G4 notes in `docs/notes/g4-2026-10-15.md`; decisions in doc 07 ("G4 on v1-animatic"). Goal: **v2 complete, then v3 close to complete**, both rendered (1080p, chunked), by morning. 4K stays Saturday.
 **Authority:** freeze art by rule (most cut-paper, most Marston, simplest), and log every freeze plus its alternatives in `docs/notes/morning-picks.md`. No public actions (no tags, releases or PRs to main). No story changes beyond G4. The director does not review between v2 and v3.
+**Usage (director: "go sparingly on the subagents, don't go ham, cause my usage limit"):** at most 2 subagents running at once; Sonnet for routine painter, docs and fix tasks, Opus only for design-heavy ones. Queue rather than parallelise. Loop heartbeat: 30 min.
+**In flight:** `spec-g4`, `cut-gator`. **Queued:** `asset-home-kit`, `asset-marston-kit` (Sonnet), then the props and boil kits, then v2 shot rebuilds.
+**Watchdog:** a scratchpad `watchdog.sh` logs to `out/watchdog.log` and kills headless Chrome when free disk < 3 GB or swap > 12 GB.
 **Machine:** at most 2 Chromes; render with `--w ≤ 960` except final renders; full renders chunked (the script is in the making-of ch 10; the render script is in the session scratchpad). Stop builders if free disk < 3 GB or swap > 12 GB.
 **Plan:**
 1. **Wave 5a (no Chrome):**
