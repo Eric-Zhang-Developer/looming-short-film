@@ -12,3 +12,7 @@
 - s06: the real-scale lamp had to be 120 cm to clear his head. Restage, or use a desk lamp from the kit.
 - s01: the skyline and oaks are proxies. Use the marston_ext_kit oak canopy and night layers.
 - Docs: README §2, assets.md and the s18 spec still describe the old desk unit.
+- s16 inserts: the writing hand is a lime-green placeholder blob. Use the gator's arm or hand piece (green felt plus the cream cuff) holding the pen.
+- s16: the six-step shrink is hard to follow in the wide shot. Hold each step, or cut closer.
+- s13: very dark.
+- Custodian, cart, neighbour and top-view figures: still proxies (no sheets painted). Paint one small cast kit if time allows.
