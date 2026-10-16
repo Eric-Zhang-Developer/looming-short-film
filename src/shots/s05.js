@@ -1,8 +1,9 @@
-// s05 · Game night: a roommate walks through it (docs/shots/s05.md). Animatic blocking on proxies until art is frozen.
-// The living room, locked camera. The Student on a floor cushion at frame right holds the phone (the key, README §4)
-// and never looks up; the Exam sits on the coffee table 5 cm from it, so its wall shadow is 8.0× by geometry
-// (0.40 / 0.05). roommate_round sits inside that shadow on the couch; roommate_tall gets up at 3.0 and walks straight
-// through it at z 0.16. What moves: all puppets on 2s (the Student, both roommates, the Exam), the TV flicker on 1s,
+// s05 · Game night: a roommate walks through it (docs/shots/s05.md, G4). v2: the living room dressed from the frozen
+// home_kit (planked floor, rug, door, poster, window, floor lamp) with the couch and coffee table at real height (their
+// apt_furniture_sheet isn't frozen: still proxies). The Student on a floor cushion at frame right games on his laptop
+// (the key, README §4; its screen glows) and never looks up; the 1.25× Exam sits on the coffee table, so its wall
+// shadow is S 6.40, 8.0 units. roommate_round sits inside that shadow on the couch; roommate_tall gets up at 3.0 and
+// walks straight through it at z 0.16. What moves: all puppets on 2s (the Student, both roommates, the Exam), the TV flicker on 1s,
 // the window ramp at 24, boil 10/s. The camera, the phone and the blob don't move.
 import * as THREE from 'three';
 import { makePaper, boilSeed } from '../paper.js';
@@ -13,18 +14,23 @@ import { hash, mulberry32, seedOf } from '../core/rng.js';
 import { makeGator } from '../characters/gator.js';
 import { makeRoommateTall, makeRoommateRound } from '../characters/roommates.js';
 import { POSES, specPose, walk } from '../characters/poses.js';
-import { makeExam } from '../characters/exam.js';
+import { createBlob } from '../blob.js';
 
 const DEG = Math.PI / 180;
 const F = (s) => Math.round(s * 12) / 12;  // spec times (2.67, 3.33, 4.83 ...) are 2s drawings: snap them to twelfths
-const L = [0.075, 0.035, 0.40];            // the phone: key light (spec)
-const B = [0.060, 0.030, 0.35];            // blob contact point on the table top (its centre is r = 0.012 above)
+const BLOB_R = { start: 0.015 };          // METER.gulp1 (README §1): 1.25× all shot
+// Real heights at the scale table's 0.055 m per real m: couch seat and coffee-table top 45 cm, couch back 88 cm,
+// the pulled-down couch cushion the laptop sits on 18 cm.
+const SEAT = 0.025, BACK = 0.048, TABLE = 0.025, CUSHION = 0.010;
+const TABLE_TRIM = 0.3;                    // coffee-table fascia albedo (ponytail: per-object exposure, by eye)
+const L = [0.075, CUSHION + 0.0075, 0.4148]; // the laptop screen's centre: the key (spec x, z: S = 0.4148 / 0.0648 = 6.40)
+const B = [0.060, TABLE, 0.35];            // blob contact point on the table top
 const CAM = { pos: [-0.04, 0.17, 1.15], look: [-0.04, 0.10, 0.15] };
 const KEY = 0.40;                          // phone spot, cd: a cream wall 0.42 m away lands lit but below white (NoToneMapping)
 const TV = 0.36;                           // 25% of the key's irradiance at the wall: 0.25 · 0.40 / 0.42² · 0.80²
 const TALL_S = 0.9;                        // roommates_sheet's tall is 0.111 m standing at scale 1; the spec wants head top 0.10
 const WALK = { x0: -0.15, x1: 0.30, t0: F(3.33), t1: F(6.33), z: 0.16 };
-const STUDENT_HIP_Y = 0.012;               // sits on the cushion, so the head top lands at the spec's 0.06
+const STUDENT_HIP_Y = 0.012;               // sits on his floor cushion
 const lerp01 = (u) => u;
 
 // A path rectangle that fills its canvas has no edge to tear, so it's inset 4% and the size grown to keep [w, h] (as s03).
@@ -63,22 +69,42 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
   // ---- Wall (z 0): apt_wall, cream cardstock x −0.6…0.4, y −0.02…0.32, the shadow's receiver. Its edges are out of frame.
   piece('apt_wall', { ...torn(1.0, 0.34), color: PALETTE.cream, res: 2048 }, { at: [-0.1, 0.15, 0], boil: false }).castShadow = false;
-  // Floor (y 0, z 0…0.5): kraft.
-  piece('apt_floor', { ...torn(1.0, 0.5), color: PALETTE.kraft, weight: 'kraft', res: 2048 }, { at: [-0.1, 0, 0.25], flat: true, boil: false }).castShadow = false;
-  // Window (z 0.002, x 0.15…0.21, y 0.17…0.23): a tissue pane. ponytail: no hole in the wall, so the dusk light is front fill.
-  piece('apt_window', { ...torn(0.06, 0.06), color: PALETTE.cream, weight: 'tissue' }, { at: [0.18, 0.20, 0.002] }).castShadow = false;
+  // Floor (y 0, z 0…0.66): home_kit's plank strip tiled, the same boards as the bedroom.
+  const home = await assets.load('home_kit');
+  const planks = (() => {
+    const bmp = home.pieces.floor_strip, [u0, v0, u1, v1] = home.visible.floor_strip, E = 4, nx = 4, ny = 12;
+    const tw = Math.round((u1 - u0) * bmp.width) - 2 * E, th = Math.round((v1 - v0) * bmp.height) - 2 * E;
+    const c = Object.assign(document.createElement('canvas'), { width: tw * nx, height: th * ny }), g = c.getContext('2d');
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) g.drawImage(bmp, u0 * bmp.width + E, v0 * bmp.height + E, tw, th, i * tw, j * th, tw, th);
+    return c;
+  })();
+  piece('apt_floor', { art: planks, size: [1.0, 0.66], weight: 'kraft', res: 2048 }, { at: [-0.1, 0, 0.33], flat: true, boil: false }).castShadow = false;
+  // Room dressing (home_kit), all at their scale-table sizes and out of the loom's way: door far left, floor lamp by the
+  // couch, a poster, the window at real sill height (the spec's y 0.17–0.23 was the old giant scale), the rug in
+  // the walk lane. ponytail: no hole behind the window, so the dusk light is front fill (as v1).
+  const kit = (name, at, o = {}) => { const { opts, vis } = art(home, name, o.weight ? { weight: o.weight } : {}); const m = piece(`kit-${name}`, opts, { at, vis, tilt: !o.flat, flat: o.flat, boil: true }); m.castShadow = false; return m; };
+  kit('door', [-0.33, 0.055, 0.002]);
+  kit('poster_a', [-0.24, 0.085, 0.002]);
+  kit('window_glass', [0.21, 0.081, 0.0015], { weight: 'tissue' });
+  kit('window_frame', [0.21, 0.080, 0.003]);
+  kit('floor_lamp', [-0.215, 0.044, 0.03]);
+  kit('bookshelf', [0.30, 0.0495, 0.012]);
+  kit('rug', [-0.06, 0.0006, 0.19], { flat: true });   // in the walk lane: under the key's graze it burnt white
 
   // ---- Couch (z 0.02…0.10, x −0.24…0.04, seat top 0.035, back top 0.075): the art as the back, behind the roommates
   // (z 0.05); a kraft seat-cushion strip in front (z 0.10) hides their legs.
   const fur = await assets.load('apt_furniture_sheet');
-  { const { opts, vis } = art(fur, 'apt_couch'); piece('apt_couch', opts, { at: [-0.10, 0.0375, 0.05], tilt: true, vis, fit: [0.28, 0.075] }); }
-  piece('couch_seat', { ...torn(0.28, 0.035), color: PALETTE.kraft, weight: 'kraft' }, { at: [-0.10, 0.0175, 0.10], tilt: true });
+  { const { opts, vis } = art(fur, 'apt_couch'); piece('apt_couch', opts, { at: [-0.105, BACK / 2, 0.05], tilt: true, vis, fit: [0.13, BACK] }); }
+  piece('couch_seat', { ...torn(0.13, SEAT), color: PALETTE.kraft, weight: 'kraft' }, { at: [-0.105, SEAT / 2, 0.10], tilt: true });
   const tableTop = '#' + new THREE.Color(PALETTE.kraft).lerp(new THREE.Color(PALETTE.navy), 0.5).getHexString();  // the key grazes it at 5°: kraft would burn out
-  // ---- Coffee table (x 0…0.14, top y 0.03, z 0.30…0.37): the art as the front fascia, a kraft top.
-  { const { opts, vis } = art(fur, 'apt_coffee_table', { weight: 'kraft' }); piece('apt_coffee_table', opts, { at: [0.07, 0.015, 0.37], tilt: true, vis, fit: [0.14, 0.03] }); }
-  piece('table_top', { ...torn(0.14, 0.07), color: tableTop, weight: 'kraft' }, { at: [0.07, 0.03, 0.335], flat: true }).castShadow = false;
-  // ---- The Student's floor cushion (z 0.405).
+  // ---- Coffee table (x 0.025…0.080, top y 0.025, z 0.33…0.36: 1.2 m × 0.6 m, 45 cm): the art as the front fascia, a kraft top.
+  // Its fascia stands 5 cm from the key and burns to white (inverse square): an albedo trim, as s04's stool.
+  { const { opts, vis } = art(fur, 'apt_coffee_table', { weight: 'kraft' }); piece('apt_coffee_table', opts, { at: [0.0525, TABLE / 2, 0.36], tilt: true, vis, fit: [0.055, TABLE] }).material.color.setScalar(TABLE_TRIM); }
+  piece('table_top', { ...torn(0.055, 0.03), color: tableTop, weight: 'kraft' }, { at: [0.0525, TABLE, 0.345], flat: true }).castShadow = false;
+  // ---- The Student's floor cushion (z 0.405), and the couch cushion pulled to the floor that the laptop sits on.
   piece('cushion', { ...ellipse(0.06, 0.014), color: PALETTE.kraft, weight: 'kraft' }, { at: [0.12, 0.007, 0.405], tilt: true }).castShadow = false;
+  piece('laptop_cushion', { ...torn(0.032, CUSHION), color: '#' + new THREE.Color(PALETTE.navy).lerp(new THREE.Color(PALETTE.kraft), 0.3).getHexString(), res: 256 },
+    { at: [L[0] - 0.002, CUSHION / 2, L[2] + 0.009], tilt: true }).castShadow = false;
 
   // ---- Roommates. roommate_tall at x −0.15 (feet on the floor when standing), roommate_round at x −0.06: the root is
   // its bottom, so the hidden 3 cm sit behind the seat strip and the head top lands at the spec's 0.08.
@@ -86,7 +112,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const tall = await makeRoommateTall(ctx, { scale: TALL_S, res: 512 });
   const round = await makeRoommateRound(ctx, { res: 512 });
   scene.add(tall.group, round.group);
-  round.group.position.set(-0.06, 0.005, 0.09);
+  round.group.position.set(-0.06, SEAT - 0.03, 0.09);   // its bottom 3 cm behind the seat strip
   // Controllers (apt_props_sheet) in the near hands; the tall one's goes to the couch arm at 2.67.
   const props = await assets.load('apt_props_sheet');
   const ctrl = (layer, name, parent, at = [0, 0, 0]) => {
@@ -97,10 +123,10 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   };
   ctrl('ctrl_round', 'controller_1', round.hand);
   const tallCtrlHand = ctrl('ctrl_tall_hand', 'controller_2', tall.hand);
-  const tallCtrlCouch = ctrl('ctrl_tall_couch', 'controller_2', scene, [-0.20, 0.038, 0.098]);
+  const tallCtrlCouch = ctrl('ctrl_tall_couch', 'controller_2', scene, [-0.165, SEAT + 0.003, 0.098]);
 
   // ---- The Student (side rig, mirrored to face frame-left), on the cushion, body plane z 0.405. The hand is placed so the
-  // fingertip lands on the phone at L: the phone is in his hand.
+  // fingertip lands on the laptop's keyboard, just in front of the screen.
   const gator = await makeGator(ctx, { res: 1024 });
   gator.group.scale.x = -1;
   scene.add(gator.group);
@@ -110,18 +136,40 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   gator.group.position.set(0, STUDENT_HIP_Y, 0.405);
   gator.group.updateMatrixWorld(true);
   const tip = gator.hand.getWorldPosition(new THREE.Vector3());
-  gator.group.position.x = L[0] - tip.x;
+  gator.group.position.x = L[0] + 0.008 - tip.x;
   const STUDENT_POSE = { flat: studentPose(0), flick: studentPose(2) };
 
-  // The phone: an upright card at L just behind the near arm, with a cyan screen on its face. Nothing on it casts.
-  const study = await assets.load('study_props_sheet');
-  { const { opts, vis } = art(study, 'phone_face'); piece('phone', opts, { at: [L[0], L[1], L[2] + 0.002], vis, rotZ: 80 * DEG, boil: false }).castShadow = false; }
-  const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.0125, 0.0058), new THREE.MeshBasicMaterial({ color: PALETTE.phone }));
-  screen.rotation.z = 80 * DEG; screen.position.set(L[0], L[1], L[2] + 0.0035);
-  scene.add(screen);
+  // The laptop (home_kit) on the cushion: screen toward his face (+x), turned 40° toward camera, the screen glowing a game
+  // (no text). Nothing on it casts.
+  const laptop = new THREE.Group();
+  laptop.position.set(L[0], CUSHION, L[2]);
+  laptop.rotation.y = 50 * DEG;
+  scene.add(laptop);
+  const lap = (name, w, y) => {
+    const { opts, vis } = art(home, name), [sw] = home.sizes[name], vw = sw * (vis[2] - vis[0]), k = w / vw;
+    const m = piece(`laptop-${name}`, { ...opts, size: opts.size.map((v) => v * k) }, { at: [0, y, name === 'laptop_base' ? 0.004 : 0], vis, parent: laptop });
+    m.castShadow = false;
+    return opts.size[1] * k * (vis[3] - vis[1]);
+  };
+  lap('laptop_base', 0.018, 0.0028);
+  const scrH = lap('laptop_screen', 0.0185, 0.0015 + 0.006);
+  const gameArt = (() => {
+    const c = Object.assign(document.createElement('canvas'), { width: 128, height: 80 }), g = c.getContext('2d');
+    const col = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
+    const gr = g.createLinearGradient(0, 0, 0, 80); gr.addColorStop(0, PALETTE.phone); gr.addColorStop(1, col('phone', 'cream', 0.5));
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 80);
+    g.fillStyle = col('navy', 'phone', 0.3);
+    for (const [x, y, w] of [[6, 62, 44], [60, 48, 30], [96, 34, 26], [0, 74, 128]]) g.fillRect(x, y, w, 6);
+    g.fillStyle = PALETTE.cream; g.beginPath(); g.arc(72, 41, 5, 0, 7); g.fill();
+    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  })();
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.0185 * 0.78, scrH * 0.70), new THREE.MeshBasicMaterial({ map: gameArt }));
+  glow.position.set(0, 0.0075 + scrH * 0.03, 0.0006);
+  laptop.add(glow);
 
   // ---- The Exam on the coffee table.
-  const exam = makeExam({ shot: 's05', seed: 1 });
+  const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
   scene.add(exam.mesh, exam.stain);
   exam.mesh.position.set(...B);
   exam.stain.position.set(B[0], B[1] + 0.0003, B[2]);
@@ -132,8 +180,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // them, no shadow, so they reach the roommates and not the wall. Window: s04's dusk-to-night ramp, front fill here.
   const spot = phoneLight({ angle: 1.0, penumbra: 0.4, distance: 0.8, intensity: KEY });
   spot.position.set(...L);
-  const C = new THREE.Vector3(B[0], B[1] + exam.radius, B[2]), P = new THREE.Vector3(...L);
-  aim(spot, new THREE.Vector3().subVectors(C, P).multiplyScalar(-P.z / (C.z - P.z)).add(P));  // wall hit (−0.045, 0.091, 0)
+  const C = new THREE.Vector3(B[0], B[1] + 1.08 * BLOB_R.start, B[2]), P = new THREE.Vector3(...L);
+  aim(spot, new THREE.Vector3().subVectors(C, P).multiplyScalar(-P.z / (C.z - P.z)).add(P));  // the blob centre's wall hit
   const face = new THREE.PointLight(PALETTE.phone, 0.03, 0.06, 2);
   face.position.set(L[0] - 0.006, L[1] + 0.006, L[2] + 0.01);
   const tvColor = new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.cream), 0.6);

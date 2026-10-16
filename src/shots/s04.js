@@ -1,35 +1,47 @@
-// s04 · The fridge dodge (docs/shots/s04.md). Animatic blocking: proxies until art is frozen, shared rigs.
-// Locked camera. Key: the fridge light just outside the mouth, aimed every frame along L → blob to its wall hit, so the
-// blob's shadow on the kitchen wall is 4.17× → 5.0× → 6.25× as it scoots toward him. He kneels in front of the light
-// (z 0.30 > L.z 0.25), so he throws nothing on the wall. Characters and props on 2s, light at 24, boil 10/s.
+// s04 · The fridge dodge (docs/shots/s04.md, G4). v2 on the frozen kitchen_kit: a counter run along the back wall
+// (sink under a window, counter, stove with the microwave over it, upper cabinets, tiled backsplash) and a full-height
+// fridge standing out at the right, turned to show its open, lit inside. He stands at it, bent in, sorting jars.
+// Key: the fridge light just outside the mouth, aimed every frame along L → blob to its wall hit. The blob holds 1.25×
+// and scoots toward the light twice, so its shadow on the kitchen wall grows 4.0 → 4.5 → 5.2 units by the light rule
+// alone (no gulp: he never looks at it). He stands in front of the light (z 0.30 > L.z), so he throws nothing on the wall.
+// Sizes are the scale table's (evidence/asset-home-kit/scale_table.md: 1 real m = 0.055 film m against the 0.096 m
+// gator), so the counter is at his chest and the fridge is taller than he is. Characters on 2s, light at 24, boil 10/s.
 import * as THREE from 'three';
-import { makePaper } from '../paper.js';
+import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
 import { phoneLight, dawnLight, ambient, aim } from '../lights.js';
 import { kf, onTwos } from '../core/ease.js';
 import { mulberry32, seedOf } from '../core/rng.js';
+import { createBlob } from '../blob.js';
 import { makeGator, hipHeight } from '../characters/gator.js';
-import { POSES, specPose } from '../characters/poses.js';
-import { makeExam } from '../characters/exam.js';
+import { specPose } from '../characters/poses.js';
 
 const ID = 's04', DEG = Math.PI / 180;
-const CAM = new THREE.Vector3(-0.11, 0.15, 1.0), LOOK = new THREE.Vector3(-0.11, 0.12, 0.12);
-const L = new THREE.Vector3(0.030, 0.035, 0.25), FILL = new THREE.Vector3(0.065, 0.035, 0.25);
-const SEAT_Y = 0.045, STOOL_Z = 0.189;      // stool cut at the back of its z 0.19..0.21, so the blob is never behind it
-const BODY_Z = 0.30, HAND_Z = BODY_Z + 0.013; // near arm +0.012, hand +0.001 (contracts §characters)
-const HIP_X = 0.005;                          // body center lands at x ≈ 0.01
-const PROP_Z = 0.245;                         // inside the spec's 0.24..0.26; at L.z exactly the jars would be edge-on to both lights
-const TOP_Y = 0.05;
-const NEAR_TRIM = 0.15;                        // see the stool                           // fridge top
-// Blob center [x, z] by local t (spec Exam table); y is SEAT_Y + r.
+const BLOB_R = { start: 0.015 };                               // METER.gulp1 (README §1): 1.25× all shot
+const CAM = new THREE.Vector3(-0.092, 0.068, 0.86), LOOK = new THREE.Vector3(-0.092, 0.072, 0);   // below the ceiling, pitched up ~0.3°: sink at the left edge, fridge at the right
+const CEIL = 0.13;
+const COUNTER_Y = 0.0495;                                     // 91 cm: the counter_run's painted top
+const UPPER_Y = 0.078;                                        // upper cabinets' and microwave's bottom (1.42 m)
+const SEAT_Y = 0.042;                                         // bar-stool seat, 76 cm
+// Fridge light: the spec's x and z (S 3.20 → 3.62 → 4.17), at the middle shelf, 5 mm over the seat. The spec puts it
+// 10 mm under the seat; there the 5.2-unit shadow rode up so far its eyes went onto the navy ceiling. S is z-only.
+const L = new THREE.Vector3(0.030, SEAT_Y + 0.005, 0.2763);
+const KEY_I = 0.3, FILL_K = 0.2, FACE_I = 0.014;              // spot (cd), interior fill as a fraction, face fill
+const AMB = 0.7;                                              // ambient: 70% of s02's
+const STOOL_Z = 0.189;                                        // stool cut at the back of its z 0.19..0.21, so the blob is never behind it
+const NEAR_TRIM = 0.15;                                       // albedo trim on the stool, 5–8 cm from the key
+// Fridge: centre, yaw (its mouth turns to −x and 35° toward camera), height. Door hinged on its front edge, swung open.
+const FRIDGE = { x: 0.056, z: 0.276, yaw: -42 * DEG, h: 0.100, doorOpen: 150 * DEG };
+const BODY_Z = 0.30, HIP_X = -0.002;                           // the Student's body plane and root x
+const HAND_DZ = 0.013;                                        // near arm +0.012, hand +0.001 (contracts §characters)
+// Blob contact [x, z] by local t (spec Exam table).
 const BLOB = [[0, [-0.015, 0.19]], [2.17, [-0.015, 0.19]], [2.33, [-0.017, 0.20]], [5.17, [-0.017, 0.20]], [5.33, [-0.020, 0.21]]];
 const step = (t, keys) => keys.reduce((v, [k, x]) => (t >= k ? x : v), keys[0][1]);
 const EYES = [[0, 'open'], [1.5, 'side'], [2.17, 'open'], [5.0, 'closed'], [5.83, 'side'], [6.5, 'closed'], [7.0, 'open']];
 const MOUTH = [[0, 'neutral'], [1.67, 'o'], [2.17, 'neutral'], [5.0, 'smile'], [5.83, 'neutral'], [6.5, 'smile']];
 const BLOB_EYES = [[0, 'side'], [5.0, 'closed'], [5.5, 'open'], [5.83, 'side']];
 
-// A shape that fills its canvas has no edge to tear, so rects are inset by 4% of the long side (as s01).
-const PAD = 0.04;
+const PAD = 0.04;   // a shape that fills its canvas has no edge to tear, so rects are inset 4% of the long side
 function torn(w, h) {
   const m = PAD * Math.max(w, h), W = w + 2 * m, H = h + 2 * m, u = m / W, v = m / H;
   return { path: [[u, v], [1 - u, v], [1 - u, 1 - v], [u, 1 - v]], size: [W, H] };
@@ -37,52 +49,60 @@ function torn(w, h) {
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const col = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
-  const tiltOf = (k) => { const r = mulberry32(seedOf(ID, k)); return [(2 * r() - 1) * 1.5 * DEG, (2 * r() - 1) * 1.5 * DEG, 0]; };
+  const tiltOf = (k) => { const r = mulberry32(seedOf(ID, k)); return [(2 * r() - 1) * 1.2 * DEG, (2 * r() - 1) * 1.2 * DEG, 0]; };
   scene.background = new THREE.Color(PALETTE.navy);
   camera.position.copy(CAM);
   camera.lookAt(LOOK);
 
   // ---------- paper helpers ----------
-  const boiling = [];  // [mesh, seed => PaperSheet], re-torn every boil step
+  const boiling = [];
   const paper = (key, opts, mat) => {
     const make = (s) => makePaper({ ...opts, key: `${ID}-${key}`, seed: s });
     const mesh = paperMesh(make(0), mat);
+    mesh.castShadow = false;   // only the blob (and the wall, for the window) cast: set below
     boiling.push([mesh, make]);
     return mesh;
   };
-  // A plane in a group whose origin is its center: the group is placed and turned, the mesh carries the tilt.
-  const place = (mesh, at, { tilt = null, rot = null } = {}) => {
+  const group = (mesh, at, { tilt = null, rot = null, parent = scene } = {}) => {
     const g = new THREE.Group();
     g.add(mesh); g.position.set(...at);
     if (rot) g.rotation.set(...rot);
     if (tilt) mesh.rotation.set(...tiltOf(tilt));
-    scene.add(g);
-    return { g, mesh };
+    parent.add(g);
+    return g;
   };
-  const DISC = Array.from({ length: 16 }, (_, i) => [0.5 + 0.4 * Math.cos(i * Math.PI / 8), 0.5 + 0.4 * Math.sin(i * Math.PI / 8)]);
-  const knobAt = (key, d, at) => place(paper(key, { path: DISC, color: knob, size: [d / 0.8, d / 0.8], res: 128 }), at, { tilt: key });
   const rect = (key, color, [w, h], at, o = {}) =>
-    place(paper(key, { ...torn(w, h), color, weight: o.weight ?? 'cardstock', res: o.res ?? 512 }, o.mat), at,
-      { tilt: o.tilt === false ? null : key, rot: o.rot });
-  // A cut piece fitted so its visible (opaque) box is [w, h] (one may be null: keep the art's aspect); origin at that
-  // box's center. The spec's sizes win over PIECES, so a proxy is scaled to them (real art at the right aspect scales uniformly).
+    group(paper(key, { ...torn(w, h), color, weight: o.weight ?? 'cardstock', res: o.res ?? 512 }, o.mat), at,
+      { tilt: o.tilt === false ? null : key, rot: o.rot, parent: o.parent });
+  // A cut piece whose visible (opaque) box is [w, h] (null keeps the art's aspect), its origin at that box's
+  // [ax, ay] (0..1 from the left / bottom; default the centre).
   const cut = (a, p, [w, h], key, o = {}) => {
     const [sw, sh] = a.sizes[p], [u0, v0, u1, v1] = a.visible[p], vw = sw * (u1 - u0), vh = sh * (v1 - v0);
-    const sx = w != null ? w / vw : h / vh, sy = h != null ? h / vh : sx;
+    const sx = w != null ? w / vw : h / vh, sy = h != null ? h / vh : sx, [ax, ay] = o.anchor ?? [0.5, 0.5];
     const mesh = paper(key, { art: a.pieces[p], size: [sw, sh], weight: o.weight ?? 'cardstock', res: o.res ?? 512 }, o.mat);
     mesh.scale.set(sx, sy, 1);
-    mesh.position.set(-((u0 + u1) / 2 - 0.5) * sw * sx, ((v0 + v1) / 2 - 0.5) * sh * sy, 0);
+    mesh.position.set(-((u0 + u1) / 2 - 0.5) * sw * sx + (0.5 - ax) * vw * sx, ((v0 + v1) / 2 - 0.5) * sh * sy + (0.5 - ay) * vh * sy, 0);
     const inner = new THREE.Group(); inner.add(mesh);
-    if (o.tilt !== false) inner.rotation.set(...tiltOf(key));
-    const g = new THREE.Group(); g.add(inner); scene.add(g);
-    return { g, inner, mesh };
+    if (o.tilt) inner.rotation.set(...tiltOf(key));
+    const g = new THREE.Group(); g.add(inner); (o.parent ?? scene).add(g);
+    return { g, inner, mesh, size: [vw * sx, vh * sy] };
+  };
+  // A piece's visible box tiled edge to edge into one canvas, [nx, ny] copies (the floor).
+  const tiled = (a, p, nx, ny) => {
+    const bmp = a.pieces[p], [u0, v0, u1, v1] = a.visible[p], E = 4;   // E px trimmed off each side: the painted rim would seam
+    const tw = Math.round((u1 - u0) * bmp.width) - 2 * E, th = Math.round((v1 - v0) * bmp.height) - 2 * E;
+    const c = Object.assign(document.createElement('canvas'), { width: tw * nx, height: th * ny }), g = c.getContext('2d');
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) g.drawImage(bmp, u0 * bmp.width + E, v0 * bmp.height + E, tw, th, i * tw, j * th, tw, th);
+    return c;
   };
 
-  const [furn, props] = await Promise.all([assets.load('apt_furniture_sheet'), assets.load('apt_props_sheet')]);
-  const cream = PALETTE.cream, cab = col('cream', 'kraft', 0.25), knob = col('kraft', 'navy', 0.35), grey = col('cream', 'navy', 0.15);
+  const [kit, home] = await Promise.all([assets.load('kitchen_kit'), assets.load('home_kit')]);
+  const cream = PALETTE.cream;
 
-  // ---------- wall (z 0): apt_kitchen plate with the window hole; the shadow receiver, so it is never tilted ----------
-  const WALL = { x0: -0.6, x1: 0.4, y0: -0.02, y1: 0.32 }, HOLE = { x0: 0.02, x1: 0.08, y0: 0.12, y1: 0.18 };
+  // ---------- room shell: back wall (z 0, the shadow receiver, never tilted) with the window hole over the sink ----------
+  const SINK_X = -0.31;
+  const WALL = { x0: -0.6, x1: 0.09, y0: -0.02, y1: CEIL + 0.02 };
+  const HOLE = { x0: SINK_X - 0.019, x1: SINK_X + 0.019, y0: 0.087, y1: 0.120 };
   const wallArt = (() => {
     const W = 2048, H = Math.round(W * (WALL.y1 - WALL.y0) / (WALL.x1 - WALL.x0));
     const c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
@@ -91,167 +111,183 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     g.clearRect(px(HOLE.x0), py(HOLE.y1), px(HOLE.x1) - px(HOLE.x0), py(HOLE.y0) - py(HOLE.y1));
     return c;
   })();
-  place(paper('apt_kitchen', { art: wallArt, size: [WALL.x1 - WALL.x0, WALL.y1 - WALL.y0], res: 2048 }),
-    [(WALL.x0 + WALL.x1) / 2, (WALL.y0 + WALL.y1) / 2, 0]);
+  const wall = paper('apt_wall', { art: wallArt, size: [WALL.x1 - WALL.x0, WALL.y1 - WALL.y0], res: 2048 });
+  group(wall, [(WALL.x0 + WALL.x1) / 2, (WALL.y0 + WALL.y1) / 2, 0]);
+  // Side wall behind the fridge (x 0.09), the corner of the L; ceiling (Night Navy, facing down); floor (the kit's
+  // checker strip, tiled, laid flat).
+  rect('side-wall', col('cream', 'navy', 0.12), [0.45, CEIL + 0.02], [0.09, CEIL / 2, 0.225], { rot: [0, -Math.PI / 2, 0], tilt: false, res: 1024 });
+  rect('apt_ceiling', PALETTE.navy, [0.8, 0.8], [-0.25, CEIL, 0.4], { rot: [Math.PI / 2, 0, 0], tilt: false, res: 256 });
+  group(paper('apt_floor', { art: tiled(kit, 'floor_strip', 3, 12), size: [0.84, 0.66], weight: 'kraft', res: 2048 }), [-0.2, 0, 0.33], { rot: [-Math.PI / 2, 0, 0] });
 
-  // Upper cabinets y 0.09..0.22. The spec runs them to x 0.05, which would cover the window (x 0.02..0.08), so they stop
-  // at x 0.01. Four doors with 4 mm gaps, 4 mm off the wall, round knobs by the meeting edges.
-  const UP = { x0: -0.45, x1: 0.01, y0: 0.09, y1: 0.22 }, nUp = 4, dw = (UP.x1 - UP.x0) / nUp;
-  for (let i = 0; i < nUp; i++) {
-    const cx = UP.x0 + dw * (i + 0.5);
-    rect(`cab-up${i}`, cab, [dw - 0.004, UP.y1 - UP.y0 - 0.004], [cx, (UP.y0 + UP.y1) / 2, 0.004]);
-    knobAt(`knob-up${i}`, 0.007, [cx + (i % 2 ? -1 : 1) * (dw / 2 - 0.012), UP.y0 + 0.014, 0.008]);
+  // ---------- counter run along the back wall: sink (under the window) | counter | stove | counter ----------
+  // Base units stand at the counter's front edge (z 0.026), their painted counter tops all at COUNTER_Y. The sink's and
+  // stove's paintings carry a tap and a cooktop above that line, so they are sized by their bodies (k = body / height,
+  // measured on the cut PNGs in px).
+  const BASE_Z = 0.026, unit = (p, k, x0, key = p) => {
+    const c = cut(kit, p, [null, COUNTER_Y / k], key, { anchor: [0, 0] });
+    c.g.position.set(x0, 0, BASE_Z);
+    return x0 + c.size[0];
+  };
+  let x = unit('sink', 218 / 336, SINK_X - 0.034);
+  x = unit('counter_run', 1, x);
+  const STOVE_X0 = x;
+  x = unit('stove', 240 / 352, x);
+  const STOVE_X1 = x;
+  unit('counter_run', 1, x, 'counter_run_2');
+  // Backsplash (tiles on the wall, counter to cabinets), upper cabinets either side of the microwave over the stove.
+  for (const [i, x0] of [[0, SINK_X - 0.034], [1, SINK_X - 0.034 + 0.18]]) {
+    cut(kit, 'backsplash_strip', [null, UPPER_Y - COUNTER_Y], `backsplash_${i}`, { anchor: [0, 0] }).g.position.set(x0, COUNTER_Y - 0.002, 0.003);
   }
-  // Lower cabinets y 0..0.045, under the counter's front edge (4 mm behind it, not on the wall plate, or the 3 cm
-  // counter overhang would hang in the air).
-  const LO = { x0: -0.45, x1: 0.05 }, nLo = 5, lw = (LO.x1 - LO.x0) / nLo;
-  for (let i = 0; i < nLo; i++) {
-    const cx = LO.x0 + lw * (i + 0.5);
-    rect(`cab-lo${i}`, cab, [lw - 0.004, 0.036], [cx, 0.020, 0.026]);
-    knobAt(`knob-lo${i}`, 0.006, [cx + (i % 2 ? -1 : 1) * (lw / 2 - 0.011), 0.031, 0.029]);
-  }
-  // Counter: kraft top at y 0.045, z 0..0.03, with a 6 mm front edge.
-  rect('counter-top', PALETTE.kraft, [0.5, 0.03], [-0.2, 0.045, 0.015], { weight: 'kraft', rot: [-Math.PI / 2, 0, 0], tilt: false });
-  rect('counter-edge', col('kraft', 'navy', 0.2), [0.5, 0.006], [-0.2, 0.042, 0.0305], { weight: 'kraft', tilt: false });
+  cut(kit, 'upper_cabinets', [null, 0.0385], 'upper_l', { anchor: [1, 0] }).g.position.set(STOVE_X0 - 0.002, UPPER_Y, 0.014);
+  cut(kit, 'upper_cabinets', [null, 0.0385], 'upper_r', { anchor: [0, 0] }).g.position.set(STOVE_X1 + 0.002, UPPER_Y, 0.014);
+  cut(kit, 'microwave', [STOVE_X1 - STOVE_X0 - 0.004, null], 'microwave', { anchor: [0.5, 0] }).g.position.set((STOVE_X0 + STOVE_X1) / 2, UPPER_Y, 0.016);
+  // Window over the sink: home_kit's frame over a tissue pane, lit from behind through the hole.
+  cut(home, 'window_frame', [null, 0.044], 'window_frame').g.position.set(SINK_X, (HOLE.y0 + HOLE.y1) / 2 - 0.002, 0.003);
+  cut(home, 'window_glass', [HOLE.x1 - HOLE.x0 + 0.004, null], 'apt_window', { weight: 'tissue', mat: { translucency: 0.8 } })
+    .g.position.set(SINK_X, (HOLE.y0 + HOLE.y1) / 2, 0.0015);
+  // Counter dressing: kettle on the stove, dish rack by the sink, fruit bowl and a mug on the counter.
+  const onCounter = (p, h, cx) => cut(kit, p, [null, h], p, { anchor: [0.5, 0] }).g.position.set(cx, COUNTER_Y - 0.0015, BASE_Z + 0.002);
+  onCounter('kettle', 0.0125, STOVE_X0 + 0.016);
+  onCounter('dish_rack', 0.011, SINK_X + 0.050);
+  onCounter('fruit_bowl', 0.011, STOVE_X0 - 0.030);
+  onCounter('mug', 0.0055, STOVE_X1 + 0.022);
 
-  // Window (apt_window, procedural): tissue pane a few mm larger than the hole, two cardstock mullion strips.
-  const wx = (HOLE.x0 + HOLE.x1) / 2, wy = (HOLE.y0 + HOLE.y1) / 2;
-  rect('window-pane', cream, [0.066, 0.066], [wx, wy, 0.002], { weight: 'tissue', tilt: false, mat: { translucency: 0.8 } });
-  rect('window-mullion-v', col('cream', 'kraft', 0.4), [0.004, 0.066], [wx, wy, 0.003], { tilt: false, res: 256 });
-  rect('window-mullion-h', col('cream', 'kraft', 0.4), [0.066, 0.004], [wx, wy, 0.003], { tilt: false, res: 256 });
+  // ---------- the fridge: open body turned toward camera, door swung wide on its front edge ----------
+  const fridge = new THREE.Group();
+  fridge.position.set(FRIDGE.x, 0, FRIDGE.z);
+  fridge.rotation.y = FRIDGE.yaw;
+  scene.add(fridge);
+  const fb = cut(kit, 'fridge_body', [null, FRIDGE.h], 'fridge_body', { anchor: [0.5, 0], parent: fridge });
+  const FW = fb.size[0];
+  // A grey-cream side panel from the mouth back toward the side wall, so it reads as a box, not a card.
+  rect('fridge-side', col('cream', 'navy', 0.25), [0.034, FRIDGE.h * 0.97], [-FW / 2, FRIDGE.h * 0.49, -0.017],
+    { rot: [0, Math.PI / 2, 0], tilt: false, parent: fridge, res: 256 });
+  const hinge = new THREE.Group();
+  hinge.position.set(FW / 2, 0, 0.001);
+  hinge.rotation.y = Math.PI + FRIDGE.doorOpen;   // closed is π (lying across the mouth); it opens toward camera
+  fridge.add(hinge);
+  cut(kit, 'fridge_door', [null, FRIDGE.h], 'fridge_door', { anchor: [0, 0], parent: hinge });
+  // Shelves in fridge-local y: the painting's two glass shelves and the crisper's top.
+  const SHELF = [0.069, 0.050, 0.031].map((y) => y * FRIDGE.h / 0.1);
+  fridge.updateMatrixWorld(true);
+  const fridgePt = (u, y) => fridge.localToWorld(new THREE.Vector3(u, y, 0.003));
 
-  // Floor (apt_floor, procedural): kraft with faint board seams running across, y = 0, z 0..0.5.
-  const floorArt = (() => {
-    const W = 2048, H = 1024, c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
-    const r = mulberry32(seedOf(ID, 'floor'));
-    g.fillStyle = PALETTE.kraft; g.fillRect(0, 0, W, H);
-    g.strokeStyle = col('kraft', 'ink', 0.25); g.lineCap = 'round';
-    for (let y = 40; y < H; y += 120) {
-      g.lineWidth = 2 + 2 * r(); g.beginPath(); g.moveTo(0, y + 6 * (r() - 0.5));
-      g.quadraticCurveTo(W / 2, y + 12 * (r() - 0.5), W, y + 6 * (r() - 0.5)); g.stroke();
-    }
+  // ---------- the jars (the kit's jar ×3 at falling sizes) and the carton (the kit has none: its cereal box) ----------
+  const prop = (p, h, key) => cut(kit, p, [null, h], key, { anchor: [0.5, 0] });
+  const JARS = [
+    { h: 0.0095, home: [-0.012, SHELF[2]], spots: [[0, [-0.014, SHELF[1]]]] },
+    { h: 0.0078, home: [0.0, SHELF[2]], spots: [[0, [-0.003, SHELF[1]]], [6.17, [-0.005, SHELF[1]]]] },   // set 2 mm out of line, nudged back
+    { h: 0.0062, home: [0.011, SHELF[2]], spots: [[0, [0.007, SHELF[1]]]] },
+  ].map((j, i) => ({ ...j, ...prop('jar', j.h, `jar_${i}`) }));
+  const carton = { ...prop('cereal_box', 0.012, 'carton'), home: [0.011, SHELF[0]] };
+  { const m = prop('mug', 0.005, 'fridge_mug'); m.g.position.copy(fridgePt(-0.012, SHELF[0])); m.g.rotation.y = FRIDGE.yaw; }
+
+  // ---------- the bar stool (procedural kraft: a round seat, two splayed legs, a footrest) ----------
+  const STOOL_H = SEAT_Y * 512 / 494;   // the canvas is 512 px tall, the seat's top at px 18
+  const stoolArt = (() => {
+    const c = Object.assign(document.createElement('canvas'), { width: 256, height: 512 }), g = c.getContext('2d');
+    g.strokeStyle = col('kraft', 'navy', 0.2); g.lineCap = 'round';
+    g.lineWidth = 22; g.beginPath(); g.moveTo(80, 60); g.lineTo(40, 500); g.moveTo(176, 60); g.lineTo(216, 500); g.stroke();
+    g.lineWidth = 16; g.beginPath(); g.moveTo(58, 330); g.lineTo(198, 330); g.stroke();
+    g.fillStyle = PALETTE.kraft; g.beginPath(); g.roundRect(14, 18, 228, 52, 24); g.fill();
     return c;
   })();
-  place(paper('apt_floor', { art: floorArt, size: [1.0, 0.5], weight: 'kraft', res: 2048 }), [-0.1, 0, 0.25], { rot: [-Math.PI / 2, 0, 0] });
+  const stoolMesh = paper('kitchen_stool', { art: stoolArt, size: [0.021, STOOL_H], weight: 'kraft', res: 512 });
+  group(stoolMesh, [-0.02, STOOL_H / 2 - (STOOL_H - SEAT_Y) + 0.0002, STOOL_Z]);
+  stoolMesh.material.color.setScalar(NEAR_TRIM / 0.15 * 0.4);
 
-  // ---------- fridge (mini_fridge): x 0.035..0.10, y 0..0.05, body z 0.22..0.28, mouth facing −x ----------
-  cut(furn, 'mini_fridge', [0.065, 0.05], 'mini_fridge').g.position.set(0.0675, 0.025, 0.28);
-  rect('fridge-top', grey, [0.065, 0.06], [0.0675, TOP_Y, 0.25], { rot: [-Math.PI / 2, 0, 0], tilt: false });
-  rect('fridge-back', grey, [0.065, 0.05], [0.0675, 0.025, 0.22], { tilt: false });
-  rect('fridge-inside', cream, [0.06, 0.05], [0.10, 0.025, 0.25], { rot: [0, -Math.PI / 2, 0], tilt: false });
-  // Door: hinged on its wall-side edge (x 0.035, z 0.22). At the spec's 100° it stands in front of the stool and cuts
-  // the light to the blob's lower half (the ray to the blob's center crosses it 3 cm from the hinge at y 0.048 < 0.05),
-  // so it swings to 135°: then it sits behind the stool and every ray from L to the blob passes above it.
-  const door = cut(furn, 'mini_fridge_door', [0.06, 0.05], 'mini_fridge_door', { tilt: false });
-  door.inner.position.x = -0.03;
-  door.g.position.set(0.035, 0.025, 0.22);
-  door.g.rotation.y = (90 - 135) * DEG;
-  door.mesh.castShadow = false;  // at 135° its shadow is a big wedge beside the blob's on the wall, a second shape competing
-
-  // Stool (kitchen_stool): seat top y 0.045, 0.03 across, centered x −0.02.
-  const stool = cut(furn, 'kitchen_stool', [0.03, SEAT_Y], 'kitchen_stool', { weight: 'kraft' });
-  stool.g.position.set(-0.02, SEAT_Y / 2, STOOL_Z);
-  // Stool and door stand 5–8 cm from the key and get ~15–20× the wall's light (inverse square), which blows them to
-  // white. ponytail: an albedo trim stands in for exposure, per object; drop it if the director wants them hot.
-  for (const m of [stool.mesh, door.mesh]) m.material.color.setScalar(NEAR_TRIM);
-
-  // Fridge contents: 3 jars of falling size (spec heights) and a carton. Blank labels: the proxies carry none.
-  const JARS = [
-    { p: 'jar_l', h: 0.012, home: [0.050, 0.015], spots: [[0, 0.045]] },
-    { p: 'jar_m', h: 0.010, home: [0.065, 0.014], spots: [[0, 0.062], [6.17, 0.060]] },  // placed 2 mm out of line, nudged back
-    { p: 'jar_s', h: 0.008, home: [0.078, 0.013], spots: [[0, 0.073]] },
-  ];
-  for (const j of JARS) Object.assign(j, cut(props, j.p, [null, j.h], j.p));
-  const carton = cut(props, 'carton', [null, 0.014], 'carton');
-  const CARTON_HOME = [0.088, 0.016];
-
-  // ---------- the Student, kneeling at the mouth, facing +x (frame right) ----------
+  // ---------- the Student, standing at the mouth, bent in, facing +x ----------
   const rig = await makeGator({ assets }, { seed: 4 });
-  const HIP_Y = hipHeight(POSES.kneel_reach);
-  rig.group.position.set(HIP_X, HIP_Y, BODY_Z);
   scene.add(rig.group);
-
-  // Poses whose hand must land on a spot: lean and arm solved so the fingertip, seen from the camera, covers the spot.
-  const SH = [0.013, 0.030], ARM = 0.032;
+  const up = (o) => specPose({ leg: 0, farLeg: 8, far: -100, ...o });
+  const HIP_Y = hipHeight(up({ lean: 0 }));
+  rig.group.position.set(HIP_X, HIP_Y, BODY_Z);
+  const SH = [0.013, 0.030], ARM = 0.032, HAND_Z = BODY_Z + HAND_DZ;
   const toPlane = (p, z) => CAM.clone().add(p.clone().sub(CAM).multiplyScalar((z - CAM.z) / (p.z - CAM.z)));
-  function reachTo(x, y) {
-    const T = toPlane(new THREE.Vector3(x, y, PROP_Z), HAND_Z);
+  // The lean (10..40° forward) and arm angle that put the fingertip, seen from the camera, on world point p.
+  function reachTo(p, extra = {}) {
+    const T = toPlane(p, HAND_Z);
     let best = null;
-    for (let i = 0; i <= 400; i++) {
-      const lean = -10 + i * 0.1, c = Math.cos(-lean * DEG), s = Math.sin(-lean * DEG);
+    for (let i = 0; i <= 300; i++) {
+      const lean = 10 + i * 0.1, c = Math.cos(-lean * DEG), s = Math.sin(-lean * DEG);
       const sx = HIP_X + SH[0] * c - SH[1] * s, sy = HIP_Y + SH[0] * s + SH[1] * c;
       const err = Math.abs(Math.hypot(T.x - sx, T.y - sy) - ARM);
       if (!best || err < best.err) best = { err, lean, arm: Math.atan2(T.y - sy, T.x - sx) / DEG };
     }
-    return specPose({ leg: -90, lean: best.lean, arm: best.arm });
+    return up({ lean: best.lean, arm: best.arm, ...extra });
   }
-  const jarY = (j) => TOP_Y + j.h / 2;
   const P = {
-    ...POSES,
-    place1: reachTo(0.045, jarY(JARS[0])),
-    place2: reachTo(0.062, jarY(JARS[1])),
-    place3: reachTo(0.073, jarY(JARS[2])),
-    antic2: specPose({ leg: -90, lean: -13, arm: -70, head: 4 }),
+    reach_in: reachTo(fridgePt(-0.012, SHELF[2] + 0.004)),
+    reach_jar2: reachTo(fridgePt(0.0, SHELF[2] + 0.004)),
+    reach_jar3: reachTo(fridgePt(0.011, SHELF[2] + 0.004)),
+    reach_top: reachTo(fridgePt(0.011, SHELF[0] + 0.005)),
+    place1: reachTo(fridgePt(-0.014, SHELF[1] + 0.005)),
+    place2: reachTo(fridgePt(-0.003, SHELF[1] + 0.004)),
+    place3: reachTo(fridgePt(0.007, SHELF[1] + 0.003)),
+    nudge: reachTo(fridgePt(-0.005, SHELF[1] + 0.004), { far: -150 }),
+    antic: up({ lean: 27, arm: -40 }),
+    inspect: up({ lean: 8, arm: 40, head: 8 }),
+    shake_a: up({ lean: 8, arm: 50 }),
+    shake_b: up({ lean: 8, arm: 30 }),
+    hips: up({ lean: -10, arm: -150, far: -150, head: 4 }),   // straightened up, hands on his hips
+    nudge_antic: up({ lean: 0, arm: -60, far: -150 }),
   };
   const KEYS = [
-    [0, 'kneel_reach'], [0.5, 'kneel_reach'], [0.67, 'kneel_antic'], [0.83, 'place1'], [1.0, 'place1'],
-    [1.33, 'kneel_reach'], [1.5, 'inspect'], [2.0, 'inspect'], [2.17, 'place2'],
-    [2.33, 'kneel_reach'], [2.5, 'inspect'], [3.17, 'inspect'], [3.33, 'place3'], [3.42, 'place3'],
-    [3.5, 'kneel_reach'], [3.67, 'shake_a'], [3.83, 'shake_b'], [4.0, 'shake_a'], [4.17, 'shake_b'], [4.33, 'kneel_reach'],
-    [4.5, 'kneel_reach'], [5.0, 'sit_heels'], [5.83, 'sit_heels'], [6.0, 'antic2'], [6.17, 'place2'], [6.33, 'place2'],
-    [6.5, 'sit_heels'], [7.0, 'kneel_reach'], [8, 'kneel_reach'],
+    [0, 'reach_in'], [0.5, 'reach_in'], [0.67, 'antic'], [0.83, 'place1'], [1.0, 'place1'],
+    [1.33, 'reach_jar2'], [1.5, 'inspect'], [2.0, 'inspect'], [2.17, 'place2'],
+    [2.33, 'place2'], [2.5, 'reach_jar3'], [2.67, 'inspect'], [3.17, 'inspect'], [3.33, 'place3'], [3.42, 'place3'],
+    [3.5, 'reach_top'], [3.67, 'shake_a'], [3.83, 'shake_b'], [4.0, 'shake_a'], [4.17, 'shake_b'], [4.33, 'reach_top'],
+    [4.5, 'reach_top'], [5.0, 'hips'], [5.83, 'hips'], [6.0, 'nudge_antic'], [6.17, 'nudge'], [6.33, 'nudge'],
+    [6.5, 'hips'], [7.0, 'reach_in'], [8, 'reach_in'],
   ];
-  const HELD = [[0, 0.83], [1.33, 2.17], [2.33, 3.33]], CARTON_HELD = [3.5, 4.33];  // [grab, release] per jar, local s
+  // [grab, release] per jar, local s. Jar 3 comes out at 2.50 (two turns to 3.17) and goes in at 3.33.
+  const HELD = [[0, 0.83], [1.33, 2.17], [2.5, 3.33]], CARTON_HELD = [3.5, 4.33];
 
-  // ---------- the Exam on the stool ----------
-  const exam = makeExam({ shot: ID });
+  // ---------- the Exam on the stool (ink, code) ----------
+  const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
   scene.add(exam.mesh);
 
   // ---------- light ----------
-  // Key: the fridge light by the phone-light convention, Phone Cyan 40% toward Cream. Intensity tuned so the lit wall
-  // sits below white under NoToneMapping.
-  const fridge = new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.cream), 0.4);
-  const KEY_I = 0.3;
-  const spot = phoneLight({ color: fridge, intensity: KEY_I, angle: 0.9, penumbra: 0.5, distance: 0.8 });
+  // Key: the fridge light by the phone-light convention, Phone Cyan 40% toward Cream (doc 03 allows two light colours).
+  const fridgeCol = new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.cream), 0.4);
+  const spot = phoneLight({ color: fridgeCol, intensity: KEY_I, angle: 0.9, penumbra: 0.5, distance: 0.8 });
   spot.position.copy(L);
   scene.add(spot, spot.target);
-  // Interior fill (README §5): unshadowed, same color, distance 0.05, 20% of the spot.
-  const fill = new THREE.PointLight(fridge, 0.2 * KEY_I, 0.05, 2);
-  fill.position.copy(FILL);
+  // Interior fill (README §5): unshadowed, same colour, 20% of the spot, just inside the mouth so the shelves glow.
+  const fill = new THREE.PointLight(fridgeCol, FILL_K * KEY_I, 0.06, 2);
+  fill.position.copy(fridgePt(0, FRIDGE.h * 0.5)).add(new THREE.Vector3(-0.012, 0, 0.008));
   scene.add(fill);
-  // Window rig: dawnLight behind the wall, aimed at the window; the wall's own shadow keeps it to the hole and pane.
-  // Capped at 20% of the spot's irradiance at the wall (at the first shadow center).
+  // Character fill (README §10): shadowless, in front of his face, dying long before the wall.
+  const face = new THREE.PointLight(new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.navy), 0.4), FACE_I, 0.15, 2);
+  face.position.set(0.02, 0.085, 0.40);
+  scene.add(face);
+  // Window rig: dawnLight behind the wall aimed at the window; the wall's shadow keeps it to the hole and the pane.
   const dawn = dawnLight();
-  dawn.light.target.position.set(wx, wy, 0);
+  dawn.light.target.position.set(SINK_X, (HOLE.y0 + HOLE.y1) / 2, 0);
   Object.assign(dawn.light.shadow.camera, { left: -0.25, right: 0.25, top: 0.25, bottom: -0.25, near: 0.1, far: 3 });
   dawn.light.shadow.camera.updateProjectionMatrix();
   scene.add(dawn.light, dawn.light.target);
-  const toL = L.clone().sub(new THREE.Vector3(-0.158, 0.127, 0));
+  const toL = L.clone().sub(new THREE.Vector3(-0.114, 0.083, 0));   // the first shadow's centre
   const E_KEY = KEY_I * (toL.z / toL.length()) / toL.lengthSq();
-  // Character fill (README §10): the key is behind him, so a shadowless cool point light in front of his face, a little
-  // above eye line. Its 0.15 m reach dies long before the wall (0.38 m away) and the stool (0.20 m), so the loom
-  // shadow's contrast is untouched; FACE_I is set so his face reads at ~30–45% of the key-lit wall (measure.txt).
-  const FACE_I = 0.014;
-  const face = new THREE.PointLight(new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.navy), 0.4), FACE_I, 0.15, 2);
-  face.position.set(0.03, 0.075, 0.38);
-  scene.add(face);
   const amb = ambient();
-  amb.intensity *= 0.7;  // 70% of s02's default
+  amb.intensity *= AMB;
   scene.add(amb);
+  wall.castShadow = true;   // for the window rig; the fridge spot sits in front of it, so the wall can't shade the room
 
-  // DOF on the Student (his body center, along the look direction). The spec's 0.89 m is not where he kneels (0.70 m);
-  // aperture 0.015 keeps the wall's blur at 768 · 0.015 · (1.0 − 0.70) ≈ 3.4 px, inside the 4 px limit.
+  // DOF on the Student; the wall's blur stays under 4 px (spec).
   const look = LOOK.clone().sub(CAM).normalize();
-  post({ focus: new THREE.Vector3(0.01, 0.04, BODY_Z).sub(CAM).dot(look), aperture: 0.015, lut: 'night' });
+  post({ focus: new THREE.Vector3(0.02, 0.05, BODY_Z).sub(CAM).dot(look), aperture: 0.012, lut: 'night' });
 
   const v = new THREE.Vector3(), B = new THREE.Vector3(), hitW = new THREE.Vector3();
-  const setAt = (obj, x, y) => obj.g.position.set(x, y, PROP_Z);
+  const inFridge = (o, [u, y]) => { o.g.position.copy(fridgePt(u, y)); o.g.rotation.set(0, FRIDGE.yaw, 0); };
+  const inHand = (o, hand) => { o.g.position.set(hand.x, hand.y - 0.003, HAND_Z - 0.0005); o.g.rotation.set(0, 0, 0); };
 
   return {
-    exam, rig, spot, face,  // for evidence/anim-s04/measure.html
+    exam, rig, spot, face,
     update(t) {
       const T = onTwos(t);
-      for (const [mesh, make] of boiling) updatePaperMesh(mesh, make(Math.floor(t * 10)));
+      const seed = boilSeed(t, 10);
+      for (const [mesh, make] of boiling) updatePaperMesh(mesh, make(seed));
 
       // Student
       rig.blend(P, KEYS, t);
@@ -260,39 +296,39 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       rig.face({ eyes: step(t, EYES), mouth: step(t, MOUTH) });
       rig.boil(t, 10);
       rig.group.updateMatrixWorld(true);
-      const hand = toPlane(rig.hand.getWorldPosition(v), PROP_Z);
+      const hand = rig.hand.getWorldPosition(v);
 
-      // Props: in the fridge, in his hand (seen from the camera, behind his fingers), or on the fridge top.
+      // Jars: on the bottom shelf, in his hand, then in a row along the middle shelf's lip.
       JARS.forEach((j, i) => {
         const [g0, g1] = HELD[i];
-        if (T < g0) setAt(j, ...j.home);
-        else if (T < g1) setAt(j, hand.x, hand.y);
-        else setAt(j, step(T, j.spots), jarY(j));
+        if (T < g0) inFridge(j, j.home);
+        else if (T < g1) inHand(j, hand);
+        else inFridge(j, step(T, j.spots));
       });
-      // Jar 3: two turns 2.50–3.17 (0.33 s each) so the blank label faces out.
-      JARS[2].g.scale.x = T >= 2.5 && T < 3.17 ? Math.cos(2 * Math.PI * (T - 2.5) / 0.333) : 1;
-      const held = T >= CARTON_HELD[0] && T < CARTON_HELD[1];
-      if (held) setAt(carton, hand.x, hand.y); else setAt(carton, ...CARTON_HOME);
-      // Carton shakes ±10°: it follows the arm's world angle about the shake poses' 40°.
-      carton.g.rotation.z = held && T >= 3.67 ? rig.joints.arm_r.rotation.z + rig.joints.body.rotation.z - 40 * DEG : 0;
+      JARS[2].inner.scale.x = T >= 2.5 && T < 3.17 ? Math.cos(2 * Math.PI * (T - 2.5) / 0.333) : 1;   // two turns
+      if (T >= CARTON_HELD[0] && T < CARTON_HELD[1]) {
+        inHand(carton, hand);
+        if (T >= 3.67) carton.g.rotation.z = rig.joints.arm_r.rotation.z + rig.joints.body.rotation.z - 40 * DEG;   // ±10° shakes
+      } else inFridge(carton, carton.home);
 
-      // Exam: scoots on 2s, squash 0.2 for one drawing as it lands at 2.33.
+      // Exam: scoots on 2s, squash 0.2 for one drawing as it lands at 2.33 and 5.33; a hopeful stretch at 5.83, sags at 6.5.
       const [bx, bz] = kf(T, BLOB);
       exam.mesh.position.set(bx, SEAT_Y, bz);
-      exam.update(t, { squash: T >= 2.33 && T < 2.4 ? 0.2 : 0, wobble: 1, eyes: step(t, BLOB_EYES), look: 1 });
+      const land = (T >= 2.33 && T < 2.4) || (T >= 5.33 && T < 5.4);
+      const squash = land ? 0.2 : T >= 5.83 && T < 6.5 ? -0.1 : T >= 6.5 && T < 6.67 ? 0.1 : 0;
+      exam.update(t, { squash, wobble: 1, eyes: step(T, BLOB_EYES), look: 1, key: spot });
       exam.mesh.updateMatrixWorld();
 
-      // Key aimed along L → blob center to its wall hit. aim() at the blob first, so the shadow frustum's near plane
-      // sits in front of it (aimed at a bare wall point, near would be 0.16 m and the blob, 0.08 m away, would not cast).
-      B.set(bx, SEAT_Y + exam.radius, bz);
+      // Key aimed along L → blob centre to its wall hit (aim() at the blob first so its frustum holds it).
+      B.set(bx, SEAT_Y + BLOB_R.start, bz);
       hitW.copy(B).sub(L).multiplyScalar(L.z / (L.z - B.z)).add(L);
       aim(spot, exam.mesh);
-      spot.shadow.camera.near = 0.004;  // README §11: the blob is within 10 cm of L
+      spot.shadow.camera.near = 0.004;
       spot.shadow.camera.updateProjectionMatrix();
       spot.target.position.copy(hitW);
       spot.target.updateMatrixWorld();
 
-      // Window: late-afternoon gold sliding toward evening, from the spec's position (dawnLight places its own).
+      // Window: late-afternoon gold sliding toward evening, at most 20% of the fridge spot at the wall.
       dawn.update(t, kf(t, [[0, 0.8], [8, 0.5]]));
       dawn.light.position.set(0.4, 0.6, -1.0);
       dawn.light.intensity = Math.min(dawn.light.intensity, 0.2 * E_KEY);

@@ -83,6 +83,25 @@ export const PIECES = {
     seated_1: [0.04, 0.06, 'ellipse', G], seated_2: [0.04, 0.06, 'ellipse', G], seated_3: [0.04, 0.06, 'ellipse', G],
     seated_4: [0.04, 0.06, 'ellipse', G], seated_5: [0.04, 0.06, 'ellipse', G], seated_6: [0.034, 0.05, 'ellipse', G],
   },
+  // home_kit and kitchen_kit (G4): sizes from evidence/asset-home-kit/scale_table.md (1 real m = 0.055 film m against the
+  // 0.096 m gator), keys from assets/cut/<kit>.boxes.json.
+  home_kit: {
+    door: [0.0690, 0.1100, 'rect', K], bookshelf: [0.0578, 0.0990, 'rect', K], bed_frame: [0.1163, 0.0550, 'rect', K],
+    window_frame: [0.0753, 0.0715, 'rect', C], desk: [0.0768, 0.0413, 'rect', K], desk_chair: [0.0416, 0.0495, 'rect', N],
+    floor_lamp: [0.0432, 0.0880, 'rect', C], bed_mattress: [0.1000, 0.0250, 'round', C], bed_blanket: [0.0900, 0.0382, 'round', N],
+    bed_pillow: [0.0300, 0.0181, 'round', C], window_glass: [0.0525, 0.0595, 'rect', C], blind_up: [0.0753, 0.0241, 'rect', C],
+    blind_down: [0.0753, 0.0659, 'rect', C], laundry_pile: [0.0354, 0.0183, 'round', C], poster_a: [0.0287, 0.0385, 'rect', C],
+    poster_b: [0.0370, 0.0220, 'rect', N], laptop_screen: [0.0185, 0.0120, 'rect', N], laptop_base: [0.0180, 0.0060, 'rect', C],
+    rug: [0.0880, 0.0406, 'round', C], wall_strip: [0.1630, 0.0550, 'rect', C], floor_strip: [0.1461, 0.0550, 'rect', K],
+  },
+  kitchen_kit: {
+    fridge_body: [0.0487, 0.0935, 'round', C], fridge_door: [0.0482, 0.0935, 'round', C], stove: [0.0440, 0.0605, 'rect', C],
+    sink: [0.0581, 0.0660, 'rect', C], counter_run: [0.1273, 0.0495, 'rect', C], upper_cabinets: [0.1054, 0.0385, 'rect', K],
+    microwave: [0.0309, 0.0196, 'rect', C], kettle: [0.0159, 0.0138, 'round', N], dish_rack: [0.0248, 0.0122, 'rect', K],
+    fruit_bowl: [0.0165, 0.0130, 'ellipse', N], cereal_box: [0.0126, 0.0165, 'rect', C], mug: [0.0062, 0.0055, 'round', C],
+    jar: [0.0071, 0.0110, 'round', C], backsplash_strip: [0.1874, 0.0275, 'rect', C], wall_strip: [0.1650, 0.0550, 'rect', C],
+    floor_strip: [0.2807, 0.0550, 'rect', K],
+  },
 };
 
 const cache = new Map();  // name → Promise of the load result
