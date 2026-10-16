@@ -1,0 +1,158 @@
+== roommates_sheet_v1_1
+no alpha in roommates_sheet_v1_1: keyed #FF00FF (tol 80), 1278324 px cleared, 17907 edge px soft-keyed and despilled
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-cast-kit/evidence/asset-cast-kit/roommates_sheet_v1_1.boxes.json
+roommates_sheet_v1_1_1: [43, 94, 254, 389] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_1/roommates_sheet_v1_1_1.png
+roommates_sheet_v1_1_2: [317, 103, 457, 355] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_1/roommates_sheet_v1_1_2.png
+roommates_sheet_v1_1_3: [573, 505, 405, 473] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_1/roommates_sheet_v1_1_3.png
+roommates_sheet_v1_1_4: [794, 120, 124, 346] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_1/roommates_sheet_v1_1_4.png
+roommates_sheet_v1_1_5: [976, 120, 126, 346] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_1/roommates_sheet_v1_1_5.png
+roommates_sheet_v1_1_6: [1110, 222, 385, 189] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_1/roommates_sheet_v1_1_6.png
+== roommates_sheet_v1_2
+alpha in roommates_sheet_v1_2: 247607 px at alpha 250-254 clamped to 255
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-cast-kit/evidence/asset-cast-kit/roommates_sheet_v1_2.boxes.json
+roommates_sheet_v1_2_1: cleared 3358 px (neighbouring islands, alpha<16 dust)
+roommates_sheet_v1_2_1: [96, 52, 204, 440] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_2/roommates_sheet_v1_2_1.png
+roommates_sheet_v1_2_2: cleared 7806 px (neighbouring islands, alpha<16 dust)
+roommates_sheet_v1_2_2: [336, 124, 432, 304] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_2/roommates_sheet_v1_2_2.png
+roommates_sheet_v1_2_3: cleared 4786 px (neighbouring islands, alpha<16 dust)
+roommates_sheet_v1_2_3: [648, 456, 380, 440] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_2/roommates_sheet_v1_2_3.png
+roommates_sheet_v1_2_4: cleared 2876 px (neighbouring islands, alpha<16 dust)
+roommates_sheet_v1_2_4: [804, 104, 148, 340] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_2/roommates_sheet_v1_2_4.png
+roommates_sheet_v1_2_5: cleared 3026 px (neighbouring islands, alpha<16 dust)
+roommates_sheet_v1_2_5: [1020, 104, 140, 343] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_2/roommates_sheet_v1_2_5.png
+roommates_sheet_v1_2_6: cleared 4398 px (neighbouring islands, alpha<16 dust)
+roommates_sheet_v1_2_6: [1216, 212, 376, 192] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_roommates_sheet_v1_2/roommates_sheet_v1_2_6.png
+== custodian_sheet_v1_1
+alpha in custodian_sheet_v1_1: 262077 px at alpha 250-254 clamped to 255
+10 alpha island(s): 10 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-cast-kit/evidence/asset-cast-kit/custodian_sheet_v1_1.boxes.json
+custodian_sheet_v1_1_1: cleared 2705 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_1: [44, 176, 312, 300] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_1.png
+custodian_sheet_v1_1_2: cleared 4791 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_2: [44, 552, 392, 324] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_2.png
+custodian_sheet_v1_1_3: cleared 2133 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_3: [372, 220, 284, 232] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_3.png
+custodian_sheet_v1_1_4: cleared 4711 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_4: [496, 744, 688, 68] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_4.png
+custodian_sheet_v1_1_5: cleared 2537 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_5: [676, 296, 232, 124] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_5.png
+custodian_sheet_v1_1_6: cleared 2167 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_6: [932, 324, 228, 112] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_6.png
+custodian_sheet_v1_1_7: cleared 1671 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_7: [1212, 328, 240, 108] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_7.png
+custodian_sheet_v1_1_8: cleared 3317 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_8: [1240, 636, 224, 220] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_8.png
+custodian_sheet_v1_1_9: cleared 1701 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_9: [1484, 340, 176, 92] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_9.png
+custodian_sheet_v1_1_10: cleared 4245 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_1_10: [1492, 476, 132, 420] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_1/custodian_sheet_v1_1_10.png
+== custodian_sheet_v1_2
+alpha in custodian_sheet_v1_2: 265021 px at alpha 250-254 clamped to 255
+10 alpha island(s): 10 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-cast-kit/evidence/asset-cast-kit/custodian_sheet_v1_2.boxes.json
+custodian_sheet_v1_2_1: cleared 1336 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_1: [52, 120, 256, 324] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_1.png
+custodian_sheet_v1_2_2: cleared 3644 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_2: [72, 528, 360, 276] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_2.png
+custodian_sheet_v1_2_3: cleared 1236 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_3: [324, 196, 268, 208] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_3.png
+custodian_sheet_v1_2_4: cleared 8217 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_4: [496, 672, 744, 84] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_4.png
+custodian_sheet_v1_2_5: cleared 1209 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_5: [612, 233, 268, 123] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_5.png
+custodian_sheet_v1_2_6: cleared 1267 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_6: [908, 256, 279, 112] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_6.png
+custodian_sheet_v1_2_7: cleared 1224 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_7: [1216, 256, 296, 120] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_7.png
+custodian_sheet_v1_2_8: cleared 1871 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_8: [1292, 580, 252, 220] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_8.png
+custodian_sheet_v1_2_9: cleared 1191 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_9: [1536, 264, 188, 104] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_9.png
+custodian_sheet_v1_2_10: cleared 2259 px (neighbouring islands, alpha<16 dust)
+custodian_sheet_v1_2_10: [1600, 416, 120, 400] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_custodian_sheet_v1_2/custodian_sheet_v1_2_10.png
+== crowd_sheet_v1_1
+alpha in crowd_sheet_v1_1: 566078 px at alpha 250-254 clamped to 255
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-cast-kit/evidence/asset-cast-kit/crowd_sheet_v1_1.boxes.json
+crowd_sheet_v1_1_1: cleared 3225 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_1_1: [104, 28, 372, 344] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_1/crowd_sheet_v1_1_1.png
+crowd_sheet_v1_1_2: cleared 3263 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_1_2: [104, 380, 372, 360] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_1/crowd_sheet_v1_1_2.png
+crowd_sheet_v1_1_3: cleared 4552 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_1_3: [664, 68, 480, 320] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_1/crowd_sheet_v1_1_3.png
+crowd_sheet_v1_1_4: cleared 4766 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_1_4: [676, 420, 472, 300] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_1/crowd_sheet_v1_1_4.png
+crowd_sheet_v1_1_5: cleared 4062 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_1_5: [1284, 473, 688, 207] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_1/crowd_sheet_v1_1_5.png
+crowd_sheet_v1_1_6: cleared 4207 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_1_6: [1285, 128, 683, 212] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_1/crowd_sheet_v1_1_6.png
+== crowd_sheet_v1_2
+alpha in crowd_sheet_v1_2: 433631 px at alpha 250-254 clamped to 255
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-cast-kit/evidence/asset-cast-kit/crowd_sheet_v1_2.boxes.json
+crowd_sheet_v1_2_1: cleared 3643 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_2_1: [104, 492, 348, 312] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_2/crowd_sheet_v1_2_1.png
+crowd_sheet_v1_2_2: cleared 3312 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_2_2: [136, 96, 288, 320] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_2/crowd_sheet_v1_2_2.png
+crowd_sheet_v1_2_3: cleared 5504 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_2_3: [556, 104, 464, 320] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_2/crowd_sheet_v1_2_3.png
+crowd_sheet_v1_2_4: cleared 5146 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_2_4: [568, 524, 464, 288] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_2/crowd_sheet_v1_2_4.png
+crowd_sheet_v1_2_5: cleared 4368 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_2_5: [1108, 212, 592, 164] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_2/crowd_sheet_v1_2_5.png
+crowd_sheet_v1_2_6: cleared 5543 px (neighbouring islands, alpha<16 dust)
+crowd_sheet_v1_2_6: [1108, 609, 600, 163] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_crowd_sheet_v1_2/crowd_sheet_v1_2_6.png
+== top_figures_sheet_v1_1
+alpha in top_figures_sheet_v1_1: 547565 px at alpha 250-254 clamped to 255
+11 alpha island(s): 11 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-cast-kit/evidence/asset-cast-kit/top_figures_sheet_v1_1.boxes.json
+top_figures_sheet_v1_1_1: cleared 2945 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_1: [20, 508, 272, 340] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_1.png
+top_figures_sheet_v1_1_2: cleared 4861 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_2: [32, 160, 312, 268] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_2.png
+top_figures_sheet_v1_1_3: cleared 3767 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_3: [304, 516, 256, 328] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_3.png
+top_figures_sheet_v1_1_4: cleared 4327 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_4: [372, 64, 240, 364] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_4.png
+top_figures_sheet_v1_1_5: cleared 4110 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_5: [580, 500, 248, 344] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_5.png
+top_figures_sheet_v1_1_6: cleared 4672 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_6: [644, 205, 452, 171] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_6.png
+top_figures_sheet_v1_1_7: cleared 4573 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_7: [848, 512, 296, 332] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_7.png
+top_figures_sheet_v1_1_8: cleared 4541 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_8: [1132, 512, 280, 336] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_8.png
+top_figures_sheet_v1_1_9: cleared 3927 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_9: [1164, 68, 136, 372] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_9.png
+top_figures_sheet_v1_1_10: cleared 3727 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_10: [1360, 140, 276, 280] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_10.png
+top_figures_sheet_v1_1_11: cleared 3303 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_1_11: [1420, 536, 236, 308] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_1/top_figures_sheet_v1_1_11.png
+== top_figures_sheet_v1_2
+alpha in top_figures_sheet_v1_2: 478968 px at alpha 250-254 clamped to 255
+11 alpha island(s): 11 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-cast-kit/evidence/asset-cast-kit/top_figures_sheet_v1_2.boxes.json
+top_figures_sheet_v1_2_1: cleared 3452 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_1: [48, 432, 276, 296] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_1.png
+top_figures_sheet_v1_2_2: cleared 4229 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_2: [128, 104, 292, 272] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_2.png
+top_figures_sheet_v1_2_3: cleared 2919 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_3: [364, 472, 296, 256] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_3.png
+top_figures_sheet_v1_2_4: cleared 1868 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_4: [492, 60, 204, 320] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_4.png
+top_figures_sheet_v1_2_5: cleared 3742 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_5: [680, 424, 280, 296] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_5.png
+top_figures_sheet_v1_2_6: cleared 5083 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_6: [768, 188, 464, 172] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_6.png
+top_figures_sheet_v1_2_7: cleared 3833 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_7: [1000, 432, 336, 292] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_7.png
+top_figures_sheet_v1_2_8: cleared 2751 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_8: [1312, 77, 112, 315] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_8.png
+top_figures_sheet_v1_2_9: cleared 2964 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_9: [1340, 448, 288, 280] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_9.png
+top_figures_sheet_v1_2_10: cleared 3254 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_10: [1540, 88, 232, 280] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_10.png
+top_figures_sheet_v1_2_11: cleared 2664 px (neighbouring islands, alpha<16 dust)
+top_figures_sheet_v1_2_11: [1676, 464, 244, 264] -> /private/tmp/claude-501/-Users-ericzhang-Library-Mobile-Documents-iCloud-md-obsidian-Documents-Notes/a94421b5-f49c-4dcf-bd13-b30b9cf2d7d4/scratchpad/cut_top_figures_sheet_v1_2/top_figures_sheet_v1_2_11.png

@@ -1,0 +1,8 @@
+evidence/asset-cast-kit/roommates_sheet_v1_1.named.json: 6 named, min box gap 8 px, min edge margin 41 px
+evidence/asset-cast-kit/roommates_sheet_v1_2.named.json: 6 named, min box gap 9 px, min edge margin 45 px
+evidence/asset-cast-kit/custodian_sheet_v1_1.named.json: 10 named, min box gap 16 px, min edge margin 12 px
+evidence/asset-cast-kit/custodian_sheet_v1_2.named.json: 10 named, min box gap 16 px, min edge margin 50 px
+evidence/asset-cast-kit/crowd_sheet_v1_1.named.json: 6 named, min box gap 8 px, min edge margin 28 px
+evidence/asset-cast-kit/crowd_sheet_v1_2.named.json: 6 named, min box gap 76 px, min edge margin 66 px
+evidence/asset-cast-kit/top_figures_sheet_v1_1.named.json: 11 named, min box gap 0 px, min edge margin 16 px
+evidence/asset-cast-kit/top_figures_sheet_v1_2.named.json: 11 named, min box gap 4 px, min edge margin 48 px

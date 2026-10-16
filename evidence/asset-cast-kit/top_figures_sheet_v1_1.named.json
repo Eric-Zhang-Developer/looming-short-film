@@ -1,0 +1,68 @@
+{
+ "top_figures_sheet_hero_body": [
+  32,
+  160,
+  312,
+  268
+ ],
+ "top_figures_sheet_hero_head": [
+  372,
+  64,
+  240,
+  364
+ ],
+ "top_figures_sheet_hero_arms": [
+  644,
+  205,
+  452,
+  171
+ ],
+ "top_figures_sheet_hero_tail": [
+  1164,
+  68,
+  136,
+  372
+ ],
+ "top_figures_sheet_hero_backpack": [
+  1360,
+  140,
+  276,
+  280
+ ],
+ "top_figures_sheet_seated_1": [
+  20,
+  508,
+  272,
+  340
+ ],
+ "top_figures_sheet_seated_2": [
+  304,
+  516,
+  256,
+  328
+ ],
+ "top_figures_sheet_seated_3": [
+  580,
+  500,
+  248,
+  344
+ ],
+ "top_figures_sheet_seated_4": [
+  848,
+  512,
+  296,
+  332
+ ],
+ "top_figures_sheet_seated_5": [
+  1132,
+  512,
+  280,
+  336
+ ],
+ "top_figures_sheet_seated_6": [
+  1420,
+  536,
+  236,
+  308
+ ]
+}

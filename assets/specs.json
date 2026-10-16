@@ -360,5 +360,101 @@
       "door slit and clock are clean; proctor reads as a standing adult gator silhouette",
       "flat elevation, torn paper look, palette, no baked light, no red, no green, no gator student"
     ]
+  },
+  {
+    "name": "roommates_sheet",
+    "purpose": "s05 roommates: a tall heron and a round bear cub, muted, blank faces (face sheet swaps); painter task asset-cast-kit (drop-in for the placeholder sheet of the same name in src/assets.js)",
+    "shots": "s05",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/roommates_sheet.v1.md",
+    "variants": 2,
+    "cap": 3,
+    "target": "largest landscape size, 6 separate pieces in two rows, every bounding box >= 60 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "one island per piece (cut.mjs --auto)",
+      "every piece named in src/assets.js PIECES present, aspect ratios near PIECES",
+      "same felt-paper/torn-rim style as gator_sheet, muted, no baked light, no text",
+      "different animal from the hero where the brief says so",
+      "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
+    ]
+  },
+  {
+    "name": "custodian_sheet",
+    "purpose": "s14 custodian: an old tortoise in a work shirt and cap with painted face, plus cart frame, tray, bucket and mop; painter task asset-cast-kit (drop-in for the placeholder sheet of the same name in src/assets.js)",
+    "shots": "s14",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/custodian_sheet.v1.md",
+    "variants": 2,
+    "cap": 3,
+    "target": "largest landscape size, 10 separate pieces in two rows, every bounding box >= 60 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "one island per piece (cut.mjs --auto)",
+      "every piece named in src/assets.js PIECES present, aspect ratios near PIECES",
+      "same felt-paper/torn-rim style as gator_sheet, muted, no baked light, no text",
+      "different animal from the hero where the brief says so",
+      "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
+    ]
+  },
+  {
+    "name": "crowd_sheet",
+    "purpose": "s16/s17 Marston neighbours: the tired neighbour and the sleeper, painted faces, seated side view; painter task asset-cast-kit (drop-in for the placeholder sheet of the same name in src/assets.js)",
+    "shots": "s16, s17",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/crowd_sheet.v1.md",
+    "variants": 2,
+    "cap": 3,
+    "target": "largest landscape size, 6 separate pieces in two rows, every bounding box >= 60 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "one island per piece (cut.mjs --auto)",
+      "every piece named in src/assets.js PIECES present, aspect ratios near PIECES",
+      "same felt-paper/torn-rim style as gator_sheet, muted, no baked light, no text",
+      "different animal from the hero where the brief says so",
+      "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
+    ]
+  },
+  {
+    "name": "top_figures_sheet",
+    "purpose": "s13 top-down figures: the hero in five parts and six varied seated students; painter task asset-cast-kit (drop-in for the placeholder sheet of the same name in src/assets.js)",
+    "shots": "s13",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/top_figures_sheet.v1.md",
+    "variants": 2,
+    "cap": 3,
+    "target": "largest landscape size, 11 separate pieces in two rows, every bounding box >= 60 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "one island per piece (cut.mjs --auto)",
+      "every piece named in src/assets.js PIECES present, aspect ratios near PIECES",
+      "same felt-paper/torn-rim style as gator_sheet, muted, no baked light, no text",
+      "different animal from the hero where the brief says so",
+      "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
+    ]
   }
 ]

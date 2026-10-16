@@ -128,5 +128,57 @@
     "frozen": "2026-10-15",
     "gate": "overnight rule",
     "approved": "Orchestrator under the director's overnight rule; painter's #1; lettering and math checked by the orchestrator from crops. Alternatives v1_2, v1_3 (chair split from desk)."
+  },
+  {
+    "name": "roommates_sheet",
+    "file": "assets/frozen/roommates_sheet.png",
+    "source": "assets/raw/roommates_sheet_v1_2.png",
+    "prompt": "assets/prompts/roommates_sheet.v1.md",
+    "sidecar": "assets/raw/thumbs/roommates_sheet_v1_2.json",
+    "variant": "v1_2",
+    "sha256": "5da9d6d8ef0fb9b8926881e515d2f0d731700653e3e8c5e4d1363b8dbc56f419",
+    "size": "1672x941",
+    "frozen": "2026-10-16",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter's #1. Alternatives v1_1 (magenta-keyed) in evidence/asset-cast-kit/contact.jpg."
+  },
+  {
+    "name": "custodian_sheet",
+    "file": "assets/frozen/custodian_sheet.png",
+    "source": "assets/raw/custodian_sheet_v1_2.png",
+    "prompt": "assets/prompts/custodian_sheet.v1.md",
+    "sidecar": "assets/raw/thumbs/custodian_sheet_v1_2.json",
+    "variant": "v1_2",
+    "sha256": "01c02088a9aad97f4160ec1d2851674bbdf051000027c8d250abf2dcab285cd1",
+    "size": "1774x887",
+    "frozen": "2026-10-16",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter's #1. Alternatives v1_1 (nicer face, tight margin) in evidence/asset-cast-kit/contact.jpg."
+  },
+  {
+    "name": "crowd_sheet",
+    "file": "assets/frozen/crowd_sheet.png",
+    "source": "assets/raw/crowd_sheet_v1_2.png",
+    "prompt": "assets/prompts/crowd_sheet.v1.md",
+    "sidecar": "assets/raw/thumbs/crowd_sheet_v1_2.json",
+    "variant": "v1_2",
+    "sha256": "f556ac26eeef2be7f1698340fe8fb4ba4b672449e80eb6392a6aadec534496d0",
+    "size": "1774x887",
+    "frozen": "2026-10-16",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter's #1. Alternatives v1_1 in evidence/asset-cast-kit/contact.jpg."
+  },
+  {
+    "name": "top_figures_sheet",
+    "file": "assets/frozen/top_figures_sheet.png",
+    "source": "assets/raw/top_figures_sheet_v1_1.png",
+    "prompt": "assets/prompts/top_figures_sheet.v1.md",
+    "sidecar": "assets/raw/thumbs/top_figures_sheet_v1_1.json",
+    "variant": "v1_1",
+    "sha256": "ef8f0855d5410fee550a549f75ab9ad6ce5333a1078c90667df8bdf4bc1c0f52",
+    "size": "1672x941",
+    "frozen": "2026-10-16",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's overnight rule; painter's #1. Alternatives v1_2 (blob-headed hero) in evidence/asset-cast-kit/contact.jpg."
   }
 ]
