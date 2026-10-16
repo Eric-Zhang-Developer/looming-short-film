@@ -1,0 +1,15 @@
+# v3-fix-home checks, at 8199292
+$ node tools/check_timeline.mjs | tail -1
+ok (21 shots, 58 beats, 195.0s)
+$ node tools/determinism.mjs --t=5.5,24.6,29,38.5,44
+t=5.5  ec1962c8bce3fdb7 ec1962c8bce3fdb7 ec1962c8bce3fdb7  PASS
+t=24.6  0737c19da8ea0aa5 0737c19da8ea0aa5 0737c19da8ea0aa5  PASS
+t=29  65afe21f9d285db3 65afe21f9d285db3 65afe21f9d285db3  PASS
+t=38.5  0be10c802139da96 0be10c802139da96 0be10c802139da96  PASS
+t=44  3125b21a1b44fd6e 3125b21a1b44fd6e 3125b21a1b44fd6e  PASS
+determinism: PASS
+# luma (ffmpeg, 24x24 patch, 1920x1080 stills at t=24.6 and t=29), shadow vs lit wall
+s03 before: shadow rgb(90,73,64) luma 76; lit wall rgb(86,81,71) luma 81   (7% darker; warm brown on grey)
+s03 after:  shadow rgb(52,48,45) luma 49 / rgb(49,42,39) luma 43; lit wall rgb(63,77,70) luma 74 / rgb(68,90,80) luma 85   (40-45% darker)
+s04 before: shadow rgb(62,54,53) luma 56; lit wall rgb(109,125,131) luma 122   (brown-grey)
+s04 after:  shadow rgb(18,29,41) luma 28; lit wall rgb(106,130,141) luma 126   (navy)

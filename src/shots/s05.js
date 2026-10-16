@@ -12,7 +12,7 @@ import { phoneLight, dawnLight, ambient, aim } from '../lights.js';
 import { kf, spring, onTwos } from '../core/ease.js';
 import { hash, mulberry32, seedOf } from '../core/rng.js';
 import { makeGator } from '../characters/gator.js';
-import { makeRoommateTall, makeRoommateRound } from '../characters/roommates.js';
+import { makeRoommateTall, makeRoommateRound, HERON_STAND_Y } from '../characters/roommates.js';
 import { POSES, specPose, walk } from '../characters/poses.js';
 import { createBlob } from '../blob.js';
 
@@ -28,10 +28,16 @@ const B = [0.060, TABLE, 0.35];            // blob contact point on the table to
 const CAM = { pos: [-0.04, 0.17, 1.15], look: [-0.04, 0.10, 0.15] };
 const KEY = 0.40;                          // phone spot, cd: a cream wall 0.42 m away lands lit but below white (NoToneMapping)
 const TV = 0.36;                           // 25% of the key's irradiance at the wall: 0.25 · 0.40 / 0.42² · 0.80²
-const TALL_S = 0.9;                        // roommates_sheet's tall is 0.111 m standing at scale 1; the spec wants head top 0.10
+const HERON_SEAT_Y = SEAT + 0.0035;         // the heron's hip on the couch seat (standing it is HERON_STAND_Y: the sheet's own proportions give his 0.098 m, the spec's 0.10)
+const LEG_SWING = 38 * DEG;                // v3: his stride is 0.05 m a step on legs 0.033 m long, so the legs swing ±38° (v2's ±22° skated)
+const HEAD_BOB = 3 * DEG, BREATHE = 0.9 * DEG;   // secondary motion: the heron's head nods with each step; everyone breathes on a 2.8 s cycle
 const WALK = { x0: -0.15, x1: 0.30, t0: F(3.33), t1: F(6.33), z: 0.16 };
 const STUDENT_HIP_Y = 0.012;               // sits on his floor cushion
 const lerp01 = (u) => u;
+// The library's poses plus s05's: the cheer, and the heron's stride at his own leg length.
+const POSES_5 = { ...POSES, round_cheer60: { arm_r: 60 * DEG, arm_l: 60 * DEG },
+  walk_tall_a: { ...POSES.walk_tall_a, leg_r: LEG_SWING, leg_l: -LEG_SWING },
+  walk_tall_b: { ...POSES.walk_tall_b, leg_r: -LEG_SWING, leg_l: LEG_SWING } };
 
 // A path rectangle that fills its canvas has no edge to tear, so it's inset 4% and the size grown to keep [w, h] (as s03).
 function torn(w, h) {
@@ -109,7 +115,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // ---- Roommates. roommate_tall at x −0.15 (feet on the floor when standing), roommate_round at x −0.06: the root is
   // its bottom, so the hidden 3 cm sit behind the seat strip and the head top lands at the spec's 0.08.
   const ctx = { assets };
-  const tall = await makeRoommateTall(ctx, { scale: TALL_S, res: 512 });
+  const tall = await makeRoommateTall(ctx, { res: 512 });
   const round = await makeRoommateRound(ctx, { res: 512 });
   scene.add(tall.group, round.group);
   round.group.position.set(-0.06, SEAT - 0.03, 0.09);   // its bottom 3 cm behind the seat strip
@@ -196,8 +202,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const dawn = dawnLight();
   dawn.light.target.position.set(0.0, 0.05, 0.1);
   dawn.light.castShadow = false;
-  const amb = ambient();
-  amb.intensity *= 0.55;
+  const amb = new THREE.HemisphereLight(PALETTE.navy, '#' + new THREE.Color(PALETTE.navy).lerp(new THREE.Color(PALETTE.phone), 0.25).getHexString(), 0.8 * 0.55);   // v3: cool bounce, as s04: the heron walks through a navy shadow, not a brown one
   scene.add(spot, spot.target, face, stFill, tv, tv.target, coFill, wlFill, dawn.light, dawn.light.target, amb);
 
   const fx = post({ focus: 0.95, aperture: 0.012, lut: 'night' });
@@ -215,6 +220,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       // ---- The Student: hunched over the phone the whole shot. Thumb flick (+2°) for one drawing every 0.5 s from 0.33.
       const flick = Array.from({ length: 16 }, (_, i) => F(0.33 + 0.5 * i)).some((f) => Math.abs(T - f) < 1e-6);
       gator.pose(flick ? STUDENT_POSE.flick : STUDENT_POSE.flat);
+      gator.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * T / 2.8 + 2.1);   // v3: the Student breathes too
       gator.follow('tail', tLocal, { k: 6, w: 18 });
       gator.face({ eyes: 'tired', mouth: T >= F(4.5) && T < F(4.83) ? 'smile' : 'neutral' });
 
@@ -224,21 +230,24 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       if (T >= F(4.83) && T < F(5.0)) rp = 'round_cheer_antic';
       else if (T >= F(5.0) && T < F(5.67)) { rp = 'round_cheer60'; rf = { eyes: 'closed', mouth: 'smile' }; }
       else if (T >= F(5.67) && T < F(6.0)) rp = 'round_cheer_antic';
-      round.blend({ ...POSES, round_cheer60: { arm_r: 60 * DEG, arm_l: 60 * DEG } }, [[0, rp], [1, rp]], tLocal);
+      round.blend(POSES_5, [[0, rp], [1, rp]], tLocal);
       round.face(rf);
 
       // ---- roommate_tall: mashes to 2.67, controller to the couch arm and a 12° lean to 3.0, stands and steps to z 0.16 by
       // 3.33, then walks frame-right 3.33–6.33 (one step per 0.33 s, 2 mm bob), eyes and mouth unchanged through the shadow.
-      let x = WALK.x0, y = 0.027 * TALL_S, z = 0.09, keys, handCtrl = false;
+      let x = WALK.x0, y = HERON_SEAT_Y, z = 0.09, keys, handCtrl = false;
       if (T < F(2.67)) { const p = `tall_mash_${mash}`; keys = [[0, p], [1, p]]; handCtrl = true; }
       else if (T < F(3.0)) keys = [[0, 'tall_lean'], [1, 'tall_lean']];
-      else if (T < WALK.t0) { keys = [[0, 'tall_stand'], [1, 'tall_stand']]; z = kf(T, [[F(3.0), 0.09], [WALK.t0, WALK.z]], lerp01); }
+      else if (T < WALK.t0) { keys = [[0, 'tall_stand'], [1, 'tall_stand']]; y = HERON_STAND_Y; z = kf(T, [[F(3.0), 0.09], [WALK.t0, WALK.z]], lerp01); }
       else {
         const w = walk(T, { set: 'tall', step: 1 / 3, t0: WALK.t0, rise: 0.0015 });
-        keys = w.keys; y += w.lift; z = WALK.z;
+        keys = w.keys; y = HERON_STAND_Y + w.lift; z = WALK.z;
         x = kf(T, [[WALK.t0, WALK.x0], [WALK.t1, WALK.x1]], lerp01);
       }
-      tall.blend(POSES, keys, tLocal);
+      tall.blend(POSES_5, keys, tLocal);
+      tall.follow('tail', tLocal, { k: 6, w: 18 });
+      if (T >= WALK.t0) tall.joints.head.rotation.z += HEAD_BOB * Math.sin(2 * Math.PI * (T - WALK.t0) / (1 / 3));   // a nod per step
+      for (const [r, ph] of [[tall, 0], [round, 1.3]]) r.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * T / 2.8 + ph);
       tall.face(T < F(2.67) ? { eyes: 'open', mouth: 'line' } : { eyes: 'open', mouth: 'neutral' });
       tall.group.position.set(x, y, z);
       tall.group.visible = T <= WALK.t1;

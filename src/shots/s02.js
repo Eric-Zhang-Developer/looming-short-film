@@ -25,11 +25,11 @@ export const DESK = {
   x0: -0.033, w: 0.0768, d: 0.033, // painted desk front (mirrored: drawers right, kneehole left by him), 60 cm deep
   hip: [-0.056, -0.0135, 0.016],   // seated hip on the desk_chair's cushion; body plane z 0.016 (near arm +0.012)
   chair: { h: 0.0495, x: -0.061, z: 0.008 },
-  // A tall table lamp (home_kit's "floor_lamp" art at 120 cm, a cartoon allowance like the bed
-  // and door: its shade must clear his head to light the blob from above), against the wall at the desk's back-left,
+  // A tall table lamp (home_kit's "floor_lamp" art at 80 cm; v3: it was a 120 cm cartoon allowance so its shade cleared his
+  // head). Now a normal tall table lamp, moved right of his snout so the shade stays visible, behind the blob's mark;
   // mirrored so the pull chain hangs on his side. Painted: shade mouth at 0.646 of its height, the chain's bead at
   // 0.505, 21 px (of 212 tall) off the stem.
-  lamp: { x: -0.004, z: 0.004, h: 0.066 },
+  lamp: { x: 0.008, z: 0.004, h: 0.044 },
   // Wall planner over the desk. Friday's empty cell (row 3, column 5 of the painted grid) holds the lettered square,
   // circled in red. fri: the cell centre in the art's uv (from the left, from the top), measured on the cut PNG.
   cal: { x0: 0.008, w: 0.050, y0: 0.030, z: 0.0015, lip: 0.008, lipZ: 0.006, fri: [173 / 275, 183 / 292] },

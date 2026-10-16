@@ -5,7 +5,7 @@
 // Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { phoneLight, dawnLight, ambient, aim } from '../lights.js';
-import { kf, ease } from '../core/ease.js';
+import { kf, ease, onTwos } from '../core/ease.js';
 import { hash2 } from '../core/rng.js';
 import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
@@ -14,11 +14,14 @@ import { DESK, B, tools, homeDesk, seatReach } from './s02.js';
 
 const ID = 's03', DEG = Math.PI / 180;
 const BLOB_R = { start: 0.012, gulp1: 0.015 };            // METER.birth → METER.gulp1 (README §1)
-const CAM = { pos: [0.028, 0.060, 0.33], look: [0.028, 0.036, 0.012] };
-const FOCUS = [[2.0, 0.318], [3.0, 0.33]];                 // blob → wall over 2–3, eased, on 1s
-const SPOT_I = 0.012, FILL_K = 0.15, SUN_K = 0.35, SUN_SCALE = 0.8 * 0.3;   // the window at 30% of s02's
+const CAM = { pos: [0.055, 0.075, 0.40], look: [0.055, 0.047, 0.012] };   // v3: pulled back and right so the bigger shadow fits
+const FOCUS = [[2.0, 0.385], [3.0, 0.40]];                 // blob → wall over 2–3, eased, on 1s
+const SCREEN_Z = 0.0195;                                   // v3: the screen sits 3 mm closer than s02's unit, so S = 0.0195 / 0.0045 = 4.33 (was 3.0): 5.4 units at 1.25×
+const SPOT_I = 0.022, FILL_K = 0.15, SUN_K = 0.35, SUN_SCALE = 0.8 * 0.03, SUN_SCALE_OFF = 0.8 * 0.3;   // v3: after the wake the window drops from 30% to 3% so the shadow goes dark, not pink
+const AMB_K = 0.2, AMB_K_OFF = 0.55;                                        // v3: ambient trimmed so the shadow is the darkest thing on the wall
+const BREATHE = 0.7 * DEG;                                  // v3 secondary motion: his back rises on a 2.8 s breath (a function of t, on 2s)
 const FLICK = 0.05;                                        // ±5% game flicker per 2s drawing
-const FACE_I = 0.008;                                      // character fill (README §10): cyan-navy, no shadow, dies before the wall
+const FACE_I = 0.012;                                      // character fill (README §10): cyan-navy, no shadow, dies before the wall
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
 const TAPS = [2.33, 2.67, 3.17, 3.5, 4.0, 4.67, 5.17, 5.67].map((s) => Math.round(s * 12));
 
@@ -29,6 +32,7 @@ export async function build(ctx) {
   camera.lookAt(...CAM.look);
   const T = tools(ctx, ID);
   const set = await homeDesk(ctx, T);
+  set.laptop.position.z += SCREEN_Z - DESK.screenZ;
   const fx = post({ focus: FOCUS[0][1], aperture: 0.01, lut: 'dawn' });
 
   // ---- the Student and his hand targets (solved through this camera) ----
@@ -76,11 +80,13 @@ export async function build(ctx) {
   sun.light.shadow.camera.updateProjectionMatrix();
   sun.update(0, SUN_K);
   sun.light.position.set(0.8, 0.6, 0.6);
-  sun.light.intensity *= SUN_SCALE;
+  const sunI = sun.light.intensity;
   const face = new THREE.PointLight(new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.navy), 0.4), 0, 0.07, 2);
   face.position.set(-0.025, 0.035, 0.065);
   scene.add(face);
-  scene.add(spot, spot.target, fill, sun.light, sun.light.target, ambient());
+  const amb = ambient();
+  const ambI = amb.intensity;
+  scene.add(spot, spot.target, fill, sun.light, sun.light.target, amb);
 
   const C = new THREE.Vector3(), hit = new THREE.Vector3();
   return {
@@ -92,6 +98,7 @@ export async function build(ctx) {
       // The Student.
       gator.boil(t, 10);
       gator.blend(P, KEYS, t);
+      gator.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * onTwos(t) / 2.8);
       gator.follow('tail', t, { k: 6, w: 18 });
       gator.group.position.y = DESK.hip[1] + (f >= 2 && f < 4 ? -0.0015 : 0);
       const eyes = f < 2 ? 'side' : f < 5 ? 'closed' : 'tired';
@@ -102,6 +109,8 @@ export async function build(ctx) {
       set.setLid(f < 8 ? 0 : f < 10 ? 30 : f < 12 ? 60 : 110);
       const on = t >= 1.0 - 1e-6;
       set.glow.visible = on;
+      sun.light.intensity = sunI * (on ? SUN_SCALE : SUN_SCALE_OFF);   // before the wake the window is the room; after it the screen is
+      amb.intensity = ambI * (on ? AMB_K : AMB_K_OFF);
 
       // The Exam: open on him; side toward the screen at 1.08; up-right at its shadow at 3.0; back to him at 4.33.
       // Gulp 1 (4.5): squash 0.3 eyes closed on 4.417, snap to 1.25× stretched on 4.5, settled by 4.75.

@@ -22,6 +22,7 @@ const CAM = new THREE.Vector3(-0.092, 0.068, 0.86), LOOK = new THREE.Vector3(-0.
 const CEIL = 0.13;
 const COUNTER_Y = 0.0495;                                     // 91 cm: the counter_run's painted top
 const UPPER_Y = 0.078;                                        // upper cabinets' and microwave's bottom (1.42 m)
+const UPPER_Z = 0.004;                                        // v3: the uppers hang flush to the wall (were 0.014), so the blob's shadow doesn't jump at their edges
 const SEAT_Y = 0.042;                                         // bar-stool seat, 76 cm
 // Fridge light: the spec's x and z (S 3.20 → 3.62 → 4.17), at the middle shelf, 5 mm over the seat. The spec puts it
 // 10 mm under the seat; there the 5.2-unit shadow rode up so far its eyes went onto the navy ceiling. S is z-only.
@@ -138,9 +139,9 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   for (const [i, x0] of [[0, SINK_X - 0.034], [1, SINK_X - 0.034 + 0.18]]) {
     cut(kit, 'backsplash_strip', [null, UPPER_Y - COUNTER_Y], `backsplash_${i}`, { anchor: [0, 0] }).g.position.set(x0, COUNTER_Y - 0.002, 0.003);
   }
-  cut(kit, 'upper_cabinets', [null, 0.0385], 'upper_l', { anchor: [1, 0] }).g.position.set(STOVE_X0 - 0.002, UPPER_Y, 0.014);
-  cut(kit, 'upper_cabinets', [null, 0.0385], 'upper_r', { anchor: [0, 0] }).g.position.set(STOVE_X1 + 0.002, UPPER_Y, 0.014);
-  cut(kit, 'microwave', [STOVE_X1 - STOVE_X0 - 0.004, null], 'microwave', { anchor: [0.5, 0] }).g.position.set((STOVE_X0 + STOVE_X1) / 2, UPPER_Y, 0.016);
+  cut(kit, 'upper_cabinets', [null, 0.0385], 'upper_l', { anchor: [1, 0] }).g.position.set(STOVE_X0 - 0.002, UPPER_Y, UPPER_Z);
+  cut(kit, 'upper_cabinets', [null, 0.0385], 'upper_r', { anchor: [0, 0] }).g.position.set(STOVE_X1 + 0.002, UPPER_Y, UPPER_Z);
+  cut(kit, 'microwave', [STOVE_X1 - STOVE_X0 - 0.004, null], 'microwave', { anchor: [0.5, 0] }).g.position.set((STOVE_X0 + STOVE_X1) / 2, UPPER_Y, UPPER_Z + 0.002);
   // Window over the sink: home_kit's frame over a tissue pane, lit from behind through the hole.
   cut(home, 'window_frame', [null, 0.044], 'window_frame').g.position.set(SINK_X, (HOLE.y0 + HOLE.y1) / 2 - 0.002, 0.003);
   cut(home, 'window_glass', [HOLE.x1 - HOLE.x0 + 0.004, null], 'apt_window', { weight: 'tissue', mat: { translucency: 0.8 } })
@@ -269,8 +270,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   scene.add(dawn.light, dawn.light.target);
   const toL = L.clone().sub(new THREE.Vector3(-0.114, 0.083, 0));   // the first shadow's centre
   const E_KEY = KEY_I * (toL.z / toL.length()) / toL.lengthSq();
-  const amb = ambient();
-  amb.intensity *= AMB;
+  const amb = new THREE.HemisphereLight(PALETTE.navy, col('navy', 'phone', 0.25), 0.8 * AMB);   // v3: cool bounce, not kraft's: the shadow is a navy shape, not a brown blotch
   scene.add(amb);
   wall.castShadow = true;   // for the window rig; the fridge spot sits in front of it, so the wall can't shade the room
 
@@ -291,6 +291,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
       // Student
       rig.blend(P, KEYS, t);
+      rig.joints.body.rotation.z += 1 * DEG * Math.sin(2 * Math.PI * T / 2.8);   // v3 secondary motion: he breathes, on 2s
       rig.follow('tail', t);
       if (T >= 5.0 && T < 5.83) rig.joints.tail.rotation.z += 4 * DEG * Math.sin(2 * Math.PI * (T - 5.0) / 0.33);  // happy swish
       rig.face({ eyes: step(t, EYES), mouth: step(t, MOUTH) });

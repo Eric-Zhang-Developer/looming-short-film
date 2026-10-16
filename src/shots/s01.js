@@ -1,6 +1,7 @@
 // s01 · Dawn skyline, push to the window (docs/shots/s01.md). v2: the apartment is built from home_kit (frames, door,
-// glass) on a brick-kraft facade; skyline_sheet and foliage_sheet are not frozen, so the skyline and the oak stay proxies.
-// No characters. What moves: the camera push (1s), the boil (10/s), the dawn warming (1s), the oak branch sway (2s).
+// glass) on a brick-kraft facade. v3: the skyline and oaks are marston_ext_kit's (century tower, facade block, stepped bay,
+// oak canopy) instead of the random proxy rooflines; skyline_sheet and foliage_sheet were never painted.
+// No characters. What moves: the camera push (1s), the boil (10/s), the dawn warming (1s), the oak canopy sway (2s).
 import * as THREE from 'three';
 import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
@@ -29,26 +30,6 @@ const CAM = { pos: [[0, [0, 0.42, 2.5]], [6, [0.17, 0.33, 1.0]]], look: [[0, [0,
 const FACADE_Z = 0.6;
 const ROOM_I = 0.05, BOUNCE_I = 0.35;   // his room light behind the pane (cd), the street bounce on the facade
 
-// Proxy skyline: a rooftop line as a path (0..1, v down) with flat and pitched roofs, oak canopies and an optional
-// clock tower [u, half-width]. Real skyline_sheet art replaces it.
-function roofline(seed, { base, jitter, tower }) {
-  const r = mulberry32(seed), pts = [[0, 1]];
-  for (let x = 0; x < 1;) {
-    const w = 0.025 + 0.05 * r(), top = base + jitter * (r() - 0.5);
-    if (tower && x <= tower[0] && x + w > tower[0]) {
-      const [tx, tw] = tower;
-      pts.push([x, top], [tx - tw, top], [tx - tw, 0.14], [tx - tw * 0.5, 0.14], [tx, 0.02], [tx + tw * 0.5, 0.14], [tx + tw, 0.14], [tx + tw, top], [x + w, top]);
-    } else if (r() < 0.35) {
-      for (let i = 0; i <= 6; i++) pts.push([x + (w * i) / 6, top - 0.6 * jitter * Math.sin((Math.PI * i) / 6)]);
-    } else {
-      pts.push([x, top], r() < 0.5 ? [x + w / 2, top - 0.5 * jitter] : [x + w / 2, top], [x + w, top]);
-    }
-    x += w;
-  }
-  pts.push([1, 1]);
-  return pts.map(([x, y]) => [Math.min(1, x), Math.max(0, y)]);
-}
-
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const hex = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
   const tiltOf = (layer) => { const r = mulberry32(seedOf('s01', layer)); return [(2 * r() - 1) * 1.5 * DEG, (2 * r() - 1) * 1.5 * DEG, 0]; };
@@ -76,15 +57,25 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     ['sky-low', hex('cream', 'lamp', 0.4), -0.05, 0.27, 0.008],
   ]) sheet(layer, { ...torn(1.8, y1 - y0), color, weight: 'tissue' }, { at: [0, (y0 + y1) / 2, z], parent: sky0, tilt: false }).castShadow = false;
 
-  // ---- Far (z 0.12) and mid (z 0.30): skyline_sheet. Proxy rooflines until the sheet is frozen.
-  const sky = await assets.load('skyline_sheet');
-  const skyline = (piece, z, y0, y1, shape) => sheet(piece, sky.proxy
-    ? { path: roofline(seedOf('s01', piece), shape), color: PALETTE.navy, size: [1.8, y1 - y0] }
-    : { art: sky.pieces[piece], size: [1.8, y1 - y0] }, { at: [0, (y0 + y1) / 2, z] });
-  // The far layer casts nothing: at this ~5° key its shadow would cover the whole mid layer's back, and the mid
-  // layer's rim (spec acceptance) would go dark. Its shadow is never visible otherwise (it lands on unlit backs).
-  skyline('skyline_far', 0.12, -0.05, 0.23, { base: 0.27, jitter: 0.12, tower: [(0.9 - 0.35) / 1.8, 0.014] }).castShadow = false;
-  skyline('skyline_near', 0.30, -0.05, 0.15, { base: 0.3, jitter: 0.25 });
+  // ---- Far (z 0.12) and mid (z 0.30): marston_ext_kit. Far: a long brick block, the stepped bay and the century tower (the
+  // one landmark). Mid: two oak canopies as the tree line. Backlit, so they read as silhouettes with a lit torn rim, and
+  // the blocks' window holes show the sky. Each is placed by its visible width and the centre of its visible box.
+  const ext = await assets.load('marston_ext_kit');
+  const kitPiece = (kit, p, w, key, at, o = {}) => {
+    const [sw, sh] = kit.sizes[p], [u0, v0, u1, v1] = kit.visible[p], k = w / (sw * (u1 - u0));
+    const m = sheet(key, { art: kit.pieces[p], size: [sw * k, sh * k], weight: o.weight ?? 'cardstock' }, { at, parent: o.parent ?? scene, tilt: o.tilt ?? true, ...o.mat });
+    m.position.x += (0.5 - (u0 + u1) / 2) * sw * k; m.position.y += ((v0 + v1) / 2 - 0.5) * sh * k;
+    return m;
+  };
+  const FAR = [['facade_block', 0.95, -0.50], ['stepped_bay', 0.36, 0.52], ['century_tower', 0.07, -0.18]];   // [piece, visible width, centre x]
+  for (const [p, w, x] of FAR) {
+    const h = w * ext.sizes[p][1] * (ext.visible[p][3] - ext.visible[p][1]) / (ext.sizes[p][0] * (ext.visible[p][2] - ext.visible[p][0]));
+    // The far layer casts nothing: at this ~5° key its shadow would cover the whole mid layer's back, and the mid
+    // layer's rim (spec acceptance) would go dark. Its shadow is never visible otherwise (it lands on unlit backs).
+    kitPiece(ext, p, w, `far_${p}`, [x, 0.0 + h / 2, p === 'century_tower' ? 0.125 : 0.12]).castShadow = false;
+  }
+  kitPiece(ext, 'oak_canopy', 0.62, 'near_oak_a', [-0.62, 0.17, 0.30]);
+  kitPiece(ext, 'oak_canopy', 0.5, 'near_oak_b', [0.42, 0.16, 0.30]);
 
   // ---- Hero (z 0.60): the apartment, built from home_kit (G4: "the house is really ugly"). A three-storey brick-kraft
   // facade with cornice bands, a 3 × 3 grid of the kit's window frames (dark panes), the kit's door on the ground floor,
@@ -126,27 +117,24 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // His pane: home_kit's glass, tissue, behind the hole. It glows by translucency (0.8), never emissive.
   cutPiece('window_glass', HOLE[0] + 0.006, 'apt_window', [HERO[0], HERO[1] + 0.003, -0.002], { weight: 'tissue', mat: { translucency: 0.8 } }).castShadow = false;
 
-  // ---- Foreground (z 0.95): foliage_sheet oak_branch as a small puppet, branch plus tissue moss, so the moss lags.
-  const fol = await assets.load('foliage_sheet'), limb = tornArt(fol.pieces.oak_branch, [0.4, 0.25]);
-  const lm = PAD * 0.4;  // tornArt's margin in m, so the pivot stays on the limb's top-left corner
-  const MOSS = [[0.06, -0.215, 0.09], [0.14, -0.19, 0.07], [0.22, -0.165, 0.085], [0.30, -0.14, 0.055]];  // [x, y, length] under the limb
-  const STRAND = [[0.15, 0], [0.85, 0], [0.7, 0.35], [0.8, 0.6], [0.55, 1], [0.4, 0.7], [0.2, 0.45]];
+  // ---- Foreground (z 0.95): the kit's oak canopy hanging in from the top-left as a small puppet, a branch plus a
+  // second, smaller sprig that lags it on a spring (secondary motion), so the moss doesn't move as one card.
+  const limb = tornArt(ext.pieces.oak_canopy, [0.62, 0.62 * 212 / 652]);
+  const lm = PAD * 0.62;  // tornArt's margin in m, so the pivot stays on the canopy's top-left corner
   const oak = definePuppet({
     name: 's01-oak',
     parts: [
       { name: 'branch', pivot: [lm / limb.size[0], lm / limb.size[1]], at: [0, 0], z: 0,
-        sheet: (s) => makePaper({ art: limb.cv, size: limb.size, key: 's01-oak_branch', seed: s }) },
-      ...MOSS.map(([x, y, l], i) => ({
-        name: `moss${i}`, pivot: [0.5, 0], parent: 'branch', at: [x, y], z: 0.004,
-        sheet: (s) => makePaper({ path: STRAND, color: hex('navy', 'gator', 0.35), weight: 'tissue', size: [0.016, l], key: `s01-moss${i}`, seed: s }),
-      })),
+        sheet: (s) => makePaper({ art: limb.cv, size: limb.size, key: 's01-oak_canopy', seed: s }) },
+      { name: 'sprig', pivot: [0.5, 0.05], parent: 'branch', at: [0.30, -0.10], z: 0.004,
+        sheet: (s) => makePaper({ art: limb.cv, size: limb.size.map((v) => v * 0.5), key: 's01-oak_sprig', seed: s }) },
     ],
   });
-  oak.group.position.set(-0.45, 0.8, 0.95);  // the top-left pivot of x −0.45..−0.05, y 0.55..0.80
+  oak.group.position.set(-0.60, 0.80, 0.95);  // the top-left pivot of x −0.60..0.02, y 0.80 down to 0.64
   oak.group.rotation.set(...tiltOf('oak_branch'));
   scene.add(oak.group);
   // ±0.6° about the pivot, period 3 s: eased keys between the extremes trace a sine that starts at 0, rising.
-  const SWAY = { l: { branch: -0.6 * DEG }, r: { branch: 0.6 * DEG } };
+  const SWAY = { l: { branch: -0.6 * DEG, sprig: 0 }, r: { branch: 0.6 * DEG, sprig: 0 } };
   const swayKeys = [-0.75, 0.75, 2.25, 3.75, 5.25, 6.75].map((t, i) => [t, i % 2 ? 'r' : 'l']);
 
   // ---- Key: dawn behind the skyline, about 5° up, so every cardstock layer is a backlit silhouette with a lit rim.
@@ -186,7 +174,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       for (const [mesh, make] of boiling) updatePaperMesh(mesh, make(seed));
       oak.boil(tLocal, 10);
       oak.blend(SWAY, swayKeys, tLocal);
-      MOSS.forEach((_, i) => oak.follow(`moss${i}`, tLocal, { k: 6, w: 18 }));
+      oak.follow('sprig', tLocal, { k: 6, w: 18, gain: 3 });
     },
   };
 }

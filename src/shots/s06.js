@@ -7,7 +7,7 @@
 // Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { phoneLight, lampLight, ambient, aim } from '../lights.js';
-import { kf } from '../core/ease.js';
+import { kf, onTwos } from '../core/ease.js';
 import { hash2 } from '../core/rng.js';
 import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
@@ -21,8 +21,9 @@ const MARK_X = 0.026, GROW_DX = 1.15 * (BLOB_R.gulp2 - BLOB_R.start), HOP_DX = -
 const ON = 0.5, OFF = 3.0, GULP = 4.0;                     // lampClickHome, lampOffHome, gulp2 (local)
 const CAM = { pos: [0.05, 0.125, 0.60], look: [0.05, 0.058, 0.02] };   // high and wide enough to hold the 6.1-unit loom
 const FOCUS = 0.58;
-const SPOT_I = 0.03, OUTSHONE = 0.05, LAMP_I = 0.12, AMB = 0.45, FACE_SCREEN = 0.006, FACE_LAMP = 0.004;
+const SPOT_I = 0.03, OUTSHONE = 0.05, LAMP_I = 0.06, AMB = 0.45, FACE_SCREEN = 0.006, FACE_LAMP = 0.004;
 const LAMP_KEYS = [[ON, 0], [ON + 1 / 24, 1.15], [ON + 3 / 24, 0.95], [ON + 5 / 24, 1.0]];
+const BREATHE = 0.7 * DEG;                                  // v3 secondary motion: a 2.8 s breath, on 2s
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
 const TAPS = [48, 54, 60, 66, 72, 78, 84, 90];               // every 0.5 s from 4.0
 
@@ -110,6 +111,7 @@ export async function build(ctx) {
       if (f >= 8 && f < 12) gator.joints.head.rotation.z += HEAD_DIP[0][1] * DEG;
       if (f === 12) gator.group.position.y = DESK.hip[1] - 0.001; else gator.group.position.y = DESK.hip[1];
       if (f === 13) { gator.joints.arm_r.rotation.z += 15 * DEG; gator.joints.arm_l.rotation.z += 15 * DEG; }
+      gator.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * onTwos(t) / 2.8);
       gator.follow('tail', t, { k: 6, w: 18 });
       gator.face({ eyes: eyesAt(f), mouth: mouthAt(f) });
 
