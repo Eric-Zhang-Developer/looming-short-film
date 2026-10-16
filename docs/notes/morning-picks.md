@@ -17,6 +17,14 @@ Everything the orchestrator froze or decided without the director, under his ove
 ## Decided overnight
 - **The gator's size:** the rig is pinned on hip-to-shoulder = 0.030, so desk hand paths keep working. He's now 9.3 cm tall, not 8. Before and after: `evidence/cut-gator/shots.jpg`.
 
+## Good morning: the overnight run in one screen
+- **Watch first:** `out/v3_draft_720p.mp4` (3:15, 24 MB; 1080p alongside). Then `out/v2_rough_cut_720p.mp4` for the step between. `out/v1_animatic*.mp4` is the before.
+- **What changed since v1:** your G4 notes are all in. The real gator; home, kitchen, Marston, props, exam room and cast are all painted and frozen; the explicit "Calc 2 exam" opening; a laptop game at home; blinds that feed the blob; the Calc 2 practice, test day and the 94; the calendar ending with a "Final" tag; the sound re-timed to 3:15 (−15.9 LUFS, −4.9 dBTP).
+- **Cold viewers, v2 → v3:** the rule went from "can't tell" to "screen glow throws the shadow, desk lamp shrinks it (a tendency)". The turn went from "no clear turning point" to "roughly 1:44–1:50, but soft; can't see his action cause it". Reports: `evidence/cold-v2/report.md` and `evidence/cold-v3/report.md`.
+- **Biggest open problem:** the turn is still soft. Your call on how explicit to make it (e.g. a close-up on the hand and the sensor, or the light following his reach across the room).
+- **Your decisions waiting:** 1) any freeze below you want to overrule (especially the **tortoise custodian**); 2) how explicit the turn gets; 3) the score stays synthesized?; 4) a title card or none; 5) **listen to the mix** (no agent can).
+- **Not done:** the 4K master (planned for Saturday night), captions, the flash check on the sensor flicker, the spec docs for s03/s12/s15/s17 (stale after v3-readability), and nothing is tagged or released (public actions wait for you).
+
 ## Look at first
 3. `evidence/asset-marston-kit/contact.jpg`: Marston from your photos.
 2. `evidence/asset-home-kit/contact.jpg` and `scale.jpg`: the new home and kitchen, with pieces sized against the gator.

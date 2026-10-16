@@ -3,6 +3,9 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-15
 
+## MORNING (2026-10-16): the overnight run finished at about 3 AM
+**Read `docs/notes/morning-picks.md` first.** v2 (`out/v2_rough_cut.mp4`, 01:29) and v3 draft (`out/v3_draft.mp4`, 02:44) are rendered, both 3:15. All work is merged and pushed on `wave/3-assets`. No task worktrees are left except `asset-face-sheet` (stale, safe to remove). Fix list: `docs/notes/v3-fixlist.md`, plus `evidence/cold-v3/report.md`. Making-of ch 11 covers the night. Next: the director's notes on v3 → a v3.1 pass on the turn and the cold-viewer list → captions and the flash check → the 4K master Saturday night.
+
 ## OVERNIGHT RUN (2026-10-15 → 16): director asleep. Read this first.
 Brief: G4 notes in `docs/notes/g4-2026-10-15.md`; decisions in doc 07 ("G4 on v1-animatic"). Goal: **v2 complete, then v3 close to complete**, both rendered (1080p, chunked), by morning. 4K stays Saturday.
 **Authority:** freeze art by rule (most cut-paper, most Marston, simplest), and log every freeze plus its alternatives in `docs/notes/morning-picks.md`. No public actions (no tags, releases or PRs to main). No story changes beyond G4. The director does not review between v2 and v3.
