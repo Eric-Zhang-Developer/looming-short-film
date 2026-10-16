@@ -32,7 +32,10 @@ const CAM = [0.020, 0.033], CAM_Z = [[2.6, 0.668], [6.0, 0.628]];
 const HINGE = [0.015, 0.002], LID_LEN = 0.035;
 
 // Intensities (cd for spots/points, lux for the directional), by eye on the key-moment sheet.
-const FLUOR_I = 0.6, PHONE_I = 1.0, LAPTOP_I = 0.15, FILL_I = 0.3 * 0.03, AMB_K = 0.4, CHAR_FILL_I = 0.008;
+// v3-readability: the cold viewer saw 80–84 s as near-black (frame luma 17–21 of 255, where s09/s10 sit at 46–51). Night
+// stays, but his lit zone has to read on a phone: the zone ×3, ambient ×3.5 and his fill ×2. The timeout (4.2) and the
+// phone's loom are unchanged, so the drop into the dark is now a bigger step, not a smaller one.
+const FLUOR_I = 1.8, PHONE_I = 1.0, LAPTOP_I = 0.15, FILL_I = 0.3 * 0.03, AMB_K = 1.4, CHAR_FILL_I = 0.016;
 
 // v3: his eyes at the hunch were 0.040 above the desk after the 9.3 cm rig (measured on the rig's eye joint), 7 mm over the
 // peak blob's 0.0324 (1.08 × r 0.030). Lean 30, head −15 puts them at 0.0333, so the gulp at 5.25 meets him eye to eye

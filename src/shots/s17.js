@@ -2,12 +2,11 @@
 // Morning comes, the morning of the exam. He puts the pen down and sits back, looks once at the blob (small now, asleep
 // on his page's corner), and closes his eyes; it opens its eyes once, looks up at him, and sleeps again. After 9.0 only
 // the light and the boil move: dawn crawls in through the ribbon windows from the foreground toward the wall, the panes
-// warm grey to gold, and the grade crossfades act 3 → Quiet 2 (0–16). The pocket climb is cut (G4).
-// Three desk units on s11's set: the empty desk (zone dead), his (zone lit), the neighbor's (asleep, zone lit), and a
-// foreground row with a sleeping extra. Characters on 2s, boil 4/s (quiet rate), light, grade at 24.
+// warm night to gold under s16's amber grade (v3-readability). The pocket climb is cut (G4).
+// Three desk units on s11's set: the empty desk (zone dead), his (zone lit), the neighbor's (asleep, zone lit).
+// Characters on 2s, boil 4/s (quiet rate), light, grade at 24.
 import * as THREE from 'three';
 import { sensorLight, dawnLight, fluorescent, ambient } from '../lights.js';
-import { loadLUT } from '../post.js';
 import { clamp, onTwos } from '../core/ease.js';
 import { makeGator } from '../characters/gator.js';
 import { makeCrowd } from '../characters/crowd.js';
@@ -26,7 +25,6 @@ const HIP = [-0.075, -0.012, 0.074];                    // s11's seat (UNIT.hip,
 // their chair fell just outside the locked frame, leaving only their blob at the edge.
 const NB = 0.310, EMPTY_DX = -0.25;                     // the empty desk Δx
 const NB_BLOB = [NB, 0.098], NB_PHONE = [NB + 0.010, 0.0015, 0.114], NB_HIP = [NB + 0.075, -0.012];
-const FG = { z: 0.354, head: [0.120, 0.035], blob: [0.150, 0.360] };   // the foreground sleeper
 // Camera: the spec's distance and angle (1.02 m, 12° down), aimed 2 cm lower, because s11's ribbon window is one low
 // band (panes y 0.078–0.132), not the spec's 0.066–0.300 openings: at the spec's aim the top of the frame was bare wall.
 // v3 (v3-fix-marston): the blob (r 0.005, 1.1 cm wide) was 32 px in a 60 cm frame. The wide moves in to 0.95 m and re-centres on
@@ -36,7 +34,12 @@ const CAM = { pos: [0.100, 0.250, 0.950], look: [0.100, 0.058, 0.062] }, FOCUS =
 const CAM_E = { pos: [-0.030, 0.028, 0.338], look: [-0.030, 0.028, 0.098], focus: [0.000, 0.010, 0.098] }, E_WINDOW = [6.75, 8.75];
 const GOLD_AT = 16;                                     // elevation, k, panes and grade ramps end here, then hold
 const ZONE_I = 0.35, FLUOR_I = 0.35, AMB_K = 0.45, FILL_I = 0.02, DAWN_K = 9;   // DAWN_K: dawn overtakes the zones by ~14 s (by eye)
-const PANE = { cold: 0.06, gold: 0.9 };                 // window tissue glow, grey dawn → gold
+// v3-readability: the cold viewer saw 18 s of near-identical wides, "the ceiling strip blown out to white", and an
+// unexplained brown foreground object. The panes went to 0.9 glow and the grade crossfaded amber → dawn, which cooled and
+// washed the room, so the dawn read as the lights going grey. Now the panes start as night (navy, barely lit) and warm to
+// gold at a glow that keeps their paper, and the grade holds s16's amber: the one change is the windows filling with
+// gold. The foreground sleeper (the brown object, cut by the frame) and its desk are gone.
+const PANE = { cold: 0.02, gold: 0.18 };                // window tissue glow, night → gold
 
 // ---------- the hero (s15 convention: lean + forward, arm = the near arm's world angle) ----------
 const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
@@ -78,7 +81,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const tissue = sheet({ path: RECT, color: '#ffffff', weight: 'tissue', size: [1.36, 0.056], key: `${ID}-window_tissue`, res: 1024 }, scene);
   tissue.position.set(0, 0.105, -0.0006); tissue.castShadow = false;
   const tissueMat = glow({ children: [tissue] });
-  const TISSUE = { cold: C('navy').lerp(C('cream'), 0.3), gold: C('lamp').lerp(C('cream'), 0.5) };
+  const TISSUE = { cold: C('navy').lerp(C('ink'), 0.3), gold: C('lamp').lerp(C('cream'), 0.35).multiplyScalar(0.55) };   // ×0.55: DAWN_K's sun lights the tissue too
   // A desk unit like s11's (privacy panel, apron, maple top, Y-back chair, ring pendant) inside group g.
   const dk = kit.pieces.desk_row_front, dm = 0.183 / 599, pk = mppOf(kit, 'ring_light_lit');
   const unit = (g, tag, lit, chair = true) => {
@@ -96,7 +99,6 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   };
   const empty = new THREE.Group(); empty.position.x = EMPTY_DX; unit(empty, '-empty', false);
   const nbrU = new THREE.Group(); nbrU.position.x = NB; nbrU.scale.x = -1; unit(nbrU, '-nbr', true);
-  const fgU = new THREE.Group(); fgU.position.set(0.053, 0, 0.280); unit(fgU, '-fg', undefined, false);   // desk top z 0.310…0.400
   pendant(1);
 
   // ---------- his desk (s16's out-state): the worked practice sheet, the stack, phone face-down, laptop shut, pen ----------
@@ -123,20 +125,12 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   nb.group.position.set(NB_HIP[0] - 0.025, NB_HIP[1], HIP[2]);
   nb.pose(specPose({ lean: 62, arm: -5, far: null, head: -12 }));
   scene.add(nb.group);
-  const fg = await makeCrowd({ assets }, 'sleeper', { seed: 2 });
-  fg.pose(POSES.crowd_sleep);
-  fg.group.updateMatrixWorld(true);
-  { const hc = new THREE.Box3().setFromObject(fg.meshes.head).getCenter(new THREE.Vector3());
-    fg.group.position.set(FG.head[0] - hc.x, FG.head[1] - hc.y, FG.z); }
-  scene.add(fg.group);
 
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });   // s16's blob, its last size
   exam.mesh.position.set(BLOB[0], 0, BLOB[1]);
   const nbBlob = createBlob({ radius: OTHER_R.neighbor, seed: 13 });
   nbBlob.mesh.position.set(NB_BLOB[0], 0, NB_BLOB[1]);
-  const fgBlob = createBlob({ radius: OTHER_R.sleeper17, seed: 11 });
-  fgBlob.mesh.position.set(FG.blob[0], 0, FG.blob[1]);
-  scene.add(exam.mesh, nbBlob.mesh, fgBlob.mesh);
+  scene.add(exam.mesh, nbBlob.mesh);
 
   // ---------- light ----------
   // Zones (README §3): his and the neighbor's lit at a constant level (both moved minutes ago); the empty desk's dead.
@@ -153,25 +147,13 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const fill = new THREE.PointLight(C('cream').lerp(C('gator'), 0.15), FILL_I, 0.07, 2);   // README §10, fluorescent tone
   fill.position.set(-0.046, 0.040, 0.114); scene.add(fill);
 
-  // ---------- camera (locked), post, grade crossfade act 3 (amber) → Quiet 2 (dawn) over 0–16 ----------
+  // ---------- camera (locked), post ----------
   const dir = new THREE.Vector3(), V3 = new THREE.Vector3();
   const aimCam = ({ pos, look, focus }) => {   // sets the camera and returns the focus distance along its axis
     camera.position.set(...pos); camera.lookAt(...look); camera.updateMatrixWorld(true);
     return camera.getWorldDirection(dir).dot(V3.set(...focus).sub(camera.position));
   };
-  const fx = post({ focus: aimCam({ ...CAM, focus: FOCUS }), aperture: 0.02, maxblur: 0.01 });
-  const LA = loadLUT('amber').image, LB = loadLUT('dawn').image;
-  const lut = new THREE.Data3DTexture(new Uint8Array(LA.data.length), LA.width, LA.height, LA.depth);
-  Object.assign(lut, { format: THREE.RGBAFormat, type: THREE.UnsignedByteType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
-    wrapS: THREE.ClampToEdgeWrapping, wrapT: THREE.ClampToEdgeWrapping, wrapR: THREE.ClampToEdgeWrapping, unpackAlignment: 1 });
-  let lutStep = -1;
-  const setGrade = (k) => {
-    const s = Math.round(clamp(k) * 255);
-    if (s === lutStep) return; lutStep = s;
-    const d = lut.image.data;
-    for (let i = 0; i < d.length; i++) d[i] = Math.round(LA.data[i] + (LB.data[i] - LA.data[i]) * s / 255);
-    lut.needsUpdate = true; fx.set({ lut });
-  };
+  const fx = post({ focus: aimCam({ ...CAM, focus: FOCUS }), aperture: 0.02, maxblur: 0.01, lut: 'amber' });   // s16's grade, held
 
   const hand = new THREE.Vector3();
   return {
@@ -179,7 +161,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       const tc = onTwos(t);
       boil(t, RATE);
       fx.set({ focus: aimCam(t >= E_WINDOW[0] && t < E_WINDOW[1] ? CAM_E : { ...CAM, focus: FOCUS }) });   // the cut to E and back, on 1s
-      for (const p of [gator, nb, fg]) p.boil(t, RATE);
+      for (const p of [gator, nb]) p.boil(t, RATE);
 
       // the hero, on 2s: still, puts the pen down, sits back; looks at the blob; eyes closed from 9.0
       gator.blend(P, BODY, tc);
@@ -198,12 +180,10 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       amb.color.copy(ambSky).lerp(ambWarm, 0.5 * g);
       tissueMat.color.copy(TISSUE.cold).lerp(TISSUE.gold, g);
       tissueMat.emissiveIntensity = PANE.cold + (PANE.gold - PANE.cold) * g;
-      setGrade(g);
 
       // the blob: asleep on the page corner; one look at him, 7.0–8.5. The others are still drawings.
       exam.update(t, { wobble: 0.4, eyes: blobEyes(tc), look: -1, key: zones[0].light });
       nbBlob.update(0, { eyes: 'closed', wobble: 0 });
-      fgBlob.update(0, { eyes: 'closed', wobble: 0 });
     },
   };
 }

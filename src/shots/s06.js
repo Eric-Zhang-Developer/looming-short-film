@@ -13,6 +13,7 @@ import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
 import { DESK, tools, homeDesk, seatReach } from './s02.js';
+import { screenHalo } from './s03.js';
 
 const ID = 's06', DEG = Math.PI / 180;
 const BLOB_R = { start: 0.015, gulp2: 0.018 };            // METER.gulp1 → METER.gulp2 (README §1)
@@ -21,7 +22,14 @@ const MARK_X = 0.026, GROW_DX = 1.15 * (BLOB_R.gulp2 - BLOB_R.start), HOP_DX = -
 const ON = 0.5, OFF = 3.0, GULP = 4.0;                     // lampClickHome, lampOffHome, gulp2 (local)
 const CAM = { pos: [0.05, 0.125, 0.60], look: [0.05, 0.058, 0.02] };   // high and wide enough to hold the 6.1-unit loom
 const FOCUS = 0.58;
-const SPOT_I = 0.03, OUTSHONE = 0.05, LAMP_I = 0.06, AMB = 0.45, FACE_SCREEN = 0.006, FACE_LAMP = 0.004;
+// v3-readability: the lamp has to read as light from *above*. At s02's 0.044 its mouth (0.028) sat level with the blob's
+// top, so it lit the blob from the side and threw its shadow off the desk front, and no pool showed. Here it stands
+// right behind the blob, tall enough (mouth 0.041) that the shade hangs over the blob's head and the pool falls under
+// it. s02/s03's lamp (DESK.lamp) is unchanged: s06 is another night and another cut.
+const LAMP = { x: 0.020, h: 0.064 };
+const LAMP_MOUTH = [LAMP.x, LAMP.h * 0.646, DESK.lamp.z], LAMP_BEAD = [LAMP.x - LAMP.h * 21 / 212, LAMP.h * 0.505, DESK.lamp.z];
+// OUTSHONE: v3 left a ghost loom (eye holes) on the lit wall at 0.05. LAMP_I: the mouth is 1.45× higher.
+const SPOT_I = 0.03, OUTSHONE = 0.004, LAMP_I = 0.12, AMB = 0.45, FACE_SCREEN = 0.006, FACE_LAMP = 0.004;
 const LAMP_KEYS = [[ON, 0], [ON + 1 / 24, 1.15], [ON + 3 / 24, 0.95], [ON + 5 / 24, 1.0]];
 const BREATHE = 0.7 * DEG;                                  // v3 secondary motion: a 2.8 s breath, on 2s
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
@@ -42,7 +50,9 @@ export async function build(ctx) {
   const gator = await makeGator(ctx, { seed: 2 });
   gator.group.position.set(...DESK.hip);
   scene.add(gator.group);
-  const cam = new THREE.Vector3(...CAM.pos), bead = new THREE.Vector3(...DESK.bead);
+  set.lamp.g.position.x = LAMP.x;
+  set.lamp.g.scale.multiplyScalar(LAMP.h / DESK.lamp.h);
+  const cam = new THREE.Vector3(...CAM.pos), bead = new THREE.Vector3(...LAMP_BEAD);
   set.laptop.updateMatrixWorld(true);
   const keys = set.laptop.localToWorld(new THREE.Vector3(0, 0.0008, 0.002));
   const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
@@ -78,8 +88,8 @@ export async function build(ctx) {
   spot.position.copy(L);
   const screenFill = new THREE.PointLight(PALETTE.phone, 0, 0.06, 2);
   screenFill.position.copy(L).add(new THREE.Vector3(-0.004, 0.004, 0));
-  const lamp = lampLight({ angle: 0.5, penumbra: 0.5, intensity: 0 });
-  lamp.light.position.fromArray(DESK.lampMouth);
+  const lamp = lampLight({ angle: 0.5, penumbra: 0.5, intensity: 0, reach: 1.3 });   // reach: the taller lamp's cone ran down the desk front to the floor
+  lamp.light.position.fromArray(LAMP_MOUTH);
   lamp.dust.material.size = 0.0012;                         // the specks at desk scale
   const face = new THREE.PointLight(PALETTE.phone, 0, 0.07, 2);
   face.position.set(-0.025, 0.04, 0.06);
@@ -87,12 +97,13 @@ export async function build(ctx) {
   scene.add(spot, spot.target, screenFill, lamp.light, lamp.light.target, lamp.cone, lamp.dust, face, amb);
   // The lamp's shade glows while it's on (tissue lit from inside).
   const shadeGlow = (() => {   // the painted shade's trapezoid: 104 px wide at the mouth, 60 at the top, 75 tall (of 212)
-    const k = DESK.lamp.h / 212, s = new THREE.Shape([[-52, 0], [52, 0], [30, 75], [-30, 75]].map(([x, y]) => new THREE.Vector2(x * k * 0.92, y * k * 0.94)));
+    const k = LAMP.h / 212, s = new THREE.Shape([[-52, 0], [52, 0], [30, 75], [-30, 75]].map(([x, y]) => new THREE.Vector2(x * k * 0.92, y * k * 0.94)));
     const m = new THREE.Mesh(new THREE.ShapeGeometry(s), new THREE.MeshBasicMaterial({ color: PALETTE.lamp, transparent: true, opacity: 0.55, toneMapped: false }));
-    m.position.set(DESK.lamp.x, DESK.lampMouth[1] + 0.0005, DESK.lamp.z + 0.0008);
+    m.position.set(LAMP.x, LAMP_MOUTH[1] + 0.0005 * LAMP.h / DESK.lamp.h, DESK.lamp.z + 0.0008);
     return m;
   })();
   scene.add(shadeGlow);
+  const halo = screenHalo(PALETTE); halo.position.copy(L).add(new THREE.Vector3(0, 0, 0.002)); scene.add(halo);
   const faceCream = new THREE.Color(PALETTE.cream), faceCyan = new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.navy), 0.4);
 
   const C = new THREE.Vector3(), hit = new THREE.Vector3(), foot = new THREE.Vector3();
@@ -156,6 +167,7 @@ export async function build(ctx) {
       lamp.light.target.position.copy(foot); lamp.light.target.updateMatrixWorld();
       lamp.update(t);
       shadeGlow.visible = lk > 0;
+      halo.material.opacity = (lit ? 0.15 : 1) * flick;
       face.color.copy(lit ? faceCream : faceCyan);
       face.intensity = lit ? FACE_LAMP : FACE_SCREEN;
     },

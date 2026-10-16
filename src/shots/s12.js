@@ -18,9 +18,12 @@ const LAPTOP_Z = 0.078;                                  // as s11 (README §2)
 // v3: the 7.1-unit loom is 17 cm tall on the wall, centred y 0.078 (spot y 0.004 over a blob eye-line of 0.03, × 2.85), so
 // it runs to y 0.165. The old camera (z 0.44, y 0.038) saw up to 0.116 and cropped it. This one sees −0.038…0.174 and the
 // loom's whole upper edge, with the desk, the gator and the blob still in the lower third.
-const CAM = [0.020, 0.068, 0.600];                       // looks straight down −Z, locked
+// v3-readability: the cold viewer read v3's 10 s as a stall, "with the croc cropped off". One slow development instead
+// of a lock: a push over the whole shot from a wide that holds him, the blob and the loom's top edge (centred between
+// him and the blob, not on the blob) to a two-shot of his face and the blob's eyes, so the loom closes over the frame.
+const CAM = [-0.012, 0.068, 0.600], CAM_END = [-0.018, 0.048, 0.400];   // straight down −Z; eased 0 → 10
 const SPOT = [-0.010, 0.004, 0.114];                     // spec: S = 0.114 / 0.040 = 2.85 → 7.1 units at 2.5×
-const SPOT_I = 1.0, FILL_I = 0.009, AMB_K = 0.15;       // fill, set against the face/wall ratio (README §10)
+const SPOT_I = 1.0, FILL_I = 0.02, AMB_K = 0.15;        // fill (README §10). v3-readability: 0.009 left him a shape on a phone screen
 const DIM = [[0, 1], [6, 1], [6.5, 0.6]];                // auto-dim, shared by the spot, the fill and the screen
 const FILL_DIM = 0.6;                                    // fill 0.30 → 0.18 with the dim
 const SAT = [[0, 1], [2, 0.55]];                         // gator saturation: ease(0–2), then hold
@@ -97,12 +100,15 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const amb = ambient(); amb.intensity *= AMB_K; scene.add(amb);
 
   // ---------- camera and post ----------
-  camera.position.set(...CAM); camera.lookAt(CAM[0], CAM[1], 0); camera.updateMatrixWorld(true);
+  const camAt = (t) => { const k = ease(t / 10); camera.position.set(...CAM.map((v, i) => v + (CAM_END[i] - v) * k));
+    camera.lookAt(camera.position.x, camera.position.y, 0); camera.updateMatrixWorld(true); };
+  camAt(0);
   const fx = post({ focus: CAM[2] - M[2], aperture: 0.03, maxblur: 0.012, lut: 'marston' });   // spec's act2b isn't in post.js
 
   function update(t) {
     const tc = onTwos(t);
     boil(t, RATE);
+    camAt(t); fx.set({ focus: camera.position.z - M[2] });   // the push runs on 1s
 
     hero.boil(t, RATE);
     hero.blend({ ...POSES, head_down: HEAD_DOWN }, [[0, 'head_down']], tc + 1e-6);

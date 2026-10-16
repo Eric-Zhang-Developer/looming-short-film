@@ -44,12 +44,18 @@ export const PAGE = [-0.0205, 0.0003, 0.095];                // page centre (x �
 // Intensities (candela for spots/points, lux for the directional), tuned by eye on the key-moment sheet.
 const PHONE_I = 1.0, ZONE_I = 0.8, FLUOR_I = 0.25, AMB_K = 0.45;   // ZONE_I: lights.js's default, the old lamp pool at the blob
 const PHONE_OUTSHONE = 0.02;   // README §4 says 0.2. anim-s15 took 0.05 (0.2 left the loom at 43%); reel-s15 0.02, by eye
-const FILL_PHONE = 0.003, FILL_ZONE = 0.02;   // character fill (README §10), set against anim-s15's face/wall ratio
+const FILL_PHONE = 0.012, FILL_ZONE = 0.02;   // character fill (README §10). v3-readability: 0.003 left him a black shape
+                                              // in the loom, so nobody could see that the reach was his
+// v3-readability: the turn must read as *his movement* waking the light. Two still drawings, then one big reach: the arm
+// swings up high (arm +45) and comes down on the pen, which lands on drawing 5 (0.417). The relay clacks on the
+// beat at 0.5, two frames behind his hand. Then A′ holds on the lit result until 2.5 and pushes slowly to B′ by 9.0.
+const PUSH = [2.5, 9.0];
 
 // ---------- the hand: K0–K3 from poses.js (shared with s06), K4–K7 down to the pen, then the rest of s15's table ----------
 const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });   // poses.js's seated legs
 const P = {
   ...POSES,
+  big_lift: seat({ lean: 8, arm: 45, head: 6 }),   // 0.250: the arm swings up high, clearly a decision
   pen_reach: seat({ lean: 19, arm: -15 }),    // K4 0.333, hand 3 mm over the capped pen
   pen_touch: seat({ lean: 21, arm: -19 }),    // K5 0.417, fingertip on the pen
   pen_press: seat({ lean: 24, arm: -16 }),    // K6 0.500 = K7: the capped point on the name line (the wake)
@@ -62,8 +68,8 @@ const P = {
 };
 const WRITE = ['write_a', 'write_b', 'write_c'];
 const BODY = [
-  ...pressKeys(0).slice(0, 4),                                // K0–K3: drawings 0–3, identical to s06
-  [dr(4), 'pen_reach'], [dr(5), 'pen_touch'], [dr(6), 'pen_press'], [dr(7), 'pen_press'],   // K4–K7, press on 6 (0.500)
+  ...pressKeys(0).slice(0, 3),                                // K0–K2: still, still, anticipation (as s06)
+  [dr(3), 'big_lift'], [dr(4), 'pen_reach'], [dr(5), 'pen_press'], [dr(7), 'pen_press'],   // the press on 5 (0.417), the wake on 6
   [dr(12), 'pen_press'], [dr(14), 'let_go'], [dr(16), 'settle'],
   [dr(83), 'settle'], [dr(84), 'phone_antic'], [dr(86), 'grab'], [dr(87), 'grip'], [dr(88), 'flip'], [dr(89), 'grip'],
   [dr(90), 'grip'], [dr(91), 'to_pen'], [dr(92), 'to_pen'], [dr(93), 'uncap'], [dr(95), 'uncap'], [dr(96), 'uncap_pull'],
@@ -264,8 +270,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     const tc = on2s(t);
     boil(t, 10);
 
-    // camera: A′ locked to 5.0, eased push to B′ by 10.0, locked after (on 1s)
-    const k = ease((t - 5) / 5), A = CAM_A2, B = CAM_B2;
+    // camera: A′ locked to PUSH[0], eased push to B′ by PUSH[1], locked after (on 1s)
+    const k = ease((t - PUSH[0]) / (PUSH[1] - PUSH[0])), A = CAM_A2, B = CAM_B2;
     camera.position.set(...A.pos.map((v, i) => v + (B.pos[i] - v) * k));
     camera.lookAt(look.set(...A.look.map((v, i) => v + (B.look[i] - v) * k)));
     camera.getWorldDirection(dir);
@@ -288,7 +294,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     phone.position.y = PHONE[1] + 0.0025 * Math.sin(flip);
 
     // pen and cap
-    const pressing = tc >= dr(6) && tc < dr(14), held = tc >= dr(5) && tc < dr(14);   // K5 grab to the 1.167 let-go
+    const pressing = tc >= dr(5) && tc < dr(14), held = tc >= dr(4) && tc < dr(14);   // grab on 4, press on 5, let go 1.167
     const lying = !held && tc < dr(92), levelPen = tc >= dr(93) && tc < dr(97);
     if (lying) {   // on the page's front edge, x −0.028…−0.016
       pen.position.set(-0.016, 0.0006, 0.106); pen.rotation.set(-Math.PI / 2, 0, 0);

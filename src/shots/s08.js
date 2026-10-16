@@ -12,6 +12,7 @@ import { kf, easeIn, onTwos } from '../core/ease.js';
 import { mulberry32, seedOf } from '../core/rng.js';
 import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
+import { specPose } from '../characters/poses.js';
 
 const ID = 's08', DEG = Math.PI / 180;
 const F = (s) => Math.round(s * 12) / 12;
@@ -32,7 +33,14 @@ const MT = BED.matB + BED.matH;                                // mattress top, 
 const L = new THREE.Vector3(0.180, MT + 0.016, 0.3447), B = new THREE.Vector3(0.125, MT, 0.29);
 const CAM = new THREE.Vector3(0.050, 0.076, 0.90), LOOK = new THREE.Vector3(0.050, 0.068, 0.20);   // under the ceiling: both blinds, the bed, his face; his feet run off right
 const SPOT = 0.12, ANGLE = 0.78;                               // phone-light key, cd; cone (anim-s08 widened the spec's 0.6)
-const FACE_FILL = 0.2;                                         // the cyan face fill, fraction of the spot
+const FACE_FILL = 0.12;                                        // the face fill, fraction of the spot (v3-readability: was 0.2, pure cyan)
+// v3-readability: the cold viewer saw "a green frog" in the bed. The front turnaround has no snout, and the hoodie sat
+// below the mattress line. Now it's the profile rig sitting up against the pillow, hoodie above the covers, snout over
+// the laptop on his lap, legs under the blanket: the long snout and the hoodie are what say "him". The spot, the blob
+// and the shadow are unchanged (L and B didn't move).
+const SIT = { hip: [0.146, MT + 0.003, 0.300], pose: specPose({ lean: -10, arm: -40, far: -48, head: -16, leg: 82, farLeg: 80, tail: -10 }) };
+const WARM = [1.18, 0.96, 0.82];   // his paper's colour multiplier against the screen's cyan, which he sits inside
+const PILLOW_X = 0.128;                                        // behind his back (was 0.172, behind the front head)
 const SUN = { I: 15, path: [[0, [-0.9, 0.45, -1.0]], [6, [-0.9, 0.70, -1.0]]], k: [[0, 0.0], [6, 0.8]] };
 const SEAM = 2.2;                                              // seam glow at k 0.8 (MeshBasic gain on lamp gold)
 const AMB = [[0, 0.15], [6, 0.30]];                            // ambient, fraction of s02's 0.8
@@ -136,7 +144,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   cut(home, 'bed_mattress', [0.104, BED.matH], 'bed_mattress', { anchor: [0, 0], at: [BED.x0 + 0.008, BED.matB, BED.z + 0.002] });
   group(paper('bed-top', { ...torn(0.104, BED.z - BED.back), color: col('cream', 'kraft', 0.12), res: 512 }),
     [BED.x0 + 0.060, MT - 0.0005, (BED.z + BED.back) / 2], { rot: [-Math.PI / 2, 0, 0] });
-  cut(home, 'bed_pillow', [0.036, null], 'bed_pillow', { anchor: [0.5, 0], at: [0.172, MT - 0.002, 0.292] });
+  cut(home, 'bed_pillow', [0.036, null], 'bed_pillow', { anchor: [0.5, 0], at: [PILLOW_X, MT - 0.002, 0.292] });
   cut(home, 'bed_blanket', [0.080, null], 'bed_blanket', { anchor: [0.5, 1], at: [0.200, MT + 0.010, 0.318], weight: 'tissue' });
   cut(home, 'laundry_pile', [0.030, null], 'laundry', { anchor: [0.5, 0], at: [0.085, 0, 0.33], tilt: true });
   cut(home, 'poster_b', [0.034, null], 'poster', { at: [0.012, 0.080, 0.002], tilt: true });
@@ -144,16 +152,17 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // ---------- the laptop on the mattress, its screen toward his face: the camera sees the lid's back, dark ----------
   const laptop = new THREE.Group();
   laptop.position.set(L.x, MT, L.z);
-  laptop.rotation.y = Math.PI;   // screen faces −z, toward him
+  laptop.rotation.y = -0.7 * Math.PI;   // screen toward him (−x), its back turned partly to camera
   scene.add(laptop);
   const lid = cut(home, 'laptop_screen', [0.0185, null], 'laptop_lid', { anchor: [0.5, 0], parent: laptop, at: [0, 0.001, 0] });
   lid.mesh.material.color.setScalar(0.25);   // the lid's back: the painting seen from behind, dimmed to a dark card
 
-  // ---------- the Student: the front turnaround, upright behind the bed's near side, head on the pillow (top at MT + 0.042) ----------
-  const rig = await makeGator({ assets }, { seed: 8, facing: 'front', res: 1024 });
-  rig.group.position.set(0.172, MT + 0.042 - 0.096, 0.30);
+  // ---------- the Student: the profile rig sitting up in bed (SIT) ----------
+  const rig = await makeGator({ assets }, { seed: 8, res: 1024 });
+  rig.group.position.set(...SIT.hip);
   scene.add(rig.group);
   rig.group.traverse((o) => { o.castShadow = false; });
+  for (const [n, m] of Object.entries(rig.meshes)) if (n !== 'eyes' && n !== 'mouth') m.material.color.setRGB(...WARM);
 
   // ---------- the Exam beside his head ----------
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
@@ -165,8 +174,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const spot = phoneLight({ intensity: SPOT, angle: ANGLE, penumbra: 0.2, distance: 1.0 });
   spot.position.copy(L);
   scene.add(spot, spot.target);
-  const fill = new THREE.PointLight(PALETTE.phone, FACE_FILL * SPOT, 0.06, 2);   // his face, lit cyan from just below
-  fill.position.set(L.x - 0.006, L.y - 0.002, L.z - 0.012);
+  const fill = new THREE.PointLight(new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.cream), 0.5), FACE_FILL * SPOT, 0.06, 2);
+  fill.position.set(L.x - 0.004, L.y + 0.022, SIT.hip[2] + 0.015);   // his face and hoodie, from the screen's side
   scene.add(fill);
   const dawn = dawnLight(), sun = dawn.light;
   sun.target.position.set((WIN.A + WIN.B) / 2, WIN.y, 0);
@@ -194,9 +203,9 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       rig.face({ eyes: at(T, 1.5, 1.67) || yawn || at(T, 4.5, 4.58) ? 'closed' : 'tired', mouth: yawn ? 'o' : 'neutral' });
       rig.boil(t, 10);
       const tap = TAPS.some((f) => Math.abs(T - f) < 1e-6) ? 2 : 0;
-      rig.joints.arm_r.rotation.z = (150 + tap) * DEG;   // both hands up over the blanket at the laptop's top edge (rot90 arms: 0 = down)
-      rig.joints.arm_l.rotation.z = -150 * DEG;
-      rig.joints.body.rotation.z = at(T, 2.83, 3.67) ? -2 * DEG : 0;   // the head tips back for the yawn
+      rig.blend({ sit: SIT.pose }, [[0, 'sit']], 0);
+      rig.joints.arm_r.rotation.z += tap * DEG;                                 // a key tap
+      if (at(T, 2.83, 3.67)) { rig.joints.body.rotation.z += 4 * DEG; rig.joints.head.rotation.z += 12 * DEG; }   // the yawn tips him back
 
       // ---- the Exam: tired, closed with his yawn, then side toward the seams (frame-left) at 5.0 ----
       exam.update(t, { wobble: 0.8, eyes: T >= F(5.0) ? 'side' : yawn ? 'closed' : 'tired', look: -1, key: spot });
