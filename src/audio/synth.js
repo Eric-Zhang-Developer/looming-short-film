@@ -114,12 +114,15 @@ export function feltPiano(midi, { vel = 0.7, dur = 1.5 } = {}) {
 }
 
 // Music box: a sine plus a bright inharmonic partial (×4.2) that dies in ~60 ms. Fractional midi = detune.
-export function musicBox(midi, { vel = 0.6, dur = 1.2 } = {}) {
-  const f = mtof(midi), out = new Float32Array(len(dur)), w1 = TAU * f / SR, w2 = TAU * f * 4.2 / SR;
+// Optional vibrato: vib cents at vibHz, stopping dead at vibUntil seconds (the pitch then holds where it is). vib 0 = none,
+// and then the samples are exactly the vibrato-less ones.
+export function musicBox(midi, { vel = 0.6, dur = 1.2, vib = 0, vibHz = 7, vibUntil = Infinity } = {}) {
+  const f = mtof(midi), out = new Float32Array(len(dur)), w1 = TAU * f / SR, w2 = TAU * f * 4.2 / SR, d = 2 ** (vib / 1200) - 1;
   for (let i = 0; i < out.length; i++) {
     const t = i / SR, fade = Math.min(1, (dur - t) / 0.02);
+    const fm = vib ? d * (1 - Math.cos(TAU * vibHz * Math.min(t, vibUntil))) / (TAU * vibHz) : 0;   // ∫ d·sin, in seconds
     out[i] = vel * 0.5 * fade * Math.min(1, t / 0.001) *
-      (Math.sin(w1 * i) * Math.exp(-t / (dur * 0.4)) + 0.35 * Math.sin(w2 * i) * Math.exp(-t / 0.06));
+      (Math.sin(w1 * i + TAU * f * fm) * Math.exp(-t / (dur * 0.4)) + 0.35 * Math.sin(w2 * i + TAU * f * 4.2 * fm) * Math.exp(-t / 0.06));
   }
   return out;
 }

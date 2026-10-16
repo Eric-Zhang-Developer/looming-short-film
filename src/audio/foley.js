@@ -117,12 +117,16 @@ function penScratch(seed = 1, dur = 3) {
     for (let i = 0; i < m && i0 + i < n; i++) speed[i0 + i] = v * Math.sin(Math.PI * i / m) ** 0.7;
     t += len + (r() < 0.18 ? 0.25 + 0.3 * r() : 0.015 + 0.05 * r());
   }
-  const lo = bandpass(noise(seed, dur), 2200, 0.8), hi = bandpass(noise(seed + 1, dur), 5500, 0.9);
+  return norm(fade(scratch(seed, dur, speed), 0.01), 0.4);
+}
+// The pen's sound for a given speed curve (0..1 per sample, length ceil(dur * SR)), unnormalized.
+function scratch(seed, dur, speed) {
+  const n = speed.length, lo = bandpass(noise(seed, dur), 2200, 0.8), hi = bandpass(noise(seed + 1, dur), 5500, 0.9);
   const rt = mulberry32(seed + 2), ticks = new Float32Array(n);
   for (let i = 0; i < n; i++) if (rt() < speed[i] * 250 / SR) ticks[i] = (rt() < 0.5 ? -1 : 1) * (0.5 + rt());
   const tk = bandpass(ticks, 4200, 3);
   for (let i = 0; i < n; i++) { const s = speed[i]; lo[i] = s * ((1 - s) * lo[i] + s * hi[i]) + s * tk[i] * 2; }
-  return norm(fade(lo, 0.01), 0.4);
+  return lo;
 }
 
 // (seed, dur) => bed. The phone's cold glow: a very faint 7.9 kHz sine with a whisper of 11.85 kHz and a
@@ -423,9 +427,201 @@ function cardTap(seed = 1) {
   return norm(fade(out, 0.03, 0), 0.4);
 }
 
+
+// ───────── snd-g4: the G4 cut's new sounds (doc 05, marked "new") ─────────
+// The same toolkit as above (seeded noise, biquads, a few sines), and the same habit: every sound gets one small
+// physical joke (the motor that wobbles, the ratchet that rises, the clock that tocks lower) so it reads as animated.
+
+// (seed) => one-shot, 0.33 s. s00's notification: a phone's vibration motor rattling on a wooden desk. The motor is a
+// soft-clipped ~165 Hz buzz that spins up from 110 Hz and wobbles ±3% at 11 Hz (a cheap motor); the desk answers each
+// motor cycle with a knock through two wood modes (280 Hz, 1.1 kHz) and a bright tick on top, and the phone skitters
+// once (a louder knock) just before the motor stops. Physical, not a UI chime.
+function phoneBuzz(seed = 1) {
+  const r = mulberry32(seed), d = 0.33, n = Math.ceil(d * SR), knocks = new Float32Array(n);
+  let ph = 0;
+  const motor = gen(d, (t, i) => {
+    const f = (110 + 55 * Math.min(1, t / 0.03)) * (1 + 0.03 * Math.sin(TAU * 11 * t));
+    const p0 = ph; ph += f / SR;
+    if (Math.floor(ph) > Math.floor(p0)) knocks[i] = 0.4 + 0.6 * r();     // one desk knock per motor turn
+    return Math.tanh(3 * Math.sin(TAU * ph));
+  });
+  knocks[Math.round(0.27 * SR)] = 2.2;                                    // the skitter
+  const desk = bandpass(knocks, 280, 2);
+  mixInto(desk, bandpass(knocks, 1100, 3), 0, 0.6);
+  mixInto(desk, highpass(knocks, 4000), 0, 0.15);
+  const hum = lowpass(motor, 900), out = gen(d, (t, i) => (0.25 * hum[i] + desk[i]) * Math.min(1, t / 0.015, (d - t) / 0.04));
+  return norm(out, 0.5);
+}
+
+// (seed) => one-shot, ~0.15 s. The laptop game's voice: a soft key tick, then a small cheerful square-wave blip (the game
+// answering), through a laptop speaker (nothing under 500 Hz). The seed picks everything, so a tap is repeatable:
+// note = C major pentatonic step seed % 6; a seed with seed % 7 === 3 jumps up a fifth halfway (a power-up).
+// Register by the seed's hundreds: 0xx C5 (home), 1xx C6 (s05, higher, under the TV), 2xx C4 (s08, sleepy: longer, softer, sagging).
+function gameBlip(seed = 1) {
+  const r = mulberry32(seed), reg = Math.floor(seed / 100) % 3, sleepy = reg === 2;
+  const midi = [72, 84, 60][reg] + [0, 2, 4, 7, 9, 12][seed % 6], jump = seed % 7 === 3, f = 440 * 2 ** ((midi - 69) / 12);
+  const len = (0.05 + 0.04 * r()) * (sleepy ? 1.6 : 1), out = new Float32Array(Math.ceil((len + 0.03) * SR));
+  mixInto(out, decay(bandpass(noise(seed, 0.01), 3500, 1.5), 0.0008), 0, 0.5);           // the key
+  let ph = 0;
+  mixInto(out, gen(len, (u) => {
+    ph += TAU * f * (jump && u > len / 2 ? 1.5 : 1) * (sleepy ? 1 - 0.06 * u / len : 1) / SR;
+    return square(ph) * Math.min(1, u / (sleepy ? 0.008 : 0.002), (len - u) / 0.01);
+  }), 0.012, 0.6);
+  return norm(fade(lowpass(highpass(out, 500), 7000), 0.01, 0), 0.5);
+}
+
+// (seed) => one-shot, 0.36 s. s07's roller blind coming down: the spring roller's ratchet over 0.2 s, its pawl clicks
+// speeding up (24 ms apart down to 8) and rising in pitch (2.2 → 3.6 kHz) like a cartoon zip, over a swell of fabric
+// noise; then at BLIND_CLACK the bottom bar's soft clack on the sill (a dull thump, 420 Hz and 1.15 kHz modes) and one
+// small bounce. Cue it at offset -BLIND_CLACK so the clack lands on the beat. One seed, so both blinds are identical.
+export const BLIND_CLACK = 0.2;
+function blindRattle(seed = 1) {
+  const r = mulberry32(seed), out = new Float32Array(Math.ceil(0.36 * SR));
+  for (let t = 0.004, k = 0; t < BLIND_CLACK - 0.006; k++) {
+    const p = t / BLIND_CLACK, f = 2200 + 1400 * p;
+    mixInto(out, decay(bandpass(noise(seed + 10 + k, 0.01), f, 1.5), 0.0012), t, 0.35 + 0.35 * p);
+    mixInto(out, gen(0.02, (u) => Math.sin(TAU * f * 0.55 * u) * Math.exp(-u / 0.003)), t, 0.12);
+    t += (0.024 - 0.016 * p) * (0.9 + 0.2 * r());
+  }
+  const cloth = bandpass(noise(seed, BLIND_CLACK), 900, 0.7);
+  for (let i = 0; i < cloth.length; i++) cloth[i] *= 0.25 * Math.sin(Math.PI * i / cloth.length);
+  mixInto(out, cloth, 0);
+  const clack = (at, g, s) => {
+    mixInto(out, decay(lowpass(noise(s, 0.03), 1800), 0.006), at, g);
+    mixInto(out, gen(0.12, (u) => (Math.sin(TAU * 420 * u) * Math.exp(-u / 0.015) + 0.5 * Math.sin(TAU * 1150 * u) * Math.exp(-u / 0.008)) * Math.min(1, u / 0.0005)), at, g * 0.7);
+  };
+  clack(BLIND_CLACK, 1, seed + 1);
+  clack(BLIND_CLACK + 0.035, 0.25, seed + 2);
+  return norm(fade(out, 0.03, 0), 0.5);
+}
+
+// (seed, dur) => one-shot of length dur (default 0.15 s). One quick, hard pen stroke: penScratch's sound at full speed
+// from the first millisecond. The crossing-out (a fix, not anger), the check marks and s18's X.
+function penStroke(seed = 1, dur = 0.15) {
+  const n = Math.ceil(dur * SR), speed = new Float32Array(n);
+  for (let i = 0; i < n; i++) speed[i] = Math.sin(Math.PI * i / n) ** 0.3;
+  return norm(fade(scratch(seed, dur, speed), 0.005), 0.5);
+}
+
+// (seed) => one-shot, 0.08 s. s16's pen tap in the pause: the tip on paper (a 3 kHz tick) and the desk under it (650 Hz).
+function penTap(seed = 1) {
+  const out = decay(bandpass(noise(seed, 0.08), 3000, 1.2), 0.0015);
+  mixInto(out, gen(0.06, (t) => Math.sin(TAU * 650 * t) * Math.exp(-t / 0.006)), 0, 0.4);
+  return norm(fade(out, 0.01, 0), 0.3);
+}
+
+// A far-away version of a sound for the exam room: darker, with two slap echoes off the walls.
+const far = (buf, hz = 2500) => { const o = lowpass(buf, hz); mixInto(o, o.slice(), 0.07, 0.3); mixInto(o, o.slice(), 0.16, 0.15); return o; };
+
+// (seed, dur) => bed. s17b's exam room: a large quiet room's air (darker and wider than roomTone), a distant page turn
+// every 1.5-3.5 s, and now and then a far pen. The wall clock and the cough are their own sounds (clockTick, cough), so
+// the room can duck at testRecognise while the clock goes on.
+function examHush(seed = 1, dur = 4) {
+  const r = mulberry32(seed), out = highpass(lowpass(lowpass(noise(seed, dur), 700), 700), 40);
+  scale(out, 0.5);
+  for (let t = 0.3 + r(), k = 0; t < dur - 0.5; t += 1.5 + 2 * r(), k++) mixInto(out, far(paperRustle(seed + 20 + k, 0.35)), t, 0.3 + 0.3 * r());
+  for (let t = 0.8 + 2 * r(), k = 0; t < dur - 1.3; t += 2.5 + 3 * r(), k++) mixInto(out, far(penScratch(seed + 40 + k, 0.6 + 0.6 * r()), 2000), t, 0.12);
+  return norm(fade(out, 0.05), 0.07);
+}
+
+// (seed, dur) => bed. The exam room's wall clock at 1 Hz, a tick on every whole second from 0: a 4.5 kHz escapement tick
+// with a small 2.1 kHz ring, every other one a "tock" a little lower and softer (the clock is a character too).
+function clockTick(seed = 1, dur = 4) {
+  const out = new Float32Array(Math.ceil(dur * SR));
+  for (let k = 0; k < dur - 0.05; k++) {
+    const tock = k % 2, f = tock ? 3800 : 4500;
+    mixInto(out, decay(bandpass(noise(seed + k % 2, 0.02), f, 2), 0.0008), k, tock ? 0.8 : 1);
+    mixInto(out, gen(0.03, (t) => Math.sin(TAU * (tock ? 1900 : 2100) * t) * Math.exp(-t / 0.003)), k, 0.3);
+  }
+  return norm(far(out, 6000), 0.12);
+}
+
+// (seed) => one-shot, 0.6 s. One soft cough across the exam room: two noise bursts shaped by three vocal-tract bands
+// (450, 1400, 2600 Hz), a sharp onset each, the second smaller, 0.18 s apart; then far().
+function cough(seed = 1) {
+  const out = new Float32Array(Math.ceil(0.6 * SR));
+  const burst = (at, g, s, len) => {
+    const x = noise(s, len), y = bandpass(x, 450, 3);
+    mixInto(y, bandpass(x, 1400, 4), 0, 0.6);
+    mixInto(y, bandpass(x, 2600, 5), 0, 0.3);
+    for (let i = 0; i < y.length; i++) { const t = i / SR; y[i] *= Math.min(1, t / 0.004) * Math.exp(-t / (len * 0.35)); }
+    mixInto(out, y, at, g);
+  };
+  burst(0, 1, seed, 0.14);
+  burst(0.18, 0.55, seed + 1, 0.12);
+  return norm(fade(far(out), 0.05, 0), 0.25);
+}
+
+// (seed) => one-shot, 0.5 s. s17c's grade coming back: a sheet slid across a table. Friction noise whose band climbs with
+// the slide's speed (1.4 → 3 kHz), then at 0.42 s the skid: stick-slip chatter (pulses 70 → 40 Hz through a 900 Hz
+// body) and a soft stop.
+function paperSlide(seed = 1) {
+  const r = mulberry32(seed), d = 0.5, n = Math.ceil(d * SR), out = new Float32Array(n), skid = 0.42;
+  const speed = (t) => t < skid ? Math.sin(Math.PI / 2 * t / skid) : Math.max(0, 1 - (t - skid) / 0.06);
+  const lo = bandpass(noise(seed, d), 1400, 0.6), hi = bandpass(noise(seed + 1, d), 3000, 0.8);
+  for (let i = 0; i < n; i++) { const v = speed(i / SR); out[i] = v * ((1 - v) * lo[i] + v * hi[i]); }
+  const chatter = new Float32Array(n);
+  for (let t = skid; t < skid + 0.06; t += 1 / (70 - 500 * (t - skid))) chatter[Math.round(t * SR)] = 0.6 + 0.4 * r();
+  mixInto(out, bandpass(chatter, 900, 4), 0, 3);
+  mixInto(out, decay(lowpass(noise(seed + 2, 0.04), 1200), 0.008), skid + 0.06, 0.4);
+  return norm(fade(out, 0.03), 0.4);
+}
+
+// (seed) => one-shot, 0.9 s. s18's dissolve: the ink soaking back into the calendar. Noise through a one-pole low-pass
+// whose cutoff swells 300 → 2.2 kHz → 400 Hz over 0.75 s, three wet blips falling (smaller each time) inside it, and
+// at 0.78 s a tiny dry tick, as if the paper drank it.
+function inkSoak(seed = 1) {
+  const d = 0.9, x = noise(seed, d), out = new Float32Array(x.length);
+  let y = 0;
+  for (let i = 0; i < x.length; i++) {
+    const t = i / SR, p = Math.min(1, t / 0.75), e = Math.sin(Math.PI * p) ** 2;
+    y += (1 - Math.exp(-TAU * (300 + 1900 * Math.sin(Math.PI * p) - 100 * p) / SR)) * (x[i] - y);
+    out[i] = y * e * (t < 0.75 ? 1 : 0);
+  }
+  [[0.1, 0.5], [0.3, 0.35], [0.45, 0.2]].forEach(([at, g], k) => {
+    let ph = 0;
+    mixInto(out, gen(0.15, (u) => { ph += TAU * (300 + (700 - 150 * k) * Math.exp(-u / 0.02)) / SR; return Math.sin(ph) * Math.min(1, u / 0.002) * Math.exp(-u / 0.04); }), at, g);
+  });
+  mixInto(out, decay(highpass(noise(seed + 1, 0.01), 4000), 0.0006), 0.78, 0.25);
+  return norm(fade(out, 0.03, 0), 0.4);
+}
+
+// (seed, dur) => one-shot of length dur (default 2 s, newDate - 2 to the beat). A felt-tip marker: squeaky strokes for
+// the letters of "Final" over the first 62.5% (F three strokes, i a stroke and a dot, n, a, l), a breath, then one round
+// stroke for the circle over the last third, its squeak gliding up and back down as it goes round, ending on the beat.
+// The squeak is a stick-slip whistle (a 1.6-2.8 kHz tone with jittered pitch and a little 2nd harmonic) over felt noise.
+function markerScratch(seed = 1, dur = 2) {
+  const r = mulberry32(seed), n = Math.ceil(dur * SR), env = new Float32Array(n), pitch = new Float32Array(n).fill(2000);
+  const stroke = (t0, len, f0, f1, round) => {
+    const i0 = Math.round(t0 * SR), m = Math.round(len * SR);
+    for (let i = 0; i < m && i0 + i < n; i++) {
+      const p = i / m;
+      env[i0 + i] = Math.sin(Math.PI * p) ** 0.5;
+      pitch[i0 + i] = round ? f0 + (f1 - f0) * Math.sin(Math.PI * p) : f0 + (f1 - f0) * p;
+    }
+  };
+  const letters = 0.625 * dur;
+  for (let k = 0, t = 0.02; k < 7; k++) {                  // F F F i n a l
+    const len = (0.08 + 0.06 * r()) * dur / 2, f = 1600 + 1000 * r();
+    stroke(t, len, f, f * (0.85 + 0.3 * r()), false);
+    t += len + (0.03 + 0.04 * r()) * dur / 2;
+    if (k === 3) { stroke(t, 0.012, 2600, 2600, false); t += 0.04 * dur / 2; }   // the i's dot
+    if (t > letters) break;
+  }
+  stroke(0.665 * dur, 0.335 * dur, 1800, 2700, true);      // the circle, ending on the beat
+  const jit = lowpass(noise(seed + 1, dur), 60), felt = bandpass(noise(seed + 2, dur), 3500, 0.8);
+  let ph = 0;
+  const out = gen(dur, (t, i) => {
+    ph += TAU * pitch[i] * (1 + 0.4 * jit[i]) / SR;                     // the stick-slip wobble
+    return env[i] * (0.6 * (Math.sin(ph) + 0.25 * Math.sin(2 * ph)) + 0.8 * felt[i]);
+  });
+  return norm(fade(out, 0.01), 0.35);
+}
+
 export const FOLEY = {
   lampClick, sensorWake, penUncap, inkDrip, paperRustle, fluorescentHum,
   penScratch, phoneHum, inkRoll, shadowGrowth, fridgeHum, controllerClick, drill,
   fluorescentFlicker, mopOnTile, paperBoil, dawnBirds, roomTone, nightHum, shadowBreath,
   thumbFlick, scrollTick, jarClink, cartonSlosh, tvBloops, roommateStep, winJingle, ladderCreak, rodSnap, curtainSwish, cardTap,
+  phoneBuzz, gameBlip, blindRattle, penStroke, penTap, examHush, clockTick, cough, paperSlide, inkSoak, markerScratch,
 };

@@ -1,0 +1,18 @@
+  0.20 s  phoneBuzz          0.330 s  peak 0.500  loudest 5 ms at 0.273 s
+  0.93 s  gameBlip seed 0    0.091 s  peak 0.500  loudest 5 ms at 0.022 s
+  1.42 s  gameBlip seed 9    0.088 s  peak 0.500  loudest 5 ms at 0.015 s
+  1.91 s  gameBlip seed 3    0.109 s  peak 0.500  loudest 5 ms at 0.060 s
+  2.42 s  gameBlip seed 103  0.091 s  peak 0.500  loudest 5 ms at 0.055 s
+  2.91 s  gameBlip seed 203  0.160 s  peak 0.500  loudest 5 ms at 0.022 s
+  3.47 s  blindRattle        0.360 s  peak 0.500  loudest 5 ms at 0.200 s
+  4.23 s  penTap             0.080 s  peak 0.300  loudest 5 ms at 0.000 s
+  4.71 s  penStroke          0.150 s  peak 0.500  loudest 5 ms at 0.072 s
+  5.26 s  cough              0.600 s  peak 0.250  loudest 5 ms at 0.003 s
+  6.26 s  clockTick          3.000 s  peak 0.120  loudest 5 ms at 0.000 s
+  9.66 s  examHush           4.000 s  peak 0.070  loudest 5 ms at 2.717 s
+ 14.06 s  paperSlide         0.500 s  peak 0.400  loudest 5 ms at 0.412 s
+ 14.96 s  inkSoak            0.900 s  peak 0.400  loudest 5 ms at 0.305 s
+ 16.26 s  markerScratch      2.000 s  peak 0.350  loudest 5 ms at 1.655 s
+blindRattle: BLIND_CLACK 0.2 s (the clack should be the loudest 5 ms)
+clockTick hits per second: 0.000, 1.000, 2.000
+wrote /Users/ericzhang/.worktrees/looming/snd-g4/out/audio/solo/g4_new.wav, 18.66 s

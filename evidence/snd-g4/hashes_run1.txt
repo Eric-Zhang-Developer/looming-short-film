@@ -1,0 +1,4 @@
+8c97f32267ea6bc165c1843ef506da3816fedef6e50c2d7c4c3934f23687e144  out/audio/mix.wav
+91147c1e0fcbd0e31ab306304ad280db5a8f0b95cacf991b379f2b032c72a1b4  out/audio/stems/ambience.wav
+f962898f85c527e67e19176278c5deac2fac39611c60e011a576b10182fd1025  out/audio/stems/foley.wav
+f581472bfd4e91f6faa44ce38cf5ffeaaf9a09371580e2d290fb89305071418b  out/audio/stems/music.wav

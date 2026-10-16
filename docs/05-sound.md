@@ -21,7 +21,7 @@ The score is small and intimate, like music played in the room.
 
 - **The Exam motif:** four music-box notes rising and falling, played slightly out of tune. It plays when the ink drop forms, and returns softer each time the blob is small.
 - **The gulp** (the meter, doc 02): each of the five gulps plays the Exam motif's **first two notes** (its rising major third) on the music box, the first on the gulp's snap drawing (`gulp1`…`gulp5`) and the second 0.275 s later, half the motif's spacing, so it sounds like a swallow. **Each gulp is one semitone lower than the last:** −1, −2, −3, −4, −5 against the motif's own pitch. The interval stays the motif's, so the ear hears the same creature getting heavier; five semitones over 60 s is clear without turning ominous. Velocity 0.30 rising to 0.42, and the second note a few cents flatter each time (the motif's out-of-tune drift growing). A soft `inkDrip` swallow at −18 dB under the first note. The shadow's swell rides on the existing `subSwell` for that dodge; the gulp adds no sub.
-- **The shrink:** each solved problem in s16 answers with the same two notes falling (second note first), **one semitone higher each time**, −4 at #1 up to +1 at #6, at −6 dB under that problem's theme note, starting 0.25 s after it. The blob ends a semitone above its birth pitch, small enough for a pocket.
+- **The shrink:** each solved problem in s16 answers with the same two notes falling (second note first), **one semitone higher each time**, −4 at #1 up to +1 at #6, at −6 dB under that problem's theme note, starting 0.25 s after it. G4 adds two more: the test (`testSolved`, +2) and the cross-off (`examCrossedOff`, +3), so the blob ends three semitones above its birth pitch, just before it soaks back into the calendar.
 - **The avoidance groove:** a light, bouncy piano figure for the Act 2a montage. Each dodge adds a layer, and the sub swell grows under it with the shadow.
 - **The first step:** **one piano note**, held, at the moment he writes his name. Then the theme enters slowly, one note per solved problem.
 
@@ -30,7 +30,7 @@ The score is small and intimate, like music played in the room.
 Two sounds carry the light, and they are the most important sounds in the film.
 
 - **The lamp click (home only).** Heard twice, in s06: on, then off. Design it once, carefully: a dry plastic click with a tiny filament "tink" as the light comes up. Both are the identical buffer.
-- **The sensor wake (Marston only).** Heard twice: when he reaches for the pen (s15) and when he walks past the Freshman (s18). One buffer, `sensorWake`, timed to the wake's light keys (`docs/shots/README.md` §3): a dry relay *clack* from the ceiling on the beat, a faint tick on each of the first two strikes (+0.042, +0.167 s), a small glassy fluorescent *ping* as the third strike catches (+0.292 s), then the tube's 120 Hz hum rising under it over about 0.3 s. Build the clack's transient from the lamp click's, pitched down with a short metallic tail, so the ear links the two. The two wakes must be identical.
+- **The sensor wake (Marston only).** Heard once since G4: when he reaches for the pen (s15). The Freshman's wake in s18 was cut with his scene. One buffer, `sensorWake`, timed to the wake's light keys (`docs/shots/README.md` §3): a dry relay *clack* from the ceiling on the beat, a faint tick on each of the first two strikes (+0.042, +0.167 s), a small glassy fluorescent *ping* as the third strike catches (+0.292 s), then the tube's 120 Hz hum rising under it over about 0.3 s. Build the clack's transient from the lamp click's, pitched down with a short metallic tail, so the ear links the two. Nothing else may sound in its 0.65 s window.
 - **Every other zone change is seen, not heard:** the Custodian's passing in s14 (the mop covers it) and the neighbor's zone in s16 (Q2: under the montage's theme). A timeout is heard as the fluorescent crackle (s11, and s14 under the mop), never as the wake.
 
 Cues hang on beat names (`src/timeline.js`); the times are the G4 cut's (3:15) and move with the beats. **New** marks a G4 cue; a new sound name is a new `foley.js` voice for the sound pass.
@@ -77,16 +77,19 @@ Cues hang on beat names (`src/timeline.js`); the times are the G4 cut's (3:15) a
 
 ## Structure by section
 
+The G4 cut, 3:15.
+
 | Section | Music | Ambience |
 |---|---|---|
-| 0:00–0:20 Birth | Exam motif on music box | Morning room tone |
-| 0:20–1:00 Avoidance | Avoidance groove, building | Comic foley, rising sub |
-| 1:00–1:18 Marston | Groove drops out. A lone low piano note. | Fluorescent hum |
-| 1:18–1:28 Quiet 1 | **Silence** | Hum and the shadow's breathing (sub) |
-| 1:28–1:40 Reveal | A sparse chord on each new shadow revealed | Hum, mop |
-| 1:40–2:15 First step | Sensor wake, silence, single note, then the theme builds | Pen scratch, the woken tube's hum |
-| 2:15–2:40 Quiet 2 | **Silence** | Room tone, distant birds |
-| 2:40–3:00 Button | Theme on felt piano, resolved; music-box tag on the yawn | Night hum |
+| 0:00–0:20 Birth | Silence under the phone's two buzzes (s00), then the Exam motif on music box at the drop (0:15) | Room tone, lowest over black, then morning |
+| 0:20–1:08 Avoidance | Avoidance groove, a layer per dodge; gulps 1–4 on the music box (0:24.5, 0:46, 0:56.5, 0:58.5); everything cuts on the second blind | Laptop blips, comic foley, rising sub |
+| 1:08–1:26 Marston | Groove gone. A lone low piano note. Gulp 5 (1:25.25). | Fluorescent hum |
+| 1:26–1:36 Quiet 1 | **Silence** | Hum and the shadow's breathing (sub) |
+| 1:36–1:48 Reveal | A sparse chord on each new shadow revealed | Hum, mop |
+| 1:48–2:26 First step | Sensor wake, silence, single note, then a theme note and a shrink per problem | Pen scratch (the practice is the closest), the woken tube's hum |
+| 2:26–2:44 Quiet 2 | **Silence** | Room tone, distant birds |
+| 2:44–2:55 The test and the grade | Ambience only, then s15's note recalled at the smile; the test's shrink (+2) | The exam room's hush and its clock; the paper slide |
+| 2:55–3:15 Ending | The motif resolves at the grade (the music box plays its opening in tune with the piano's theme); the theme lands on C and rests through the dissolve; the tag's trembling reprise, then one held note into the fade | Home room tone; the marker |
 
 ## Sync
 

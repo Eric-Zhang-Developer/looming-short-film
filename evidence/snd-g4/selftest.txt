@@ -1,0 +1,17 @@
+    lampClickHome@42.5s, lampOffHome@45s; 12960 samples each (-0.1…+0.17 s), peak 0.5645, tail past 0.17 s 0.061% of peak
+ok  two lamp clicks (home on, home off) are sample-identical in out/audio/stems/foley.wav
+    sensorWakeMarston@108.5s; 31200 samples equal the buffer x 0.8 (max diff 1.1920928966180355e-8), peak 0.4000
+ok  the s15 sensor wake: one cue on its beat, the seeded buffer, alone in foley.wav for its window; none on the neighbor
+    blind1-0.2@55.80s, blind2-0.2@57.80s; 17280 samples each, peak 0.3000
+ok  the two blindRattles are one seed and gain, sample-identical in foley.wav
+    penUncap@116.00s, tagPenUncap@191.50s; 12000 samples each, peak 0.4704
+ok  the two penUncaps are one seed and gain, sample-identical in foley.wav
+    notifyBuzz@0.50s, notifyBuzz+1.5@2.00s; 15840 samples each, peak 0.3500
+ok  the two phoneBuzzs are one seed and gain, sample-identical in foley.wav
+    43 bed cues sound at both ends of their spans
+ok  every bed cue with a length sounds at both ends of its own span
+ok  voices and foley are deterministic and finite
+ok  every foley sound renders, deterministic and finite
+    max diff vs lampOffHome [0,0] LSB over 8160 samples each, peak 18034 LSB
+ok  the two lamp clicks are identical within ±1 LSB in out/audio/mix.wav (over the first 0.17 s)
+wrote /Users/ericzhang/.worktrees/looming/snd-g4/out/audio/solo/{lampclick,sensorwake,piano_c4}.wav (19200, 146400 samples)
