@@ -1,6 +1,6 @@
 # 02 · Story, v4 draft: the walk is the climax
 
-**Status: DRAFT for the director (2026-10-17).** Nothing is built from this until he approves it. Once he does, it replaces `docs/02-story.md` §Logline through §Ending, and the shot specs follow.
+**Status: APPROVED (director, 2026-10-17: "I approve everything. I looked at the script, and I like it. Let's do it.").** Its beat sheet is now in `docs/02-story.md`; this file keeps the why, the cut list and the cost.
 
 ## Why it changed (director, on v3, verbatim)
 > "the keystone decision in my life to get overcoming procrastination is to go to the library … I'm super scared but I made the decision and that's the keystone decision not the fucking random janitor"

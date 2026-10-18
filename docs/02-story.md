@@ -1,104 +1,79 @@
 # 02 · Story
 
 ## Logline
-
-A gator student gets the notice: Calc 2 exam, Friday. The exam is a small drop of ink that swells a little every time he looks away from it, and its shadow fills the room, until one night in Marston Library he takes the first step. When the exam is over he crosses it off, and the ink goes back into the calendar it came from.
+A gator student gets the notice: Calc 2 exam, Friday. The exam is a drop of ink that grows every time he looks away, and its shadow fills his room. At 3 a.m., in bed on his phone, he finally makes the hardest choice of the film: he gets up and walks to the library. The walk is terrifying. The library's light is not.
 
 ## Theme
+**The scary thing is always smaller than its shadow, and the first step is walking toward the light.** The turn is a decision he makes, not something that happens to him: leaving the room where the dread grows, for the place where it can't.
 
-**The scary thing is always smaller than its shadow.** The turning point is not courage or rescue. It is one tiny, almost silly first step: uncapping a pen and writing your name. After that, the work turns out to be easier than the dread was.
-
-Secondary notes: **everyone has one.** The hero thinks he's alone with his shadow until he looks up. And **it comes back:** every date on the calendar grows its own drop. The ending is not that dread is gone for good, but that he now meets the next one with the pen, early.
-
-## The visual rule
-
-The whole film rests on one rule that the audience learns without words:
-
+## The rule, now with one job
 > **Light held low and close makes the shadow loom. Light from above makes it small.**
 
-- A **screen** is a low, close light. It throws the Exam's shadow huge across walls and ceilings. At home the screen is his **laptop** (the game he hides in); at Marston it is his **phone**.
-- **Light from above** drops the shadow into a small pool under the blob: the **desk lamp** at home, the **ceiling fluorescent** at Marston and in the exam room.
-- **Daylight out-shines a screen.** While the sun is in the room, the screen's loom is only a faint shape; each band of daylight he shuts out leaves more of the room to the screen (s07). Marston has no desk lamps. Its lights run on motion sensors, one zone per desk: stillness lets them time out, and movement brings them back.
-- This is real optics: shadow scale ≈ (distance from light to wall) ÷ (distance from light to blob). See doc 04.
+Home is all low light: the laptop, the phone in bed, the door's backlight. Marston is light from above. **So going to the library is literally walking into the light that shrinks the dread.** The rule and the turn are now the same event. The film shows the rule plainly at home (s03 laptop: big; s06 lamp: small, and he *refuses* it by clicking it off), and the climax pays it off: he walks into the overhead light he refused.
 
-The rule is shown **three times** before Marston: the laptop in s03, the lamp in s06, and the blinds in s07, where each blind shuts out a band of sun and leaves more of the room to the screen. So the climax reads instantly.
+The motion-sensor lights are **cut**. The library's light is the turn now, and it stays on. (The submission text gets reworded to match.)
 
-### The meter
+## The clock
+One plain analog wall clock: tick marks, no numbers, the same paper style as the calendar. It hangs **beside the calendar** in his room. It's the film's pulse.
 
-> **Every time he looks away, it grows. Every problem he solves, it shrinks.**
+| Where | Reads | What it means |
+|---|---|---|
+| s02, the calendar push-in | ~9:00 | the day starts with time |
+| s07, bed rot | ~1:45 | over his shoulder: the day is gone |
+| s08, rock bottom | **3:00** | the tick is the only sound; it's what gets him up |
+| s17b, exam room | morning | the same tick, slow and calm |
+| s18 tag | an ordinary afternoon | he sleeps normally now |
 
-The blob's own size is the readable meter of dread (director, 2026-10-15). Each time he glances toward the exam (the blob, the calendar, the page) and looks away to something easier (the laptop, the phone, the blinds), it gives a small nervous **gulp** on a beat and grows one step: from 1× at birth to 2.5× by Marston, where it sits at his desk eye to eye with him. Each solved problem shrinks it one step: back through its birth size, smaller still after the test, and at the end, when he crosses the exam off, down to a dot of ink that the calendar soaks back up. The shadow stays on top as how it *feels*: always bigger than the blob, always obeying the light rule. So the light shows what the dread feels like, and the size shows what the avoidance did.
+**Sound:** the tick is a foley cue. At 3 a.m. it plays alone. On the walk it doubles into a heartbeat pulse, and the climax's music is built on it. At Marston's door it resolves into one held chord.
 
-The meter is learned by the end of Act 2a in **four gulps**: s03 (the laptop), s06 (the lamp), and one for each blind in s07. The fifth, the peak, is at Marston (s11). Sizes, timings and the gulp's drawings are in `docs/shots/README.md` §1.
+## Beat sheet (3:15) · ★ new · ✎ rewritten · = kept
 
-## Tone
+### Act 1 · Birth (0:00–0:26)
+- **0:00 · s00 =** Black. A phone buzzes: **"Calc 2 Exam · Fri"**.
+- **0:04 · s01 =** Dawn skyline, push in to his window.
+- **0:09 · s02 ✎** The desk. The calendar, with **the clock beside it at ~9:00**. Push in to the circled "Calc 2 exam". The ink drop is born from the circle and wobbles toward him. *Face: numb → small flinch.*
+- **0:19 · s03 =** He opens the laptop and plays a game. **The rule, first time:** in the screen's low glow the shadow climbs the wall. The blob gulps and grows. *Face: guilt glance, then away.*
 
-A Pixar short in pacing and heart, a shadow play in look. Funny in the first act, quiet in the middle, warm at the end. The touchstone for the two held shots is the Sixth Station train sequence in *Spirited Away*: nobody hurries, and light moves across faces.
+### Act 2 · Avoidance, plain (0:26–1:10)
+Each dodge is one obvious idea, and the blob is one size bigger every time.
+- **0:26 · s04 =** The kitchen: snacks instead of studying. The fridge light throws the shadow over the cabinets.
+- **0:33 · s05 ✎** Game night with **two gator roommates** (different hoodies). One walks straight through the shadow without noticing.
+- **0:40 · s06 =** **The rule, second time:** he clicks the desk lamp on, and the shadow collapses to a puddle. He sees the blob *as it is*, flinches, and **clicks the lamp off**. He chooses the dark. *This is the beat the climax pays off.*
+- **0:48 · s07 ★ Bed rot (12 s).** Plain and obvious. In bed, under the blanket, phone glow under his chin, thumb scrolling. The blob sits on the blanket. Its shadow covers the whole ceiling. The clock over his shoulder reads ~1:45. He keeps scrolling. Gulp. *Face: numb, half-lid, slack. The saddest the film gets.*
+- **1:00 · s08 ★ 3:00 a.m., rock bottom (10 s).** The music drops out. **Only the clock ticks.** Close on the clock: 3:00. Close on him. His eyes go from the clock to the red circle on the calendar and back. The blob's eyes glow in the dark beside him. Hold. *Face: guilt → dread (sweat drop).*
 
-## Characters
+### Act 3 · The keystone decision: the walk (1:10–1:50) · CLIMAX, 40 s
+- **1:10 · s09a ★ The choice (6 s).** He turns the phone face down, and the room goes black. Only the blob's two eyes. A breath (the acting kit's slow breath). He sits up. *Face: dread → resolve: brows flat, tight mouth.* He grabs his backpack.
+- **1:16 · s09b ★ The door (6 s).** He opens his door. The hallway light spills in **behind** him, so the blob's shadow is thrown huge **ahead** of him, down the hall. He has to walk into it. He does. *The poster image.*
+- **1:22 · s09c ★ The walk (20 s).** Campus at night, an empty path of street lamps, Century Tower ahead. **Each lamp is a heartbeat:** the shadow stretches long as he approaches, shrinks under his feet, then stretches again. The tick has become a pulse, and the score adds one layer per lamp, climbing (the opposite of the blob's falling gulp motif). His pace quickens. Once, the blob plants itself in his path, huge shadow and all, and he looks at it, then **steps around it**. Then Marston's ribbon windows appear across the plaza, glowing warm. *Face: dread → resolve, sweat, never a smile yet.*
+- **1:42 · s10 ★ The threshold (8 s).** He pushes Marston's door. **Warm light from above floods him, and the shadow snaps to a puddle.** The pulse resolves into a single held chord, then near-silence. The blob blinks, suddenly small and confused at his feet. He closes his eyes and exhales. *Face: resolve → relief (eyes closed, brows up).* Close-up on `gator_hero`.
 
-**The Student.** A gator, freshman-to-sophomore age, taking Calc 2. A good kid, not lazy, just avoidant. Expressive through posture and a small set of eye shapes (doc 03). He never speaks. His arc is from hiding behind a screen's light to bringing the light back himself. At home he clicks the lamp off and chooses the dark, then pulls blinds over the daylight. At Marston he goes still and the light dies on its own, and when he finally moves toward the work, it comes back. At the end he writes the next exam on the calendar himself, and reaches for his pen before the drop can grow.
+### Act 4 · Under the light (1:50–2:38)
+- **1:50 · s11 ✎** He sits at a window desk (the perforated cubicle, the ring pendant above). The blob climbs onto the desk beside him: big, but nothing like its shadow, and a little nervous.
+- **1:57 · s13 ✎ Everyone has one (5 s).** Top-down over the reading room: other gators studying, each with a small blob under their own light. He's not alone, and they're working.
+- **2:02 · s15 ✎ The name (8 s).** He uncaps the pen and writes his name at the top of the page. The blob flinches. *Face: resolve → a small, surprised smile.* (No sensor; the light is already on.)
+- **2:10 · s16 ✎ Practice (16 s).** ∫x·eˣ dx with the crossing-out and the check, the blob shrinking a step per problem; the series; a short montage. *The comedy beat: "That was it?"*
+- **2:26 · s17 ✎ Quiet: dawn (12 s, cut from 18).** Gold light through the ribbon windows. He sits back and closes his eyes. The blob, hamster-sized, dozes on his page.
 
-**The Exam.** A drop of ink born from the circled date on his calendar, which becomes a small round blob with two eyes. It is never evil. It grows because it is ignored, the way a neglected pet acts out: one visible step, a nervous gulp, each time he looks away, from about the size of a coffee mug at birth to eye level with him at his desk. Up close in light from above it is small and a little nervous. It is the only thing in the film made of ink, not paper (doc 03: everything is cut paper except the dread). It ends where it began: when he crosses the date off, it shrinks to a dot and soaks back into the calendar. Not defeated, just done.
+### Payoff (2:38–2:55)
+- **2:38 · s17b ✎ Test day (10 s).** He's front row and lit. The exam room's clock ticks **slow and calm**. He recognises the problem, smiles, and writes it in one pass.
+- **2:48 · s17c = Grade (7 s).** The 94. Still beat, wide eyes, then a grin. *Face: pride.*
 
-**The Roommates (2).** Oblivious. They walk straight through the shadow during game night. They exist to show how invisible this feeling is to everyone else.
+### Ending (2:55–3:15)
+- **2:55 · s18 ✎** Home, daytime, lamp on: the light from above, chosen now. He crosses off the exam. The ink soaks back into the calendar.
+- **3:05 · Tag.** The clock reads an ordinary afternoon. He letters **"Final"**, circles it, and a tiny drop quivers. He uncaps the pen and makes a first mark. Black.
 
-**The Custodian.** An older gator mopping Marston at 3 a.m. His own blob is tiny and asleep on his cart. He never looks up and never helps. He is proof that it can be small, not a mentor. His passing wakes the light over our gator's desk for a moment without his noticing; our gator stays still, and it times out again. **He must not give the hero a light that stays on.** The hero does that.
+## The acting map (one expression per beat, held at least half a second)
+numb (bed, the birth) · guilt (glances at the calendar/clock) · flinch (the lamp, the birth) · dread (3 a.m., the walk) · **resolve** (the choice → the threshold) · **relief** (the threshold) · surprise → smile (the name, "that was it?") · pride (the 94). Plus brows, blinks, breathing (fast on the walk, slow at the threshold), slump in bed against upright on the walk, tail droop against curl. Close-ups on `gator_hero` at: the clock glance, sitting up, the door, the threshold, the 94.
 
-**The Neighbor.** The gator with three energy drinks, one of the frozen faces in the Marston crowd reveal (s13). Later, when the hero stands to stretch mid-montage, his movement wakes the dead light over this neighbor's desk, and they start working too (s16).
-
-**The Freshman.** One of the frozen gators in the Marston crowd reveal (s13): one more face that says everyone has one. Their own payoff, a light the hero wakes next semester, is cut from this version (see the cut list).
-
-## Beat sheet (3:15)
-
-Timings are the cut in `src/timeline.js`. **Quiet** marks a held shot: locked camera, ambience only, light is the only thing that moves. Words on screen are the only ones in the film, and each is short and hand-lettered in the paper style.
-
-### Act 1: Birth (0:00–0:26)
-
-- **0:00 · s00** Black. A phone **buzzes**, and its screen wakes on a dark desk at dawn: a generic school notification with a red badge, **"Calc 2 Exam · Fri"**. No logo. It buzzes once more and dims.
-- **0:04 · s01** Dawn over a paper Gainesville skyline. Push in to an apartment window.
-- **0:10 · s02** The desk. He is slumped beside the phone and a blank practice sheet. **0:11.5** The camera pushes in to the paper calendar on the wall, to Friday: **"Calc 2 exam"**, hand-lettered and circled in red. Hold so it reads. **0:15** A drop of ink beads on the red circle, runs down the sheet and perches on its curled bottom edge. It opens two eyes, looks up at the words it came from, then over at him, and lets go. On the desk it lands, swells to full size and wobbles toward him like a kitten.
-- **0:20 · s03** He looks at it, shrugs, and opens his laptop instead: a game. **Rule shown, first time:** in the screen's low cyan glow, the blob's shadow climbs the wall, three times its size. He doesn't notice. Then, with its eyes on him, the blob gulps and grows a step, and its shadow swells with it. **The meter, first time.**
-
-### Act 2a: Avoidance (0:26–1:08)
-
-Four dodges that escalate. Each one makes the shadow bigger, and each dodge is funnier than the last. The day/night cycle speeds up through the windows between them.
-
-1. **The fridge (0:26 · s04).** He reorganizes the fridge instead of studying, in a kitchen that reads at a glance (fridge, stove, sink, counter, microwave). The fridge light throws the shadow across the cabinets. The blob scoots closer each time he isn't looking, and every scoot toward the light makes its shadow bigger. He never looks at it.
-2. **Game night (0:34 · s05).** Roommates on the couch with controllers; he games on his laptop on the floor. The shadow now spans the living-room wall. A roommate walks straight through it to get a snack.
-3. **The lamp (0:42 · s06). Rule shown, second time.** He sits at the desk with his laptop and clicks the desk lamp on. The shadow snaps down to a small pool, and the blob blinks up at him, *right there*, plainly bigger than this morning. He flinches and clicks the lamp off. The shadow springs back. He turns back to the game, and on the groove's next downbeat the blob gulps again. This is the moment the climax mirrors.
-4. **The blinds (0:50 · s07). Rule shown, third time, and the peak.** The next morning the sun glares on his screen, so he installs blackout roller blinds: drill, brackets, comic and fast. Then he games on the floor with two bands of sun across the room, one of them on the blob; with the sun in, the screen's loom is only a faint shape on the wall. He glances at it and pulls the first blind: a band of daylight goes, the screen's loom darkens, and the blob gulps. He glances again and pulls the second: the last of the sun is gone, only the screen's glow is left, and the blob gulps again as the shadow fills the wall and runs onto the ceiling. He shut out the passing day, and that is what fed it.
-5. **Game to sunrise (1:02 · s08).** In bed, face lit cyan by the laptop. Dawn creeps around the edges of the blinds. A whole day went by in the dark. Thursday.
-
-### Act 2b: Marston (1:08–1:48)
-
-- **1:08 · s09** Night exterior: Marston Library, a few lit windows. He walks in with his backpack.
-- **1:14 · s10** The stacks. The shadow follows him in and fills the aisles. Fluorescent lights flicker as it passes.
-- **1:20 · s11** He sits, opens his laptop, then opens his phone instead. The shadow closes over the table. He goes still over the phone, and the motion-sensor light over his desk times out. In the dark the blob gulps one last time: its peak, eye to eye with him.
-- **1:26 · s12 · Quiet 1 (10 s).** Head on the desk. The whole frame is shadow except the faint phone glow. Fluorescent hum. The shadow slowly breathes. Nothing happens. This is the darkest frame of the film.
-- **1:36 · s13** He lifts his head and looks around. **Every gator in Marston has a shadow looming over them:** the one asleep on a textbook, the one with three energy drinks, the Freshman frozen in front of a blank page. Wide top-down shot: a grid of dark desks, each with its own shadow, a few faint phone glows.
-- **1:43 · s14** The Custodian mops past. His blob is tiny, asleep on the cart. He doesn't look up. His passing wakes the light over our gator's desk: the shadow drops to a pool, and for a moment our gator sees his own blob as it is, big but nothing like its shadow. Our gator only watches the cart go by. As it leaves, his light times out again.
-
-### Act 3: The first step (1:48–2:26)
-
-- **1:48 · s15** His hand reaches for the pen and sets its point on the page. The same gesture as the home lamp beat, aimed at the work this time. The movement trips the sensor: a relay *clack*, the tube overhead stutters on, and the shadow drops to a small pool on the desk. The blob sits in the light pool, eye to eye with him: bigger than it ever was at home, far smaller than its shadow, and nervous. One look between them. He turns the phone face-down. He uncaps a pen. He writes his name at the top of the page (an illegible squiggle). The shadow flinches.
-- **2:02 · s16** **Practice, problem 1.** He braces, and the blob braces too. An insert on the page: a Calc 2 practice sheet, **∫ x eˣ dx**. His hand works it: *u = x, dv = eˣ dx*, then *x eˣ − ∫ eˣ dx*, then *x eˣ + eˣ*. The pen stops. He **crosses out** the wrong sign and writes **x eˣ − eˣ + C**, and a check. Cut back: the blob shrinks a step, and he stares at the page in disbelief. *That was it?* This is the comedy beat and the thesis in one.
-- **2:12** The time-lapse montage: pages turn, his light stays on because he keeps working, and with each problem the blob shrinks one step. One more insert reads the second kind of problem, a series by the ratio test: **Σ n/2ⁿ**, *(n+1)/2n → ½ < 1*, **converges**, check. By the third problem the blob is back to the size it was born, and it keeps going. He stands to stretch, and his movement wakes the dead light over a neighbor frozen at their phone. They look up at him and start working.
-
-### Quiet 2: Dawn (2:26–2:44)
-
-- **2:26 · s17 · Quiet 2 (18 s).** Dawn. A locked wide shot of the Marston reading room. Gold light crawls through the tall windows across sleeping gators and empty desks. Our gator sits back and closes his eyes. The blob, now hamster-sized, dozes on the corner of his page. No cuts and no music, only ambience and the light. This is the film's Sixth Station.
-
-### Payoff (2:44–2:58)
-
-- **2:44 · s17b · Test day.** A short scene in an exam room in morning light: rows of desks, heads down, every gator with a test page and a small blob of their own. His page, close: **∫ x e²ˣ dx**. The pen stops; he recognizes it. A small smile. Then he writes it calmly, in one pass: **(x/2)e²ˣ − ¼e²ˣ + C**. His tiny blob, on the corner of the page, shrinks one more step.
-- **2:53 · s17c · Grade back.** A paper slides onto his desk face-down. He turns it over: red checks down the page, and a score circled in red, **94**.
-
-### Ending (2:58–3:15)
-
-- **2:58 · s18** Home, at the desk, the lamp on. He reaches up and **crosses off** "Calc 2 exam" on the calendar. The blob, by the calendar's foot, shrinks to a dot of ink. The dot hops onto the calendar's curled edge, runs back up the sheet the way it came down, and soaks into the red circle: gone, leaving the faintest stain.
-- **3:05 · Tag.** He letters a new date a few weeks on, **"Final"**, and circles it in red. A tiny drop of ink beads on the new circle and quivers. He looks at it, picks up his pen, and uncaps it. The drop goes still.
-- **3:15** Black.
+## The swell, in sound (cue sheet for the score)
+1. **s07:** the score thins and flattens; the scrolling thumb ticks.
+2. **s08:** music **out**; the clock's tick alone, slow (~60 bpm), the room tone.
+3. **s09a:** one low held note under the breath.
+4. **s09b:** the door opens on a swell of room tone and the hall's hum.
+5. **s09c:** the tick doubles into a pulse (~120 bpm). Layer 1 is the pulse, then felt piano (the motif *rising*), strings pad, the music box, a bass swell; one layer per lamp. A small dissonance when the blob blocks him, which resolves as he steps around it.
+6. **s10:** the peak is the door push. **Cut to one held major chord** with the light, then near-silence and a breath.
+7. **Act 4:** the theme in major, softly.
 
 ## Story rules
 
