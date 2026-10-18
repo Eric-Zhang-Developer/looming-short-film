@@ -1,0 +1,11 @@
+# node evidence/climax-a2/probe.mjs --shot=s10 --t=1.458,1.5 --plane=ground --keep='{"z":[0.10,0.8]}'
+# (s10 local t; global 103.458 and 103.5 = lightFlood). Ratio = shadow extent on the lobby floor / the blob's measured width.
+# BEFORE (475e2eb, climax-a2's s10, re-run today; matches done/climax-a2.md's 5.7x -> 1.14x)
+t=1.458  blob w 0.0465 (x -0.027…0.020)  shadow x -0.026…0.053 z 0.117…0.382 y -0.000…0.000  len/w 5.70  xlen/w 1.69  zlen/w 5.70  lit/dark 1.52  cover 20%  px 82756
+t=1.500  blob w 0.0662 (x 0.000…0.067)  shadow x -0.001…0.075 z 0.162…0.180 y -0.000…0.000  len/w 1.14  xlen/w 1.14  zlen/w 0.27  lit/dark 1.42  cover 1%  px 3748
+# AFTER (fix-threshold, fixes 1-3)
+t=1.458  blob w 0.0444 (x -0.027…0.018)  shadow x -0.026…0.053 z 0.117…0.382 y -0.000…0.000  len/w 5.97  xlen/w 1.77  zlen/w 5.97  lit/dark 1.52  cover 20%  px 82756
+t=1.500  blob w 0.0654 (x 0.002…0.068)  shadow x -0.001…0.075 z 0.162…0.180 y -0.000…0.000  len/w 1.15  xlen/w 1.15  zlen/w 0.28  lit/dark 1.42  cover 1%  px 3748
+# The shadow is the same extent and size (px 82756 / 3748) before and after. Only the blob's measured width moves
+# (0.0465 -> 0.0444, 0.0662 -> 0.0654). Probably his figure, now 1.8 cm further left and a different rig after 1.5,
+# changing which blob pixels the probe's blob pass sees; not checked. The ratios move with it: 5.70 -> 5.97, 1.14 -> 1.15.

@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { ambient, aim } from '../lights.js';
 import { kf, ease, onTwos } from '../core/ease.js';
 import { SHOTS } from '../timeline.js';
-import { makeGator, HIP } from '../characters/gator.js';
+import { makeGator, HIP, hipHeight } from '../characters/gator.js';
 import { POSES, specPose, walk } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
 import { createBlob } from '../blob.js';
@@ -25,14 +25,16 @@ const BLOB_R = { start: 0.030 };                         // 2.5× (README §1, Q
 const DOOR_Z = 0.10, DOOR_W = 0.06, DOOR_H = 0.12, BAR_Y = 0.045, OPEN = 80;   // 80°, not 60: at 60 the leaf's tip met his side
 const LAMP5 = [-0.03, -0.25];                            // s09c's lamp 5 (its light point at LAMP_H)
 const PANEL = [0.0, 0.145, 0.13], SPOT_Y = 0.142;        // the recessed panel over the threshold
-const STOP = [-0.022, 0.13];                             // him under the panel at lightFlood
+const STOP = [-0.040, 0.13];   // him under the panel at lightFlood. fix-threshold: 1.8 cm left of climax-a2's −0.022, so
+                               // his snout, now in profile toward the blob, ends at its edge instead of behind it
 const BLOB_IN = [0.032, 0.16];   // at his feet, in the pool, 3 cm in front of the panel: a cutout lit from straight above casts a
                                  // line; this lays its puddle forward on the floor where the camera sees it (README §3's 6 mm, more)
 // Him on 2s: [t, [x, z]]. A step from the glass, the hand to the bar, the push, one step across the sill, the stop.
 const HIM = [[0, [-0.02, 0.060]], [0.5, [-0.02, 0.080]], [B.doorPush, [-0.02, 0.082]], [B.lightFlood, STOP]];
-const CU_I = 0.010, WARM_I = 0.020, ROOM_I = 0.15, ROOM_FLOOD = 0.30, AMB_K = 0.35, FILL_I = 0.003, PANEL_GLOW = 0.9;
+const CU_I = 0.010, WARM_I = 0.020, ROOM_I = 0.15, ROOM_FLOOD = 0.30, AMB_K = 0.35, FILL_I = 0.006, PANEL_GLOW = 0.9;
 const CAM_W = { pos: [0.0, 0.060, 0.75], look: [0.0, 0.068, 0.10] };   // the panel in the top 15%, the door pair whole
 const CU = B.exhale - 1.0;                               // the cut to the close-up, 4.0
+const TURN_Y = -20;   // fix-threshold: on the stop he turns to the blob, side view angled 20° to us (cold-v4 1:44: front-on "reads as a frog")
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const C = (k) => new THREE.Color(PALETTE[k]), hex = (c) => '#' + c.getHexString();
@@ -47,26 +49,48 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
   // ---- Outside: the night sky, an oak, the plaza to the sill, lamp 5.
   plain(hex(C('navy').multiplyScalar(0.85)), [2.0, 1.0], 'night_sky').position.set(0, 0.2, -1.5);
-  noCast(art(ext.pieces.oak_canopy, 'oak', { mpp: 0.5 * mppOf(ext, 'oak_canopy'), anchor: [326, 200], parent: scene, res: 1024 })).position.set(0.1, 0.16, -0.9);
+  noCast(art(ext.pieces.oak_canopy, 'oak', { mpp: 0.5 * mppOf(ext, 'oak_canopy'), anchor: [326, 200], parent: scene, res: 1024 })).position.set(0.1, 0.21, -0.9);
+  // fix-threshold: up 5 cm. At 0.16 its moss hung into the top of the door opening as torn tongues: the cold viewer's icicles.
   flat(plain(hex(C('navy').multiplyScalar(0.75)), [1.2, 0.8], 'plaza')).position.set(0, 0, DOOR_Z - 0.4);
   const lantern = lamppost(ext, art, scene, 'lamp5', LAMP5, COOL);
   const pool5 = new THREE.PointLight(COOL, 0.002, 0.22, 2); pool5.position.set(LAMP5[0], LAMP_H, LAMP5[1]); scene.add(pool5);
 
   // ---- The door wall: marston_kit's navy-grey wall with the door pair's opening; the glass doors in it.
+  // fix-threshold: glass, not ice (cold-v4 1:42, "a frosted, iced-over glass door"). The ice was the wall's own torn hole:
+  // its broken white fibre rim and the jags hanging off the top edge read as frost and icicles, the kraft frames as a
+  // window, the cream haze on the panes as frosting. Now: the wall without a rim, a dark metal-grey surround that covers
+  // the hole's torn edge, dark grey door frames, and clear panes that carry one soft diagonal reflection each.
+  const METAL = C('navy').lerp(C('cream'), 0.10).lerp(C('ink'), 0.25), BAR = C('navy').lerp(C('cream'), 0.4);
+  const DULL = { edgeCatch: 0 };                          // lamp 5 backlights these: a caught torn edge is the frost
   const WW = [0.6, 0.15];
-  const wall = sheet({ art: wallCanvas(kit, WW, [[WW[0] / 2 - DOOR_W, 0, WW[0] / 2 + DOOR_W, DOOR_H]]), size: WW, key: `${ID}-door_wall`, res: 2048 }, scene);
+  const wall = sheet({ art: wallCanvas(kit, WW, [[WW[0] / 2 - DOOR_W, 0, WW[0] / 2 + DOOR_W, DOOR_H]]), size: WW, key: `${ID}-door_wall`, res: 2048, rim: 'none', mat: DULL }, scene);
   wall.position.set(0, WW[1] / 2, DOOR_Z); wall.castShadow = false;
-  const doorArt = (() => {                                 // a kraft frame, a tissue-clear pane, a push bar
+  const SUR = 0.011, PXM = 3000;                           // the surround's band (m) and its canvas px per metre
+  const surround = (() => {                                // a frame round the opening: SUR wide outside it, 4 mm inside
+    const w = 2 * (DOOR_W + SUR), h = DOOR_H + SUR, c = canvas(w * PXM, h * PXM), g = c.getContext('2d'), k = 0.004 * PXM;
+    g.fillStyle = hex(METAL); g.fillRect(0, 0, c.width, c.height);
+    g.clearRect(SUR * PXM - k, SUR * PXM - k, 2 * DOOR_W * PXM + 2 * k, c.height);
+    return { c, w, h };
+  })();
+  const sur = sheet({ art: surround.c, size: [surround.w, surround.h], key: `${ID}-door_surround`, weight: 'vellum', res: 1024, rim: 'none', mat: DULL }, scene);
+  sur.position.set(0, surround.h / 2, DOOR_Z + 0.0006); sur.castShadow = false;
+  const doorArt = (() => {                                 // a dark metal frame, a clear pane, a push bar
     const c = canvas(300, 600), g = c.getContext('2d');
-    g.strokeStyle = PALETTE.kraft; g.lineWidth = 34; g.strokeRect(17, 17, 266, 566);
-    g.fillStyle = hex(C('kraft').multiplyScalar(0.7)); g.fillRect(40, 600 - (BAR_Y / DOOR_H) * 600 - 10, 220, 20);
+    g.strokeStyle = hex(METAL); g.lineWidth = 34; g.strokeRect(17, 17, 266, 566);
+    g.fillStyle = hex(BAR); g.fillRect(40, 600 - (BAR_Y / DOOR_H) * 600 - 10, 220, 20);
     return c;
   })();
+  const glint = (() => {                                   // one soft diagonal band, the lobby light on the glass (alpha is blended in linear light: 1% reads as a sheen on the dark)
+    const c = canvas(128, 256), g = c.getContext('2d'), gr = g.createLinearGradient(0, 256, 128, 0);
+    [[0.38, 0], [0.46, 0.006], [0.5, 0.009], [0.54, 0.006], [0.62, 0]].forEach(([o, a]) => gr.addColorStop(o, `rgba(255,255,255,${a})`));
+    g.fillStyle = gr; g.fillRect(0, 0, 128, 256);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+  })();
   const pane = () => new THREE.Mesh(new THREE.PlaneGeometry(DOOR_W - 0.007, DOOR_H - 0.007),
-    new THREE.MeshBasicMaterial({ color: hex(C('cream').lerp(C('phone'), 0.3)), transparent: true, opacity: 0.10, depthWrite: false }));
+    new THREE.MeshBasicMaterial({ map: glint, color: hex(C('cream').lerp(C('lamp'), 0.2)), transparent: true, depthWrite: false }));
   const doors = [-1, 1].map((side) => {                  // his is the left one, hinged at its left edge, opening toward us
     const hinge = new THREE.Group(); hinge.position.set(side * DOOR_W, 0, DOOR_Z + 0.001); scene.add(hinge);
-    const f = sheet({ art: doorArt, size: [DOOR_W, DOOR_H], key: `${ID}-glass_door${side}`, res: 512, rim: 'none' }, hinge);
+    const f = sheet({ art: doorArt, size: [DOOR_W, DOOR_H], key: `${ID}-glass_door${side}`, res: 512, rim: 'none', mat: DULL }, hinge);
     f.position.set(-side * DOOR_W / 2, DOOR_H / 2, 0); f.castShadow = false;
     const p = pane(); p.position.copy(f.position); p.castShadow = false; hinge.add(p);
     return hinge;
@@ -96,6 +120,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // ---- The Student: front view in the wide, the close-up rig in CU. The Exam.
   const hero = await makeGator({ assets }, { seed: 101, facing: 'front', res: 1024 });
   scene.add(hero.group); noCast(hero.group);
+  const side = await makeGator({ assets }, { seed: 101, facing: 'side', res: 1024 });   // from lightFlood: the snout reads
+  scene.add(side.group); noCast(side.group);
   const eyes0 = hero.joints.eyes.position.y, mouth0 = hero.joints.mouth.position.y;
   const cu = await closeupRig({ assets }, tools, ['resolve', 'relief'], { seed: 102 });
   scene.add(cu.rig.group); noCast(cu.rig.group);
@@ -109,7 +135,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   over.castShadow = true; over.shadow.mapSize.set(2048, 2048); over.shadow.bias = -0.0004; over.shadow.radius = 1;
   over.position.set(PANEL[0], SPOT_Y, PANEL[2]); over.target.position.set(PANEL[0], 0, PANEL[2]); scene.add(over, over.target);
   over.shadow.camera.near = 0.004; over.shadow.camera.far = 0.5;
-  const fill = new THREE.PointLight(WARM, 0, 0.06, 2); scene.add(fill);   // README §10, after the flood only
+  const fill = new THREE.PointLight(WARM.clone().lerp(C('cream'), 0.5), 0, 0.06, 2); scene.add(fill);   // README §10, after the flood only
   // CU key: the panel's light as it falls on a cutout in profile. The panel is straight overhead, edge-on to the head's
   // paper, so on its own it lights nothing on the face; this stands in for it just above and in front of the brow, no
   // shadow, falling off down the face (brow brighter than the jaw).
@@ -133,8 +159,17 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
     // ---------- the Student
     const [hx, hz] = kf(T, HIM, (x) => x);
-    hero.group.visible = !close; cu.rig.group.visible = close; doors.forEach((d) => { d.visible = !close; });   // CU: the open leaf is between us and him
-    if (!close) {
+    const turned = T >= B.lightFlood;                    // the stop drawing is the turn: front → side, toward the blob
+    hero.group.visible = !close && !turned; side.group.visible = !close && turned; cu.rig.group.visible = close; doors.forEach((d) => { d.visible = !close; });   // CU: the open leaf is between us and him
+    if (!close && turned) {                               // standing in the pool, turned to the blob, lit from above
+      side.boil(t, 10);
+      side.blend({ s: STAND }, [[0, 's']], T);
+      side.group.position.set(hx, hipHeight(STAND), hz); side.group.rotation.y = TURN_Y * D;
+      act(side, t, [[0, 'resolve']], { slump: 0 });
+      side.joints.head.rotation.z += kf(T, [[3.0 - 1 / 12, 0], [3.0, 6]], ease) * D;   // 3.0: he looks up at the light
+      fill.position.set(hx, 0.052, hz + 0.04);
+      fill.intensity = FILL_I;
+    } else if (!close) {
       hero.boil(t, 10);
       const walking = T < 0.5 || (T >= B.doorPush + 1 / 12 && T < B.lightFlood);
       const w = walk(T, { set: 'front', step: 0.25 });
@@ -147,7 +182,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       act(hero, t, [[0, 'resolve']], { slump: 0 });
       const look = kf(T, [[3.0 - 1 / 12, 0], [3.0, 6]], ease);   // 3.0: he looks up at the light (the face slides up)
       hero.joints.eyes.position.y = eyes0 + 0.00012 * look; hero.joints.mouth.position.y = mouth0 + 0.00012 * look;
-      fill.position.set(hx, 0.065, hz + 0.04);
+      fill.position.set(hx, 0.052, hz + 0.04);
       fill.intensity = T >= B.lightFlood ? FILL_I : 0;
     } else {                                              // CU: his head in profile facing right, lit from above
       cu.rig.boil(t, 10);

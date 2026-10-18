@@ -1,0 +1,10 @@
+# Mean sRGB and Rec.709 luma of a hoodie box and a face-green box (evidence/fix-threshold/measure.mjs on 960/640 px sheets,
+# boxes placed by eye and checked with enlarged crops). Sheets were deleted after measuring, per the brief.
+before (475e2eb), measured at 1920 on the canvas:
+  101.5 s09c   hoodie rgb  79  84  92 luma 83   green rgb 33 50 47 luma 46
+  105.0 s10 W  hoodie rgb  64  54  55 luma 56   green rgb 36 44 37 luma 42
+  106.5 s10 CU hoodie rgb  57  49  51 luma 51   green rgb 44 57 42 luma 53
+fill 0.015 at y 0.065 (rejected: overshoot)  105.0 hoodie luma 93  green luma 78
+fill 0.007 at y 0.065                        105.0 hoodie luma 75  green luma 60
+fill 0.006 at y 0.052, front rig (640 sheet) 101.5 hoodie 86 green 45 | 103.5 hoodie 86 green 53 | 105.0 hoodie 86 green 52
+final (side rig after lightFlood, 640 sheet)  103.5 hoodie 96 green 43 | 105.5 hoodie 96 green 43
