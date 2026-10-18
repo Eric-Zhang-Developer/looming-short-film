@@ -19,3 +19,4 @@
 - s17b/s17c/s18: the handwriting is the Noteworthy system font (machine-dependent). Use the painted props where possible, or bundle a font file.
 - s18: the lamp is in front of its shade; the ink and gator cast no shadows; the cross-off reach shows his legs over the desk.
 - s17: the blob is tiny in the wide. Make sure the shrink reads.
+- Neck (rig-v4): the throat reads pale and flat next to the sheet's green neck with its cream underside. Match the sheet's colours. resolve vs neutral look alike at phone size: a bolder set mouth (close-up heads may cover it).
