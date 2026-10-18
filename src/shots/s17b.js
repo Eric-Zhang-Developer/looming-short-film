@@ -25,13 +25,15 @@ const CUT_T1 = 1, CUT_T2 = 3, CUT_T3 = 5, CUT_BACK = 6.5, HOLD_HERO = 1.75;
 const CLOCK = { at: [0.12, 0.10, 0.0008], d: 0.014, reads: [9, 0], s0: 12 };   // T1's far wall, upper right (README §13); s0: the second
 // hand starts at :12, so it isn't hidden under the minute hand at 12 for the whole of K (9:00:12 still reads 9:00)
 // Camera K: face-on to the dial, close enough that it fills ~70% of the frame height (fov 20)
-const CAM_K = { pos: [0.12, 0.10, 0.0008 + 0.014 / 0.7 / (2 * Math.tan(10 * Math.PI / 180))], look: [0.12, 0.10, 0.0008] };
+// fix-payoff: the dial fills 84% of the frame height, easing in to 92% over the hold (it was a flat 70%: "I can't read the clock")
+const KFILL = [0.84, 0.92], kZ = (fill) => 0.0008 + 0.014 / fill / (2 * Math.tan(10 * Math.PI / 180));
+const CAM_K = { pos: [0.12, 0.10, kZ(KFILL[0])], look: [0.12, 0.10, 0.0008] };
 
 // ---------- tunables ----------
 const BLOB_R = { start: 0.005, testSolved: 0.004 };      // SHRINK[6] → SHRINK[7] (README §1; exam.js has no SHRINK ladder yet)
 const OTHER_R = [0.004, 0.007];                           // the room's blobs, seeded in this range (never cloned)
 const ROOM = { table: 0.041, rows: [0.25, 0.19, 0.13, 0.07], x: [-0.32, 0.32], depth: 0.022 };   // 75 cm tables at 0.055 m/m
-const SEATED_DROP = 0.022, SEAT_BACK = 0.024;                                // the standing back figure lowered to a seated height
+const HIP_DROP = -0.0134, SEAT_BACK = 0.024;                                 // the seated figure's hip below the table top (T3's), and the seat backs' height
 const FLUOR_I = 0.8, WIN_I = 0.15, AMB_K = 0.6;          // T1 (window fill ≤ 30% of the fluorescent); v3: the room is dim, he is the lit one
 const CROWD_DIM = 0.45, HERO_I = 3.2;                    // the crowd is tinted toward navy; his spot (cold viewer v2: "a lecture hall of frogs")
 const CAM_HERO = { pos: [0.0, 0.115, 0.42], look: [0.004, 0.05, 0.093] };   // the establishing beat: on him, then the room
@@ -156,8 +158,10 @@ export async function build(ctx) {
   await loadHand();
   const { scene, camera, assets, PALETTE, post } = ctx;
   const C = (k) => new THREE.Color(PALETTE[k]);
+  camera.near = 0.002; camera.updateProjectionMatrix();   // the stage's 5 cm near plane clips Camera K, which sits 5 cm from the clock (s00 does the same)
   scene.background = C('navy').lerp(C('cream'), 0.15);
   const T = tools(ctx, ID);
+  const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
   const [room, props, gsheet] = await Promise.all([assets.load('exam_room_kit'), assets.load('props_kit'), assets.load('gator_sheet')]);
   const t1 = new THREE.Group(), unit = new THREE.Group(), t2 = new THREE.Group(), t3 = new THREE.Group();
   scene.add(t1, unit); unit.add(t2, t3);
@@ -193,6 +197,15 @@ export async function build(ctx) {
   // The film's one clock (README §13), the exam face: on T1's far wall, and Camera K's subject.
   const clock = await makeClock(ctx, { seed: 17, diameter: CLOCK.d, face: 'exam' });
   clock.group.position.set(...CLOCK.at); t1.add(clock.group);
+  // fix-payoff: the navy second hand was the same weight and colour as the minute hand, so at :12 it read as one of the two
+  // ("roughly 12:10"). Red and thin, it can only be the second hand. (clock.js adds its children in the order face, hour,
+  // minute, second, pin; the second hand's group turns with set().)
+  {
+    const sec = clock.group.children[3], k = CLOCK.d / 0.020;
+    sec.children[0].visible = false;
+    const red = new THREE.Mesh(new THREE.PlaneGeometry(0.0005 * k, (0.0076 + 0.0016) * k), new THREE.MeshBasicMaterial({ color: PALETTE.calendarRed, toneMapped: false }));
+    red.position.y = (0.0076 - 0.0016) * k / 2; sec.add(red);
+  }
   // Rows of long tables, three or four gators a row from behind, each with a test page and their own small blob.
   const rng = mulberry32(seedOf(ID, 'room'));
   const figures = [], bobbers = [], blobs1 = [];
@@ -210,13 +223,22 @@ export async function build(ctx) {
     top.children[0].receiveShadow = true;
     strip(`apron${ri}`, PALETTE.kraft, [ROOM.x[1] - ROOM.x[0], 0.004], [0, ROOM.table - 0.002, z + ROOM.depth / 2], { weight: 'kraft' });
     strip(`seats${ri}`, seatCol, [ROOM.x[1] - ROOM.x[0], SEAT_BACK], [0, SEAT_BACK / 2, z + ROOM.depth / 2 + 0.019], {});
-    const xs = ri === 3 ? [-0.20, 0.0, 0.21] : ri === 0 ? [-0.24, -0.06, 0.12, 0.27] : [-0.27, -0.10, 0.08, 0.25];   // v3: he sits front and centre
+    // v3: he sits front and centre; fix-payoff: the rows before him leave his aisle (|x| < 0.12) clear, and row 3 sits close beside him
+    const xs = [[-0.28, -0.18, 0.18, 0.28], [-0.26, -0.15, 0.15, 0.26], [-0.24, -0.13, 0.13, 0.24], [-0.15, 0.0, 0.15]][ri];
     for (const x0 of xs) {
       const hero = ri === 3 && x0 === 0;
       const x = hero ? 0 : x0 + (rng() - 0.5) * 0.03;
-      const fig = await makeGator(ctx, { facing: 'back', seed: 30 + gi, res: hero ? 512 : 256, green: hero ? undefined : '#' + new THREE.Color(greenVariant(gi)).lerp(C('navy'), CROWD_DIM).getHexString() });
-      fig.group.position.set(x, -SEATED_DROP, z + ROOM.depth / 2 + 0.012);
-      fig.group.scale.setScalar(hero ? 1.1 : 0.94 + 0.1 * rng());
+      // fix-payoff: from behind every gator read as a frog (two eye bumps, no snout). They sit in profile now, heads down
+      // toward their pages, turned 12–32° so the snout is foreshortened but there; he is the one in the cream hoodie.
+      const hoodie = hero ? undefined : '#' + C('cream').lerp(C(['navy', 'kraft', 'phone', 'ink'][gi % 4]), 0.45 + 0.2 * rng()).lerp(C('navy'), CROWD_DIM * 0.5).getHexString();
+      const fig = await makeGator(ctx, { seed: 30 + gi, res: hero ? 512 : 256, hoodie,
+        green: hero ? undefined : '#' + new THREE.Color(greenVariant(gi)).lerp(C('navy'), CROWD_DIM).getHexString() });
+      const sc = hero ? 1.1 : 0.94 + 0.1 * rng();
+      fig.group.position.set(x - 0.03 * sc, ROOM.table + HIP_DROP * sc, z + ROOM.depth / 2 + 0.012);
+      fig.group.rotation.y = hero ? -10 * DEG : (rng() < 0.5 ? -1 : 1) * (12 + 20 * rng()) * DEG;
+      fig.group.scale.setScalar(sc);
+      fig.pose = seat({ lean: hero ? 12 : 8 + 8 * rng(), arm: -26, head: hero ? -8 : -4 - 8 * rng() });
+      fig.eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';   // down at the page
       t1.add(fig.group); figures.push(fig);
       if (hero) figures.hero = fig; else if (bobbers.length < 2 && rng() < 0.5) bobbers.push(fig);
       // their page and their blob on the table, to the figure's right
@@ -275,7 +297,6 @@ export async function build(ctx) {
   const pen3 = T.cut(props, 'pen', [0.012, null], 't3pen', { anchor: [0, 0.5], parent: t3 });
   const fill3 = new THREE.PointLight(C('cream').lerp(C('gator'), 0.15), FILL_T3, 0.08, 2); fill3.position.set(-0.03, 0.045, 0.13);
   t3.add(fill3);
-  const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
   const P3 = { write: seat({ lean: 12, arm: -26, head: -8 }), breath: seat({ lean: 11, arm: -27, head: -8 }), lean: seat({ lean: 16, arm: -22, head: -10 }) };
   const BODY3 = [[0, 'write'], [5.333, 'write'], [5.334, 'breath'], [5.999, 'breath'], [6.0, 'lean'], [7, 'lean']];
   // The acting kit on T3: calm resolve, then pride's wide → smile on testSmile (held small: the preset's own mouth).
@@ -318,7 +339,7 @@ export async function build(ctx) {
       exam.update(t, { squash, wobble: 0.6, eyes, look: look1, key: spot });
 
       if (inK) {   // Camera K: the clock, face-on, the room's light on it (the T1 lights)
-        camera.position.set(...CAM_K.pos); camera.lookAt(look.set(...CAM_K.look));
+        camera.position.set(CAM_K.pos[0], CAM_K.pos[1], lerp(CAM_K.pos[2], kZ(KFILL[1]), ease(t))); camera.lookAt(look.set(...CAM_K.look));
         fx.set({ focus: CAM_K.pos[2] - CAM_K.look[2], aperture: 0.002 });
         return;
       }
@@ -328,9 +349,9 @@ export async function build(ctx) {
         camera.position.set(...CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k)));
         camera.lookAt(look.set(...CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k))));
         fx.set({ focus: camera.position.distanceTo(hp.set(0, 0.05, 0.093)), aperture: lerp(0.004, 0.009, k) });
-        for (const fig of figures) fig.boil(t, 10);
-        // he reads: 2 more degrees of head-down at 2.5, a hair lower on the figure; two pens bob on 2s
-        figures.hero.group.position.y = -SEATED_DROP - (tc >= 2.5 ? 0.0006 : 0);
+        // he reads: 3 more degrees of head-down at 2.5; two pens bob on 2s
+        for (const fig of figures) { fig.boil(t, 10); fig.blend({ s: fig === figures.hero && tc >= 2.5 ? { ...fig.pose, head: fig.pose.head - 3 * DEG } : fig.pose }, [[0, 's']], 0);
+          fig.face({ eyes: fig.eyes, mouth: fig === figures.hero ? 'line' : 'neutral' }); }
         bobbers.forEach((b, i) => { b.group.rotation.z = (f + i) % 4 < 2 ? 1 * DEG : -1 * DEG; });
         blobs1.forEach(({ b, eyes: e, look: l }) => b.update(t, { wobble: 0.5, eyes: e, look: l, key: tubes.light }));
         return;

@@ -1,0 +1,106 @@
+s00     0.0 -    4.0
+        notifyBuzz           local   0.5  global    0.5
+s01     4.0 -    9.0
+s02     9.0 -   19.0
+        calendarZoom         local   1.5  global   10.5
+        inkDropForms         local   5.0  global   14.0
+s03    19.0 -   26.0
+        laptopUp             local   1.0  global   20.0
+        gulp1                local   4.5  global   23.5
+s04    26.0 -   33.0
+        fridge               local   0.0  global   26.0
+s05    33.0 -   40.0
+        gameNight            local   0.0  global   33.0
+s06    40.0 -   48.0
+        lampClickHome        local   0.5  global   40.5
+        lampOffHome          local   3.0  global   43.0
+        gulp2                local   4.0  global   44.0
+s07    48.0 -   60.0
+        bedRot               local   0.0  global   48.0
+        clockGlance          local   6.0  global   54.0
+        gulp3                local   7.5  global   55.5
+s08    60.0 -   70.0
+        clockThree           local   0.0  global   60.0
+        circleGlance         local   4.0  global   64.0
+        sweatDrop            local   6.5  global   66.5
+s09a    70.0 -   76.0
+        phoneFaceDown        local   0.5  global   70.5
+        breathIn             local   1.5  global   71.5
+        resolveFace          local   3.0  global   73.0
+        sitUp                local   3.5  global   73.5
+        lampOn               local   4.0  global   74.0
+        backpackGrab         local   5.0  global   75.0
+s09b    76.0 -   82.0
+        doorOpen             local   1.0  global   77.0
+        shadowAhead          local   2.5  global   78.5
+        stepIntoShadow       local   4.5  global   80.5
+s09c    82.0 -  102.0
+        walkStart            local   0.0  global   82.0
+        lamp1                local   2.0  global   84.0
+        lamp2                local   5.5  global   87.5
+        lamp3                local   8.5  global   90.5
+        blobBlocks           local  10.0  global   92.0
+        stepAround           local  12.0  global   94.0
+        lamp4                local  13.5  global   95.5
+        lamp5                local  15.0  global   97.0
+        marstonSeen          local  16.0  global   98.0
+s10   102.0 -  110.0
+        doorPush             local   1.0  global  103.0
+        lightFlood           local   1.5  global  103.5
+        blobBlinks           local   2.5  global  104.5
+        exhale               local   5.0  global  107.0
+s11   110.0 -  117.0
+        deskSit              local   0.5  global  110.5
+        blobClimbs           local   3.0  global  113.0
+        blobSettles          local   5.0  global  115.0
+s13   117.0 -  122.0
+        headLift             local   0.5  global  117.5
+        revealDrinks         local   1.5  global  118.5
+        revealFreshman       local   2.8  global  119.8
+s15   122.0 -  130.0
+        penUncap             local   1.5  global  123.5
+        nameWritten          local   4.5  global  126.5
+        nameSmile            local   5.5  global  127.5
+s16   130.0 -  146.0
+        crossOut             local   4.6  global  134.6
+        problemOneSolved     local   6.5  global  136.5
+        problemSolved2       local  11.5  global  141.5
+        problemSolved3       local  13.0  global  143.0
+        problemSolved4       local  14.0  global  144.0
+        problemSolved5       local  15.0  global  145.0
+s17   146.0 -  158.0
+        quiet2Start          local   0.0  global  146.0
+        dawnBird1            local   3.0  global  149.0
+        dawnBird2            local   7.0  global  153.0
+        dawnBird3            local  10.0  global  156.0
+s17b   158.0 -  168.0
+        examRoom             local   0.0  global  158.0
+        testRecognise        local   4.0  global  162.0
+        testSmile            local   5.5  global  163.5
+        testSolved           local   9.5  global  167.5
+s17c   168.0 -  175.0
+        gradeSlide           local   0.5  global  168.5
+        gradeReveal          local   2.0  global  170.0
+        gradeGrin            local   4.0  global  172.0
+s18   175.0 -  195.0
+        examCrossedOff       local   2.0  global  177.0
+        blobAbsorbed         local   5.5  global  180.5
+        lampSitBack          local   7.5  global  182.5
+        newDate              local  12.5  global  187.5
+        dropQuivers          local  14.0  global  189.0
+        tagPenUncap          local  16.5  global  191.5
+
+ok (21 shots, 70 beats, 195.0s)
+t=158.5  ff90f0631b35fc0a ff90f0631b35fc0a ff90f0631b35fc0a  PASS
+t=160  6a3343691e039664 6a3343691e039664 6a3343691e039664  PASS
+t=161.5  6db1ee0422b6b2c0 6db1ee0422b6b2c0 6db1ee0422b6b2c0  PASS
+t=165  e8862c4f23c12044 e8862c4f23c12044 e8862c4f23c12044  PASS
+t=168.8  f38299dcd3159d7d f38299dcd3159d7d f38299dcd3159d7d  PASS
+t=169.4  daf21bd75e9ebd07 daf21bd75e9ebd07 daf21bd75e9ebd07  PASS
+t=171  a7d2580106aea6f0 a7d2580106aea6f0 a7d2580106aea6f0  PASS
+t=176  d94d2c73056f2bca d94d2c73056f2bca d94d2c73056f2bca  PASS
+t=182  1f648276619e9c26 1f648276619e9c26 1f648276619e9c26  PASS
+t=187  b791afeb84784e74 b791afeb84784e74 b791afeb84784e74  PASS
+t=189  44ba1e2c20e25f1d 44ba1e2c20e25f1d 44ba1e2c20e25f1d  PASS
+t=193  9bbb61e13730dcad 9bbb61e13730dcad 9bbb61e13730dcad  PASS
+determinism: PASS

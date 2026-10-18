@@ -68,6 +68,18 @@ export async function build(ctx) {
   front.mesh.receiveShadow = true;   // the paper casts nothing: on edge, its shadow printed a black slab across the table
   const back = T.cut(props, 'blank_page', [PAGE.w, null], 'graded_back', { parent: flip });
   back.g.position.set(0, -0.00006, PAGE_H / 2); back.g.rotation.set(Math.PI / 2, 0, 0);   // faces down
+  // fix-payoff: a plain white back read as "a blank page" (cold viewer: "handed in? turned over?"). A returned test shows its
+  // red marks through the paper: faint, no number, so the 94 is still the reveal. The paper is turned about its centre line,
+  // so the front's marks sit at the mirrored height from here (circle low, checks above it).
+  {
+    const [sw, sh] = props.sizes.blank_page, W = 138, H = Math.round(W * sh / sw), cv = Object.assign(document.createElement('canvas'), { width: W * 4, height: H * 4 }), g = cv.getContext('2d');
+    g.scale(4, 4); g.strokeStyle = PALETTE.calendarRed; g.lineWidth = 2.4; g.lineCap = g.lineJoin = 'round';
+    g.beginPath(); g.ellipse(0.77 * W, 0.86 * H, 17, 15, 0.2, 0, 7); g.stroke();
+    for (const v of [0.72, 0.52, 0.32]) { g.beginPath(); g.moveTo(0.74 * W, (v - 0.01) * H); g.lineTo(0.79 * W, (v + 0.03) * H); g.lineTo(0.88 * W, (v - 0.04) * H); g.stroke(); }
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(sw, sh), new THREE.MeshLambertMaterial({ map: tex, transparent: true, opacity: 0.75, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
+    m.position.z = 0.00003; back.mesh.add(m);
+  }
   const P0 = new THREE.Vector3(PAGE.at[0], PAGE.at[1], PAGE.at[2] - PAGE_H / 2);
 
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
@@ -124,14 +136,18 @@ export async function build(ctx) {
         pivot.rotation.x = -p.ang * DEG;   // lifts the near edge, both sides of the cheat
       }
 
-      // His hand: in at 1.33 to the near edge, with it through the flip, out by 2.33; back at 3.33 for one tap on the 94.
+      // His hand: it draws the paper in by the near edge from 0.58 (it comes down with the slide), turns it over (1.33–2.33)
+      // and is out by 2.33; back at 3.33 for one tap on the 94. fix-payoff: it used to appear only at the flip, so the paper
+      // arrived by itself and read as "handed in?".
       let hv = false;
-      if (tc >= 1.333 && tc < 2.333) {
+      if (tc >= 0.5 + 1 / 12 && tc < 2.333) {
         hv = true;
-        const out = clamp((tc - 2.0) / 0.333);
+        const out = clamp((tc - 2.0) / 0.333), inn = ease(clamp((tc - 0.5) / 0.4));
         const a = (p?.ang ?? 0) * DEG;
-        nearEdge.set(PAGE.at[0] - 0.002, 0.0012 + PAGE_H * Math.sin(a), P0.z + PAGE_H * Math.cos(a) - 0.001);
-        hand.hand.position.set(nearEdge.x - 0.03 * ease(out), nearEdge.y, nearEdge.z + 0.012 * ease(out));
+        nearEdge.set(PAGE.at[0] - 0.002, 0.0012 + PAGE_H * Math.sin(a), P0.z + (p?.dz ?? 0) + PAGE_H * Math.cos(a) - 0.001);
+        // drawing it in: the fingertips on the paper's left edge, a third of the way down, riding the slide; then to the near edge for the flip
+        const m = ease(clamp((tc - 1.0) / 0.333)), slide = new THREE.Vector3(PAGE.at[0] - PAGE.w / 2 + 0.004, 0.0012, P0.z + (p?.dz ?? 0) + 0.45 * PAGE_H);
+        hand.hand.position.set(lerp(slide.x, nearEdge.x, m) - 0.03 * ease(out) - 0.02 * (1 - inn), lerp(slide.y, nearEdge.y, m), lerp(slide.z, nearEdge.z, m) + 0.012 * ease(out));
       } else if (tc >= TAP - 0.167 && tc < TAP + 0.417) {
         hv = true;
         const k = tc < TAP ? (tc - TAP + 0.167) / 0.167 : tc < TAP + 0.25 ? 1 : 1 - (tc - TAP - 0.25) / 0.167;

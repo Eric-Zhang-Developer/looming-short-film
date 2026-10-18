@@ -171,7 +171,7 @@ export async function build(ctx) {
   // Eyes: on the pen, down at the blob (2.17), half-lidded under the lamp (7.5), the glance up-right at the clock (8.5–9.25), back
   // on the calendar's circle; the tag's look up at the new drop (14.5), then level. Mouth: the small relief smile at the sit-back.
   const eyesAt = (tc) => (tc < F(26) ? 'open' : tc < B.lampSitBack ? 'side' : tc < 8.5 ? 'tired' : tc < 9.25 ? 'side' : tc < CUT_W ? 'open' : tc < 15 ? 'side' : 'open');
-  const mouthAt = (tc) => (tc >= 17.5 ? 'smile' : tc >= 15.5 ? 'neutral' : tc >= B.lampSitBack && tc < CUT_I2 ? 'smile' : 'line');
+  const mouthAt = (tc) => (tc >= CUT_W || (tc >= B.lampSitBack && tc < CUT_I2) ? 'smile' : 'line');   // fix-payoff: the small smile from the sit-back, again from the tag's first frame to the end
 
   // ---------- the Exam, the dot, its trace, and the new drop ----------
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
@@ -198,17 +198,6 @@ export async function build(ctx) {
   const contact = () => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: softTex, transparent: true, depthWrite: false, opacity: 0.5 }));
     m.visible = false; scene.add(m); return m; };
   const dotShadow = contact(), dropShadow = contact();
-  // The old blob, remembered: a dashed outline at its 0.33× size beside the new drop (cold viewer v2: "can't tell the blob under Final is smaller").
-  const GHOST_R = BLOB_R.start, GW = 0.0105;
-  const ghost = (() => { const K = 256, cv = Object.assign(document.createElement('canvas'), { width: K, height: K }), g = cv.getContext('2d');
-    const u = K / GW, r = GHOST_R * u, cx = K / 2, base = K - 14;
-    g.strokeStyle = INK; g.lineWidth = 5; g.lineCap = 'round'; g.setLineDash([12, 9]);
-    g.beginPath(); g.moveTo(cx - r, base); g.bezierCurveTo(cx - r, base - 2 * r, cx + r, base - 2 * r, cx + r, base); g.closePath();
-    g.fillStyle = 'rgba(30,42,63,0.22)'; g.fill(); g.stroke();
-    g.setLineDash([]); g.fillStyle = PALETTE.cream; for (const sx of [-1, 1]) { g.beginPath(); g.arc(cx + sx * 0.42 * r, base - 1.2 * r, 0.16 * r, 0, 7); g.fill(); }
-    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(GW, GW), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity: 0 }));
-    m.position.set(NX + CIRCLE_R * mpp + GHOST_R + 0.0008, NY - CIRCLE_R * 0.92 * mpp + (GW / 2 - 14 / K * GW) - 0.0021, C.z + 0.0011); scene.add(m); return m; })();
   // The first mark: a fresh sheet propped on the desk at the pad (leaning at 50°), "1." going down in the hand.
   const pad = T.cut(props, 'blank_page', [PAD.w, null], 'pad');
   pad.g.rotation.set(-(Math.PI / 2 - PH_RAD), 0, 0);
@@ -287,9 +276,10 @@ export async function build(ctx) {
       gator.blend({ now: pose }, [[0, 'now']], 0);
       gator.group.position.set(lerp(DESK.hip[0], STAND[0], stand), lerp(DESK.hip[1], STAND[1], stand) - (tc >= 15.5 && tc < F(188) ? 0.0005 : 0), DESK.hip[2]);
       gator.follow('tail', t, { k: 6, w: 18 });
-      // v4 acting: resolve at the cross-off, relief from the cue that sits him down to the tag, resolve again at the new drop. slump 0:
+      // v4 acting: resolve at the cross-off, then relief from the sit-back to the end (fix-payoff: no second resolve at the tag, whose
+      // lowered brow and bar mouth read as dread; one slow breath of 5 s instead). slump 0, tilt 0:
       // his hand is on the pen, the calendar and the desk, so the poses own the lean. The face goes over the preset's (the eyes follow the beats above).
-      act(gator, t, [[0, 'resolve'], [F(26), 'relief'], [CUT_W, 'resolve']], { slump: 0, blink: false });
+      act(gator, t, [[0, 'resolve'], [F(26), 'relief']], { slump: 0, tilt: 0, breath: 5, blink: false });
       gator.face({ eyes: eyesAt(tc), mouth: mouthAt(tc) });
       gator.group.updateMatrixWorld(true);
       gator.hand.getWorldPosition(hp);
@@ -344,8 +334,7 @@ export async function build(ctx) {
         drop.update(quiver ? 2 * t : uncapped ? 2 * B.tagPenUncap : t, { wobble: quiver ? 1.6 : 0.4, eyes: 'closed', key: lamp.light });
       }
 
-      // ---- the old blob's ghost beside the new drop (I2 only), and the first mark on the propped sheet ----
-      ghost.material.opacity = inI2 ? ease(clamp((tc - 13.5) / 0.4)) : 0;
+      // ---- the first mark (fix-payoff: the dashed ghost of the old blob is gone, cold viewer: "its old size, or the next one forming?") on the propped sheet ----
       pad.g.visible = inW && tc >= CUT_W;
       padInk(inW ? clamp((tc - T_TOUCH) / (T_MARK - T_TOUCH)) : 0);
       // ---- his hand in I2: in 7.0–7.5 with the marker, writes "Final", circles it, leaves after 9.67 ----
