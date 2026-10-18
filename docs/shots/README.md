@@ -1,8 +1,19 @@
 # Shot specs · film-wide conventions
 
-`s01.md` … `s18.md` were written by three storyboard passes and reconciled into one film by `sb-reconcile`; `spec-g4` rewrote them to the director's G4 notes and added `s00`, `s17b` and `s17c`. The rules below apply to every shot.
+`s01.md` … `s18.md` were written by three storyboard passes and reconciled into one film by `sb-reconcile`; `spec-g4` rewrote them to the director's G4 notes and added `s00`, `s17b` and `s17c`. The rules below apply to every shot. `spec-v4` rebuilt the film on the approved v4 story (doc 02, director 2026-10-17): new climax specs s07–s10, Marston rewritten as the reward, the rest trimmed with a v4 block at the top of each file.
 
-**Shot order (the G4 cut, 3:15; `src/timeline.js`):** s00 notification · s01 skyline · s02 calendar and the birth · s03 laptop · s04 fridge · s05 game night · s06 lamp · s07 blinds · s08 game to sunrise · s09 Marston · s10 stacks · s11 laptop, then phone · s12 Quiet 1 · s13 everyone has one · s14 Custodian · s15 the name · s16 practice · s17 Quiet 2 · **s17b test day** · **s17c grade** · s18 crossed off, and the tag. A letter after a number means a shot added after the numbering froze: it plays after the number it carries (s00 before s01). Where a shot file and this page disagree, this page wins and the shot file is the bug. Open director calls are in [`QUESTIONS.md`](QUESTIONS.md); asset names are in [`docs/assets.md`](../assets.md). The numbers quoted here come from `evidence/sb-reconcile/geometry.mjs` (output in `geometry.txt`).
+**Shot order (the v4 cut, 3:15; `src/timeline.js`):** s00 notification · s01 skyline · s02 calendar, clock and the birth · s03 laptop · s04 fridge · s05 game night · s06 lamp · **s07 bed rot** · **s08 3 a.m.** · **s09a the choice** · **s09b the door** · **s09c the walk** · **s10 the threshold** · s11 the desk · s13 everyone has one · s15 the name · s16 practice · s17 quiet: dawn · s17b test day · s17c grade · s18 crossed off, and the tag. Cut since G4: s09 (Marston exterior), s12 (quiet 1), s14 (custodian); s07, s08 and s10 reuse their file names for new shots. A letter after a number means a shot added after the numbering froze: it plays after the number it carries (s00 before s01). Where a shot file and this page disagree, this page wins and the shot file is the bug. Open director calls are in [`QUESTIONS.md`](QUESTIONS.md); asset names are in [`docs/assets.md`](../assets.md). The numbers quoted here come from `evidence/sb-reconcile/geometry.mjs` (output in `geometry.txt`).
+
+
+## v4 at a glance (spec-v4, 2026-10-17)
+Read this before the sections below; where they disagree, this wins.
+- **The turn is his walk to the library** (doc 02). The climax, s07–s10, is specified beat by beat in its own files; those files carry the numbers.
+- **No motion sensors.** §3's Marston half (the zone fiction, `sensorWake`, `sensorTimeout`, timeouts in film time) is retired. Marston's desk light is **the ring pendant (`marston_kit` ring_light_lit) as a constant spot**: `sensorLight({ at: [0, 0.127, 0.040], aimAt: [0, 0, 0.098], angle: 0.8, penumbra: 0.5 })` with no wake and no timeout, in **v4 Marston warm, `lerp(PALETTE.lamp, PALETTE.cream, 0.3)`** (doc 02 calls the library's light warm; this answers Q12 toward (b) for v4, and s10's threshold, s09c's windows and the desks share it). `fluorescent()` stays the dim distant room light.
+- **No laptop at Marston** (it was the home game). §2's laptop-in-front-of-the-blob note no longer applies; the 2× blob at the Marston mark needs nothing in front of it.
+- **The meter peaks at 2× after three gulps** (§1, rewritten below; Q16).
+- **Only the blob casts**, as the built shots already do (`castShadow` off on every other piece unless a spec says otherwise). The climax depends on it: one light, one shadow, every time.
+- **Two new fields in every spec, `Acting` and `Close-up`** (§12), and **one clock** (§13).
+- **Dead files for builders to delete:** `src/shots/s09.js`, `src/shots/s12.js`, `src/shots/s14.js` (their shots are cut; `film.js` imports by the timeline's ids, so nothing loads them). `src/shots/s07.js`, `s08.js` and `s10.js` are rebuilt from scratch under their old names. New modules: `src/shots/s09a.js`, `s09b.js`, `s09c.js`. The doc files `s09.md`, `s12.md` and `s14.md` are deleted (git history keeps them).
 
 ## 1. The Exam's size: the dread meter
 Director, 2026-10-15 (process log): **the blob's own size is the readable meter of dread.** It grows one step each time he avoids the exam and shrinks one step per solved problem. The shadow stays on top as *how it feels*: it is still the big thing, and it still obeys the light rule. This supersedes Q5's answer (body constant through Act 2).
@@ -17,14 +28,11 @@ Director, 2026-10-15 (process log): **the blob's own size is the readable meter 
 | s04 | 1.25× | 1.25× | — (G4: he never looks at it; its shadow grows by scooting toward the light) | 0.015 |
 | s05 | 1.25× | 1.25× | — | 0.015 |
 | s06 | 1.25× | 1.5× | **gulp 2 @ 4.0** (the lamp shows it at 1.25× first) | 0.015 → 0.018 |
-| s07 | 1.5× | 2× | **gulp 3 @ 6.5** (blind 1) → 1.75×, **gulp 4 @ 8.5** (blind 2) → 2× | 0.018 → 0.021 → 0.024 |
-| s08–s10 | 2× | 2× | — | 0.024 |
-| s11 | 2× | **2.5×** | **gulp 5 @ 5.25**: the peak | 0.024 → 0.030 |
-| s12–s14 | 2.5× | 2.5× | (s12's ±6% breath is a breath, not growth) | 0.030 |
-| s15 | 2.5× | 2.5× | the wake shows its real size: a 1.31× pool under what was a 7.1-unit loom | 0.030 |
-| s16 | 2.5× | 0.42× | solve #1 @ 7.0 → 2×, #2 @ 13.5 → 1.5×, #3 @ 16.0 → **1× (birth size)**, #4 @ 18.0 → 0.75×, #5 @ 19.5 → 0.58×, #6 @ 21.0 → 0.42× | 0.030 → 0.024 → 0.018 → 0.012 → 0.009 → 0.007 → 0.005 |
+| s07 | 1.5× | **2×** | **gulp 3 @ 7.5** (bed rot, after the clock glance): the peak (v4) | 0.018 → 0.024 |
+| s08–s15 | 2× | 2× | — (the climax and Marston: nothing grows while he faces it, and nothing shrinks until he solves something) | 0.024 |
+| s16 | 2× | 0.42× | solve #1 @ 6.5 → 1.5×, #2 @ 11.5 → **1× (birth size)**, #3 @ 13.0 → 0.75×, #4 @ 14.0 → 0.58×, #5 @ 15.0 → 0.42× (v4: five solves) | 0.024 → 0.018 → 0.012 → 0.009 → 0.007 → 0.005 |
 | s17 | 0.42× | 0.42× | asleep on the page | 0.005 |
-| s17b | 0.42× | 0.33× | **the test @ 8.5** (`testSolved`) | 0.005 → 0.004 |
+| s17b | 0.42× | 0.33× | **the test @ 9.5** (`testSolved`) | 0.005 → 0.004 |
 | s17c | 0.33× | 0.33× | — (a grade isn't a solved problem) | 0.004 |
 | s18 | 0.33× | gone | **the cross-off @ 2.0** → the dot (0.125×); soaks into the calendar @ 5.5. The tag's new drop is s02's bead, r 0.002, a new exam | 0.004 → 0.0015 → 0 |
 
@@ -50,6 +58,8 @@ s17b: const BLOB_R = { start: SHRINK[6], testSolved: SHRINK[7] };
 s17c: const BLOB_R = { start: SHRINK[7] };
 s18: const BLOB_R = { start: SHRINK[7], examCrossedOff: SHRINK[8] };   // then soaks away at blobAbsorbed; the tag's drop is a new birth-bead
 ```
+**v4 ladder** (supersedes the block above for s07–s16): s07 `{ start: 0.018, gulp3: 0.024 }`; s08–s15 `{ start: 0.024 }`; s16 `{ start: 0.024, problemOneSolved: 0.018, problemSolved2: 0.012, problemSolved3: 0.009, problemSolved4: 0.007, problemSolved5: 0.005 }`; s17 on as above. `gulp4` and `gulp5` are gone with the blinds and old s11; 0.021 and 0.030 are no longer sizes in the film. The peak is 2× (r 0.024): 5.5 cm wide; at the Marston mark its eyes sit just below his (0.026 against 0.030), big but not towering. Q16 has the 2.5× alternative.
+
 The blob is built at `start`; a step is a mesh scale of `BLOB_R[step] / BLOB_R.start` from its drawing on (as s16's `scaleAt` does now). Other people's blobs stay in `exam.js`'s existing `BLOB_R` map (Freshman, neighbor, Custodian, sleeper, and the s17b exam room's); rename that one (e.g. `OTHER_R`) so the per-shot name is free.
 
 **Beat times and cuts moved once, at G4** (doc 11 allows it when the director's notes change the story; the v1/v3 comparison aligns by scene). The five `gulpN` beats are in `src/timeline.js` from `spec-g4`.
@@ -158,6 +168,8 @@ Keys switch only on beats, cuts or a zone's wake and timeout: s03 window → lap
 - **Room maps:** s13's top-down grid is schematic (desks 0.11 × 0.065 at 0.16 spacing, the hero at the center desk). The side-view rows in s15–s17 use the full desk unit at 0.25 spacing with the hero's desk against the window wall. No shot shows both, and the top-down cut hides the difference. If the animatic shows it, restage s13 with the hero in the wall row.
 
 ## 9. Sound anchors
+**v4 (spec-v4):** `src/timeline.js` now names 69 beats on 21 shots. New: `bedRot`, `clockGlance`, `gulp3` (moved to s07 @ 7.5), `clockThree`, `circleGlance`, `sweatDrop`, `breathIn`, `resolveFace`, `sitUp`, `backpackGrab`, `doorOpen`, `shadowAhead`, `stepIntoShadow`, `walkStart`, `lamp1`…`lamp5`, `blobBlocks`, `stepAround`, `marstonSeen`, `doorPush`, `lightFlood`, `blobBlinks`, `exhale`, `deskSit`, `blobClimbs`, `blobSettles`, `nameSmile`, `gradeGrin`, `lampSitBack`. Moved: `phoneFaceDown` (s15 → s09a 0.5). Cut: the blinds, sunrise, stacks, sensor, custodian and quiet-1 beats, `gulp4`, `gulp5`, `laptopOpen`, `phoneWake`, `revealSleeper`, `problemSolved6`. Doc 05 has the full rename map and the cue table. The climax runs on two grids: the tick at 1 s from s08 (60.0) and the pulse at 0.5 s from `lamp1` (84.0). The G4 paragraph below is history.
+
 Cues hang on beat names only (doc 05). `src/timeline.js` names every anchor the specs use (58 beats, `spec-g4`). G4 renamed the beats whose moment changed: `phoneUp` → `laptopUp` (s03), `curtainsStart` → `blindsStart` and `curtainsDone` → `blind2` (s07, with `blind1` new), `scrollStart` → `sunriseGame` (s08); removed `nextSemester`, `sensorWakeFreshman` and `blobYawn` (old s18); and added `notifyBuzz` (s00), `calendarZoom` (s02), the five `gulpN` (s03 4.5, s06 4.0, s07 6.5 and 8.5, s11 5.25), `crossOut` (s16), `examRoom`, `testRecognise`, `testSmile`, `testSolved` (s17b), `gradeSlide`, `gradeReveal` (s17c), `examCrossedOff`, `blobAbsorbed`, `newDate`, `dropQuivers`, `tagPenUncap` (s18). `src/audio/cues.js` and `score.js` still name the removed beats until the sound pass renames them (doc 05 has the map). `lampClickMarston` in older shot text means `sensorWakeMarston`; `tableLightDies` (s11) is a timeout.
 
 ## 10. Character fill (added by the orchestrator after s04 and s09)
@@ -173,3 +185,22 @@ It's a fill, not a second key, so doc 03 rule 1 (one key, one shadow) still hold
 - `aim()` now defaults the shadow near plane to `min(0.004, d/20)` (contract-light-key), so no manual `near` is needed.
 - The blob keys its highlight off the light with the biggest contribution at the blob. A §10 character fill near the blob can win that, so pass `exam.update(t, { key: <your key light> })` whenever a fill sits close to the blob.
 - The colour grade for s09 and s10 is `night` (the spec's `act2b` doesn't exist, and `marston` crushes the exterior), so the s09→s10 cut doesn't jump.
+
+## 12. Acting and close-ups (v4, every spec)
+Every spec now has two more sections. Builders drive them with rig-v4's acting kit (`src/characters/acting.js`; until it lands, `tasks/rig-v4.md` §3 is the API: `act(rig, t, [[t0, preset], …], { breath, slump })`).
+- **Acting:** one preset per beat, from doc 02's acting map: `numb` (half-lid, flat mouth), `guilt` (side-glance, tight line), `flinch` (wide, o), `dread` (worried + sweat, tight line), `resolve` (level eyes, tight line, brows flat and low), `relief` (closed-content, small smile, brows up), `pride` (wide → smile), `neutral`. Doc 02's "surprise → smile" (s15's name, s16's "that was it?") is `pride`'s wide → smile, held small. Each change takes the kit's 2–3-frame anticipation and holds ≥ 12 frames. **Breath** is in breaths per minute (8 slack, 10–12 calm, 20 dread, 36–40 the walk, one long exhale at the threshold). **Posture:** `slump` 0–1 (1 in bed, 0 from the sit-up on), tail droop (Act 2, the bed) against level (the walk) against curl (from the threshold's exhale).
+- **Close-up:** whether a beat uses a close-up head. Doc 02's five: **s08 C2 (the clock glance), s09a C4 (sitting up), s09b C5 (the door), s10 CU (the threshold), s17c CU (the 94).** The head is **`closeup_head_kit`** (`docs/assets.md`, to be painted): the hero's side head at close-up resolution with separate eyes, pupils, lids, mouths and a sweat drop, so the acting kit can drive it and the gaze can point anywhere (s08 needs pupils that move to the clock and the calendar). Until it's frozen, the fallback is `gator_hero`'s head, cropped, with `face_sheet` swaps scaled up and the acting kit's code brows. Close-ups are side views; lying ones (s08, s09a) rotate the head snout-up.
+
+## 13. The clock (v4)
+One design, procedural (`wall_clock`, `docs/assets.md`), so it can tell any time and match the calendar's paper: a cream torn-paper disc Ø 0.020 inside a thin Night Navy rim, **twelve tick marks and no numerals** (the four quarter ticks longer), an hour hand, a minute hand and a thin second hand, each a paper strip on its own plane (so a low light gives them small shadows), an amber centre dot. The second hand steps on whole seconds (one frame of +1.5° overshoot, back the next): a pure function of t.
+
+| Shot | Reads | Where in frame |
+|---|---|---|
+| s02 | 9:00 | Beside the calendar: centre 0.014 right of the calendar's right edge, 0.70 of its height up; in s02.js's unit **(0.072, 0.067, 0.0015)**. In W, upper middle; off frame during the push and I |
+| s07 | ~1:45 | Same wall, seen from the bed: bedroom **(0.044, 0.099, 0.0015)**, up and left of his head ("over his shoulder"), ≥ 60 px |
+| s08 | **3:00:00 → 3:00:09** | C1 fills the frame; C2 soft above and behind his head; C3 as s07 |
+| s09a | 3:00:10 on | Dark after 0.5 (unlit) |
+| s17b | 9:00 | Camera K insert (0.0–1.0); then T1's far wall, upper right (0.12, 0.10) |
+| s18 | ~4:10 | Beside the calendar as s02, in W; at I2's right edge |
+
+The tick (`clockTick`, doc 05) is heard faint in s02 and s18, alone in s08, under s09a–s09c, doubled into the pulse from s09c's `lamp1`, and calm in s17b.
