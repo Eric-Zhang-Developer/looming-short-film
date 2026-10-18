@@ -51,3 +51,7 @@ The hard part was the machine. Another job pushed the load past 400, and a 22-fr
 
 ## State
 built (fixes 1–3; 4–5 not started) · 2026-10-18
+
+
+## Addendum (orchestrator, 2026-10-18)
+The final-build probe finished after the squash-merge, and its file was lost when the orchestrator removed the worktree before the builder's last background job ended (the orchestrator's mistake: the builder's first completion notice was interim). The numbers are transcribed in `evidence/fix-walk/probe_final.txt`: mid-span length 2.61-2.98x (target 3x, not met; the frame edge caps it), darkness 22-33% of the lit path (met), lamp puddles 1.45-1.47x (the 1.41-1.45 in the merge message came from an earlier build). Two corrections: `evidence/fix-walk/probe_midspan.txt` is a page-load timeout log, not data; and `fix_76-110.jpg`, cited above and in `shadow_measure.txt`, was never saved; the same frames are the lower rows of `before_after.jpg`.
