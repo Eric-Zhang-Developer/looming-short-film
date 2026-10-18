@@ -214,3 +214,6 @@ At about 23:50, squash-merging `v2-marston-a` hit a conflict in `src/assets.js` 
 
 ## 2026-10-17 · Story v4 approved: the walk to the library is the climax
 On v3 the director said the turn was wrong: "the keystone decision in my life to get overcoming procrastination is to go to the library … not the fucking random janitor". He asked for a plain bed-rot scene, cut the blinds ("makes no sense in context"), made the roommates gators and asked for more emotion in the gator and a clock. The orchestrator drafted `docs/02-story-v4-draft.md`: a 40-second walk climax built on the light rule (home's low screens loom; Marston's light from above shrinks), the clock as the film's pulse, and the motion sensors cut. Director: "I approve everything. I looked at the script, and I like it. Let's do it." Also approved: a Codex close-up head kit for the big emotional beats, and a JSDoc + `@ts-check` type pass (no build step), run by an agent after the v4 shots merge and proven a no-op by frame hashes.
+
+## 2026-10-17 · The master is 1080p
+Director: "quick update master render should be in 1080p". This drops the 4K plan (doc 11 §Fidelity), which also removes the overnight-render risk from the schedule. The master is the chunked 1080p render at CRF 18 (or lower) with 256k+ AAC, plus the compressed backup cut from it.

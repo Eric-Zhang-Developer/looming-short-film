@@ -35,7 +35,8 @@ Why this is the right shape:
 The schedule is tight but realistic at today's pace: about 17 shots blocked in one day. The real limits are machine RAM (two builders at once) and the 4K render time, not agent speed. Buffer: if M4 slips, ship a 1080p final on Sunday and keep 4K for a post-deadline release.
 
 ## Fidelity target for `v3-final` (director: "The final version should be as high fidelity as possible.")
-- **Render a 4K master** (3840×2160, 24 fps). YouTube serves 4K uploads with better codecs (VP9 or AV1) to every viewer, so even people watching at 1080p see a cleaner picture than a 1080p upload gives them.
+- **Master at 1080p** (1920×1080, 24 fps; director, 2026-10-17: "master render should be in 1080p"). Superseded: the 4K plan below stays as notes only.
+- ~~**Render a 4K master** (3840×2160, 24 fps).~~ YouTube serves 4K uploads with better codecs (VP9 or AV1) to every viewer, so even people watching at 1080p see a cleaner picture than a 1080p upload gives them.
 - **Anti-aliasing:** render with supersampling, or at 4K and downscale for any HD copy. The torn paper edges and fibre rims are where aliasing shows first.
 - **Shadows:** raise shadow-map resolution per shot until the soft edges stop stepping at 4K, especially the s15 loom collapse.
 - **Art resolution:** close-ups use `gator_hero` and the largest generations available. Any frozen asset that's softer than its on-screen size at 4K gets regenerated or upscaled before the final pass, and listed here.
