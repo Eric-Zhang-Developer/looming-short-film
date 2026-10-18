@@ -15,6 +15,7 @@ import { POSES, specPose, walk } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
 import { createBlob } from '../blob.js';
 import { kitTools, mppOf, noCast, glow } from './s11.js';
+import { closeupRig, HEAD_AT } from './s09b.js';
 
 const ID = 's09c', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;
@@ -33,7 +34,13 @@ const TURN = 18.0, END = [1.36, -0.115];                // the turn into depth, 
 const BLOCK = [0.650, 0.104];                           // the block: in his path, a hair in front of his plane
 
 // The lamps. Each lamp beat is the frame the blob is under that lamp, so the lamp x's come from x(t) − 0.045.
-export const LAMP_H = 0.105, LAMP_Z = 0.09;             // the light point: above his head (0.080); 0.100 made the 2.5× puddle 1.4×
+export const LAMP_H = 0.095;   // the light point, just above his head top (0.085). fix-walk: 0.105 → 0.095 stretches the
+// shadow's tip (s = H / (H − 0.060): 2.33 → 2.71); the puddles grow a little (1.32–1.36 → 1.41–1.45×, probe). Mid-span the shadow
+// now runs to the frame's edge, so the frame, not the lamp, sets how long it measures.
+// fix-walk: the lamps stand on the path's far edge, behind the hedge line, not on his walk line. The blob is a flat
+// cutout facing the lens; a lamp in its own plane throws it as a hairline along the path (cold-v4: "a ground puddle").
+// 7 cm behind it, the lamp throws it forward across the paving as a wedge as wide as the blob is tall.
+const LAMP_Z = 0.045;
 const LAMP_BEATS = ['lamp1', 'lamp2', 'lamp3', 'lamp4', 'lamp5'];
 export const LAMP_X = LAMP_BEATS.map((b) => X(B[b]) + HEEL[0]);   // −0.045, 0.193, 0.433, 0.780, 0.930
 // Key hand-overs (1 → 2, 2 → 3, 3 → 4 on the blob's landing, 4 → 5), each a 0.25 s crossfade centred on a pulse beat.
@@ -42,7 +49,15 @@ export const LAMP_COOL = (PALETTE) => new THREE.Color(PALETTE.cream).lerp(new TH
 export const KEY_I = 1.6;                                // cd, decay 0 (stylized: the long shadow stays as dark as the puddle)
 const POOL_I = 0.002, POOL_D = 0.22;                    // each lamp's own non-casting pool light, decay 2
 const AMB_K = 0.3, FILL_I = 0.010, WARM_I = 0.25;
-const CAM_Y = 0.160, CAM_Z = [[B.blobBlocks, 0.80], [B.stepAround, 0.66]], LOOK_Y = 0.045;
+// fix-walk: the wide is pushed in (0.71 → 0.59 m) and looks down 11° (was 9°), so his slump reads at 400 px and the
+// paving, the shadow's receiver, is a band; steeper lost the sky and the tower. It centres on the blob, so the key lamp and the shadow's tip
+// both stay in frame either side of each lamp.
+const CAM_Y = 0.160, CAM_Z = [[B.blobBlocks, 0.70], [B.stepAround, 0.62]], LOOK_Y = 0.050, LOOK_Z = 0.12;
+// The block's close-up (fix-walk): cut in after the stop and the flinch, the painted dread head (sweat) held, resolve on
+// DECIDE, and cut back to the wide as he side-steps past it.
+const CU = [B.blobBlocks + 1 / 3, DECIDE + 0.5], CU_I = 0.007;
+// At the block the wide slides 8.5 cm ahead, so lamp 4, beyond the blob, is in frame with the shadow it throws back at him.
+const BLOCK_PAN = [[9.0, 0], [B.blobBlocks, 0.085], [B.stepAround + 0.5, 0.085], [B.lamp4, 0]];
 const HOP = 0.5, HOP_H = 0.003;
 
 // A lamppost from marston_ext_kit, globe centre at the light point. Returns its glowing material.
@@ -132,7 +147,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
   // ---- Ground: navy plaza from z −0.4 to 0.6; the paver path (the shadow receiver) z 0.07…0.17, x −0.40…1.60.
   // Wider than the spec's 0.07…0.14: the 2.5× blob's puddle reaches z 0.15, and a broader band reads as the receiver.
-  const PZ = [0.03, 0.20];
+  const PZ = [0.03, 0.26];   // fix-walk: to 0.26, the lamps behind the hedge throw the shadow forward to z 0.21
   const paver = (() => {
     const c = Object.assign(document.createElement('canvas'), { width: 1000, height: 400 }), g = c.getContext('2d');
     g.fillStyle = hex(C('cream').lerp(C('navy'), 0.12)); g.fillRect(0, 0, 1000, 400);
@@ -145,7 +160,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     const p = flat(sheet({ art: paver, size: [0.26, PZ[1] - PZ[0]], key: `${ID}-path-${i}`, res: 1024 }, scene));
     p.position.set(x, 0.0002 * (i % 2), (PZ[0] + PZ[1]) / 2); p.castShadow = false;
   });
-  strip(-0.45, 1.9, 0.5, (x, i) => {
+  strip(-1.2, 1.9, 0.5, (x, i) => {   // fix-walk: from −1.2, the pushed-in camera saw the first strip's corner
     const p = flat(sheet({ path: RECT, color: hex(C('navy').multiplyScalar(0.75)), size: [0.5, 1.6], key: `${ID}-plaza-${i}`, res: 512, rim: 'none', mat: { edgeCatch: 0 } }, scene));
     p.position.set(x, -0.0004, -0.2); p.castShadow = false;   // its far edge hides behind Marston and the trees
   });
@@ -162,7 +177,9 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const pools = LAMP_X.map((x) => { const p = new THREE.PointLight(COOL, POOL_I, POOL_D, 2); p.position.set(x, LAMP_H, LAMP_Z); scene.add(p); return p; });
   // The two shadow keys: A takes lamps 1, 3, 5, B takes 2 and 4. Each moves to its next lamp while the other is key.
   const keyA = lampKey(COOL), keyB = lampKey(COOL);
-  for (const k of [keyA, keyB]) scene.add(k, k.target);
+  // fix-walk: no penumbra and a wider cone, here only (s10's lamp 5 keeps lampKey's), so the paving stays at full light out
+  // to where the long shadow's tip lands (the 0.2 penumbra faded it from 66°). It did not change the probe's lengths.
+  for (const k of [keyA, keyB]) { k.penumbra = 0; k.angle = 1.5; scene.add(k, k.target); }
   // Lamp i's share of the key: 1 − u(h0) for lamp 1, u(h_{i−1}) − u(h_i) after; u ramps over FADE centred on hand-over h.
   const u = (h, t) => clamp((t - (h - FADE / 2)) / FADE);
   const share = (i, t) => (i ? u(HANDOVER[i - 1], t) : 1) - (i < 4 ? u(HANDOVER[i], t) : 0);
@@ -184,6 +201,11 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const DROP = [[0.5, 0], [0.85, 0.15], [1, 0.5], [0.85, 0.85], [0.5, 1], [0.15, 0.85], [0, 0.5], [0.15, 0.15]];
   const sweat = sheet({ path: DROP, color: hex(C('cream').lerp(C('phone'), 0.35)), weight: 'vellum', size: [0.0024, 0.0034], key: `${ID}-sweat`, res: 128 }, side.joints.head);
   sweat.castShadow = false;
+  // The block's close-up rig (s09b's): the side Student with the painted heads, backpack on. Its own cool key from the
+  // lamp side: lamp 4 is beyond him and edge-on to the head's paper, so on its own it lights only the rim.
+  const cu = await closeupRig({ assets }, tools, ['dread', 'resolve'], { seed: 94 });
+  scene.add(cu.rig.group); noCast(cu.rig.group); pack(cu.rig, [-0.020, 0.026, -0.0045], -1);
+  const cuKey = new THREE.PointLight(COOL, 0, 0.10, 2); scene.add(cuKey);
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
   scene.add(exam.mesh);
 
@@ -191,9 +213,10 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const P = POSES, STAND = specPose({ lean: 0, arm: -92, far: -92, head: 0, leg: 0, farLeg: 8 });
   const RECOIL = specPose({ lean: -2, arm: -98, far: -98, head: 2, leg: 0, farLeg: 8 });
   const CUES = [[0, 'dread'], [B.blobBlocks, 'flinch'], [B.blobBlocks + 7 / 12, 'dread'], [DECIDE, 'resolve']];
-  const camX = (t) => {                                   // his x + 0.06, smoothed: a 1 s box average of x(t). Before lamp 1
-    let s = 0; for (let i = -5; i <= 5; i++) s += X(Math.min(t, TURN) + i * 0.1);   // it sits 5 cm further back, so the long
-    return s / 11 + 0.06 - 0.05 * (1 - ease(t / B.lamp1));                         // shadow behind them is in frame
+  const camX = (t) => {                                   // the blob's x + 0.02, smoothed: a 1 s box average of x(t). Before
+    let s = 0; for (let i = -5; i <= 5; i++) s += X(Math.min(t, TURN) + i * 0.1);   // lamp 1 it sits 3 cm further back, so the
+    return s / 11 + HEEL[0] + 0.02 - 0.03 * (1 - ease(t / B.lamp1))                // long shadow behind them is in frame
+      + kf(t, BLOCK_PAN, ease);
   };
   const bc = new THREE.Vector3();
 
@@ -205,6 +228,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     const turned = T >= TURN;
     side.group.visible = !turned; back.group.visible = turned;
     let root;
+    const close = t >= CU[0] && t < CU[1];
     if (!turned) {
       side.boil(t, 10);
       let hip;
@@ -224,9 +248,10 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       const z = kf(T, [[DECIDE, WALK_Z], [B.stepAround, AROUND_Z], [B.stepAround + 0.5, WALK_Z]], ease);
       root = [X(T), hip, z];
       side.group.position.set(...root);
-      // Acting: 36/min to the decision, 40/min after; no slump, tail level (brief), head down 8° under dread.
+      // Acting: 36/min to the decision, 40/min after; head down 8° under dread. fix-walk: hunched and tail drooped until
+      // he decides (cold-v4 read the upright plod as "out for a walk with his pet"), upright and tail level after.
       const breath = T < DECIDE ? 60 / 36 : 60 / 40;
-      const f = act(side, t, CUES, { breath, slump: 0, tail: 0 });
+      const f = act(side, t, CUES, { breath, slump: T < DECIDE ? 0.6 : 0, tail: T < DECIDE ? -16 : 0 });
       const head = kf(T, [[0, -10], [B.blobBlocks, -10], [B.blobBlocks + 1 / 12, 0], [DECIDE, -2], [B.lamp4, -2], [B.lamp4 + 1 / 3, 0],
         [B.marstonSeen, 0], [B.marstonSeen + 1 / 3, 4]], ease);
       side.joints.head.rotation.z += head * D;
@@ -238,6 +263,19 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       sweat.visible = T >= 6.0 && T < 7.0;
       sweat.position.set(-0.0018, 0.0254 - 0.001 * clamp((T - 6.0) / 0.5), 0.003);
       fill.position.set(root[0] + 0.035, 0.07, root[2] + 0.03);
+      // the close-up: the same pose and place, the painted head; dread (sweat) → resolve on DECIDE, the swallow 10.75
+      side.group.visible = !close; cu.rig.group.visible = close;
+      if (close) {
+        cu.rig.boil(t, 10);
+        cu.rig.group.position.set(...root);
+        if (T < DECIDE) cu.rig.blend({ s: STAND }, [[0, 's']], T);
+        else { const w = walk(T, { set: 'side', step: (B.stepAround - DECIDE) / 3, t0: DECIDE }); cu.rig.blend(P, w.keys, T); }
+        cu.show(T < DECIDE ? 'dread' : 'resolve', { antic: T >= DECIDE - 1 / 12 - 1e-6 && T < DECIDE });
+        const swallow = T >= 10.75 - 1e-6 && T < 10.917 - 1e-6;
+        cu.holder.position.y = HEAD_AT[1] + (swallow ? (T < 10.833 ? 0.0006 : -0.0003) : 0);
+        cu.rig.joints.head.rotation.z = kf(T, [[DECIDE - 1e-3, -6], [DECIDE + 1 / 6, 2]], ease) * D;   // head down, then level
+        cu.rig.joints.body.scale.y = 1 + (T < DECIDE ? 0.004 * Math.sin(2 * Math.PI * T / (60 / 36)) : 0);   // the held breath, shallow
+      }
     } else {                                              // into depth toward the entrance, back view, step 1/4
       back.boil(t, 10);
       const w = walk(T, { set: 'back', step: 0.25, t0: TURN });
@@ -271,6 +309,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     if (LAMP_BEATS.some((b) => Math.abs(T - B[b]) < 1e-3)) sq = 0.3;   // the light presses it down on each puddle beat
     if (T >= B.marstonSeen && T < TURN) { eyes = 'side'; look = 1; }
     exam.mesh.position.set(bx, by, bz);
+    cuKey.intensity = close ? CU_I : 0;
+    if (close) cuKey.position.set(root[0] + 0.03, 0.10, root[2] + 0.05);
     exam.mesh.scale.set(mirror ? -1 : 1, 1, 1);
 
     // ---------- light, on 1s
@@ -292,12 +332,20 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
     // ---------- camera, on 1s: lateral track at his x + 0.06, the block's push-in in z, locked from the turn
     const cx = camX(t), cz = kf(t, CAM_Z, ease);
-    camera.position.set(cx, CAM_Y, cz);
-    camera.lookAt(cx, LOOK_Y, WALK_Z);
-    far.sky.position.x = cx; far.tower.position.x = 0.85 * cx;
-    bc.set(root[0], 0.04, root[2]);
-    fx.set({ focus: camera.position.distanceTo(bc) });
+    if (close) {                                          // the close-up: level, from the camera side, on his head
+      cu.rig.joints.head.getWorldPosition(bc);
+      camera.position.set(bc.x + 0.018, bc.y + 0.009, root[2] + 0.20);
+      camera.lookAt(bc.x + 0.018, bc.y + 0.009, root[2]);
+      far.sky.position.x = bc.x; far.tower.visible = false;   // the tower sat on the blob's crown like a hat
+      fx.set({ focus: 0.20, aperture: 0.008 });
+    } else {
+      camera.position.set(cx, CAM_Y, cz);
+      camera.lookAt(cx, LOOK_Y, LOOK_Z);
+      far.sky.position.x = cx; far.tower.position.x = 0.85 * cx; far.tower.visible = true;
+      bc.set(root[0], 0.04, root[2]);
+      fx.set({ focus: camera.position.distanceTo(bc), aperture: 0.012 });
+    }
   }
 
-  return { parts: { exam, camera, side, back, keyA, keyB, X, LAMP_X }, update };
+  return { parts: { exam, camera, side, back, cu, keyA, keyB, X, LAMP_X }, update };
 }

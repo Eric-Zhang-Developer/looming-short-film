@@ -43,7 +43,11 @@ const C5 = [3.5, B.stepIntoShadow];                      // the close-up's cut i
 // wall and the room's right half are left out, and the camera stands off to the right of the lamp → blob → door line,
 // seeing all three in one frame: the lamp in the room (left), the blob on his threshold, the shadow down the hall, the
 // eye holes on the front door, and him at the near side of the dark road. Locked.
-const CAM = { pos: [0.30, 0.135, 1.32], look: [-0.030, 0.040, 0.40] };
+// fix-walk: cold-v4 read that cutaway as "a cut-away, stage-set-looking room" and couldn't tell the front door from "a
+// mirror or a poster". The camera now stands square to his door wall, in his room behind the lamp, a few cm right of the
+// lamp → front-door line and high enough to see the eye holes over the blob: his door frame is the frame, the hall runs
+// straight away through it, and the front door at its end gets a lit gap under it and a transom (the night outside).
+const CAM = { pos: [0.040, 0.112, 1.02], look: [0.000, 0.058, 0.0] };
 const LAMP_I = 0.45, AMB_K = 0.25, SHADE_GLOW = 0.9, FILL_I = 0.006;
 
 // ---------- the close-up rig (README §12): the side Student with a painted closeup_heads head on the hood ----------
@@ -89,6 +93,13 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   plain(cream, [2 * HALL_X + 0.01, CEIL + 0.01], 'end_wall').position.set(0, CEIL / 2, 0);
   const front = noCast(art(home.pieces.door, 'front_door', { mpp: 0.110 / (home.pieces.door.height - 8), sx: 0.069 / 0.0690, anchor: [home.pieces.door.width / 2, home.pieces.door.height - 4], parent: scene }));
   front.position.set(0, 0, 0.001);
+  { // fix-walk: the front door reads as the way out: the night's cool light under it and through a transom above it
+    const NIGHT = C('cream').lerp(C('phone'), 0.4);
+    const gap = plain(hex(NIGHT), [0.060, 0.0022], 'front_gap'); gap.position.set(0, 0.0012, 0.0015);
+    const tr = plain(hex(NIGHT), [0.052, 0.012], 'transom', scene, { weight: 'tissue' }); tr.position.set(0, 0.121, 0.0012);
+    for (const m of [gap, tr]) { m.material.emissive.copy(NIGHT); m.material.emissiveIntensity = 0.35; }
+    const bar = plain(hex(C('kraft').multiplyScalar(0.6)), [0.058, 0.003], 'transom_bar'); bar.position.set(0, 0.1135, 0.0014);
+  }
   { const w = plain(creamSide, [DOOR_Z + 0.01, CEIL + 0.01], 'hall_wall_left'); w.rotation.y = Math.PI / 2; w.position.set(-HALL_X, CEIL / 2, DOOR_Z / 2); }   // the right wall is cut away
   flat(sheet({ art: planks(2 * HALL_X + 0.01, DOOR_Z), size: [2 * HALL_X + 0.01, DOOR_Z], key: `${ID}-hall_floor`, res: 1024, rim: 'none' }, scene)).position.set(0, 0, DOOR_Z / 2);
   { // the runner down the middle: home_kit's rug, stretched along the hall
@@ -99,21 +110,26 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
   // ---- His room: the door wall (room side) with the doorway cut through it, his floor, his ceiling.
   {
-    const W = 0.34, WH = 0.22, pxm = 3000, c = canvas(W * pxm, WH * pxm), g = c.getContext('2d');   // taller than the
+    const W = 0.68, WH = 0.22, pxm = 3000, c = canvas(W * pxm, WH * pxm), g = c.getContext('2d');   // taller than the
     // ceiling: the camera looks down over the room's (unseen, hidden) ceiling line
     // his room's wall is home_kit's navy wall strip (cream baseboard), so the lit hall in the doorway is the bright shape
     const ws = home.pieces.wall_strip, wk = mppOf(home, 'wall_strip') * pxm, NAVY = [8, 30, ws.width - 8, 80], BASE = [8, 86, ws.width - 8, 102];
     const tw = (NAVY[2] - NAVY[0]) * wk, th = (NAVY[3] - NAVY[1]) * wk, bh = (BASE[3] - BASE[1]) * wk;
     for (let y = c.height - bh; y > -th; y -= th) for (let x = 0; x < c.width; x += tw) g.drawImage(ws, NAVY[0], NAVY[1], tw / wk, th / wk, x, y - th, tw, th);
     for (let x = 0; x < c.width; x += tw) g.drawImage(ws, BASE[0], BASE[1], tw / wk, bh / wk, x, c.height - bh, tw, bh);
-    g.clearRect((W - DOORWAY[0]) * pxm, (WH - DOORWAY[1]) * pxm, DOORWAY[0] * pxm, DOORWAY[1] * pxm);
+    g.clearRect((W / 2 - DOORWAY[0] / 2) * pxm, (WH - DOORWAY[1]) * pxm, DOORWAY[0] * pxm, DOORWAY[1] * pxm);
+    { // fix-walk: his door's casing, cream, so the doorway reads as a door frame
+      const k = 0.006 * pxm, x0 = (W / 2 - DOORWAY[0] / 2) * pxm, y0 = (WH - DOORWAY[1]) * pxm;
+      g.fillStyle = cream; g.fillRect(x0 - k, y0 - k, k, DOORWAY[1] * pxm + k); g.fillRect(x0 + DOORWAY[0] * pxm, y0 - k, k, DOORWAY[1] * pxm + k);
+      g.fillRect(x0 - k, y0 - k, DOORWAY[0] * pxm + 2 * k, k);
+    }
     const w = sheet({ art: c, size: [W, WH], key: `${ID}-door_wall`, res: 2048, rim: 'none' }, scene);
-    w.position.set(DOORWAY[0] / 2 - W / 2, WH / 2, DOOR_Z);   // x −0.295 … the doorway's right edge: cut away beyond
+    w.position.set(0, WH / 2, DOOR_Z);   // fix-walk: the whole wall, the doorway in its middle (was cut away right of it)
     // The one exception to "only the blob casts": this wall and his door cast, so the lamp reaches the hall only through
     // the doorway. With the right half cut away the hall is in view the whole shot; this keeps it dark until doorOpen.
     w.castShadow = true;
   }
-  flat(sheet({ art: planks(0.36, 0.5), size: [0.36, 0.5], key: `${ID}-room_floor`, res: 1024 }, scene)).position.set(HALL_X - 0.18, 0, DOOR_Z + 0.25);
+  flat(sheet({ art: planks(0.60, 0.6), size: [0.60, 0.6], key: `${ID}-room_floor`, res: 1024 }, scene)).position.set(0, 0, DOOR_Z + 0.30);
     // His door: home_kit door, hinged on the doorway's left edge, opening into his room (toward us), away from the view.
   const hinge = new THREE.Group(); hinge.position.set(-DOORWAY[0] / 2, 0, DOOR_Z + 0.001); scene.add(hinge);
   const door = noCast(art(home.pieces.door, 'his_door', { mpp: 0.110 / (home.pieces.door.height - 8), sx: DOORWAY[0] / 0.0690, anchor: [home.pieces.door.width / 2, home.pieces.door.height - 4], parent: hinge }));
