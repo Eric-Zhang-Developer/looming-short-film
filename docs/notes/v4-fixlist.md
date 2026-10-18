@@ -10,6 +10,7 @@ Known issues from the batch-A builders' own measurements and the orchestrator's 
 
 ## After the deadline (found in fix round 1)
 - **s09a determinism, 73.6–74.5:** frames differ only when rendered out of order (a fresh page and the in-order run match); the base commit 134495b does the same, and it isn't the lamp shadow. Likely state built lazily on first use. The chunked render is in order, so the master is safe; find it before any out-of-order re-render.
+- **s09b, the blob blocks him in the doorway** for most of 1:17.5–1:21 in the final master: no frame makes a poster still (the spec's poster frame, the shadow thrown down the hall ahead of him, isn't clearly in any of them).
 - **s07 ceiling shadow** still reads flat ("a UFO"); two caster flips were tried and rejected (`evidence/fix-bedroom/s07_caster_tried_*.jpg`).
 - **Orchestration lessons:** a completion notice that says background work is still running is interim, so keep the worktree until the final one; never run a heavy encode (x265 slow) beside builders' renders; four headless Chromes grew swap by about 3 GB of disk.
 

@@ -24,7 +24,7 @@ Alternatives, if a subtitle helps: *Looming: a paper film about the first step*,
 ## Project Synopsis
 > Provide a brief description of the project and its goals.
 
-*Looming* is a 3:15 wordless animated short about a UF student, a small gator, and the exam he keeps avoiding. The exam is a drop of ink that rolls off his calendar and becomes a little blob with eyes. Every time he looks away from it, it grows half a size, up to two and a half times. Its shadow grows far more: under the low glow of his laptop or phone it fills the wall and the ceiling, and under light from above it shrinks to a puddle. [now: all 21 shots built and merged; planned: the final render]
+*Looming* is a 3:15 wordless animated short about a UF student, a small gator, and the exam he keeps avoiding. The exam is a drop of ink that rolls off his calendar and becomes a little blob with eyes. Every time he looks away from it, it grows half a size, up to two and a half times. Its shadow grows far more: under the low glow of his laptop or phone it fills the wall and the ceiling, and under light from above it shrinks to a puddle. [now: all 21 shots built; final master rendered 2026-10-18, `out/looming_final.mp4`]
 
 The film runs on one physical rule: **light held low and close makes the shadow loom; light from above makes it small.** The shadows are not drawn. They are real light computed in code, so the film's metaphor is literally the algorithm.
 
@@ -45,7 +45,7 @@ Goal: one honest, gentle film about starting, made in a way anyone can open up a
 ## Project Context
 > Share details of how the project is ideally to be deployed, published, exhibited, distributed, interacted with, used and or maintained.
 
-*Looming* is a 3:15 film for screens: a single MP4 that plays anywhere. The master is 1080p (director, Oct 17), with a compressed backup copy cut from it. [planned: the final render]
+*Looming* is a 3:15 film for screens: a single MP4 that plays anywhere. The master is 1080p (director, Oct 17), with a compressed backup copy cut from it. [now: master 1920×1080, 3:15, −15.9 LUFS / −4.8 dBTP; backup 720p, 8.65 MB, rendered 2026-10-18]
 
 - **Where it's meant to be seen.** Finals week, on screens in Marston Science Library, where the climax ends and the film's second half takes place, and in first-year orientation and counselling outreach, where the "first step" message is useful. Online, it's short enough to share in a group chat. [planned: venues not arranged]
 - **Open and re-renderable.** The whole film is a public GitHub repository: https://github.com/Eric-Zhang-Developer/looming-short-film. Every frame is a pure function of time, so anyone can re-render it bit for bit on a laptop. The repo includes the shot specs, the asset manifest, every image prompt (rejects included) and a process log of every creative decision. [now]

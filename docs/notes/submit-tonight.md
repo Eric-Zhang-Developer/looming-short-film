@@ -2,10 +2,10 @@
 
 What only the director can do, in order. The orchestrator prepares every file; uploading, submitting and anything public is the director's action.
 
-## Files (the orchestrator makes these when the master render finishes)
-- `out/looming_final.mp4`: the 1080p master, 3:15. **This goes to YouTube.**
-- `out/looming_final_backup.mp4`: the ProposalSpace upload, ≤ 10 MB (`tools/backup.sh`; the v4 cut came to 8.66 MB).
-- `out/stills/`: 2–3 PNG stills for the form (optional; the doc 10 plan lists them as "possibly").
+## Files (ready, 2026-10-18 18:50)
+- `out/looming_final.mp4`: the 1080p master, 3:15, 747 MB, −15.9 LUFS / −4.8 dBTP. **This goes to YouTube.**
+- `out/looming_final_backup.mp4`: the ProposalSpace upload, 720p, 8.65 MB (9,076,185 bytes, under the 10 MB cap).
+- `out/stills/`: three 1080p PNG stills (0:22 the phone shadow, 1:59.5 everyone's blob, 2:52.5 his grin), about 1.6–1.9 MB each. Optional.
 
 ## The director's steps
 1. **Watch** `out/looming_final.mp4` once, with sound. No agent has listened to it. The listen list from the sound pass is in `done/snd-v4.md` ("What the director should listen for").

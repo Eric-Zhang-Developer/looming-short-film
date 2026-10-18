@@ -3,14 +3,10 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-18
 
-## v4 (2026-10-18, 07:35): climax and sound merged, trims in flight · final due Sun Oct 18, 11:59 PM
-Story v4 approved by the director 2026-10-17 ("I approve everything … Let's do it"); master render **1080p**. The plan is the 11 steps in doc 07's "Story v4 approved" entry.
-- **Merged on `wave/3-assets`:** rig-v4, story v4, `closeup_heads` + `clock_kit` frozen (35133b2), spec-v4 (b3234b6), the director's Q16/Q17 answers (09bd2ff: 2.5× peak; his nightstand lamp, clicked on in s09a), climax-a2 (228d5b2: s09b, s09c, s10), climax-a1 (253f3a5: s07, s08, s09a, `src/clock.js`), snd-v4 (5f80ea1: −15.9 LUFS / −4.7 dBTP; the director's listen list is in `done/snd-v4.md`).
-- **The film still doesn't render end to end** until both trims land (the kept shots read pre-v4 beats; s12.js and s14.js still exist).
-- **In flight (2):** `trims-marston` (Opus: s11, s13, s15–s17c, delete s12/s14) and `trims-home` (Sonnet: s01–s06, s18, the neck colour, the `resolve` preset).
-- **Next:** render v4 (`tools/render_film.sh v4_cut`) → cold viewer → one fix round from `docs/notes/v4-fixlist.md` → `@ts-check` agent (frame-hash no-op) → submission text (doc 10, doc 03 rules 2/8 still say motion sensors) + making-of ch 12 → 1080p master.
-- **`out/` is a local folder for now** (director, 2026-10-18: "Swap the out/ link for a local folder on the internal disk for the v4 render; put the link back later"). The Seagate drive was unplugged, and the earlier cuts (v1–v3, the old watchdog log) are on it. **To restore once the drive is back and anything worth keeping in the local `out/` is copied over:** `mv out out.local && ln -s "/Volumes/Seagate Storage/Media/Looming/out" out`.
-- **Disk:** about 6.5 GB free on Data with two builders rendering. Watch it during the full render (the watchdog trips under 3 GB).
+## FINAL (2026-10-18, 18:50): the master is rendered · submission is the director's · due 11:59 PM tonight
+**Read `docs/notes/submit-tonight.md` first.** Ready: `out/looming_final.mp4` (1080p, 3:15, −15.9 LUFS / −4.8 dBTP; for YouTube), `out/looming_final_backup.mp4` (720p, 8.65 MB; the ProposalSpace upload), `out/stills/` (three PNGs). Everything is merged and pushed on `wave/3-assets`; no task worktrees are left. Fix round 1 (four builders after `evidence/cold-v4/report.md`) is merged; what's left is in `docs/notes/v4-fixlist.md`.
+- **The director's, not the orchestrator's:** watch with sound (no agent has listened), upload to YouTube, confirm the flagged lines in doc 10 (and cut "captions" and "flash check": they don't exist), fill and submit the form. After: a PR from `wave/3-assets` to `main`, a tag and release, the `@ts-check` pass (plan step 9, a frame-hash no-op, deferred until after the deadline).
+- **`out/` is a local folder** while the Seagate drive is unplugged. To restore after copying the finals across: `mv out out.local && ln -s "/Volumes/Seagate Storage/Media/Looming/out" out`.
 
 ## MORNING (2026-10-16): the overnight run finished at about 3 AM
 **Read `docs/notes/morning-picks.md` first.** v2 (`out/v2_rough_cut.mp4`, 01:29) and v3 draft (`out/v3_draft.mp4`, 02:44) are rendered, both 3:15. All work is merged and pushed on `wave/3-assets`. No task worktrees are left except `asset-face-sheet` (stale, safe to remove). Fix list: `docs/notes/v3-fixlist.md`, plus `evidence/cold-v3/report.md`. Making-of ch 11 covers the night. Next: the director's notes on v3 → a v3.1 pass on the turn and the cold-viewer list → captions and the flash check → the 4K master Saturday night.
