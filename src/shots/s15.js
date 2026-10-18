@@ -1,89 +1,85 @@
-// s15 · The pen, the light, the look, the name (docs/shots/s15.md, G4). v2 on the frozen Marston kits and props_kit.
-// The film's turn: the reach for the pen wakes the motion-sensor zone over his desk (README §3) on the press drawing, the
-// 7.1-unit loom drops to a 1.31× pool under the 2.5× blob, and he writes his name. s11's desk set (marstonDesk: ribbon
-// window, desk row, Y-back chair, ring pendant as the zone's fixture), Camera A′ → B′ (README §8).
-// Characters (gator, blob, the props he handles) step on 2s; light and camera run at 24.
-// UNIT below is the pre-G4 master that s06, s12, s14, s16 and s17 import: its values are left as they were, and this
-// shot's G4 numbers are the constants after it. s16 imports the practice-sheet helpers from here.
+// s15 · The name (docs/shots/s15.md, v4). 8 s, Camera B′ locked, with one close-up. No sensor (the light has been on
+// since s10), no phone light (it's face-down since s11), no laptop. He picks up the pen, uncaps it (penUncap 1.5),
+// hesitates, writes his name at the top of the practice sheet (nameWritten 4.5), and the blob flinches. He looks at it;
+// cut to the close-up on the painted surprised_smile head (nameSmile 5.5): the first mark is smaller than he thought.
+// Back on B′ at 7.5 he moves the pen to problem line 1, the brace s16 opens on. s11's desk set (marstonDesk), the 2.5×
+// blob (Q16) at the Marston mark under the ring pendant's constant warm light. Only the blob casts.
+// Characters and the props he handles on 2s; light and camera on 1s.
+// UNIT below is the pre-G4 master that s16 imports: its values are left as they were. s16 also imports BLOB_AT, PHONE,
+// PAGE, CAM_B2 and the practice-sheet helpers from here.
 import * as THREE from 'three';
-import { phoneLight, sensorLight, fluorescent, ambient, aim, shadowScale } from '../lights.js';
-import { kf, ease, clamp } from '../core/ease.js';
+import { sensorLight, fluorescent, ambient } from '../lights.js';
+import { kf, clamp } from '../core/ease.js';
 import { makeGator } from '../characters/gator.js';
 import { createBlob } from '../blob.js';
-import { POSES, specPose, pressKeys } from '../characters/poses.js';
-import { kitTools, marstonDesk, MARK, noCast } from './s11.js';
+import { POSES, specPose } from '../characters/poses.js';
+import { act } from '../characters/acting.js';
+import { SHOTS } from '../timeline.js';
+import { kitTools, marstonDesk, MARK, castOnly } from './s11.js';
+import { closeupRig, HEAD_AT } from './s09b.js';
 
 const ID = 's15', D = Math.PI / 180;
+const B = SHOTS.find((s) => s.id === ID).beats;            // penUncap 1.5, nameWritten 4.5, nameSmile 5.5
 const dr = (n) => n / 12;                                    // drawing n (12 fps) → local seconds
 const on2s = (t) => Math.floor(t * 12 + 1e-4) / 12;          // onTwos, but 100.0833 − 100 = 0.08333333333332860 floors to drawing 0 there (evidence/anim-s15/ontwos.txt)
 
-// ---------- the pre-G4 master numbers (imported by s06, s12, s14, s16, s17; not this shot's G4 staging) ----------
+// ---------- the pre-G4 master numbers (imported by s16; not this shot's staging) ----------
 export const UNIT = {
   hip: [-0.075, -0.012], bodyZ: 0.074,                       // gator root (makeGator puts the near arm at +0.012 → z 0.086)
   camA: { pos: [-0.010, 0.118, 0.392], look: [-0.010, 0.0385, 0.080] },   // spec look y 0.030, tilted up 1.45° (loom fix)
   camB: { pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] },
   focus: [-0.024, 0.020, 0.086], aperture: 0.02, maxblur: 0.01,
   fill: [-0.046, 0.040, 0.114],                             // character fill (README §10): before him, just above eye line
-  tube: [0, 0.127, 0.040],                                   // sensor_trough tube centre (README §3), above the frame in A and B
-  blob: [0, 0.012, 0.0884], phone: [-0.010, 0.0015, 0.116], phoneLight: [-0.014, 0.006, 0.116],   // loom fix: 4.2x, see done note
-  press: 0.5,                                                // K6, drawing 6: the pen's capped point meets the page = the sensor
-                                                             // wake time (lampClickMarston). Beat-locked: don't move it.
+  tube: [0, 0.127, 0.040],                                   // the pendant's light (README §3's trough position)
+  blob: [0, 0.012, 0.0884], phone: [-0.010, 0.0015, 0.116], phoneLight: [-0.014, 0.006, 0.116],
+  press: 0.5,                                                // G4's press drawing (kept for the importers' numbers)
 };
 
-// ---------- G4 (this shot) ----------
-const BLOB_R = { start: 0.030 };                             // METER.gulp5 (README §1); exam.js has no METER export yet
+// ---------- v4 (this shot) ----------
+const BLOB_R = { start: 0.030 };                             // 2.5×, the v4 peak (README §1, Q16)
 // The Marston mark (README §1), moved BLOB_DX along +x: at B′ the 9.3 cm cut gator's snout (cut-gator) reached the
-// 2.5× blob. 0 puts it back on the spec's mark.
+// 2.5× blob. 0 puts it back on the spec's mark. s11 and s13 use the same spot.
 export const BLOB_DX = 0.016;
 export const BLOB_AT = (r) => { const m = MARK(r); return [m[0] + BLOB_DX, 0, m[2]]; };
-export const PHONE = [-0.010, 0.0015, 0.114], PHONE_L = [-0.010, 0.004, 0.114];   // rest spot and its light: S 0.114 / 0.040 = 2.85
-const LAPTOP_Z = 0.078;                                      // in front of the grown blob (README §2)
-export const CAM_A2 = { pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] };    // Camera A′ (README §8)
+export const PHONE = [-0.010, 0.0015, 0.114], PHONE_L = [-0.010, 0.004, 0.114];   // rest spot (and G4's light above it)
+export const CAM_A2 = { pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] };    // Camera A′ (README §8; G4's opening)
 export const CAM_B2 = { pos: [-0.010, 0.112, 0.358], look: [-0.010, 0.020, 0.084] };  // Camera B′
 export const PAGE = [-0.0205, 0.0003, 0.095];                // page centre (x −0.033…−0.008, z 0.080…0.110)
-// Intensities (candela for spots/points, lux for the directional), tuned by eye on the key-moment sheet.
-const PHONE_I = 1.0, ZONE_I = 0.8, FLUOR_I = 0.25, AMB_K = 0.45;   // ZONE_I: lights.js's default, the old lamp pool at the blob
-const PHONE_OUTSHONE = 0.02;   // README §4 says 0.2. anim-s15 took 0.05 (0.2 left the loom at 43%); reel-s15 0.02, by eye
-const FILL_PHONE = 0.012, FILL_ZONE = 0.02;   // character fill (README §10). v3-readability: 0.003 left him a black shape
-                                              // in the loom, so nobody could see that the reach was his
-// v3-readability: the turn must read as *his movement* waking the light. Two still drawings, then one big reach: the arm
-// swings up high (arm +45) and comes down on the pen, which lands on drawing 5 (0.417). The relay clacks on the
-// beat at 0.5, two frames behind his hand. Then A′ holds on the lit result until 2.5 and pushes slowly to B′ by 9.0.
-const PUSH = [2.5, 9.0];
+const CU = [B.nameSmile, 7.5];                               // the close-up's cut in and out
+// CU: level with his head from in front, close enough that the painted head fills the frame's left half and the blob's
+// eyes are in at the right, so "he and the blob look at each other" holds in one frame.
+const CAM_CU = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };
+const WARM = 0.3;                                            // v4 Marston warm: lerp(lamp, cream, 0.3) (README v4)
+// Intensities, by eye on the sheet: G4's lit zone (the old lamp pool at the blob), its fill and ambient.
+const ZONE_I = 0.25, FLUOR_I = 0.25, AMB_K = 0.6, FILL_I = 0.02, CU_KEY = 0.010;   // ZONE_I: s11's 0.8 blew the desk out from B′'s height
 
-// ---------- the hand: K0–K3 from poses.js (shared with s06), K4–K7 down to the pen, then the rest of s15's table ----------
+// ---------- the hand: s15's table, to the pen and the name ----------
 const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });   // poses.js's seated legs
 const P = {
   ...POSES,
-  big_lift: seat({ lean: 8, arm: 45, head: 6 }),   // 0.250: the arm swings up high, clearly a decision
-  pen_reach: seat({ lean: 19, arm: -15 }),    // K4 0.333, hand 3 mm over the capped pen
-  pen_touch: seat({ lean: 21, arm: -19 }),    // K5 0.417, fingertip on the pen
-  pen_press: seat({ lean: 24, arm: -16 }),    // K6 0.500 = K7: the capped point on the name line (the wake)
-  let_go: seat({ lean: 10, arm: -10 }),       // 1.167
-  settle: seat({ lean: 6, arm: -30 }),        // 1.333, tip (−0.031, 0.000): hand flat on the desk
-  phone_antic: seat({ lean: 4, arm: -36 }),   // 7.000
-  flip: seat({ lean: 30, arm: -4.5 }),        // 7.333, solved for the spec's tip (−0.017, 0.005)
-  to_pen: seat({ lean: 10, arm: -30 }),       // 7.583
-  line1: seat({ lean: 14, arm: -21 }),        // 13.0, tip 2.5 mm above the desk (problem line 1)
+  settle: seat({ lean: 6, arm: -30 }),        // 0.0: hands flat on the desk either side of the page (s11's end)
+  pen_reach: seat({ lean: 19, arm: -15 }),    // 0.5: hand 3 mm over the capped pen
+  pen_touch: seat({ lean: 21, arm: -19 }),    // 0.75: fingertip on the pen, picks it up
+  squeeze: seat({ lean: 10, arm: -8, far: -6 }),   // 1.17: hands 1 mm closer
+  line1: seat({ lean: 14, arm: -21 }),        // 7.5–8.0: tip 2 mm above the desk at problem line 1 (s16's first pose)
 };
 const WRITE = ['write_a', 'write_b', 'write_c'];
+const NAME = [dr(28), dr(54)];                               // 2.333–4.5: the name, 26 drawings
 const BODY = [
-  ...pressKeys(0).slice(0, 3),                                // K0–K2: still, still, anticipation (as s06)
-  [dr(3), 'big_lift'], [dr(4), 'pen_reach'], [dr(5), 'pen_press'], [dr(7), 'pen_press'],   // the press on 5 (0.417), the wake on 6
-  [dr(12), 'pen_press'], [dr(14), 'let_go'], [dr(16), 'settle'],
-  [dr(83), 'settle'], [dr(84), 'phone_antic'], [dr(86), 'grab'], [dr(87), 'grip'], [dr(88), 'flip'], [dr(89), 'grip'],
-  [dr(90), 'grip'], [dr(91), 'to_pen'], [dr(92), 'to_pen'], [dr(93), 'uncap'], [dr(95), 'uncap'], [dr(96), 'uncap_pull'],
-  [dr(100), 'poise'], [dr(105), 'poise'],
-  ...Array.from({ length: 14 }, (_, i) => [dr(106 + i), WRITE[i % 3]]),   // 8.833–10.0: the name, 14 drawings
-  [dr(120), 'poise'], [dr(144), 'poise'], [dr(146), 'exhale'], [dr(150), 'exhale'], [dr(156), 'line1'],
+  [0, 'settle'], [dr(5), 'settle'], [dr(6), 'pen_reach'], [dr(8), 'pen_reach'], [dr(9), 'pen_touch'], [dr(11), 'pen_touch'],
+  [dr(12), 'uncap'], [dr(13), 'uncap'], [dr(14), 'squeeze'], [dr(17), 'squeeze'], [dr(18), 'uncap_pull'], [dr(19), 'uncap_pull'],
+  [dr(22), 'poise'], [dr(27), 'poise'],
+  ...Array.from({ length: 26 }, (_, i) => [dr(28 + i), WRITE[i % 3]]),
+  [dr(54), 'poise'], [7.5 - dr(1), 'poise'], [7.5, 'line1'],
 ];
-// Head on body (deg, + snout up), set with pose() after blend: K2's dip, the turn down to the blob, the look at the name.
-const HEAD = [[0, 0], [dr(1), 0], [dr(2), -3], [dr(3), 0], [dr(29), 0], [dr(30), 2], [dr(32), -6], [dr(34), -10],
-  [dr(120), -10], [dr(126), -14]];
-const eyesAt = (t) => t < dr(6) ? 'open' : t < dr(8) ? 'closed' : t < dr(32) ? 'open' : t < dr(60) ? 'side'
-  : t >= dr(75) && t < dr(77) ? 'closed' : t < dr(84) ? 'open' : t < dr(93) ? 'side' : t < dr(132) ? 'open'
-  : t < dr(162) ? 'side' : 'worried';
-const mouthAt = (t) => t < dr(60) || t >= dr(93) ? 'line' : 'neutral';
+// Head on body (deg, + snout up), added after act(): 4.5–5.0 down 4° at the name; up 3° on the smile (in the CU).
+const HEAD = [[dr(54), 0], [dr(56), -4], [B.nameSmile - dr(1), -4], [B.nameSmile, 3], [7.5 - dr(1), 3], [7.5, -4]];
+// The acting kit: quiet resolve; the smile is pride's wide → smile (README §12), played on the painted head in the CU;
+// resolve again for the brace. The 4-drawing flicker of dread (2.00–2.33) is too short for a preset (12-frame hold), so
+// it's the brow alone, set after act(): brows up.
+const CUES = [[-0.1, 'resolve'], [B.nameSmile, 'pride'], [7.5, 'resolve']];
+const FLICKER = [2.0, NAME[0]], DREAD_BROW = [32, -4];
+const EYES = [[5.0, B.nameSmile, 'side']];                  // 5.0: eyes to the blob (it just flinched)
 
 // The blob's startle and flinch: spring()'s own damping (k 6, w 18) in cosine phase, so the kick peaks on the beat frame.
 const kick = (t, t0, a) => (t < t0 ? 0 : a * Math.exp(-6 * (t - t0)) * Math.cos(18 * (t - t0)));
@@ -202,28 +198,15 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   };
   const flat = (g) => { g.rotation.x = -Math.PI / 2; return g; };   // lying on the desk: local +y runs away from camera
 
-  // ---------- set: s11's desk unit, the closed laptop and the backpack as s11–s14 left them ----------
+  // ---------- set: s11's desk unit, the backpack behind the chair, the phone face-down at the rest spot ----------
   { const b = cut(props, 'backpack_side'); b.position.set(-0.145, -0.034 + 0.02, 0.028); }
-  cut(props, 'laptop_base').position.set(-0.0075, 0.0015, LAPTOP_Z);
-  cut(props, 'laptop_lid').position.set(-0.0075, 0.0045, LAPTOP_Z + 0.0001);
+  const phone = new THREE.Group(); phone.position.set(...PHONE); phone.rotation.x = Math.PI; scene.add(phone);
+  { const back = cut(kitp, 'phone_face_down', { parent: phone }); back.rotation.x = Math.PI / 2; back.position.y = -0.0004; }
 
   // ---------- props he handles ----------
-  // The page: problem 1's practice sheet, its printed problem showing, his name revealed under the pen (8.833–10.0).
+  // The page: problem 1's practice sheet, its printed problem showing, his name revealed under the pen (2.333–4.5).
   const page = practiceSheet({ props: kitp, sheet, which: 'practice_1', at: PAGE, key: `${ID}-page`, parent: scene });
   const INK = SHEET_INK.practice_1;
-
-  // phone: props_kit, face up (dark screen) at rest with a glyph-bar glow over it; turns over onto its painted back.
-  const phone = new THREE.Group(); phone.position.set(...PHONE); scene.add(phone);
-  flat(cut(kitp, 'phone_face_up', { parent: phone })).position.y = 0.0004;
-  { const back = cut(kitp, 'phone_face_down', { parent: phone }); back.rotation.x = Math.PI / 2; back.position.y = -0.0004; }
-  const SCR = Object.assign(document.createElement('canvas'), { width: 120, height: 64 });
-  { const g = SCR.getContext('2d'); g.fillStyle = PALETTE.phone; g.fillRect(0, 0, 120, 64); g.fillStyle = PALETTE.navy;   // glyph bars, no text
-    [[14, 12, 70], [14, 28, 88], [14, 44, 52]].forEach(([x, y, w]) => { g.beginPath(); g.roundRect(x, y, w, 8, 4); g.fill(); }); }
-  const scrTex = new THREE.CanvasTexture(SCR); scrTex.colorSpace = THREE.SRGBColorSpace;
-  const screen = flat(new THREE.Mesh(new THREE.PlaneGeometry(0.0128, 0.0054), new THREE.MeshBasicMaterial({ map: scrTex })));
-  screen.position.y = 0.00045; phone.add(screen);
-  noCast(phone);
-
   // pen + cap (props_kit): the pen holder's origin is its tip (+x end) so it can hang off the fingertip. The painted pen
   // points −x, so it's mirrored.
   const pen = new THREE.Group(); scene.add(pen);
@@ -234,114 +217,98 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const hero = await makeGator({ assets }, { res: 1024 });
   hero.group.position.set(UNIT.hip[0], UNIT.hip[1], UNIT.bodyZ);
   scene.add(hero.group);
+  const cu = await closeupRig({ assets }, tools, ['surprised_smile'], { seed: 15 });   // README §12: the painted head
+  cu.rig.group.position.copy(hero.group.position); scene.add(cu.rig.group);
   const M = BLOB_AT(BLOB_R.start);
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
   exam.stain.position.set(M[0], 0.0004, M[2]);
   scene.add(exam.mesh, exam.stain);
+  castOnly(scene, [exam.mesh]);                              // only the blob casts (README v4)
 
-  // ---------- light ----------
-  const BLOB_C = V([M[0], BLOB_R.start, M[2]]);
-  const phoneSpot = phoneLight({ angle: 0.9, penumbra: 0.4, intensity: PHONE_I });
-  phoneSpot.position.copy(V(PHONE_L));
-  scene.add(phoneSpot, phoneSpot.target);
-  aim(phoneSpot, BLOB_C);   // along phone → blob, i.e. at its wall hit
-  // Character fill (README §10, which also covers §4's face fill): shadowless, in front of him just above eye line, short
-  // range so it never reaches the wall. Cool under the phone, the fluorescent tone under the zone.
-  const fill = new THREE.PointLight(PALETTE.phone, 0, 0.07, 2);
-  fill.castShadow = false; fill.position.set(...UNIT.fill); scene.add(fill);
-  const FILL = { phone: C('phone').lerp(C('navy'), 0.35), zone: C('cream').lerp(C('gator'), 0.15) };   // README §6 tone
-
-  // His desk zone (README §3): dead until the press, then the shared wake. Its fixture is s11's ring pendant (the
-  // procedural trough isn't added); the light aims at the 1× mark's foot.
+  // ---------- light: s11's, constant ----------
+  const warm = C('lamp').lerp(C('cream'), WARM);
   const zone = sensorLight({ at: UNIT.tube, aimAt: [0, 0, 0.098], intensity: ZONE_I });
+  zone.light.color.copy(warm); zone.light.shadow.mapSize.set(2048, 2048);
   scene.add(zone.light, zone.light.target);
-
-  const tubes = fluorescent({ intensity: FLUOR_I });   // the distant aisle light; flicker 0: its update() is never called
-  scene.add(tubes.light);
+  pendant(1);
+  const fill = new THREE.PointLight(warm, FILL_I, 0.07, 2);   // README §10: shadowless, before him just above eye line
+  fill.position.set(...UNIT.fill); scene.add(fill);
+  // CU key: the pendant's light as it falls on a profile cutout (it's edge-on from straight above): just above and in
+  // front of the brow, no shadow (s10's CU key).
+  const cuKey = new THREE.PointLight(warm, 0, 0.09, 2); cuKey.position.set(-0.040, 0.075, 0.105); scene.add(cuKey);
+  const tubes = fluorescent({ intensity: FLUOR_I });   // the distant room light; flicker 0: its update() is never called
+  tubes.light.castShadow = false; scene.add(tubes.light);
   const amb = ambient(); amb.intensity *= AMB_K; scene.add(amb);
 
   // ---------- camera and post ----------
-  const FOCUS = V(UNIT.focus), look = new THREE.Vector3(), dir = new THREE.Vector3();
-  const fx = post({ focus: 0.3, aperture: UNIT.aperture, maxblur: UNIT.maxblur, lut: 'marston' });
-
-  const hand = new THREE.Vector3(), far = new THREE.Vector3(), capOff = new THREE.Vector3();
+  const FOCUS = V(UNIT.focus), look = new THREE.Vector3(), dir = new THREE.Vector3(), fv = new THREE.Vector3();
+  const fx = post({ focus: 0.3, aperture: UNIT.aperture, maxblur: UNIT.maxblur, lut: 'amber' });
+  const hand = new THREE.Vector3(), far = new THREE.Vector3();
 
   function update(t) {
-    const tc = on2s(t);
+    const tc = on2s(t), close = t >= CU[0] && t < CU[1];
     boil(t, 10);
 
-    // camera: A′ locked to PUSH[0], eased push to B′ by PUSH[1], locked after (on 1s)
-    const k = ease((t - PUSH[0]) / (PUSH[1] - PUSH[0])), A = CAM_A2, B = CAM_B2;
-    camera.position.set(...A.pos.map((v, i) => v + (B.pos[i] - v) * k));
-    camera.lookAt(look.set(...A.look.map((v, i) => v + (B.look[i] - v) * k)));
-    camera.getWorldDirection(dir);
-    const level = zone.update(t, { wake: UNIT.press }), lit = level >= 0.5;   // on 1s; README §4's outshone switch
-    pendant(level);
-    fx.set({ focus: dir.dot(FOCUS.clone().sub(camera.position)), lut: lit ? 'amber' : 'marston' });
+    // camera on 1s: B′ locked, the CU, B′ again
+    const cam = close ? CAM_CU : CAM_B2;
+    camera.position.set(...cam.pos); camera.lookAt(look.set(...cam.look)); camera.getWorldDirection(dir);
+    fx.set({ focus: dir.dot(fv.copy(close ? look : FOCUS).sub(camera.position)), aperture: close ? 0.008 : UNIT.aperture });
 
-    // gator
-    hero.boil(t, 10);
-    hero.blend(P, BODY, tc + 1e-6);
-    hero.pose({ head: kf(tc, HEAD) * D });
-    hero.face({ eyes: eyesAt(t + 1e-6), mouth: mouthAt(t + 1e-6) });
-    hero.group.position.y = UNIT.hip[1] - (tc >= dr(146) ? 0.001 : 0);   // the exhale's shoulder drop
+    // the Student: the rig on B′, the close-up rig (same pose and hip) in the CU
+    hero.group.visible = !close; cu.rig.group.visible = close;
+    for (const r of [hero, cu.rig]) {
+      r.boil(t, 10);
+      r.blend(P, BODY, tc + 1e-6);
+    }
+    const f = act(hero, t, CUES, { slump: 0, breath: tc >= FLICKER[0] && tc < NAME[0] ? 30 : 6, seed: 15 });
+    hero.joints.head.rotation.z += kf(tc, HEAD) * D;
+    if (tc >= FLICKER[0] && tc < FLICKER[1]) { hero.joints.brow.rotation.z = DREAD_BROW[0] * D; }
+    const look2 = EYES.find(([a, b]) => tc >= a && tc < b);
+    if (look2 && f.eyes !== 'closed') hero.face({ eyes: look2[2], mouth: f.mouth });
+    cu.show('surprised_smile');
+    cu.rig.joints.head.rotation.z += kf(tc, HEAD) * D;
+    cu.holder.position.y = HEAD_AT[1] + (tc >= B.nameSmile && tc < B.nameSmile + 0.25 ? 0.0006 : 0);   // the laugh-breath out
     hero.group.updateMatrixWorld(true);
     hero.hand.getWorldPosition(hand); hero.hands.arm_l.getWorldPosition(far);
 
-    // phone: flat to 7.25, on edge at 7.333, face-down from 7.417 (phoneFaceDown)
-    const flip = tc >= dr(89) ? Math.PI : tc >= dr(88) ? Math.PI / 2 : 0;
-    phone.rotation.x = flip;
-    phone.position.y = PHONE[1] + 0.0025 * Math.sin(flip);
-
-    // pen and cap
-    const pressing = tc >= dr(5) && tc < dr(14), held = tc >= dr(4) && tc < dr(14);   // grab on 4, press on 5, let go 1.167
-    const lying = !held && tc < dr(92), levelPen = tc >= dr(93) && tc < dr(97);
-    if (lying) {   // on the page's front edge, x −0.028…−0.016
+    // pen and cap. The pen's z is the drawing plane (0.0868, the flat-puppet cheat): the name line is behind it.
+    const held = tc >= dr(9), levelPen = tc >= dr(12) && tc < dr(18), writing = tc >= NAME[0] && tc < NAME[1];
+    if (!held) {   // on the page's front edge, x −0.028…−0.016
       pen.position.set(-0.016, 0.0006, 0.106); pen.rotation.set(-Math.PI / 2, 0, 0);
-    } else if (held && !pressing) {   // K5: on the fingertip, still lying flat (the flat-puppet cheat)
-      pen.position.set(hand.x + 0.006, 0.0006, 0.0868); pen.rotation.set(-Math.PI / 2, 0, 0);
-    } else if (pressing) {   // K6–1.0: tipped up 45° on the fingertip, the capped point on the name line
-      pen.position.set(hand.x, 0.0003, 0.0868); pen.rotation.set(0, 0, -Math.PI / 4);
     } else {       // tip on the fingertip: level for the uncap, else 45° down-forward; touching y 0 while writing
       pen.rotation.set(0, 0, levelPen ? 0 : -Math.PI / 4);
-      const writing = tc >= dr(106) && tc < dr(120), bob = writing ? (Math.round(tc * 12) % 2) * 0.0005 : 0;
-      pen.position.set(hand.x + (levelPen ? 0.006 : 0), writing ? 0.0002 + bob : hand.y + 0.0003, 0.0868);
+      const bob = writing ? (Math.round(tc * 12) % 2) * 0.0005 : 0;
+      const tremble = tc >= dr(22) && tc < NAME[0] ? 0.0003 * (Math.round(tc * 12) % 2 ? 1 : -1) : 0;
+      const y = writing ? 0.0002 + bob : levelPen ? 0.012 : tc >= dr(22) && tc < NAME[0] ? 0.0015 + tremble
+        : tc >= NAME[1] && tc < 7.5 ? 0.0022 : tc >= 7.5 ? 0.002 : hand.y + 0.0003;
+      pen.position.set(hand.x + (levelPen ? 0.006 : 0), y, 0.0868);
     }
-    if (tc < dr(96)) {   // on the pen's tip end until the uncap
+    if (tc < B.penUncap) {   // on the pen's tip end until the uncap
       cap.rotation.copy(pen.rotation);
-      cap.position.copy(pen.position).add(capOff.set(-0.002, 0, 0).applyEuler(pen.rotation)).add(capOff.set(0, 0.0002, 0.0002));
-    } else if (tc < dr(100)) {   // 8.0: jerked off in the far hand, then set down by 8.333
-      const s = clamp((tc - dr(96)) / (dr(100) - dr(96)));
+      cap.position.copy(pen.position).add(fv.set(-0.002, 0, 0).applyEuler(pen.rotation)).add(fv.set(0, 0.0002, 0.0002));
+    } else if (tc < dr(22)) {   // 1.5: jerked back 5 mm in the far hand in one drawing, then set down by 1.833
+      const s = clamp((tc - dr(19)) / (dr(22) - dr(19)));
       cap.rotation.set(0, 0, 0);
-      cap.position.set(far.x + (-0.030 - far.x) * s, far.y + (0.001 - far.y) * s, 0.0868 + (0.100 - 0.0868) * s);
+      const x0 = far.x - 0.005, y0 = far.y;
+      cap.position.set(x0 + (-0.030 - x0) * s, y0 + (0.001 - y0) * s, 0.0868 + (0.100 - 0.0868) * s);
     } else { cap.position.set(-0.030, 0.0008, 0.100); cap.rotation.set(-Math.PI / 2, 0, 0); }
-    // the page: the printed problem, and the name written over drawings 106–119
-    page.draw([[INK.problem, 0, 1], [INK.name, 1, (tc - dr(105)) * 12 / 14]]);
+    // the page: the printed problem, and the name written over drawings 28–53
+    page.draw([[INK.problem, 0, 1], [INK.name, 1, (tc - NAME[0]) / (NAME[1] - NAME[0])]]);
 
-    // blob (on 2s)
+    // blob (on 2s): watches the pen, startles at the uncap, leans to the writing, flinches on the name, looks at him
+    const flinch = kick(tc, B.nameWritten, 0.35);
     exam.update(t, {
-      wobble: tc < UNIT.press ? 1.4 : tc >= 5 && tc < 7 ? 0 : 1,
-      squash: kick(tc, UNIT.press, 0.3) + kick(tc, 10, 0.35),
-      eyes: (tc >= dr(21) && tc < dr(23)) || (tc >= dr(138) && tc < dr(139)) ? 'closed' : tc >= 3.5 && tc < 7 ? 'side' : 'open',
-      look: -1, key: lit ? zone.light : phoneSpot,   // README §11: the face fill sits near the blob
+      wobble: 1.2,
+      squash: kick(tc, B.penUncap, 0.2) + flinch,
+      eyes: tc >= 6.5 && tc < dr(79) ? 'closed' : tc < 5.0 ? 'side' : 'open',
+      look: -1, key: zone.light,
     });
-    exam.mesh.scale.set(1, tc >= 5 && tc < 7 ? 1 + 0.03 * Math.sin(2 * Math.PI * (tc - 5) / 1.6) : 1, 1);   // breathing
-    exam.mesh.rotation.z = kf(tc, [[3.5, 0], [dr(44), 10], [4.5, 10], [dr(58), 0]]) * D;                   // tilts toward him
-    exam.mesh.position.set(M[0] + kick(tc, 10, 0.002), Math.abs(tc - dr(45)) < 1e-6 ? 0.001 : 0, M[2]);
+    exam.mesh.rotation.z = (tc >= NAME[0] && tc < NAME[1] ? 6 : 0) * D;   // leans toward the writing
+    exam.mesh.position.set(M[0] + kick(tc, B.nameWritten, 0.002), 0, M[2]);   // the recoil; its pool moves with it
 
-    // light: phone is the key until the wake; out-shone on every frame the zone is ≥ 0.5, so the loom flashes back on the
-    // stutter's dark frames; off once the screen is face-down (7.417).
-    phoneSpot.intensity = PHONE_I * (t >= dr(89) ? 0 : lit ? PHONE_OUTSHONE : 1);
-    fill.color.copy(lit ? FILL.zone : FILL.phone); fill.intensity = lit ? FILL_ZONE : FILL_PHONE;
-    screen.material.color.setScalar(t < UNIT.press ? 1 : 0.6);
+    cuKey.intensity = close ? CU_KEY : 0;
+    fill.intensity = close ? 0 : FILL_I;
   }
 
-  // For evidence/anim-s15/measure.html: the world points the acceptance checks project.
-  const probe = () => ({
-    hand: hand.toArray(), head: hero.meshes.head.getWorldPosition(new THREE.Vector3()).toArray(), pen: pen.getWorldPosition(new THREE.Vector3()).toArray(),
-    wallScale: shadowScale(phoneSpot.position, BLOB_C, 0),
-    poolScale: zone.light.position.y / (zone.light.position.y - BLOB_R.start),
-    joints: Object.fromEntries(Object.entries(hero.joints).map(([n, j]) => [n, j.rotation.z])),
-  });
-  return { update, probe };
+  return { parts: { exam, hero, cu, camera, light: zone.light }, update };
 }

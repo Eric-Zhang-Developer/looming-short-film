@@ -1,0 +1,27 @@
+$ node tools/check_timeline.mjs | tail -1
+ok (21 shots, 70 beats, 195.0s)
+$ node src/characters/acting.js
+acting: ok 1.67 4.92 8.42
+$ ls src/shots/s12.js src/shots/s14.js
+ls: src/shots/s12.js: No such file or directory
+ls: src/shots/s14.js: No such file or directory
+$ grep -rnE "s12|s14" src/shots/ ; grep -rnE "from .\./s1[24]|shots/s1[24]" src/
+(no output: no shot file mentions s12/s14 and nothing imports them)
+$ grep -rnE "s12|s14" src/  (what is left: comments and sound-cue notes in files outside this task)
+src/timeline.js:4:// (s00 before s01; s09a-c after s08; s17b after s17). Cut since G4: s09 (Marston exterior), s12 (quiet 1), s14 (custodian);
+src/lights.js:185:// dead after. Every timeout (s11, s14) uses s11's seed.
+src/lights.js:192:// No wake: lit (1) until timeoutAt. Wake and timeout may both be given (s14: woken at 1.0, times out at 4.2).
+src/assets.js:7:// (desk unit README §2, s01, s05, s09, s10, s13, s14, s15, s18). Shot specs win over these numbers.
+src/characters/custodian.js:1:// The Custodian and his cart (s14), from custodian_sheet. He faces +x; s14 walks him −x with group.scale.x = −1.
+src/audio/foley.js:225:// (seed, dur) => bed. The custodian's mop: one wet swish every 0.5 s exactly, starting at 0 (s14: 0.5 + 0.5n), so a cue
+src/audio/foley.js:287:// (seed, dur) => bed (default 10 s, s12). The shadow's breathing in Quiet 1: a 45 Hz sine and a breath of noise below
+src/audio/foley.js:288:// 250 Hz, following the blob's breath (s12: period 5 s, peaks at 1.25 and 6.25 s), then holding its 6.0 s level.
+src/characters/poses.js:41:  ['sit', 'gator', ['s11', 's14', 's15'], seat({ lean: 0, arm: -30 })],
+src/characters/poses.js:46:  ['head_down', 'gator', ['s12'], seat({ lean: 35, arm: -30, far: -30, head: -20, tail: -30 })],
+src/characters/poses.js:124:  // The Custodian (s14): stooped 12°, head −20° the whole walk, near hand on the cart handle. mop_a/b: pose() after blend.
+src/characters/poses.js:125:  ['walk_stoop_a', 'custodian', ['s14'], sp({ lean: 12, arm: -10, far: -75, head: -20, tail: 6 })],
+src/characters/poses.js:126:  ['walk_stoop_pass', 'custodian', ['s14'], sp({ lean: 12, arm: -10, far: -90, head: -20, tail: 0 })],
+src/characters/poses.js:127:  ['walk_stoop_b', 'custodian', ['s14'], sp({ lean: 12, arm: -10, far: -105, head: -20, tail: -6 })],
+src/characters/poses.js:128:  ['mop_a', 'custodian', ['s14'], deg({ mop: 12.4 })],   // ±0.015 m at the mop head (asin(0.015 / 0.07))
+src/characters/poses.js:129:  ['mop_b', 'custodian', ['s14'], deg({ mop: -12.4 })],
+src/characters/gator.js:243:  // s14: the 3/4 head replaces head, snout and jaw on one drawing. It has its own painted eyes and smile, so the face

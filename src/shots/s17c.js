@@ -1,8 +1,10 @@
-// s17c · The grade comes back (docs/shots/s17c.md, G4). New in G4. One locked insert on s17b's Camera P, days later:
-// the paper slides in face-down (gradeSlide 0.5), his hand turns it over, and it lands face-up exactly where he wrote it
-// (gradeReveal 2.0): props_kit's graded_test with its painted red checks and circled 94, carrying his own three lines
-// from s17b (the same lettering code), so the 94 is earned on screen. His fingertip taps the 94 once (3.5). The blob,
-// 0.33× now, startles at the slide, looks down at the grade, and closes its eyes, content.
+// s17c · The grade comes back (docs/shots/s17c.md, v4). 7 s. G4's 0–3 on s17b's Camera P, days later: the paper slides
+// in face-down (gradeSlide 0.5), his hand turns it over, and it lands face-up exactly where he wrote it (gradeReveal
+// 2.0): props_kit's graded_test with its painted red checks and circled 94, carrying his own three lines from s17b (the
+// same lettering code), so the 94 is earned on screen. The blob, 0.33× now, startles at the slide, looks down at the
+// grade and closes its eyes, content. v4: 3.0 cuts to a close-up on the painted heads (README §12), his profile in the
+// exam room's top light: the still beat, eyes wide (surprised_smile), then the grin (pride) on gradeGrin 4.0. 6.0 cuts
+// back to P, and his fingertip taps the 94 once at 6.25.
 // Characters and the paper on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.js';
@@ -10,6 +12,9 @@ import { ambient } from '../lights.js';
 import { easeOut, ease, clamp, lerp } from '../core/ease.js';
 import { createBlob } from '../blob.js';
 import { tools } from './s02.js';
+import { kitTools } from './s11.js';
+import { closeupRig, HEAD_AT } from './s09b.js';
+import { specPose } from '../characters/poses.js';
 import { PAGE, CAM_P, BLOB_AT, pageWithInk, flatHand, overheadSpot, loadHand } from './s17b.js';
 
 const ID = 's17c', DEG = Math.PI / 180;
@@ -22,7 +27,11 @@ const PAGE_H = PAGE.w * 366 / 263;                        // the page's paper he
 const SLIDE_FROM = 0.045, SKID = 0.001;                   // the slide starts above frame (−z), overshoots 1 mm, settles
 const NINETY_FOUR = [214, 58];                            // the circled 94 on graded_test, art px (measured on the cut PNG)
 
-const STILL = 3.917, WIDE = 4.167, SMILE = 4.417;          // the 94's landing: stillness, wide eyes, the smile
+const CU = [3, 6], TAP = 6.25;                             // the close-up's cut in and out; the tap on the 94
+const CU_AT = [0.6, 0, 0];                                  // the CU set, off to the side of the page set
+const CU_HIP = [-0.054, -0.0134, 0.074];                    // s17b's seat at the exam desk
+const CAM_CU = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };   // s15's CU framing
+const CU_KEY = 0.024, CU_AMB = 0.8;
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
 
 // The paper per drawing: [z offset from the page position, flip angle about its far edge (deg; 180 = face-down there,
@@ -71,12 +80,38 @@ export async function build(ctx) {
   const win = new THREE.DirectionalLight(C('lamp').lerp(C('cream'), 0.4), WARM[0]); win.position.set(0.3, 0.4, -0.6);
   scene.add(spot, spot.target, amb, win);
 
+  // ---------- the close-up: his profile at the exam desk, the painted heads, the room's top light ----------
+  const kt = kitTools(ID), cuSet = new THREE.Group(); cuSet.position.set(...CU_AT); scene.add(cuSet);
+  T.rect('cu_wall', '#' + C('cream').lerp(C('kraft'), 0.2).getHexString(), [0.6, 0.3], [0, 0.10, -0.02], { parent: cuSet });
+  T.rect('cu_desk', '#' + C('kraft').lerp(C('cream'), 0.25).getHexString(), [0.06, 0.05], [0.0, 0, 0.092], { rot: [-Math.PI / 2, 0, 0], weight: 'kraft', parent: cuSet });
+  const cu = await closeupRig(ctx, kt, ['surprised_smile', 'pride'], { seed: 173 });
+  cu.rig.group.position.set(...CU_HIP); cuSet.add(cu.rig.group);
+  cu.rig.group.traverse((o) => { o.castShadow = false; });
+  const CU_POSE = specPose({ lean: 12, arm: -26, head: -8, leg: 60, farLeg: 54 });   // s17b's T3 'write': looking down at the page
+  const cuKey = new THREE.PointLight(C('cream').lerp(C('lamp'), 0.3), 0, 0.09, 2);   // the overhead as it falls on a profile cutout
+  cuKey.position.set(CU_AT[0] - 0.040, 0.075, 0.105); scene.add(cuKey);
+  const cuAmb = ambient(); cuAmb.intensity *= CU_AMB; cuAmb.visible = false; scene.add(cuAmb);
+  const camLook = new THREE.Vector3();
+
   const nearEdge = new THREE.Vector3(), tap = new THREE.Vector3();
   pivot.position.copy(P0); front.toWorld(...NINETY_FOUR, tap);   // the 94 at rest: face-up, in place
   return {
     update(t) {
-      T.boil(t);
-      const f = fr(t), tc = F(f);
+      T.boil(t); kt.boil(t, 10);
+      const f = fr(t), tc = F(f), close = t >= CU[0] && t < CU[1];
+      // camera on 1s: P, the CU (3.0–6.0), P again
+      if (close) { camera.position.set(CAM_CU.pos[0] + CU_AT[0], CAM_CU.pos[1], CAM_CU.pos[2]); camera.lookAt(camLook.set(CAM_CU.look[0] + CU_AT[0], CAM_CU.look[1], CAM_CU.look[2])); }
+      else { camera.position.set(...CAM_P.pos); camera.lookAt(...CAM_P.look); }
+      fx.set({ focus: close ? CAM_CU.pos[2] - CAM_CU.look[2] : new THREE.Vector3(...CAM_P.pos).distanceTo(new THREE.Vector3(...CAM_P.look)), aperture: close ? 0.008 : 0.002 });
+      cuSet.visible = close; cuKey.intensity = close ? CU_KEY : 0; cuAmb.visible = close;
+      // the CU: the still beat, eyes wide, 3.0–4.0 (nothing moves); the grin on gradeGrin with one anticipation drawing
+      // on the outgoing head (3.917); a laugh-breath out and the head up 3° on the grin
+      cu.rig.boil(t, 10);
+      cu.rig.blend({ s: CU_POSE }, [[0, 's']], tc);
+      const grin = tc >= B.gradeGrin - 1e-6;
+      cu.show(grin ? 'pride' : 'surprised_smile', { antic: !grin && tc >= B.gradeGrin - 1 / 12 - 1e-6 });
+      cu.rig.joints.head.rotation.z += (grin ? 3 : 0) * DEG;
+      cu.holder.position.y = HEAD_AT[1] + (grin && tc < B.gradeGrin + 0.25 ? 0.0006 : 0);
 
       const p = paperAt(f);
       pivot.visible = !!p;
@@ -97,23 +132,20 @@ export async function build(ctx) {
         const a = (p?.ang ?? 0) * DEG;
         nearEdge.set(PAGE.at[0] - 0.002, 0.0012 + PAGE_H * Math.sin(a), P0.z + PAGE_H * Math.cos(a) - 0.001);
         hand.hand.position.set(nearEdge.x - 0.03 * ease(out), nearEdge.y, nearEdge.z + 0.012 * ease(out));
-      } else if (tc >= 3.333 && tc < 3.917) {
+      } else if (tc >= TAP - 0.167 && tc < TAP + 0.417) {
         hv = true;
-        const k = tc < 3.5 ? (tc - 3.333) / 0.167 : tc < 3.75 ? 1 : 1 - (tc - 3.75) / 0.167;
-        const down = f === 42 ? 0.0004 : 0.0022;   // 3.5: the one drawing down
+        const k = tc < TAP ? (tc - TAP + 0.167) / 0.167 : tc < TAP + 0.25 ? 1 : 1 - (tc - TAP - 0.25) / 0.167;
+        const down = f === Math.round(TAP * 12) ? 0.0004 : 0.0022;   // 6.25: the one drawing down
         hand.hand.position.set(lerp(tap.x - 0.03, tap.x, ease(k)), down, lerp(tap.z + 0.012, tap.z, ease(k)));
       }
       hand.hand.visible = hv;
 
-      // The Exam: waiting; startles as the paper slides past; looks down at the 94 and watches the tap. v3: the 94 gets a
-      // beat of stillness once the hand is gone (3.92–4.17: eyes on it, no wobble), then eyes go wide (4.17), then the
-      // content smile (4.42) with one small rise and settle, and it holds to the cut.
+      // The Exam (G4's): waiting; startles as the paper slides past; looks down at the 94 (2.0); closes its eyes,
+      // content, and settles lower (2.75), held to the end. The wide eyes and the grin are his now, in the CU.
       let squash = 0, eyes = 'open', look = -1, wobble = 0.6;
       if (tc >= B.gradeSlide && tc < 1.0) squash = 0.2 * Math.exp(-6 * (tc - B.gradeSlide)) * Math.cos(18 * (tc - B.gradeSlide));
-      if (tc >= B.gradeReveal) { eyes = 'side'; look = -1; }
-      if (tc >= STILL) wobble = 0.1;
-      if (tc >= WIDE) { eyes = 'gasp'; squash = -0.12; }
-      if (tc >= SMILE) { eyes = 'closed'; wobble = 0.5; squash = 0.15 + 0.25 * Math.exp(-7 * (tc - SMILE)) * Math.cos(16 * (tc - SMILE)); }
+      if (tc >= B.gradeReveal) eyes = 'side';
+      if (tc >= 2.75) { eyes = 'closed'; squash = 0.15 + 0.25 * Math.exp(-7 * (tc - 2.75)) * Math.cos(16 * (tc - 2.75)); }
       exam.update(t, { squash, wobble, eyes, look, key: spot });
 
       // Light on 1s: the window fill warms over the reveal (the theme enters resolved here).

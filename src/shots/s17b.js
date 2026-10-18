@@ -1,7 +1,9 @@
-// s17b · Test day: he recognizes it (docs/shots/s17b.md, G4). New in G4, on the frozen exam_room_kit and props_kit.
-// Three setups (README §8): T1 the exam room wide from the back (0–2), T2 his test page from above (2–4, 5.5–9), T3 his
-// profile at the exam desk (4–5.5). On the page, problem 3 is the one he practised; the pen stops on it (testRecognise
-// 3.0), he smiles (testSmile 4.5) and writes the working in one pass, and the blob shrinks one step (testSolved 8.5).
+// s17b · Test day: he recognizes it (docs/shots/s17b.md, v4). 10 s: a 1 s insert on the exam room's wall clock first
+// (Camera K, 0–1, reading 9:00, the film's one clock with the exam face), then G4's shot 1 s later. Three setups after it
+// (README §8): T1 the exam room wide from the back (1–3), T2 his test page from above (3–5, 6.5–10), T3 his profile at
+// the exam desk (5–6.5). On the page, problem 3 is the one he practised; the pen stops on it (testRecognise 4.0), he
+// smiles (testSmile 5.5) and writes the working in one pass, and the blob shrinks one step (testSolved 9.5).
+// The clock ticks slow and calm: its second hand steps on every whole second of the shot, from 9:00:12 at 0.0.
 // Each setup is a Group shown only in its own time, lights included, so nothing leaks across a cut. T2 and T3 share the
 // desk unit (page, its ink, the blob, the overhead light). This file exports the page and Camera P for s17c, so the
 // graded paper lands where he wrote and carries his own three lines. Characters on 2s, light and camera on 1s, boil 10/s.
@@ -13,11 +15,17 @@ import { mulberry32, seedOf } from '../core/rng.js';
 import { createBlob } from '../blob.js';
 import { makeGator, greenVariant } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
+import { act } from '../characters/acting.js';
+import { makeClock } from '../clock.js';
 import { tools } from './s02.js';
 
 const ID = 's17b', DEG = Math.PI / 180;
-const B = SHOTS.find((s) => s.id === ID).beats;          // examRoom 0, testRecognise 3, testSmile 4.5, testSolved 8.5
-const CUT_T2 = 2, CUT_T3 = 4, CUT_BACK = 5.5, HOLD_HERO = 0.75;
+const B = SHOTS.find((s) => s.id === ID).beats;          // examRoom 0, testRecognise 4, testSmile 5.5, testSolved 9.5
+const CUT_T1 = 1, CUT_T2 = 3, CUT_T3 = 5, CUT_BACK = 6.5, HOLD_HERO = 1.75;
+const CLOCK = { at: [0.12, 0.10, 0.0008], d: 0.014, reads: [9, 0], s0: 12 };   // T1's far wall, upper right (README §13); s0: the second
+// hand starts at :12, so it isn't hidden under the minute hand at 12 for the whole of K (9:00:12 still reads 9:00)
+// Camera K: face-on to the dial, close enough that it fills ~70% of the frame height (fov 20)
+const CAM_K = { pos: [0.12, 0.10, 0.0008 + 0.014 / 0.7 / (2 * Math.tan(10 * Math.PI / 180))], look: [0.12, 0.10, 0.0008] };
 
 // ---------- tunables ----------
 const BLOB_R = { start: 0.005, testSolved: 0.004 };      // SHRINK[6] → SHRINK[7] (README §1; exam.js has no SHRINK ladder yet)
@@ -40,7 +48,7 @@ export const LINES = [
   { x: 46, y: 342, runs: [['= (x/2) e'], ['2x', 1], [' − ∫ ½ e'], ['2x', 1], [' dx']] },
   { x: 46, y: 363, runs: [['= (x/2) e'], ['2x', 1], [' − ¼ e'], ['2x', 1], [' + C']] },
 ];
-export const WRITE = [[5.5, 6.5], [6.5, 7.5], [7.5, 8.4]];   // local times per line (s17b's table)
+export const WRITE = [[6.5, 7.5], [7.5, 8.5], [8.5, 9.4]];   // local times per line (s17b's table, v4: +1.0)
 // The hand is Caveat (SIL OFL 1.1, assets/fonts/OFL-Caveat.txt), bundled so a render never depends on the machine's fonts.
 // It has no integral sign, so the ∫ is a stroked path (INT) rather than a system fallback glyph.
 const FONT = 22, FONT_FACE = 'LoomingHand', INK = 'rgb(30, 42, 63)';
@@ -171,7 +179,6 @@ export async function build(ctx) {
     fl.children[0].receiveShadow = true;
     // Board (blank but for chalk scribbles), the clock (ticks only), the door, two tall morning windows.
     T.cut(room, 'board', [0.125, null], 'board', { parent: t1 }).g.position.set(-0.03, 0.0825, 0.0006);
-    T.cut(room, 'wall_clock', [0.014, null], 'clock', { parent: t1 }).g.position.set(0.12, 0.10, 0.0008);
     T.cut(room, 'door', [null, 0.11], 'door', { anchor: [0.5, 0], parent: t1 }).g.position.set(-0.33, 0, 0.0006);
     const WIN = C('lamp').lerp(C('cream'), 0.55);
     for (const x of [-0.20, 0.23]) {
@@ -183,6 +190,9 @@ export async function build(ctx) {
       frame.children[0].receiveShadow = false;
     }
   }
+  // The film's one clock (README §13), the exam face: on T1's far wall, and Camera K's subject.
+  const clock = await makeClock(ctx, { seed: 17, diameter: CLOCK.d, face: 'exam' });
+  clock.group.position.set(...CLOCK.at); t1.add(clock.group);
   // Rows of long tables, three or four gators a row from behind, each with a test page and their own small blob.
   const rng = mulberry32(seedOf(ID, 'room'));
   const figures = [], bobbers = [], blobs1 = [];
@@ -267,12 +277,14 @@ export async function build(ctx) {
   t3.add(fill3);
   const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
   const P3 = { write: seat({ lean: 12, arm: -26, head: -8 }), breath: seat({ lean: 11, arm: -27, head: -8 }), lean: seat({ lean: 16, arm: -22, head: -10 }) };
-  const BODY3 = [[0, 'write'], [4.333, 'write'], [4.334, 'breath'], [4.999, 'breath'], [5.0, 'lean'], [6, 'lean']];
+  const BODY3 = [[0, 'write'], [5.333, 'write'], [5.334, 'breath'], [5.999, 'breath'], [6.0, 'lean'], [7, 'lean']];
+  // The acting kit on T3: calm resolve, then pride's wide → smile on testSmile (held small: the preset's own mouth).
+  const CUES3 = [[-0.1, 'resolve'], [B.testSmile, 'pride']];
 
   // ---- the pen's path over the page (T2), in page-art px ----
   const L0 = LINES[0], startPx = [L0.x - 2, L0.y - 3];
   const tipAt = (t, f) => {   // [px, py, lift (m)]
-    if (t < 3) { const k = easeOut((t - 2) / 1); return [lerp(startPx[0] - 70, startPx[0] + 4, k), lerp(startPx[1] + 55, startPx[1], k), 0.003]; }
+    if (t < 4) { const k = easeOut((t - 3) / 1); return [lerp(startPx[0] - 70, startPx[0] + 4, k), lerp(startPx[1] + 55, startPx[1], k), 0.003]; }
     if (t < WRITE[0][0]) return [startPx[0] + 4, startPx[1], 0.003];
     for (let i = 0; i < 3; i++) if (t < WRITE[i][1] || (i === 2 && t < B.testSolved)) {
       const k = clamp(f[i]), L = LINES[i];
@@ -287,8 +299,9 @@ export async function build(ctx) {
     update(t) {
       T.boil(t);
       const f = fr(t), tc = F(f);
-      const inT1 = t < CUT_T2, inT3 = t >= CUT_T3 && t < CUT_BACK, inT2 = !inT1 && !inT3;
+      const inK = t < CUT_T1, inT1 = t < CUT_T2, inT3 = t >= CUT_T3 && t < CUT_BACK, inT2 = !inT1 && !inT3;
       t1.visible = inT1; unit.visible = !inT1; t2.visible = inT2; t3.visible = inT3;
+      clock.set(...CLOCK.reads, CLOCK.s0 + t); clock.boil(t);   // 9:00:12 at 0.0, a step on every whole second
 
       // the writing: each line revealed over its time, on 2s; the pen tip follows the reveal
       const fl = WRITE.map(([a, b]) => clamp((tc - a) / (b - a)));
@@ -297,22 +310,27 @@ export async function build(ctx) {
       // The Exam: dozing, eyes open on him at 3.0, meets his look and stretches on the smile, calm, then the shrink.
       const solved = tc >= B.testSolved - 1e-6, s = solved ? BLOB_R.testSolved / BLOB_R.start : 1;
       let eyes = tc < B.testRecognise ? 'closed' : 'open', squash = 0, look1 = -1;
-      if (inT3 && tc >= 4.333) eyes = 'side';
-      if (tc >= B.testSmile && tc < 5.0) squash = -0.1;
+      if (inT3 && tc >= 5.333) eyes = 'side';
+      if (tc >= B.testSmile && tc < 6.0) squash = -0.1;
       if (solved) squash = 0.3 * Math.exp(-6 * (tc - B.testSolved)) * Math.cos(18 * (tc - B.testSolved));
       exam.mesh.scale.setScalar(s); exam.stain.scale.setScalar(s);
       exam.mesh.rotation.x = inT2 ? -55 * DEG : 0;   // in the overhead insert it leans back to face the lens
       exam.update(t, { squash, wobble: 0.6, eyes, look: look1, key: spot });
 
+      if (inK) {   // Camera K: the clock, face-on, the room's light on it (the T1 lights)
+        camera.position.set(...CAM_K.pos); camera.lookAt(look.set(...CAM_K.look));
+        fx.set({ focus: CAM_K.pos[2] - CAM_K.look[2], aperture: 0.002 });
+        return;
+      }
       if (inT1) {
-        // 0–0.75 held on him; then it eases out to the wide (the room, with him still front and centre). On 1s.
+        // 1.0–1.75 held on him; then it eases out to the wide (the room, with him still front and centre). On 1s.
         const k = ease(clamp((t - HOLD_HERO) / (CUT_T2 - HOLD_HERO)));
         camera.position.set(...CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k)));
         camera.lookAt(look.set(...CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k))));
         fx.set({ focus: camera.position.distanceTo(hp.set(0, 0.05, 0.093)), aperture: lerp(0.004, 0.009, k) });
         for (const fig of figures) fig.boil(t, 10);
-        // he reads: 2 more degrees of head-down at 1.5, a hair lower on the figure; two pens bob on 2s
-        figures.hero.group.position.y = -SEATED_DROP - (tc >= 1.5 ? 0.0006 : 0);
+        // he reads: 2 more degrees of head-down at 2.5, a hair lower on the figure; two pens bob on 2s
+        figures.hero.group.position.y = -SEATED_DROP - (tc >= 2.5 ? 0.0006 : 0);
         bobbers.forEach((b, i) => { b.group.rotation.z = (f + i) % 4 < 2 ? 1 * DEG : -1 * DEG; });
         blobs1.forEach(({ b, eyes: e, look: l }) => b.update(t, { wobble: 0.5, eyes: e, look: l, key: tubes.light }));
         return;
@@ -332,8 +350,9 @@ export async function build(ctx) {
       fx.set({ focus: dir.dot(hp.set(-0.02, 0.02, 0.09).sub(camera.position)), aperture: 0.01 });
       hero.boil(t, 10);
       hero.blend(P3, BODY3, t);
-      hero.group.position.y = HIP[1] - (tc >= 4.333 && tc < 5 ? 0.0005 : 0);
-      hero.face({ eyes: tc >= 4.333 && tc < B.testSmile ? 'side' : 'open', mouth: tc >= B.testSmile ? 'smile' : 'line' });
+      hero.group.position.y = HIP[1] - (tc >= 5.333 && tc < 6 ? 0.0005 : 0);
+      const f3 = act(hero, t, CUES3, { slump: 0, tilt: 0, breath: 6, seed: 172 });
+      if (tc >= 5.333 && tc < B.testSmile - 1 / 12 - 1e-6 && f3.eyes !== 'closed') hero.face({ eyes: 'side', mouth: f3.mouth });   // to the blob
       hero.group.updateMatrixWorld(true);
       hero.hand.getWorldPosition(hp);
       pen3.g.rotation.set(0, 0, 125 * DEG); pen3.g.position.set(hp.x + 0.003, hp.y - 0.003, 0.0868);
