@@ -8,6 +8,11 @@ The cold viewer read the rule unprompted. It missed **the decision** and found b
 
 Known issues from the batch-A builders' own measurements and the orchestrator's review of their sheets. The cold viewer on the v4 render adds to this; one fix round takes the top of it.
 
+## After the deadline (found in fix round 1)
+- **s09a determinism, 73.6–74.5:** frames differ only when rendered out of order (a fresh page and the in-order run match); the base commit 134495b does the same, and it isn't the lamp shadow. Likely state built lazily on first use. The chunked render is in order, so the master is safe; find it before any out-of-order re-render.
+- **s07 ceiling shadow** still reads flat ("a UFO"); two caster flips were tried and rejected (`evidence/fix-bedroom/s07_caster_tried_*.jpg`).
+- **Orchestration lessons:** a completion notice that says background work is still running is interim, so keep the worktree until the final one; never run a heavy encode (x265 slow) beside builders' renders; four headless Chromes grew swap by about 3 GB of disk.
+
 ## Climax, from the builders (measured)
 - **s07** ceiling shadow covers 68% of the visible ceiling (spec ≥ 80%); a third runs off frame right (`done/climax-a1.md`).
 - **s08** is not darker than s07 (mean luma 68.17 vs 68.18). The 3 a.m. bottom should read darker.
