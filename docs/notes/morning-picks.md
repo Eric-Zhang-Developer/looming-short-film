@@ -12,6 +12,8 @@ Everything the orchestrator froze or decided without the director, under his ove
 | Props kit (calendar, notification, Calc 2 sheets, test, graded 94) | v1_1 | 7-column calendar; every lettered and math piece checked correct (integration by parts with a struck sign error; Σ n/2ⁿ by the ratio test) | v1_2, v1_3 · `evidence/asset-props-kit/contact.jpg` |
 | Exam room kit | v1_1 | Desk and chair in one piece; cleanest | v1_2, v1_3 |
 | Cast: roommates (heron + bear), custodian (**tortoise**), Marston neighbours, top-down students | v1_2 / v1_2 / v1_2 / v1_1 | Painter's #1 each; drop-in sheets for the existing rigs | **Flag:** doc 02 says the custodian is an "older gator"; the tortoise came from the orchestrator's brief. Overrule and it gets repainted. `evidence/asset-cast-kit/contact.jpg` |
+| Close-up heads, v4 (numb, dread, resolve, relief, surprised smile, pride) · 2026-10-18 | v1_2 | All six moods read at phone size; closest eyes; the relief puff stays on the snout | v1_1, v1_3 · `evidence/asset-v4-kit/contact.jpg`. **Flag:** all three drift from `gator_hero` (eye bump 2.2–2.5× taller, snout 4–9% thicker, greener): `heads_vs_hero.jpg` |
+| Wall clock, v4 (home kraft face, exam navy face, hands, pin) · 2026-10-18 | v1_2 | Two faces within 0.2% of each other, torn rim like the calendar, no numerals | v1_1 (thinner hands). Hands are ~1.4× too long; the rig scales them |
 | Face sheet | v1_3 | The painter and orchestrator both ranked it first: closest line weight and colour to the frozen head, the most even and friendly set | v1_1, v1_2 (`evidence/asset-face-sheet/contact.jpg`) |
 
 ## Decided overnight

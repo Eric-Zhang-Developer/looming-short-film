@@ -180,5 +180,31 @@
     "frozen": "2026-10-16",
     "gate": "overnight rule",
     "approved": "Orchestrator under the director's overnight rule; painter's #1. Alternatives v1_2 (blob-headed hero) in evidence/asset-cast-kit/contact.jpg."
+  },
+  {
+    "name": "closeup_heads",
+    "file": "assets/frozen/closeup_heads.png",
+    "source": "assets/raw/closeup_heads_v1_2.png",
+    "prompt": "assets/prompts/closeup_heads.v1.md",
+    "sidecar": "assets/raw/thumbs/closeup_heads_v1_2.json",
+    "variant": "v1_2",
+    "sha256": "b64ff9c56deff5930a70d7ec9b5166e1155ce503e174cc494a0894faf73b74fb",
+    "size": "1536x1024",
+    "frozen": "2026-10-18",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's v4 approval (2026-10-17, 'I approve everything'); painter's #1. Alternatives v1_1, v1_3 in evidence/asset-v4-kit/contact.jpg. Known drift: eye bump 2.2-2.5x taller, snout 4-9% thicker than gator_hero (done/asset-v4-kit.md)."
+  },
+  {
+    "name": "clock_kit",
+    "file": "assets/frozen/clock_kit.png",
+    "source": "assets/raw/clock_kit_v1_2.png",
+    "prompt": "assets/prompts/clock_kit.v1.md",
+    "sidecar": "assets/raw/thumbs/clock_kit_v1_2.json",
+    "variant": "v1_2",
+    "sha256": "d6dd71cad07db5f41f00eba4126e063155eda921380b5ea804f22932e4ff1821",
+    "size": "1536x1024",
+    "frozen": "2026-10-18",
+    "gate": "overnight rule",
+    "approved": "Orchestrator under the director's v4 approval (2026-10-17, 'I approve everything'); painter's #1. Alternative v1_1 in evidence/asset-v4-kit/contact.jpg. Hands ~1.4x too long: scale minute ~0.69, hour ~0.63 at rig time."
   }
 ]
