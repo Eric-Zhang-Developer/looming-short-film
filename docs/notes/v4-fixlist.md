@@ -1,5 +1,11 @@
 # v4 fix list (open)
 
+## Fix round 1 (2026-10-18, after `evidence/cold-v4/report.md`): ranked, two builders, timeline frozen
+The cold viewer read the rule unprompted. It missed **the decision** and found bed rot and the walk the weakest stretches, so the round spends everything on the climax (s07–s10). Re-render after it is chunks 30–120 only.
+- **fix-bedroom** (`tasks/fix-bedroom.md`): 1) s09a: the decision on his face, not the blob's eye (C4 read as "the blob's huge eye looming over his body"; "I never see him decide"). 2) s07: plainly in bed on his phone, face visible, one cut in, a ceiling shadow that reads as the blob's ("reads as a UFO"). 3) s08 darker than s07. 4) s09a after `lampOn` reads as night, not day.
+- **fix-walk** (`tasks/fix-walk.md`): 1) s09c: his fear on the walk (a close-up at the block; "could read as out for a walk with his pet"). 2) s09c: shadows long and dark enough to read the stretch. 3) s09b: the door reads as his bedroom door onto the hall ("a door, a mirror or a poster?"). 4) s10: the glass doors read as ice; the colour jump at 1:40–1:44. 5) s10: his front view reads as a frog.
+- **Not this round (time):** the exam-hall heads read as frogs (2:40), the s17b clock unreadable (2:38), the blank page at 2:48, the ending's tone, the kitchen and game-night geography (0:26–0:38), the 0:40 lamp reading as a time jump.
+
 Known issues from the batch-A builders' own measurements and the orchestrator's review of their sheets. The cold viewer on the v4 render adds to this; one fix round takes the top of it.
 
 ## Climax, from the builders (measured)
