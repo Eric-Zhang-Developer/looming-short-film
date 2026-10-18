@@ -59,16 +59,16 @@ The dawn rose is **lamp amber mixed into cream through tissue**, not a new color
 | Quiet 2 dawn | Gold through tissue windows, cold shadows warming | Peaceful |
 | Button | An ordinary afternoon at home with the lamp on: the light from above, chosen now | Kind |
 
-**Desaturate on the low point.** During Quiet 1 the gator drains slightly toward grey, while the shadow stays rich.
+**Desaturate on the low point.** At 3 a.m. (s08) the gator drains slightly toward grey, while the shadow stays rich.
 
 ## Lighting rules
 
-1. **One motivated source per shot.** Every shot names its key light (phone, lamp, fluorescent, window, dawn). Fill comes only from bounce and ambient.
+1. **One motivated source per shot.** Every shot names its key light (phone, lamp, street lamp, Marston's pendant, window, dawn). Fill comes only from bounce and ambient.
 2. **Light has shape.** Lamp light is a visible vellum cone with a hard pool on the desk and a few dust specks. Phone light is a low wedge. Marston's light is a ring pendant hung over each desk: a warm spot from above with a soft pool and no cone, always lit, and kept in frame where it matters so the audience sees the cause. Draw the light as an object.
 3. **Light falls off.** Brightness on each paper layer is computed from its distance to the source. The phone lights the gator's snout and the room fades to navy.
 4. **Light comes through paper.** Thin stock glows when lit from behind: tissue curtains, the lampshade, the window, a lit torn edge. This is the look's signature.
-5. **Light seeps out from behind layers.** Dawn creeps under the apartment door and between the Marston stacks as a hot thin seam along a paper edge.
-6. **Two temperatures, one story.** When phone and lamp (at home) or phone and fluorescent (at Marston) share a room, the direction of the shadow tells you which one is winning.
+5. **Light seeps out from behind layers.** Dawn creeps under the apartment door and along Marston's ribbon windows as a hot thin seam along a paper edge.
+6. **Two temperatures, one story.** When phone and lamp share a room (at home), or a low street lamp and the light from above meet (the walk, Marston's door), the direction and size of the shadow tell you which one is winning.
 7. **No glow without shadow.** Bloom is used sparingly, at the source only. Every glow must also cast a shadow somewhere.
 8. **Marston's light is warm, from above, and stays on.** There are no desk lamps at Marston and no motion sensors (cut in v4: the library's light is the turn). The pendant over each desk is lit before he arrives and nobody ever switches it. The only lights anyone clicks are at home: the desk lamp (s06, clicked on, then off: he refuses it) and his nightstand lamp (s09a, clicked on and left on behind him, the same click). That second lamp is low, so it throws the shadow long down the hall: "I don't have a night light though I have a nightstand lamp" (director, 2026-10-18, Q17). Light held low and close makes the shadow loom, and light from above makes it small, so the walk from the one to the other is the rule and the story at once. Numbers are in `docs/shots/README.md` ("v4 at a glance" and §3).
 
@@ -86,7 +86,7 @@ The dawn rose is **lamp amber mixed into cream through tissue**, not a new color
 
 **Its size is the meter** (doc 02, `docs/shots/README.md` §1). It grows in steps from 1× at birth (2.4 cm across) to 2.5× by Marston (6 cm tall, its eyes level with his at the desk), then shrinks one step per solved problem to 0.42×, small enough for his pocket. Each step is a **gulp**: eyes closed on a squash, a one-drawing snap to the next size with a stretch, a settle, and its eyes back on him. Bigger means heavier and more anxious, never meaner: the eyes stay round cream discs, it never gets a mouth or teeth, and the matte ink, the painted highlight and the stain scale with it unchanged. It never swells slowly. Each size must read against props the audience knows: the calendar circle, the jars and the stool (s04), the coffee table (s05), his head (s06 on).
 
-**Roommates, Custodian, Freshman.** The same puppet system with different proportions and paper colors: a tall roommate, a round one, an older custodian with a hunch and a cap, a small Freshman with an oversized backpack.
+**Roommates, Freshman.** The same puppet system with different proportions and paper colors: two gator roommates, a tall one and a round one (rig-v4), and a small Freshman with an oversized backpack. (The custodian was cut in v4.)
 
 **Crowds.** Marston extras are simpler cardstock silhouettes with 2–3 parts each. Every one has a different scale, pose and distance from its light. **Never clone a figure.**
 
@@ -121,7 +121,7 @@ Eight code-made films were reviewed (see `reference-videos/`, not in git). None 
 
 ## What reads as "made by AI" (banned)
 
-- On-screen text, captions, HUDs, fake data labels
+- HUDs and fake data labels; any text beyond the few hand-lettered words the story needs (director, 2026-10-15: "use text very sparingly"; doc 07)
 - Cloned crowds
 - Bloom soup and blown-out glow
 - Swirling light ribbons and particle-storm climaxes
