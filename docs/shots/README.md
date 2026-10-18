@@ -10,7 +10,7 @@ Read this before the sections below; where they disagree, this wins.
 - **The turn is his walk to the library** (doc 02). The climax, s07–s10, is specified beat by beat in its own files; those files carry the numbers.
 - **No motion sensors.** §3's Marston half (the zone fiction, `sensorWake`, `sensorTimeout`, timeouts in film time) is retired. Marston's desk light is **the ring pendant (`marston_kit` ring_light_lit) as a constant spot**: `sensorLight({ at: [0, 0.127, 0.040], aimAt: [0, 0, 0.098], angle: 0.8, penumbra: 0.5 })` with no wake and no timeout, in **v4 Marston warm, `lerp(PALETTE.lamp, PALETTE.cream, 0.3)`** (doc 02 calls the library's light warm; this answers Q12 toward (b) for v4, and s10's threshold, s09c's windows and the desks share it). `fluorescent()` stays the dim distant room light.
 - **No laptop at Marston** (it was the home game). §2's laptop-in-front-of-the-blob note no longer applies; the 2× blob at the Marston mark needs nothing in front of it.
-- **The meter peaks at 2× after three gulps** (§1, rewritten below; Q16).
+- **The meter peaks at 2.5× after three gulps** (§1; Q16, director 2026-10-18: "can we somehow do 2.5x"). Each gulp is half a size: 1 → 1.5 → 2 → 2.5.
 - **Only the blob casts**, as the built shots already do (`castShadow` off on every other piece unless a spec says otherwise). The climax depends on it: one light, one shadow, every time.
 - **Two new fields in every spec, `Acting` and `Close-up`** (§12), and **one clock** (§13).
 - **Dead files for builders to delete:** `src/shots/s09.js`, `src/shots/s12.js`, `src/shots/s14.js` (their shots are cut; `film.js` imports by the timeline's ids, so nothing loads them). `src/shots/s07.js`, `s08.js` and `s10.js` are rebuilt from scratch under their old names. New modules: `src/shots/s09a.js`, `s09b.js`, `s09c.js`. The doc files `s09.md`, `s12.md` and `s14.md` are deleted (git history keeps them).
@@ -24,13 +24,13 @@ Director, 2026-10-15 (process log): **the blob's own size is the readable meter 
 | Shot | Start | End | Steps (local t → size) | r (m) |
 |---|---|---|---|---|
 | s02 | born | 1× | bead 0.17 on the circle at 5.0 (`inkDropForms`), gathers to 0.5 hanging from the calendar's lip by 6.0, full 1× after it lands (7.75–8.25) | → 0.012 |
-| s03 | 1× | 1.25× | **gulp 1 @ 4.5** | 0.012 → 0.015 |
-| s04 | 1.25× | 1.25× | — (G4: he never looks at it; its shadow grows by scooting toward the light) | 0.015 |
-| s05 | 1.25× | 1.25× | — | 0.015 |
-| s06 | 1.25× | 1.5× | **gulp 2 @ 4.0** (the lamp shows it at 1.25× first) | 0.015 → 0.018 |
-| s07 | 1.5× | **2×** | **gulp 3 @ 7.5** (bed rot, after the clock glance): the peak (v4) | 0.018 → 0.024 |
-| s08–s15 | 2× | 2× | — (the climax and Marston: nothing grows while he faces it, and nothing shrinks until he solves something) | 0.024 |
-| s16 | 2× | 0.42× | solve #1 @ 6.5 → 1.5×, #2 @ 11.5 → **1× (birth size)**, #3 @ 13.0 → 0.75×, #4 @ 14.0 → 0.58×, #5 @ 15.0 → 0.42× (v4: five solves) | 0.024 → 0.018 → 0.012 → 0.009 → 0.007 → 0.005 |
+| s03 | 1× | 1.5× | **gulp 1 @ 4.5** | 0.012 → 0.018 |
+| s04 | 1.5× | 1.5× | — (G4: he never looks at it; its shadow grows by scooting toward the light) | 0.018 |
+| s05 | 1.5× | 1.5× | — | 0.018 |
+| s06 | 1.5× | 2× | **gulp 2 @ 4.0** (the lamp shows it at 1.5× first) | 0.018 → 0.024 |
+| s07 | 2× | **2.5×** | **gulp 3 @ 7.5** (bed rot, after the clock glance): the peak (v4) | 0.024 → 0.030 |
+| s08–s15 | 2.5× | 2.5× | — (the climax and Marston: nothing grows while he faces it, and nothing shrinks until he solves something) | 0.030 |
+| s16 | 2.5× | 0.42× | solve #1 @ 6.5 → 1.75×, #2 @ 11.5 → **1× (birth size)**, #3 @ 13.0 → 0.75×, #4 @ 14.0 → 0.58×, #5 @ 15.0 → 0.42× (v4: five solves) | 0.030 → 0.021 → 0.012 → 0.009 → 0.007 → 0.005 |
 | s17 | 0.42× | 0.42× | asleep on the page | 0.005 |
 | s17b | 0.42× | 0.33× | **the test @ 9.5** (`testSolved`) | 0.005 → 0.004 |
 | s17c | 0.33× | 0.33× | — (a grade isn't a solved problem) | 0.004 |
@@ -40,23 +40,21 @@ Director, 2026-10-15 (process log): **the blob's own size is the readable meter 
 
 ```js
 // src/characters/exam.js: the film-wide ladder (radius, m)
-export const METER = { birth: 0.012, gulp1: 0.015, gulp2: 0.018, gulp3: 0.021, gulp4: 0.024, gulp5: 0.030 };
-export const SHRINK = [0.030, 0.024, 0.018, 0.012, 0.009, 0.007, 0.005, 0.004, 0.0015];   // r after n solved: s16's six, the test (s17b), the cross-off dot (s18)
+export const METER = { birth: 0.012, gulp1: 0.018, gulp2: 0.024, gulp3: 0.030 };   // v4: three gulps, the peak 2.5× (Q16)
+export const SHRINK = [0.030, 0.021, 0.012, 0.009, 0.007, 0.005, 0.004, 0.0015];   // r after n solved: s16's five, the test (s17b), the cross-off dot (s18)
 // top of each shot file
 s02: const BLOB_R = { start: METER.birth };                        // bead and perch are mesh scales on it
 s03: const BLOB_R = { start: METER.birth, gulp1: METER.gulp1 };
 s04, s05: const BLOB_R = { start: METER.gulp1 };
 s06: const BLOB_R = { start: METER.gulp1, gulp2: METER.gulp2 };
-s07: const BLOB_R = { start: METER.gulp2, gulp3: METER.gulp3, gulp4: METER.gulp4 };
-s08, s09, s10: const BLOB_R = { start: METER.gulp4 };
-s11: const BLOB_R = { start: METER.gulp4, gulp5: METER.gulp5 };
-s12, s13, s14, s15: const BLOB_R = { start: METER.gulp5 };
+s07: const BLOB_R = { start: METER.gulp2, gulp3: METER.gulp3 };
+s08, s09a, s09b, s09c, s10, s11, s13, s15: const BLOB_R = { start: METER.gulp3 };
 s16: const BLOB_R = { start: SHRINK[0], problemOneSolved: SHRINK[1], problemSolved2: SHRINK[2], problemSolved3: SHRINK[3],
-                      problemSolved4: SHRINK[4], problemSolved5: SHRINK[5], problemSolved6: SHRINK[6] };
-s17: const BLOB_R = { start: SHRINK[6] };
-s17b: const BLOB_R = { start: SHRINK[6], testSolved: SHRINK[7] };
-s17c: const BLOB_R = { start: SHRINK[7] };
-s18: const BLOB_R = { start: SHRINK[7], examCrossedOff: SHRINK[8] };   // then soaks away at blobAbsorbed; the tag's drop is a new birth-bead
+                      problemSolved4: SHRINK[4], problemSolved5: SHRINK[5] };
+s17: const BLOB_R = { start: SHRINK[5] };
+s17b: const BLOB_R = { start: SHRINK[5], testSolved: SHRINK[6] };
+s17c: const BLOB_R = { start: SHRINK[6] };
+s18: const BLOB_R = { start: SHRINK[6], examCrossedOff: SHRINK[7] };   // then soaks away at blobAbsorbed; the tag's drop is a new birth-bead
 ```
 **v4 ladder** (supersedes the block above for s07–s16): s07 `{ start: 0.018, gulp3: 0.024 }`; s08–s15 `{ start: 0.024 }`; s16 `{ start: 0.024, problemOneSolved: 0.018, problemSolved2: 0.012, problemSolved3: 0.009, problemSolved4: 0.007, problemSolved5: 0.005 }`; s17 on as above. `gulp4` and `gulp5` are gone with the blinds and old s11; 0.021 and 0.030 are no longer sizes in the film. The peak is 2× (r 0.024): 5.5 cm wide; at the Marston mark its eyes sit just below his (0.026 against 0.030), big but not towering. Q16 has the 2.5× alternative.
 

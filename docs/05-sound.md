@@ -40,7 +40,7 @@ Cues hang on beat names (`src/timeline.js`); the times are the **v4 cut's** (3:1
 |---|---|---|
 | **Phone buzz** (`phoneBuzz`) | `notifyBuzz` 0.5, and +1.5 (2.0) | Over black. Unchanged |
 | **Clock tick** (`clockTick`) · new | s02 W only (9.0–10.5, 16.08–19.0) at −30 dB; **s08 `clockThree` 60.0 → 69.0, every whole second, alone** (−12 dB close in C1, never under −20); s09a–s09b 70.0–81.0 (−16 dB, room-distant from 76.0); s09c 82.0, 83.0, then it becomes the pulse; s17b `examRoom` 158.0 → 167.0 at 1 Hz with room reverb (−18 dB in the clock insert, −26 dB after); s18 W only at −30 dB | The film's pulse. One buffer |
-| Lamp click | `lampClickHome` 40.5, `lampOffHome` 43.0 | Home only. The identical buffer twice. Unchanged |
+| Lamp click | `lampClickHome` 40.5, `lampOffHome` 43.0, **`lampOn` 74.0** (s09a, the nightstand lamp, Q17) | Home only. The identical buffer three times: the click that chose the dark is the click that leaves. On the tick at 74.0 |
 | Game blips (`gameBlip`) | `laptopUp` 20.0 (boot), then his key taps in s03, s05, s06 (cut on the click, back at `lampOffHome` + 0.17) | s07/s08's taps are gone (no laptop there now) |
 | Screen glow hum (`phoneHum`) | The laptop from `laptopUp` 20.0 through s06 (not in the lamp's window); the phone in s07 (48.0–60.0); **off from `clockThree` 60.0** | No screen at Marston in v4 |
 | **Scroll tick** (`scrollTick`) · new | s07 thumb flicks: `bedRot` + 0.5, then every 0.75 s to +5.75 (48.5…53.75), paused for `clockGlance`, again from +7.0 (55.0…59.75) | A tiny dry tick, −22 dB, seeded per flick |
@@ -54,7 +54,7 @@ Cues hang on beat names (`src/timeline.js`); the times are the **v4 cut's** (3:1
 | Phone face-down (`phoneFaceDown`) | **`phoneFaceDown` 70.5 (s09a, on his hoodie)**; `deskSit` + 2.0 = 112.5 (s11, on the desk, −6 dB) | The card tap; was s15's |
 | **Held low note** (score) · new | `breathIn` 71.5 → fades into `doorOpen` 77.0 | Felt piano low C, −20 dB, a slow pad swell under it (doc 02 cue 3) |
 | Blanket rustle, backpack | `sitUp` 73.5 (`paperRustle`, soft); **`backpackGrab` 75.0** (`backpackGrab`, new: a fabric grab and zip jingle); s11 backpack down `deskSit` + 0.25 | |
-| **Door and hall** (`doorLatch`, `hallHum`) · new | `doorOpen` 77.0: the latch and hinge, then **a swell of room tone and the hall's hum** (+6 dB over 0.5 s; a faint electric night-light hum) to 82.0 | Doc 02 cue 4 |
+| **Door and hall** (`doorLatch`, `hallHum`) · new | `doorOpen` 77.0: the latch and hinge, then **a swell of room tone and the hall's hum** (+6 dB over 0.5 s; no electric hum: the light is his nightstand lamp, Q17) to 82.0 | Doc 02 cue 4 |
 | **Swallow** · new | 79.67 (s09b's close-up) | A tiny dry throat sound, −24 dB |
 | **Footsteps** (`footstep`) · new | `stepIntoShadow` 80.5, 81.0 (runner); s09c on every step (paving, quickening), −20 dB; s10 to `doorPush` | The film's first footsteps |
 | **The pulse** (score) · new | **`lamp1` 84.0** → `lightFlood` 103.5, every 0.5 s (lub on the beat, dub +0.18) | Layer 1: the tick, an octave down, with a soft low thump |

@@ -93,14 +93,18 @@ The blob's own size is now the dread meter (process log 2026-10-15; `docs/shots/
 - (c) Keep Camera A for the rough (`v1-animatic` is built that way) and switch to A′ for the final. The comparison then differs in framing in these two shots, not just in art.
 - **Recommend (a).** The turn has to show a shape dropping to a pool, and the s06 ↔ s15 rhyme survives because both move together. Counterpoint: he is a third of the frame height before the push, smaller than in the built shot.
 
-# Opened by spec-v4 (2026-10-17), unanswered
+# Opened by spec-v4 (2026-10-17), answered 2026-10-18
 
 The v4 story (doc 02) is approved; these are the calls it left to the specs. The specs are built to each **Recommend** line until you answer. Q10 and Q11 are moot (the motion sensors and the custodian are cut); Q12 is answered warm for v4 (README "v4 at a glance").
+
+**Answered (director, 2026-10-18): 2.5×.** "can we somehow do 2.5x". Built as half-size gulps over the same three (s03 1 → 1.5, s06 → 2, s07 → 2.5), so "one size bigger every time" stays true with no jump; s16 shrinks 2.5 → 1.75 → 1 → 0.75 → 0.58 → 0.42 in its five solves. At the Marston desk its eyes are now about level with his. README §1 holds the numbers.
 
 **Q16 · Where does the meter peak now?** v4 has one gulp in bed (s07) where G4 had two for the blinds and one at Marston, so the old ladder (peak 2.5× after five gulps) no longer fits.
 - (a) **2× (r 0.024) after three gulps** (s03, s06, s07), each one step: 1 → 1.25 → 1.5 → 2. s16 shrinks it in five solves (2 → 1.5 → 1 → 0.75 → 0.58 → 0.42), which fits its new 16 s. *(current)*
 - (b) 2.5× (r 0.030): s07's single gulp jumps 1.5 → 2.5, and s16 keeps G4's six solves in 16 s.
 - **Recommend (a).** "One size bigger every time" stays literally true, and the climax's shadow numbers were already written for 2×. Counterpoint: at the Marston desk its eyes sit 4 mm below his instead of level with them, so the s11 look is up, not eye to eye.
+
+**Answered (director, 2026-10-18): low and behind, but his nightstand lamp.** "Q17 is fine uhh I don't have a night light though I have a nightstand lamp". He clicks it on in s09a (`lampOn` @ 4.0, the rhyme with s06's lamp click-off), and it stays on behind him in s09b, with his door at the hall's near end so the shadow runs down the hall. Option (b)'s worry (a light on muddies the choice) is answered by making the click part of the choice.
 
 **Q17 · Which light is behind him at the door (s09b)?** Doc 02: "the hallway light spills in behind him, so the blob's shadow is thrown huge ahead of him, down the hall". A ceiling light would make the shadow small (the rule), so it has to be low.
 - (a) **A plug-in night-light low on the wall beside his door, on the hall side.** It spills across the threshold when he opens the door, then it's behind him as he steps out, and it throws the blob's shadow down the hall over the front door. *(current)*

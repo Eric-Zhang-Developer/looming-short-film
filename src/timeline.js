@@ -18,7 +18,7 @@ export const SHOTS = [
   { id: 's06',  start: 40,  duration: 8,  beats: { lampClickHome: 0.5, lampOffHome: 3, gulp2: 4 } },     // 0:40
   { id: 's07',  start: 48,  duration: 12, beats: { bedRot: 0, clockGlance: 6, gulp3: 7.5 } },            // 0:48 bed rot; clock ~1:45
   { id: 's08',  start: 60,  duration: 10, beats: { clockThree: 0, circleGlance: 4, sweatDrop: 6.5 } },   // 1:00 3 a.m.: music out, tick alone
-  { id: 's09a', start: 70,  duration: 6,  beats: { phoneFaceDown: 0.5, breathIn: 1.5, resolveFace: 3, sitUp: 3.5, backpackGrab: 5 } }, // 1:10 the choice
+  { id: 's09a', start: 70,  duration: 6,  beats: { phoneFaceDown: 0.5, breathIn: 1.5, resolveFace: 3, sitUp: 3.5, lampOn: 4, backpackGrab: 5 } }, // 1:10 the choice
   { id: 's09b', start: 76,  duration: 6,  beats: { doorOpen: 1, shadowAhead: 2.5, stepIntoShadow: 4.5 } }, // 1:16 the door
   { id: 's09c', start: 82,  duration: 20, beats: { walkStart: 0, lamp1: 2, lamp2: 5.5, lamp3: 8.5, blobBlocks: 10, stepAround: 12, lamp4: 13.5, lamp5: 15, marstonSeen: 16 } }, // 1:22 the walk
   { id: 's10',  start: 102, duration: 8,  beats: { doorPush: 1, lightFlood: 1.5, blobBlinks: 2.5, exhale: 5 } }, // 1:42 the threshold
