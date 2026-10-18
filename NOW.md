@@ -3,14 +3,14 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-18
 
-## v4 (2026-10-18, 03:30): building the climax · final due Sun Oct 18, 11:59 PM
+## v4 (2026-10-18, 07:35): climax and sound merged, trims in flight · final due Sun Oct 18, 11:59 PM
 Story v4 approved by the director 2026-10-17 ("I approve everything … Let's do it"); master render **1080p**. The plan is the 11 steps in doc 07's "Story v4 approved" entry.
-- **Merged on `wave/3-assets`:** rig-v4 (neck, gator roommates, `acting.js`), story v4 in doc 02, `closeup_heads` + `clock_kit` frozen at v1_2 (35133b2, picks and drift in `docs/notes/morning-picks.md`), spec-v4 (b3234b6: 21 shots, 195 s, doc 05 cues), PIECES rows for both kits (c0bbd4a).
-- **The film doesn't render right now:** the timeline names s09a–c, which only exist once batch A lands, and the old shot and audio modules read cut beats. Don't render until A, B and snd-v4 are merged.
-- **In flight (2, Opus):** `climax-a1` (s07, s08, s09a, `src/clock.js`) and `climax-a2` (s09b, s09c, s10, delete s09.js).
-- **Queued:** `snd-v4` (tick, pulse, swell, chord, re-time; `src/audio/` names cut beats) and batch B trims (s01–s06, s11, s13, s15–s18, delete s12/s14; needs A1's `makeClock`). Then render v4 → cold viewer → one fix round → `@ts-check` agent (frame-hash no-op) → submission text (doc 10, doc 03 rules 2/8 still say motion sensors) + making-of ch 12 → 1080p master.
-- **Open for the director:** Q16 (meter peaks at 2×) and Q17 (a night-light at the door), both built to the Recommend line.
-- **Disk:** about 3 GB free on Data; `out/` is now a link to the Seagate drive.
+- **Merged on `wave/3-assets`:** rig-v4, story v4, `closeup_heads` + `clock_kit` frozen (35133b2), spec-v4 (b3234b6), the director's Q16/Q17 answers (09bd2ff: 2.5× peak; his nightstand lamp, clicked on in s09a), climax-a2 (228d5b2: s09b, s09c, s10), climax-a1 (253f3a5: s07, s08, s09a, `src/clock.js`), snd-v4 (5f80ea1: −15.9 LUFS / −4.7 dBTP; the director's listen list is in `done/snd-v4.md`).
+- **The film still doesn't render end to end** until both trims land (the kept shots read pre-v4 beats; s12.js and s14.js still exist).
+- **In flight (2):** `trims-marston` (Opus: s11, s13, s15–s17c, delete s12/s14) and `trims-home` (Sonnet: s01–s06, s18, the neck colour, the `resolve` preset).
+- **Next:** render v4 (`tools/render_film.sh v4_cut`) → cold viewer → one fix round from `docs/notes/v4-fixlist.md` → `@ts-check` agent (frame-hash no-op) → submission text (doc 10, doc 03 rules 2/8 still say motion sensors) + making-of ch 12 → 1080p master.
+- **`out/` is a local folder for now** (director, 2026-10-18: "Swap the out/ link for a local folder on the internal disk for the v4 render; put the link back later"). The Seagate drive was unplugged, and the earlier cuts (v1–v3, the old watchdog log) are on it. **To restore once the drive is back and anything worth keeping in the local `out/` is copied over:** `mv out out.local && ln -s "/Volumes/Seagate Storage/Media/Looming/out" out`.
+- **Disk:** about 6.5 GB free on Data with two builders rendering. Watch it during the full render (the watchdog trips under 3 GB).
 
 ## MORNING (2026-10-16): the overnight run finished at about 3 AM
 **Read `docs/notes/morning-picks.md` first.** v2 (`out/v2_rough_cut.mp4`, 01:29) and v3 draft (`out/v3_draft.mp4`, 02:44) are rendered, both 3:15. All work is merged and pushed on `wave/3-assets`. No task worktrees are left except `asset-face-sheet` (stale, safe to remove). Fix list: `docs/notes/v3-fixlist.md`, plus `evidence/cold-v3/report.md`. Making-of ch 11 covers the night. Next: the director's notes on v3 → a v3.1 pass on the turn and the cold-viewer list → captions and the flash check → the 4K master Saturday night.
