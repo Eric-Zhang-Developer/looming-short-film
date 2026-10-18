@@ -1,0 +1,8 @@
+[closeup_heads_v1_1] codex exec in /var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-HdmydS
+[closeup_heads_v1_1] -> /Users/ericzhang/.worktrees/looming/asset-v4-kit/assets/raw/closeup_heads_v1_1.png
+[closeup_heads_v1_2] codex exec in /var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-vPYrma
+[closeup_heads_v1_2] -> /Users/ericzhang/.worktrees/looming/asset-v4-kit/assets/raw/closeup_heads_v1_2.png
+[closeup_heads_v1_3] codex exec in /var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-BIDxKH
+[closeup_heads_v1_3] -> /Users/ericzhang/.worktrees/looming/asset-v4-kit/assets/raw/closeup_heads_v1_3.png
+contact sheet: /Users/ericzhang/.worktrees/looming/asset-v4-kit/assets/raw/thumbs/closeup_heads_v1_contact.jpg (3 of 3 variants)
+exit 0

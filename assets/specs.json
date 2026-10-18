@@ -456,5 +456,96 @@
       "different animal from the hero where the brief says so",
       "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
     ]
+  },
+  {
+    "name": "closeup_heads",
+    "purpose": "v4 close-up heads: six whole-head replacement drawings of the hero (side view) that the climax close-ups swap in, so the gator's emotion is painted, not just eyes and mouth swapped. Same head as gator_hero in shape, line weight, felt texture and palette; only the face acts.",
+    "shots": "s08, s09a, s09b, s10, s15, s17c (close-ups)",
+    "refs": [
+      "assets/frozen/gator_hero.png",
+      "assets/frozen/style_tile.png"
+    ],
+    "prompt": "assets/prompts/closeup_heads.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "landscape sheet (~1536x1024), 6 heads in a 3x2 grid, each head ~400 px wide (~55% of the hero's pixel scale), all six the same size, >= 70 px between heads and from the frame edge",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "parts": {
+      "closeup_heads_numb": {
+        "face": "half-lidded green lid, low flat brow, slack sagging mouth line"
+      },
+      "closeup_heads_dread": {
+        "face": "worried eye, brow up and in (snout end high), sweat drop(s) on the head, tight wavy mouth"
+      },
+      "closeup_heads_resolve": {
+        "face": "level open eye, flat low brow, firm straight mouth, jaw set"
+      },
+      "closeup_heads_relief": {
+        "face": "closed arch eye, lifted brow, faint smile, parted mouth, a breath puff touching the snout tip"
+      },
+      "closeup_heads_surprised_smile": {
+        "face": "wide eye, high arch brow, small smile with two tooth tips"
+      },
+      "closeup_heads_pride": {
+        "face": "big grin with 4-5 tooth tips, bright eye with two highlights, cheek-corner dash"
+      }
+    },
+    "acceptance": [
+      "six separate islands in the 3x2 order numb, dread, resolve, relief, surprised, pride (cut.mjs --auto gives 6)",
+      "same gator as gator_hero: head outline, eye bump, snout, jaw, nostril, torn rim, palette (judged beside the hero)",
+      "head size within 5% of the hero's after one uniform scale, and the six within 5% of each other (measured)",
+      "each mood reads at phone size",
+      "no hoodie, no baked light or shadow, no text; background alpha or flat magenta"
+    ]
+  },
+  {
+    "name": "clock_kit",
+    "purpose": "v4 wall clock: the film's pulse. A tick-mark-only analog clock face (home: kraft rim; exam room: navy rim), separate hour and minute hands and a centre pin so the film can set any time. Paper style matches the calendar.",
+    "shots": "s02, s07, s08, s17b, s18",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/props_kit.png",
+      "assets/frozen/exam_room_kit.png"
+    ],
+    "prompt": "assets/prompts/clock_kit.v1.md",
+    "variants": 2,
+    "cap": 4,
+    "target": "landscape sheet, 7 pieces in two rows, faces ~45% of the canvas height, every piece >= 60 px from every other and from the frame edge",
+    "key": {
+      "name": "green",
+      "hex": "#00FF00"
+    },
+    "parts": {
+      "clock_kit_face_home": {
+        "face": "cream face, navy ticks (12/3/6/9 longer), kraft rim, no numbers, no hands"
+      },
+      "clock_kit_face_exam": {
+        "face": "same face, navy rim"
+      },
+      "clock_kit_hour": {
+        "face": "short wide navy hand pointing up"
+      },
+      "clock_kit_minute": {
+        "face": "longer navy hand pointing up"
+      },
+      "clock_kit_pin": {
+        "face": "small amber centre disc"
+      },
+      "clock_kit_tab": {
+        "face": "small kraft hanging tab"
+      },
+      "clock_kit_minute_spare": {
+        "face": "spare minute hand"
+      }
+    },
+    "acceptance": [
+      "7 separate islands (cut.mjs --auto)",
+      "no numerals or letters on the faces",
+      "paper style matches the calendar; no baked light or shadow; no glass shine",
+      "the two faces are the same size, differing only in rim colour"
+    ]
   }
 ]

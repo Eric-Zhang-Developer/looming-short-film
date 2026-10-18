@@ -1,0 +1,115 @@
+{
+ "variant": "2",
+ "hero": {
+  "W": 741,
+  "snout_thick_over_W": 0.3509,
+  "bump_rise_over_W": 0.0513,
+  "eye_w_over_W": 0.2024
+ },
+ "heads": [
+  {
+   "head": "numb",
+   "box": [
+    49,
+    145,
+    449,
+    309
+   ],
+   "W": 445,
+   "s": 0.601,
+   "snout_thick_over_W": 0.364,
+   "bump_rise_over_W": 0.1101,
+   "eye_w_over_W": 0.209,
+   "d_snout_pct": 3.7,
+   "d_bump_x": 2.15,
+   "d_eye_pct": 3.3
+  },
+  {
+   "head": "dread",
+   "box": [
+    564,
+    145,
+    441,
+    309
+   ],
+   "W": 437,
+   "s": 0.59,
+   "snout_thick_over_W": 0.373,
+   "bump_rise_over_W": 0.1213,
+   "eye_w_over_W": 0.2128,
+   "d_snout_pct": 6.3,
+   "d_bump_x": 2.36,
+   "d_eye_pct": 5.1
+  },
+  {
+   "head": "resolve",
+   "box": [
+    1054,
+    145,
+    438,
+    309
+   ],
+   "W": 433,
+   "s": 0.584,
+   "snout_thick_over_W": 0.3718,
+   "bump_rise_over_W": 0.1224,
+   "eye_w_over_W": 0.2194,
+   "d_snout_pct": 6,
+   "d_bump_x": 2.39,
+   "d_eye_pct": 8.4
+  },
+  {
+   "head": "relief",
+   "box": [
+    46,
+    569,
+    486,
+    307
+   ],
+   "W": 423,
+   "s": 0.571,
+   "snout_thick_over_W": 0.383,
+   "bump_rise_over_W": 0.1277,
+   "eye_w_over_W": null,
+   "d_snout_pct": 9.1,
+   "d_bump_x": 2.49,
+   "d_eye_pct": null
+  },
+  {
+   "head": "surprised_smile",
+   "box": [
+    568,
+    565,
+    438,
+    311
+   ],
+   "W": 433,
+   "s": 0.584,
+   "snout_thick_over_W": 0.3764,
+   "bump_rise_over_W": 0.127,
+   "eye_w_over_W": 0.2194,
+   "d_snout_pct": 7.3,
+   "d_bump_x": 2.48,
+   "d_eye_pct": 8.4
+  },
+  {
+   "head": "pride",
+   "box": [
+    1057,
+    565,
+    436,
+    311
+   ],
+   "W": 432,
+   "s": 0.583,
+   "snout_thick_over_W": 0.375,
+   "bump_rise_over_W": 0.1296,
+   "eye_w_over_W": 0.2176,
+   "d_snout_pct": 6.9,
+   "d_bump_x": 2.53,
+   "d_eye_pct": 7.5
+  }
+ ],
+ "scale_mean": 0.586,
+ "scale_spread_pct": 5.1
+}
