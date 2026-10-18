@@ -136,6 +136,19 @@ export const PIECES = {
     proctor: [0.0940, 0.1050, 'gator', N], door: [0.0598, 0.1100, 'rect', K], wall_strip: [0.2400, 0.0550, 'rect', C],
     floor_strip: [0.2815, 0.0550, 'rect', K],
   },
+  // closeup_heads (v4): six whole-expression side heads, cut at the neck to sit under the collar. One shared px scale,
+  // numb's snout-to-nape at 0.070 (the side rig's head + snout, rough); close-up shots frame them, so shots resize.
+  closeup_heads: {
+    numb: [0.0700, 0.0486, 'head', G], dread: [0.0688, 0.0486, 'head', G], resolve: [0.0683, 0.0486, 'head', G],
+    relief: [0.0757, 0.0483, 'head', G], surprised_smile: [0.0683, 0.0489, 'head', G], pride: [0.0680, 0.0489, 'head', G],
+  },
+  // clock_kit (v4): dial Ø 0.020 (docs/shots/README.md §13). Hands are pre-scaled (minute 0.69, hour 0.63) because the
+  // painted ones overshoot the dial (done/asset-v4-kit.md); each pivots on its round end.
+  clock_kit: {
+    face_home: [0.0200, 0.0199, 'ellipse', C], face_exam: [0.0200, 0.0198, 'ellipse', C], tab: [0.0065, 0.0080, 'rect', K],
+    minute: [0.0018, 0.0080, 'rect', N], minute_spare: [0.0018, 0.0074, 'rect', N], hour: [0.0017, 0.0053, 'rect', N],
+    pin: [0.0035, 0.0035, 'ellipse', K],
+  },
 };
 
 const cache = new Map();  // name → Promise of the load result
