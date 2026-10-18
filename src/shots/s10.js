@@ -1,183 +1,212 @@
-// s10 · The stacks (docs/shots/s10.md, G4). v2 on the frozen Marston kit.
-// He walks down a stacks aisle toward the locked camera, phone low in his right hand; the 2× blob waddles on the carpet
-// behind his right side. The aisle is the kit's bookshelf bays as wings, coffered ceiling strips as borders with strip
-// lights under them, and the navy end wall. The phone is the key: it throws the blob's shadow on the end wall, and the
-// shadow grows as he nears the lens. Tubes 1 and 2 falter as the blob passes under them. Characters on 2s, light and
-// camera on 1s, boil 10/s.
+// s10 · The threshold (docs/shots/s10.md, v4; climax-a2). Rebuilt under the old file name (the stacks shot is cut).
+// Marston's entrance vestibule at night, from inside, looking out through the glass doors at the plaza he crossed, lamp 5
+// behind him. He pushes the door; on lightFlood he and the blob stand under the warm overhead panel and the shadow snaps
+// from a long tongue (lamp 5, far and low) to a puddle (the panel, overhead): one frame, because the far light was out-shone,
+// not because anything moved. The blob blinks, confused; he looks up; close-up: the painted heads, resolve → relief on the
+// exhale. Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
-import { ambient, aim, phoneLight, fluorescent } from '../lights.js';
+import { ambient, aim } from '../lights.js';
 import { kf, ease, onTwos } from '../core/ease.js';
-import { hash2, mulberry32, seedOf } from '../core/rng.js';
 import { SHOTS } from '../timeline.js';
 import { makeGator, HIP } from '../characters/gator.js';
-import { POSES, walk } from '../characters/poses.js';
+import { POSES, specPose, walk } from '../characters/poses.js';
+import { act } from '../characters/acting.js';
 import { createBlob } from '../blob.js';
-import { kitTools, mppOf, wallCanvas, carpetCanvas, noCast, glow } from './s11.js';
+import { kitTools, mppOf, noCast, glow, wallCanvas } from './s11.js';
+import { lamppost, lampKey, LAMP_COOL, LAMP_H, KEY_I } from './s09c.js';
+import { closeupRig, HEAD_AT } from './s09b.js';
 
-const ID = 's10';
-const B = SHOTS.find((s) => s.id === ID).beats;          // stacksEnter 0, stacksFlicker1 0.4, stacksFlicker2 3.4
-const BLOB_R = { start: 0.024 };                         // METER.gulp4, 2× (README §1)
-const STEP = 0.25, HOP = 0.5, HOP_H = 0.004;             // a footfall every 0.25 s; the blob hops every 0.5 s, 4 mm
-const zG = (t) => 0.08 + 0.04 * t;                       // the gator's walk line, toward the camera
-const CAM = [0, 0.085, 0.95];
-const PHONE = [-0.040, 0.019, 0.035], BLOB = [-0.045, 0, -0.025];   // offsets from his root (the feet): spec, G4
-const WING_Z = [0.06, 0.18, 0.30, 0.42], AISLE = 0.09;   // wings stand at these depths, inner edge ±0.09
-const TUBE_Z = [0.08, 0.20, 0.32], HEADER_Y = 0.16;
-const WINDOW = [[B.stacksFlicker1, B.stacksFlicker1 + 0.6], [B.stacksFlicker2, B.stacksFlicker2 + 0.6], null];
-const CEILING_K = 0.3;                   // the cream coffers under the tubes: dimmed so the ceiling doesn't outshine the loom
-const TUBE_I = 0.7;                      // intensity at envelope 1.0; the envelope is 0.5 / 0.18 (spec), so 0.35 / 0.126
-const TUBE_GLOW = 0.9;                   // the strip light's painted tube at envelope 0.5
-const SPOT_REF = 0.25, WALL_REF = 0.12;  // phone cd that lights the navy end wall 12 cm away to a readable level
-const FILL_I = 0.012;                    // face fill cd at the phone; its 6 cm reach, d² clamps at 10 cm, so ×100 on him
+const ID = 's10', D = Math.PI / 180;
+const B = SHOTS.find((s) => s.id === ID).beats;          // doorPush 1, lightFlood 1.5, blobBlinks 2.5, exhale 5
+const BLOB_R = { start: 0.030 };                         // 2.5× (README §1, Q16)
+
+// The doors at z 0.10, not the spec's table's 0.20: the spec's own panel (z 0.13, "just inside the door"), its pool
+// (0.07…0.19) and his stop (z 0.13) are all inside only if the sill is nearer the plaza. Everything else as specced.
+const DOOR_Z = 0.10, DOOR_W = 0.06, DOOR_H = 0.12, BAR_Y = 0.045, OPEN = 80;   // 80°, not 60: at 60 the leaf's tip met his side
+const LAMP5 = [-0.03, -0.25];                            // s09c's lamp 5 (its light point at LAMP_H)
+const PANEL = [0.0, 0.145, 0.13], SPOT_Y = 0.142;        // the recessed panel over the threshold
+const STOP = [-0.022, 0.13];                             // him under the panel at lightFlood
+const BLOB_IN = [0.032, 0.16];   // at his feet, in the pool, 3 cm in front of the panel: a cutout lit from straight above casts a
+                                 // line; this lays its puddle forward on the floor where the camera sees it (README §3's 6 mm, more)
+// Him on 2s: [t, [x, z]]. A step from the glass, the hand to the bar, the push, one step across the sill, the stop.
+const HIM = [[0, [-0.02, 0.060]], [0.5, [-0.02, 0.080]], [B.doorPush, [-0.02, 0.082]], [B.lightFlood, STOP]];
+const CU_I = 0.010, WARM_I = 0.020, ROOM_I = 0.15, ROOM_FLOOD = 0.30, AMB_K = 0.35, FILL_I = 0.003, PANEL_GLOW = 0.9;
+const CAM_W = { pos: [0.0, 0.060, 0.75], look: [0.0, 0.068, 0.10] };   // the panel in the top 15%, the door pair whole
+const CU = B.exhale - 1.0;                               // the cut to the close-up, 4.0
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
-  const col = (k) => new THREE.Color(PALETTE[k]);
-  const FL = col('cream').lerp(col('gator'), 0.15);   // the Marston fluorescent tone (README §6)
-  scene.background = col('navy').multiplyScalar(0.5);
-
+  const C = (k) => new THREE.Color(PALETTE[k]), hex = (c) => '#' + c.getHexString();
+  const COOL = LAMP_COOL(PALETTE), WARM = C('lamp').lerp(C('cream'), 0.3);
+  scene.background = C('navy').lerp(C('ink'), 0.4);
   const tools = kitTools(ID), { sheet, art, boil } = tools;
-  const kit = await assets.load('marston_kit');
+  const [kit, ext] = await Promise.all([assets.load('marston_kit'), assets.load('marston_ext_kit')]);
+  const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
+  const canvas = (w, h) => Object.assign(document.createElement('canvas'), { width: w, height: h });
   const flat = (m) => { m.rotation.x = -Math.PI / 2; return m; };
+  const plain = (color, size, key, opts = {}) => { const m = sheet({ path: RECT, color, size, key: `${ID}-${key}`, res: 1024, rim: 'none', ...opts }, scene); m.castShadow = false; return m; };
 
-  // ---- z 0: the end wall, the kit's navy wall with its baseboard, floor to y 0.35. It only receives.
-  const wall = sheet({ art: wallCanvas(kit, [0.6, 0.35]), size: [0.6, 0.35], key: `${ID}-wall`, res: 2048 }, scene);
-  wall.position.set(0, 0.175, 0); wall.castShadow = false;
-  // the exit sign over the aisle end (glyph and arrow, no letters), glowing faintly
-  const exit = noCast(art(kit.pieces.exit_sign, 'exit_sign', { mpp: mppOf(kit, 'exit_sign'), parent: scene }));
-  exit.position.set(-0.055, 0.138, 0.001); glow(exit).emissiveIntensity = 0.25;
+  // ---- Outside: the night sky, an oak, the plaza to the sill, lamp 5.
+  plain(hex(C('navy').multiplyScalar(0.85)), [2.0, 1.0], 'night_sky').position.set(0, 0.2, -1.5);
+  noCast(art(ext.pieces.oak_canopy, 'oak', { mpp: 0.5 * mppOf(ext, 'oak_canopy'), anchor: [326, 200], parent: scene, res: 1024 })).position.set(0.1, 0.16, -0.9);
+  flat(plain(hex(C('navy').multiplyScalar(0.75)), [1.2, 0.8], 'plaza')).position.set(0, 0, DOOR_Z - 0.4);
+  const lantern = lamppost(ext, art, scene, 'lamp5', LAMP5, COOL);
+  const pool5 = new THREE.PointLight(COOL, 0.002, 0.22, 2); pool5.position.set(LAMP5[0], LAMP_H, LAMP5[1]); scene.add(pool5);
 
-  // ---- y = 0: carpet, x ±0.35, z 0 → 1.0.
-  const floor = flat(sheet({ art: carpetCanvas(kit, [0.7, 1.0]), size: [0.7, 1.0], key: `${ID}-carpet`, res: 1024 }, scene));
-  floor.position.set(0, 0, 0.5); floor.castShadow = false;
-
-  // ---- Wings: at each depth, bookshelf bays side by side outward from the aisle edge, at the kit's scale (2.1 m tall).
-  // Never the same twice in a row: every other bay is mirrored and each takes a slightly different tint (seeded).
-  const bk = mppOf(kit, 'bookshelf_bay'), bayW = 226 * bk, rnd = mulberry32(seedOf(ID, 'bays'));
-  WING_Z.forEach((z, w) => [-1, 1].forEach((side) => {
-    for (let i = 0; i < 3; i++) {
-      const flip = (w + i + (side > 0 ? 1 : 0)) % 2 ? -1 : 1;
-      const bay = noCast(art(kit.pieces.bookshelf_bay, `bay-${w}-${side}-${i}`, { mpp: bk, sx: flip, anchor: [123, 286], parent: scene, weight: 'kraft' }));
-      bay.position.set(side * (AISLE + bayW * (i + 0.5)), 0, z + 0.0005 * i);
-      bay.children[0].material.color.setScalar(0.85 + 0.15 * rnd());
-    }
-  }));
-
-  // ---- Ceiling borders: the coffered ceiling strip, three across, bottom at y 0.16; a strip light under each, its
-  // painted tube glowing with that tube's envelope.
-  const ck = mppOf(kit, 'ceiling_strip'), stripW = 417 * ck, sk = mppOf(kit, 'strip_light');
-  const tubeMat = TUBE_Z.map((z, n) => {
-    for (let i = -1; i <= 1; i++) {
-      const c = noCast(art(kit.pieces.ceiling_strip, `ceiling-${n}-${i}`, { mpp: ck, sx: i ? -1 : 1, anchor: [214.5, 106], parent: scene }));
-      c.position.set(i * stripW, HEADER_Y, z); c.children[0].material.color.setScalar(CEILING_K);
-    }
-    const strip = noCast(art(kit.pieces.strip_light, `strip-${n}`, { mpp: sk, anchor: [259, 62], parent: scene }));
-    strip.position.set(0, HEADER_Y - 0.006, z + 0.002);
-    return glow(strip);
+  // ---- The door wall: marston_kit's navy-grey wall with the door pair's opening; the glass doors in it.
+  const WW = [0.6, 0.15];
+  const wall = sheet({ art: wallCanvas(kit, WW, [[WW[0] / 2 - DOOR_W, 0, WW[0] / 2 + DOOR_W, DOOR_H]]), size: WW, key: `${ID}-door_wall`, res: 2048 }, scene);
+  wall.position.set(0, WW[1] / 2, DOOR_Z); wall.castShadow = false;
+  const doorArt = (() => {                                 // a kraft frame, a tissue-clear pane, a push bar
+    const c = canvas(300, 600), g = c.getContext('2d');
+    g.strokeStyle = PALETTE.kraft; g.lineWidth = 34; g.strokeRect(17, 17, 266, 566);
+    g.fillStyle = hex(C('kraft').multiplyScalar(0.7)); g.fillRect(40, 600 - (BAR_Y / DOOR_H) * 600 - 10, 220, 20);
+    return c;
+  })();
+  const pane = () => new THREE.Mesh(new THREE.PlaneGeometry(DOOR_W - 0.007, DOOR_H - 0.007),
+    new THREE.MeshBasicMaterial({ color: hex(C('cream').lerp(C('phone'), 0.3)), transparent: true, opacity: 0.10, depthWrite: false }));
+  const doors = [-1, 1].map((side) => {                  // his is the left one, hinged at its left edge, opening toward us
+    const hinge = new THREE.Group(); hinge.position.set(side * DOOR_W, 0, DOOR_Z + 0.001); scene.add(hinge);
+    const f = sheet({ art: doorArt, size: [DOOR_W, DOOR_H], key: `${ID}-glass_door${side}`, res: 512, rim: 'none' }, hinge);
+    f.position.set(-side * DOOR_W / 2, DOOR_H / 2, 0); f.castShadow = false;
+    const p = pane(); p.position.copy(f.position); p.castShadow = false; hinge.add(p);
+    return hinge;
   });
 
-  // ---- The Student, front view, root at the feet. His right side is screen left (−x).
-  const gator = await makeGator({ assets }, { seed: 10, facing: 'front', res: 1024 });
-  scene.add(gator.group);
-  gator.meshes.arm_r.castShadow = false;   // its tip is at the phone, inside the cone: it would throw a wall-sized shadow
-  const eyes0 = gator.joints.eyes.position.y, mouth0 = gator.joints.mouth.position.y;
-  const props = await assets.load('study_props_sheet');
-  const prop = (name) => {
-    const [w, h] = props.sizes[name], [u0, v0, u1, v1] = props.visible[name], g = new THREE.Group();
-    const m = sheet({ art: props.pieces[name], size: [w, h], key: `${ID}-${name}`, res: 512 }, g);
-    m.castShadow = false;
-    m.position.set(-((u0 + u1) / 2 - 0.5) * w, ((v0 + v1) / 2 - 0.5) * h, 0);   // centre the visible shape on the origin
-    return g;
-  };
-  {  // backpack_front hangs behind him, poking out on his right. Not casting: inside the cone it throws a 9× rectangle.
-    const pack = prop('backpack_front');
-    pack.position.set(-0.020, 0.048, -0.030);
-    gator.joints.body.add(pack);
-  }
-  // The phone: a card tilted screen-up toward his face, with a cyan screen, at the spec's hand offset each frame.
-  const phone = new THREE.Group();
-  {
-    const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.0125, 0.0058), new THREE.MeshBasicMaterial({ color: PALETTE.phone }));
-    screen.position.z = 0.0006;
-    phone.add(prop('phone_face'), screen);
-    phone.rotation.x = -1.0;
-    scene.add(phone);
-  }
+  // ---- Inside: the vestibule floor (cream-grey tile, the receiver), side walls, the ceiling and its panel.
+  const tile = (() => {
+    const c = canvas(1200, 1400), g = c.getContext('2d');
+    g.fillStyle = hex(C('cream').lerp(C('navy'), 0.15)); g.fillRect(0, 0, 1200, 1400);
+    g.strokeStyle = hex(C('cream').lerp(C('navy'), 0.32)); g.lineWidth = 5;
+    for (let x = 0; x <= 1200; x += 100) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 1400); g.stroke(); }
+    for (let y = 0; y <= 1400; y += 100) { g.beginPath(); g.moveTo(0, y); g.lineTo(1200, y); g.stroke(); }
+    return c;
+  })();
+  const floor = flat(sheet({ art: tile, size: [0.6, 0.7], key: `${ID}-floor`, res: 2048, rim: 'none' }, scene));
+  floor.position.set(0, 0, DOOR_Z + 0.35); floor.castShadow = false;
+  [-1, 1].forEach((s) => {
+    const w = sheet({ art: wallCanvas(kit, [0.7, 0.15]), size: [0.7, 0.15], key: `${ID}-side${s}`, res: 1024 }, scene);
+    w.rotation.y = s * -Math.PI / 2; w.position.set(s * 0.3, 0.075, DOOR_Z + 0.35); w.castShadow = false;
+  });
+  const ceil = plain(hex(C('cream').multiplyScalar(0.55)), [0.6, 0.7], 'ceiling');
+  ceil.rotation.x = Math.PI / 2; ceil.position.set(0, PANEL[1], DOOR_Z + 0.35);
+  const panel = noCast(art(kit.pieces.recessed_panel, 'panel', { mpp: 0.033 / (kit.pieces.recessed_panel.width - 8), parent: scene }));
+  panel.rotation.x = Math.PI / 2; panel.position.set(PANEL[0], PANEL[1] - 0.0005, PANEL[2]);
+  const panelMat = glow(panel); panelMat.emissive.copy(WARM); panelMat.emissiveIntensity = PANEL_GLOW;
 
+  // ---- The Student: front view in the wide, the close-up rig in CU. The Exam.
+  const hero = await makeGator({ assets }, { seed: 101, facing: 'front', res: 1024 });
+  scene.add(hero.group); noCast(hero.group);
+  const eyes0 = hero.joints.eyes.position.y, mouth0 = hero.joints.mouth.position.y;
+  const cu = await closeupRig({ assets }, tools, ['resolve', 'relief'], { seed: 102 });
+  scene.add(cu.rig.group); noCast(cu.rig.group);
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
   scene.add(exam.mesh);
 
-  // ---- Light. Key: the phone's shadow spot, aimed phone → blob. angle 0.7 (40°, spec): the blob's half-angle is about
-  // 30°, his body 56–63° off the axis, so he casts nothing into it.
-  const spot = phoneLight({ angle: 0.7, penumbra: 0.3, distance: 0.6 });
-  scene.add(spot, spot.target);
-  const fill = new THREE.PointLight(PALETTE.phone, FILL_I, 0.06, 2);   // face fill (doc 03 rule 3, same source)
-  scene.add(fill);
-  // Set light: one dim directional per tube, the flicker seeded on/off per 24 fps frame inside each window.
-  const tubes = TUBE_Z.map((z, n) => {
-    const f = fluorescent({ flickerSeed: seedOf(ID, n + 1) });
-    f.light.color.copy(FL);
-    f.light.shadow.mapSize.set(1024, 1024);
-    f.light.position.set(0, 1.5, z + 0.8);
-    f.light.target.position.set(0, 0, z);
-    scene.add(f.light, f.light.target);
-    return { ...f, seed: seedOf(ID, 'tube', n + 1) };
-  });
-  const envelope = (n, t) => {
-    const w = WINDOW[n];
-    if (!w || t < w[0]) return 0.5;
-    if (t >= w[1]) return n === 2 ? 0.5 : 0.18;
-    return t - w[0] < 1 / 24 || hash2(tubes[n].seed % 65536, Math.floor(t * 24)) < 0.5 ? 0 : 0.5;   // chatter: starts dark
-  };
-  const amb = ambient();
-  amb.intensity *= 0.5;
-  scene.add(amb);
+  // ---- Light. 0–1.5 key: lamp 5 behind him (s09c's: cool, decay 0, aimed at the blob). From lightFlood it's at 0.2
+  // (out-shone, README §4) and the overhead panel's spot, on the whole shot, is the only key.
+  const key5 = lampKey(COOL); key5.angle = 0.9; key5.penumbra = 0.3; key5.position.set(LAMP5[0], LAMP_H, LAMP5[1]); scene.add(key5, key5.target);
+  const over = new THREE.SpotLight(WARM, WARM_I, 0, 0.7, 0.5, 2);
+  over.castShadow = true; over.shadow.mapSize.set(2048, 2048); over.shadow.bias = -0.0004; over.shadow.radius = 1;
+  over.position.set(PANEL[0], SPOT_Y, PANEL[2]); over.target.position.set(PANEL[0], 0, PANEL[2]); scene.add(over, over.target);
+  over.shadow.camera.near = 0.004; over.shadow.camera.far = 0.5;
+  const fill = new THREE.PointLight(WARM, 0, 0.06, 2); scene.add(fill);   // README §10, after the flood only
+  // CU key: the panel's light as it falls on a cutout in profile. The panel is straight overhead, edge-on to the head's
+  // paper, so on its own it lights nothing on the face; this stands in for it just above and in front of the brow, no
+  // shadow, falling off down the face (brow brighter than the jaw).
+  const cuKey = new THREE.PointLight(WARM, 0, 0.09, 2); scene.add(cuKey);
+  const amb = ambient(); amb.intensity *= AMB_K; scene.add(amb);
+  // The vestibule's own dim room light (non-casting, from above). It sets the floor's base level to about lamp 5's
+  // light on it, so lamp 5's tongue reads at 2:1 before the flood and at 1.2:1 (README §4's ≤ 20%) once it's at 0.2.
+  const room = new THREE.DirectionalLight(WARM, ROOM_I); room.position.set(0, 1, 0.2); room.target.position.set(0, 0, 0.35); scene.add(room, room.target);
 
-  const fx = post({ focus: CAM[2] - zG(0), aperture: 0.02, maxblur: 0.01, lut: 'night' });
-  const root = new THREE.Vector3(), P = new THREE.Vector3(), Cn = new THREE.Vector3();
+  const fx = post({ focus: 0.62, aperture: 0.015, maxblur: 0.008, lut: 'night' });
+  const BC = new THREE.Vector3();
+  const STAND = specPose({ lean: 0, arm: -92, far: -92, head: 0, leg: 0, farLeg: 8 });
 
-  return {
-    parts: { exam, spot, gator, phone, fill, tubes, wall, zG },
-    update(tLocal) {
-      camera.position.set(...CAM);   // locked
-      camera.rotation.set(0, 0, 0);
-      fx.set({ focus: CAM[2] - zG(tLocal) });
-      boil(tLocal, 10);
+  function update(t) {
+    const T = onTwos(t);
+    boil(t, 10);
+    const close = t >= CU;
 
-      // Characters on 2s.
-      const T = onTwos(tLocal);
-      gator.boil(tLocal, 10);
-      const w = walk(tLocal, { set: 'front', step: STEP });
-      gator.blend(POSES, w.keys, tLocal);
-      root.set(0, w.lift, zG(T));
-      gator.group.position.copy(root);
-      // The phone sits at the spec's hand offset; arm_r points at it from its shoulder (body sways ±3° about the feet).
-      const rb = gator.joints.body.rotation.z, sx = -0.0175, sy = HIP + 0.030;
-      const vx = PHONE[0] - (sx * Math.cos(rb) - sy * Math.sin(rb)), vy = PHONE[1] - w.lift - (sx * Math.sin(rb) + sy * Math.cos(rb));
-      gator.joints.arm_r.rotation.z = Math.atan2(vx, -vy) - rb;
-      // Head: the front turnaround has no head joint, so the face slides on the body (−12° down, +6° up).
-      const head = kf(T, [[0, -12], [3.25, -12], [3.333, -15], [3.417, 6], [4.0, 6], [4.167, -12]], ease);
-      gator.joints.eyes.position.y = eyes0 + 0.00012 * head;
-      gator.joints.mouth.position.y = mouth0 + 0.00012 * head;
-      gator.face({ eyes: T >= 3.4 && T < 4.0 ? 'open' : 'tired', mouth: 'line' });
+    // ---------- his door, on 2s: three drawings to 80° on doorPush
+    doors[0].rotation.y = -kf(T, [[B.doorPush - 1e-3, 0], [B.doorPush, 25], [B.doorPush + 1 / 12, 55], [B.doorPush + 2 / 12, OPEN]], (x) => x) * D;
 
-      // Phone and blob ride his root. The blob hops on the carpet, one hop per two of his steps, squashing on landing.
-      P.set(root.x + PHONE[0], root.y + PHONE[1], root.z + PHONE[2]);
-      phone.position.copy(P);
-      const ph = (T % HOP) / HOP, land = ph < 1 / 6 + 1e-6;
-      exam.mesh.position.set(root.x + BLOB[0], HOP_H * Math.sin(Math.PI * ph), root.z + BLOB[2]);
-      Cn.copy(exam.mesh.position).setY(exam.mesh.position.y + BLOB_R.start);
-      exam.update(tLocal, { wobble: 1, squash: land ? 0.15 : 0, eyes: T >= 2.5 && T < 2.58 ? 'closed' : 'open', key: spot });
+    // ---------- the Student
+    const [hx, hz] = kf(T, HIM, (x) => x);
+    hero.group.visible = !close; cu.rig.group.visible = close; doors.forEach((d) => { d.visible = !close; });   // CU: the open leaf is between us and him
+    if (!close) {
+      hero.boil(t, 10);
+      const walking = T < 0.5 || (T >= B.doorPush + 1 / 12 && T < B.lightFlood);
+      const w = walk(T, { set: 'front', step: 0.25 });
+      hero.blend(POSES, walking ? w.keys : [[0, 'stand_front']], T);
+      hero.group.position.set(hx, walking ? w.lift : 0, hz);
+      // the push: hand to the bar (0.5), lean back (0.83), lean into it 8° on the push (front view: toward the lens)
+      const lean = kf(T, [[0.75, 0], [0.833, -3], [B.doorPush, 8], [B.doorPush + 0.5, 8], [B.lightFlood, 0]], ease);
+      hero.joints.body.rotation.x = -lean * D;
+      hero.joints.arm_r.rotation.z = kf(T, [[0.417, 0], [0.5, -55], [B.doorPush + 1 / 6, -55], [B.doorPush + 0.333, 0]], ease) * D;
+      act(hero, t, [[0, 'resolve']], { slump: 0 });
+      const look = kf(T, [[3.0 - 1 / 12, 0], [3.0, 6]], ease);   // 3.0: he looks up at the light (the face slides up)
+      hero.joints.eyes.position.y = eyes0 + 0.00012 * look; hero.joints.mouth.position.y = mouth0 + 0.00012 * look;
+      fill.position.set(hx, 0.065, hz + 0.04);
+      fill.intensity = T >= B.lightFlood ? FILL_I : 0;
+    } else {                                              // CU: his head in profile facing right, lit from above
+      cu.rig.boil(t, 10);
+      cu.rig.group.position.set(STOP[0], HIP, STOP[1]);
+      cu.rig.group.rotation.y = -Math.PI / 2;
+      cu.rig.blend({ s: STAND }, [[0, 's']], T);
+      const R = B.exhale;
+      cu.show(T < R ? 'resolve' : 'relief', { antic: T >= R - 1 / 12 - 1e-6 && T < R });
+      // 4.42: brows tighten (one drawing: the head dips), 5.0 the exhale (head back 3°, shoulders and jaw drop 1.5 mm),
+      // then one slow breath: in 6.0–7.0, out 7.0–7.75
+      const tilt = kf(T, [[4.417, 0], [4.5, -1], [R - 1 / 12, 0], [R, 3], [R + 0.5, 3]], ease);
+      cu.rig.joints.head.rotation.z = tilt * D;
+      const drop = kf(T, [[R, 0], [R + 0.5, -0.0015], [6.0, -0.0015], [7.0, -0.0003], [7.75, -0.0015]], ease);
+      cu.holder.position.y = HEAD_AT[1] + drop;
+      cu.rig.joints.body.scale.y = 1 + 0.5 * drop / 0.03;
+      fill.intensity = 0;
+      cuKey.position.set(STOP[0] - 0.03, 0.115, STOP[1] + 0.03);
+    }
+    cuKey.intensity = close ? CU_I : 0;
 
-      spot.position.copy(P);
-      spot.intensity = SPOT_REF * (P.z / WALL_REF) ** 2;   // the wall gets farther as he walks; hold its brightness
-      aim(spot, Cn);
-      fill.position.copy(P);
+    // ---------- the Exam, on 2s: at his heels; one hop in after him (1.25 → 1.5); the blink; looks down, then up
+    const HOP = [B.doorPush + 0.25, B.lightFlood];
+    let p, y = 0, sq = 0, eyes = 'open', look = 1;
+    if (T < HOP[0]) {
+      const h = kf(T, HIM, (x) => x); p = [h[0] + 0.03, h[1] - 0.03];
+      const ph = ((T + 1e-6) % 0.5) / 0.5; if (T < 0.5) { y = 0.003 * Math.sin(Math.PI * ph); sq = ph < 1 / 6 ? 0.2 : 0; }
+    } else if (T < HOP[1]) {                              // through his door's opening (squeezed: it's wider than the gap)
+      const k = (T - HOP[0]) / (HOP[1] - HOP[0]), h0 = kf(HOP[0], HIM, (x) => x);
+      p = [kf(k, [[0, h0[0] + 0.03], [0.5, -0.022], [1, BLOB_IN[0]]], (x) => x), kf(k, [[0, h0[1] - 0.03], [0.5, DOOR_Z], [1, BLOB_IN[1]]], (x) => x)];
+      y = 0.012 * Math.sin(Math.PI * k); sq = -0.15;
+    } else { p = BLOB_IN; sq = T < B.lightFlood + 1 / 12 ? 0.2 : T >= 3.25 ? 0.15 : 0; }
+    if (T >= B.doorPush && T < B.lightFlood) { eyes = 'side'; look = -1; }   // following him in
+    if (T >= B.blobBlinks && T < B.blobBlinks + 1 / 12) eyes = 'closed';
+    else if (T >= 2.75 && T < 3.25) eyes = 'tired';      // down at its puddle
+    else if (T >= 3.25) eyes = 'worried';                // up at him
+    const sx = T >= HOP[0] && T < HOP[1] && Math.abs(p[1] - DOOR_Z) < 0.03 ? 0.75 : 1;
+    exam.mesh.visible = !close;
+    exam.mesh.position.set(p[0], y, p[1]); exam.mesh.scale.set(sx, 1, 1);
 
-      tubes.forEach(({ light }, n) => {
-        const e = envelope(n, tLocal);
-        light.intensity = TUBE_I * e;
-        tubeMat[n].emissiveIntensity = TUBE_GLOW * (0.15 + 0.85 * e / 0.5);
-      });
-    },
-  };
+    // ---------- light, on 1s. The snap: lamp 5 at 0.2 from the lightFlood frame, no fade.
+    const flooded = t >= B.lightFlood - 1e-6;
+    key5.intensity = KEY_I * (flooded ? 0.2 : 1);
+    // ...and the lobby's warm fill doubles on the same frame: lamp 5 at 0.2 alone left the tongue at 17% contrast with
+    // both eye holes still legible at 960; under the doubled fill it falls to ~9% and only the puddle reads.
+    room.intensity = flooded ? ROOM_FLOOD : ROOM_I;
+    BC.set(p[0], 0.03, p[1]); aim(key5, BC); key5.shadow.camera.near = 0.004; key5.shadow.camera.updateProjectionMatrix();
+    exam.update(t, { squash: sq, wobble: flooded ? 0.6 : 1, eyes, look, key: flooded ? over : key5 });
+    lantern.emissiveIntensity = 0.9;
+
+    // ---------- camera, on 1s: locked wide; locked CU from his left (he faces screen right)
+    if (close) {
+      camera.position.set(STOP[0] - 0.26, 0.071, STOP[1] + 0.022);
+      camera.lookAt(STOP[0], 0.071, STOP[1] + 0.022);
+      fx.set({ focus: 0.26, aperture: 0.008 });
+    } else {
+      camera.position.set(...CAM_W.pos); camera.lookAt(...CAM_W.look);
+      fx.set({ focus: T < B.doorPush ? CAM_W.pos[2] - DOOR_Z : CAM_W.pos[2] - hz, aperture: 0.015 });
+    }
+  }
+
+  return { parts: { exam, camera, key5, over, hero, cu }, update };
 }
