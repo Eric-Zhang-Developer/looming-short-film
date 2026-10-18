@@ -1,72 +1,50 @@
-// The roommates (s05), fitted to the painted roommates_sheet (v3-fix-home): a heron (tall) and a bear (round), both facing +x.
-// Every size is the cut's painted pixel box × a metres-per-pixel constant, so the painter's proportions are held exactly
-// (v2 stretched the tail 2× and squashed the bear 24%). roommates_sheet has no arm pieces, so both borrow the Student's arm
-// cutouts, multiplied by the roommate's own body colour so they read as a wing and a paw, not a green sleeve.
-import { buildRig } from './gator.js';
+// The roommates (s05), rig-v4: two gators built from the Student's own side rig (gator_sheet), because in a film where
+// everyone is a gator a heron and a bear read as a mistake (director, 2026-10-17). They differ from him, and from each
+// other, by hoodie colour, green and proportions, so they read as three different gators at a glance:
+//   tall: lanky, a blue hoodie (navy lifted toward the phone cyan so it reads as blue, not charcoal), a yellower green, long body and legs.
+//   round: stout, a kraft hoodie, a darker green, a wide short body.
+// roommates_sheet stays frozen but is no longer used. Both face +x and take every side pose (specPose, s15 convention).
+// Root at the hip, as the Student. s05's numbers are kept: HERON_STAND_Y is the tall one's standing hip height, and the
+// round one's root sits ROUND_DROP below its hip so s05's `SEAT − 0.03` placement still puts him on the couch.
+import * as THREE from 'three';
+import { PALETTE } from '../core/palette.js';
+import { buildRig, sideParts, greenVariant, HIP } from './gator.js';
 
-const R = (piece) => ['roommates_sheet', piece];
 const FACES = { eyes: 'open', mouth: 'neutral' };
+const mix = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
 
-export const HERON_K = 0.0001;       // m per painted px: 440 px of body = 4.4 cm, the whole bird about 0.098 m to the crest (the spec's 0.10)
-export const BEAR_K = 0.000193;      // m per painted px: 440 px = 8.5 cm, head top 0.08 m with the bottom 3 cm behind the seat strip
-export const HERON_STAND_Y = 0.0326; // root height with both feet on the floor (the leg shaft below its pivot, from the art)
+// body: [x, y] stretch of the hoodie about the hip (every joint on the body moves with it), leg: the boots' length, arm: reach,
+// head: the head joint's scale (face, brow and throat with it).
+const BUILD = {
+  tall: { scale: 1.04, body: [0.72, 1.3], leg: 1.8, arm: 1.12, head: 0.9, green: greenVariant(1), hoodie: mix('navy', 'phone', 0.4) },
+  round: { scale: 0.97, body: [1.35, 0.88], leg: 0.8, arm: 0.92, head: 0.96, green: greenVariant(3), hoodie: mix('kraft', 'cream', 0.1) },
+};
+export const TALL_STAND_Y = HIP * BUILD.tall.leg * BUILD.tall.scale;   // hip height with the boots straight down on the floor
+export const ROUND_STAND_Y = HIP * BUILD.round.leg * BUILD.round.scale;
+export const HERON_STAND_Y = TALL_STAND_Y;                              // the name s05 imports (from the v3 heron)
+export const ROUND_DROP = 0.038;  // the round one's hip above his root: s05 sets the root 0.03 under the seat, so the hip is 8 mm over it
 
-const px = (w, h, k) => [w * k, h * k];
-
-// The mean colour of a piece's opaque pixels, for tinting the borrowed arms.
-async function meanColor(ctx, [asset, piece]) {
-  const bmp = (await ctx.assets.load(asset)).pieces[piece];
-  const c = Object.assign(document.createElement('canvas'), { width: 16, height: 16 }), g = c.getContext('2d', { willReadFrequently: true });
-  g.drawImage(bmp, 0, 0, 16, 16);
-  const d = g.getImageData(0, 0, 16, 16).data;
-  let r = 0, gr = 0, b = 0, n = 0;
-  for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 200) { r += d[i]; gr += d[i + 1]; b += d[i + 2]; n++; }
-  return `rgb(${Math.round(r / n)},${Math.round(gr / n)},${Math.round(b / n)})`;
+function proportion(parts, { body: [bx, by], leg, arm }) {
+  return parts.map((p) => {
+    if (p.name === 'body') return { ...p, size: [p.size[0] * bx, p.size[1] * by] };
+    if (p.parent !== 'body') return p;
+    const q = { ...p, at: [p.at[0] * bx, p.at[1] * by] };
+    if (p.name.startsWith('leg_')) q.size = [p.size[0], p.size[1] * leg];
+    if (p.reach) q.reach = p.reach * arm;
+    return q;
+  });
 }
 
-// A ctx whose assets.load('roommate_arms') is the gator's two arm cutouts multiplied by `color`.
-async function withArms(ctx, color) {
-  const gs = await ctx.assets.load('gator_sheet'), pieces = {};
-  for (const n of ['arm_l', 'arm_r']) {
-    const src = gs.pieces[n], c = Object.assign(document.createElement('canvas'), { width: src.width, height: src.height }), g = c.getContext('2d');
-    g.drawImage(src, 0, 0);
-    g.globalCompositeOperation = 'multiply'; g.fillStyle = color; g.fillRect(0, 0, c.width, c.height);
-    g.globalCompositeOperation = 'destination-in'; g.drawImage(src, 0, 0);
-    pieces[n] = c;
-  }
-  return { assets: { load: async (n) => (n === 'roommate_arms' ? { pieces, sizes: gs.sizes, visible: gs.visible, proxy: false } : ctx.assets.load(n)) } };
+async function makeRoommate(ctx, who, { seed = 0, scale = 1, green, hoodie, res = 512, root = [0, 0] }) {
+  const b = BUILD[who], g = green ?? b.green;
+  const parts = proportion(sideParts('gator_sheet', { throat: true, brow: true, green: g }), b);
+  parts[0] = { ...parts[0], at: root };
+  const rig = await buildRig(ctx, { name: who, seed, scale: scale * b.scale, green: g, hoodie: hoodie ?? b.hoodie, res, parts, faces: FACES });
+  rig.joints.head.scale.setScalar(b.head);
+  return rig;
 }
 
-// Root at the hip (the body's lower third). Legs hang from it; standing, the feet are HERON_STAND_Y below the root.
-// Body, head and legs are boxes from the sheet (204×440, 432×304, 148×340, 140×343, 376×192 px). Pivots read off the art:
-// the neck's base at the head's bottom (u 0.43), the collar's centre at the body's top (u 0.45), the leg shaft's top, the tail's stub.
-export async function makeRoommateTall(ctx, { seed = 0, scale = 1, res = 512 } = {}) {
-  const c2 = await withArms(ctx, await meanColor(ctx, R('tall_body')));
-  const K = HERON_K, A = (n) => ['roommate_arms', n], body = px(204, 440, K);
-  const onBody = (u, v) => [(u - 0.45) * body[0], (0.88 - v) * body[1]];   // a point on the body art, from its pivot
-  return buildRig(c2, { name: 'tall', seed, scale, green: null, res, faces: FACES, parts: [
-    { name: 'body', from: R('tall_body'), size: body, pivot: [0.45, 0.88], at: [0, 0] },
-    { name: 'leg_l', from: R('tall_leg_l'), parent: 'body', size: px(148, 340, K), pivot: [0.22, 0.07], at: onBody(0.36, 0.9), z: -0.003 },
-    { name: 'leg_r', from: R('tall_leg_r'), parent: 'body', size: px(140, 343, K), pivot: [0.22, 0.07], at: onBody(0.58, 0.9), z: 0.003 },
-    { name: 'tail', from: R('tall_tail'), parent: 'body', size: px(376, 192, K), pivot: [0.95, 0.45], at: onBody(0.1, 0.74), z: -0.002 },
-    { name: 'arm_l', from: A('arm_l'), parent: 'body', reach: 0.03, at: onBody(0.52, 0.2), z: -0.004 },
-    { name: 'head', from: R('tall_head'), parent: 'body', size: px(432, 304, K), pivot: [0.43, 0.97], at: onBody(0.45, 0.07), z: 0.003 },
-    { name: 'eyes', from: null, parent: 'head', at: [0.0148, 0.0145], z: 0.002 },
-    { name: 'mouth', from: null, parent: 'head', at: [0.03, 0.0085], z: 0.002, hidden: true },   // the beak is the mouth
-    { name: 'arm_r', from: A('arm_r'), parent: 'body', reach: 0.03, at: onBody(0.52, 0.2), z: 0.008 },
-  ] });
-}
-
-// One painted piece (seated, back three-quarter, head turned to +x, 380×440 px), root at its bottom centre, plus the
-// borrowed paws and the shared faces on the turned head.
-export async function makeRoommateRound(ctx, { seed = 0, scale = 1, res = 512 } = {}) {
-  const c2 = await withArms(ctx, await meanColor(ctx, R('round')));
-  const [w, h] = px(380, 440, BEAR_K), on = (u, v) => [(u - 0.5) * w, (1 - v) * h];   // a point on the art, from the root at its bottom centre
-  return buildRig(c2, { name: 'round', seed, scale, green: null, res, faces: FACES, parts: [
-    { name: 'body', from: R('round'), size: [w, h], pivot: [0.5, 1], at: [0, 0] },
-    { name: 'arm_l', from: ['roommate_arms', 'arm_l'], parent: 'body', reach: 0.03, at: on(0.62, 0.55), z: -0.004 },
-    { name: 'eyes', from: null, parent: 'body', at: on(0.76, 0.27), z: 0.002 },
-    { name: 'mouth', from: null, parent: 'body', at: on(0.93, 0.4), z: 0.002 },
-    { name: 'arm_r', from: ['roommate_arms', 'arm_r'], parent: 'body', reach: 0.03, at: on(0.62, 0.55), z: 0.008 },
-  ] });
-}
+// Parts: body (root at the hip), leg_l, leg_r, tail, arm_l, pocket, head, snout, throat, jaw, eyes, brow, mouth, arm_r.
+export const makeRoommateTall = (ctx, opts = {}) => makeRoommate(ctx, 'tall', opts);
+// The same parts; the hip is ROUND_DROP × scale above the root (s05's couch placement).
+export const makeRoommateRound = (ctx, opts = {}) => makeRoommate(ctx, 'round', { ...opts, root: [0, ROUND_DROP / BUILD.round.scale] });

@@ -456,3 +456,19 @@ walk(t, opts)  // → { keys, lift, hip } for the side set: hip = the root's hei
 - Art convention for the cutter: legs vertical, hip end up, foot pointing +x. `hipHeight` uses the proxy foot's shape; re-measure it from the cut `leg_l` when art lands.
 
 A shot whose numbers differ from a named pose builds its own with `specPose` (the specs' numbers win). New poses go into `poses.js` through this task's owner or a `contract-characters` task.
+
+### Acting (task `rig-v4`)
+
+```js
+// acting.js: expressions and life for any sideParts rig with brow: true (makeGator side, both roommates)
+export const PRESETS      // neutral, numb, guilt, flinch, dread, resolve, relief, pride → { eyes, mouth, brow, tilt, slump, tail, breath, depth }
+export const ANTIC, MIN_HOLD, SETTLE   // 2/24 s, 12/24 s, 4/12 s
+export function act(rig, t, cues, { breath, depth, slump, tilt, tail, blink = true, seed = 0 } = {})  // → { name, eyes, mouth }
+  // cues [[t0, preset], ...] ascending, shot-local t. The face lands on t0; one anticipation drawing (eyes shut, brow
+  // and body pushed the other way) comes before it; the body settles over SETTLE. A hold under MIN_HOLD throws.
+  // opts replace the presets' own numbers (slump: 0 for a shot whose hand is pinned to a prop). breath = s per breath.
+```
+
+- Opt-in: a shot that never calls `act()` renders as before, except for the neck below. Call it every frame **after** `blend()`/`pose()` and `follow()`; it adds to head, body and tail angles and sets `body.scale.y`, the face and the brow, so it replaces s11's `idle()`.
+- `pride` is two beats: `gasp` + `o` for 0.5 s, then the smile. Blinks are one drawing, 3–5 s apart, seeded by `seed`, never within 0.25 s of a change.
+- rig-v4 rig changes: the side Student (and the roommates) gain `throat` (cream paper, the neck) and `brow` (hidden until `act()`), and the head sits 10 figure px higher. `buildRig` takes `hoodie` (a colour for the hoodie pieces) and code-drawn `paper` parts. The roommates are now gators on the Student's rig (`makeRoommateTall`, `makeRoommateRound` keep their names and s05's placement numbers); `roommates_sheet` is unused.

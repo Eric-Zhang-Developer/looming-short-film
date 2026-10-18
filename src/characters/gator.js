@@ -16,19 +16,23 @@ const rot90 = (img) => {  // clockwise: a piece pointing +x now points down
   g.translate(img.height, 0); g.rotate(Math.PI / 2); g.drawImage(img, 0, 0); return c;
 };
 // Multiplies the green paint by green / PALETTE.gator per channel, so painted shading survives. Only green pixels
-// take it (weight by how far g leads r and b), so a tinted cut keeps its cream hoodie, sleeves and rim.
-function tint(img, green) {
+// take it (weight by how far g leads r and b), so a tinted cut keeps its cream hoodie, sleeves and rim. hoodie (rig-v4)
+// multiplies the other pixels by hoodie / PALETTE.cream the same way: only HOODIE pieces get it, so the throat stays cream.
+function tint(img, green, hoodie) {
   const c = canvas(img.width, img.height), g = c.getContext('2d');
   g.drawImage(img, 0, 0);
-  const S = THREE.SRGBColorSpace, to = new THREE.Color(green).getRGB({}, S), from = new THREE.Color(PALETTE.gator).getRGB({}, S);  // pixels are sRGB
-  const k = [to.r / from.r, to.g / from.g, to.b / from.b], d = g.getImageData(0, 0, c.width, c.height), p = d.data;
+  const S = THREE.SRGBColorSpace, rgb = (x) => new THREE.Color(x).getRGB({}, S);  // pixels are sRGB
+  const ratio = (to, from) => (to ? [to.r / from.r, to.g / from.g, to.b / from.b] : [1, 1, 1]);
+  const k = ratio(green && rgb(green), rgb(PALETTE.gator)), kh = ratio(hoodie && rgb(hoodie), rgb(PALETTE.cream));
+  const d = g.getImageData(0, 0, c.width, c.height), p = d.data;
   for (let i = 0; i < p.length; i += 4) {
     const w = Math.min(1, Math.max(0, (p[i + 1] - Math.max(p[i], p[i + 2])) / 24));
-    for (let j = 0; j < 3; j++) p[i + j] = Math.min(255, p[i + j] * (1 + w * (k[j] - 1)));
+    for (let j = 0; j < 3; j++) p[i + j] = Math.min(255, p[i + j] * (1 + w * (k[j] - 1) + (1 - w) * (kh[j] - 1)));
   }
   g.putImageData(d, 0, 0);
   return c;
 }
+const HOODIE = new Set(['body', 'arm_l', 'arm_r', 'pocket']);  // gator_sheet pieces that are hoodie, not skin
 
 // Mixed from PALETTE so no hex is typed here. Crowds are never cloned: every figure gets its own i.
 const MIX = [['navy', 0.22], ['kraft', 0.3], ['cream', 0.2], ['ink', 0.3], ['kraft', 0.55], ['navy', 0.4], ['cream', 0.35], ['phone', 0.14]];
@@ -44,9 +48,11 @@ export function greenVariant(i) {
 //   weight?, turn?: 'mirror' | 'rot90' (applied always) | 'mirrorProxy' (only to proxies, whose tapers point +x),
 //   reach?: L (pivot at the round end, tip exactly L away along the piece; size and pivot come from the art's aspect),
 //   hidden? }]
+// A part may instead be drawn in code (rig-v4: throat, brow): { name, paper: { path, color, weight? }, size, pivot, parent, at, z }
+// (path in 0..1, v down, as makePaper takes it).
 // faces: true adds eyes and mouth slots from face_sheet (parts named eyes/mouth must be in `parts`, from: null).
 // facePair: draw every eye take as a front-view pair this many face px apart (makeFaces).
-export async function buildRig(ctx, { name, seed = 0, scale = 1, green, res = 512, parts, faces = null, facePair = 0 }) {
+export async function buildRig(ctx, { name, seed = 0, scale = 1, green, hoodie, res = 512, parts, faces = null, facePair = 0 }) {
   const id = `${name}${seed}`;
   const loaded = {};
   for (const p of parts) if (p.from && !loaded[p.from[0]]) loaded[p.from[0]] = await ctx.assets.load(p.from[0]);
@@ -54,9 +60,15 @@ export async function buildRig(ctx, { name, seed = 0, scale = 1, green, res = 51
   const faceSet = faces ? await makeFaces(ctx, { id, scale, res: Math.min(res, 256), pair: facePair }) : null;
   const hands = {}, defs = [];
   for (const p of parts) {
-    if (!p.from) {  // face slot
+    if (!p.from && !p.paper) {  // face slot
       const takes = faceSet.takes[p.name];
       defs.push({ name: p.name, parent: p.parent, sheet: takes[faces[p.name]], pivot: [0.5, 0.5], at: s(p.at), z: (p.z ?? 0) * scale });
+      continue;
+    }
+    if (p.paper) {
+      const key = `${id}-${p.name}`, size = s(p.size);
+      defs.push({ name: p.name, parent: p.parent, pivot: p.pivot, at: s(p.at), z: (p.z ?? 0) * scale,
+        sheet: (sd) => makePaper({ ...p.paper, size, key, res, seed: sd }) });
       continue;
     }
     const [asset, piece] = p.from, a = loaded[asset];
@@ -66,7 +78,8 @@ export async function buildRig(ctx, { name, seed = 0, scale = 1, green, res = 51
     let [u0, v0, u1, v1] = a.visible?.[piece] ?? [0, 0, 1, 1];
     if (p.turn === 'mirror' || (p.turn === 'mirrorProxy' && a.proxy)) { art = mirror(art); [u0, u1] = [1 - u1, 1 - u0]; }
     if (p.turn === 'rot90') { art = rot90(art); [u0, v0, u1, v1] = [1 - v1, u0, 1 - v0, u1]; }
-    if (green && PIECES[asset]?.[piece]?.[3] === 'gator') art = tint(art, green);
+    const hood = hoodie && asset === 'gator_sheet' && HOODIE.has(piece) ? hoodie : null;
+    if ((green && PIECES[asset]?.[piece]?.[3] === 'gator') || hood) art = tint(art, green, hood);
     const fw = u1 - u0, fh = v1 - v0;
     let size = p.size && s(p.size), pivot = p.pivot;
     if (p.reach) {  // exact reach: the joint sits at the round end's center, the tip is `reach` away
@@ -128,7 +141,7 @@ async function makeFaces(ctx, { id, scale, res, pair = 0 }) {
 // The joints the shots choreograph keep their numbers: the hip is the root, SHOULDER, ARM. The rest follows the
 // figure: a 9.3 cm gator with stubby boots and the big head of the sheet. The head hangs 3.5 mm behind the body so
 // the hood wraps the neck; the jaw sits in front of the snout so its teeth show, as painted.
-const K = 0.030 / 130;                          // m per figure px
+export const FIG_K = 0.030 / 130; const K = FIG_K;                        // m per figure px
 const FACE = 0.4595 * K;                        // m per face_sheet px (makeFaces)
 const SHOULDER = [0.013, 0.030], ARM = 0.032;
 const HIP_F = [200, 352], NECK_F = [240, 180];  // figure px of the hip and the neck
@@ -142,8 +155,29 @@ export const HIP = LEG[1] * (1 - LEG_PIVOT[1]);  // the boot's height below its 
 const LK = 0.56 * K, SOLE = [(21 - 56) * LK, (133 - 56) * LK], R = 14 * LK;
 const drop = (a) => R + Math.max(...SOLE.map((x) => (HIP - R) * Math.cos(a) - x * Math.sin(a)));
 export const hipHeight = (p) => Math.max(drop((p.body ?? 0) + (p.leg_r ?? 0)), drop((p.body ?? 0) + (p.leg_l ?? 0)));
-export function sideParts(sheet, { pocket = true, backpack = false, head34 = false } = {}) {
-  const P = (piece) => [sheet, piece], N = (x, y) => at(x, y, NECK_F), neck = at(...NECK_F);
+// rig-v4, the neck. On the sheet's side figure the cream throat runs from under the jaw down into the hood; the cut head
+// is only the green dome, so the rig had nothing under the snout. THROAT is that cream shape traced on the figure (figure
+// px, y down, read off evidence/rig-v4/neck.jpg's grid), drawn in code as cream paper on the head between the green dome and
+// the jaw; its bottom runs into the hood, which covers it (the head sits behind the body plane). HEAD_LIFT raises the head
+// on the hood to the figure's height (the v3 rig sat it about 10 figure px low).
+const THROAT = [[208, 222], [209, 186], [215, 160], [229, 140], [250, 126], [278, 118], [320, 116], [362, 120], [362, 148],
+  [346, 158], [334, 168], [322, 180], [314, 200], [310, 222]];
+const HEAD_LIFT = 10;
+// The brow (rig-v4, acting.js): one torn strip of dark green paper over the side eye, hidden until act() shows it.
+// BROW_AT is its centre at rest (figure px), BROW its box; acting.js moves it (figure px × FIG_K) and turns it (degrees).
+export const BROW_AT = [262, 30], BROW = [58, 17];
+// A polygon in figure px → a paper part: its box (plus a 3 px margin to tear on) as size, pivot at the box's top left.
+function drawn(name, poly, { parent, z, color, origin }) {
+  const m = 3, xs = poly.map(([x]) => x), ys = poly.map(([, y]) => y);
+  const x0 = Math.min(...xs) - m, y0 = Math.min(...ys) - m, w = Math.max(...xs) + m - x0, h = Math.max(...ys) + m - y0;
+  return { name, parent, z, paper: { path: poly.map(([x, y]) => [(x - x0) / w, (y - y0) / h]), color }, size: [w * K, h * K],
+    pivot: [0, 0], at: at(x0, y0, origin) };
+}
+export function sideParts(sheet, { pocket = true, backpack = false, head34 = false, throat = false, brow = false, green } = {}) {
+  const P = (piece) => [sheet, piece], N = (x, y) => at(x, y, NECK_F), neck = at(NECK_F[0], NECK_F[1] - (throat ? HEAD_LIFT : 0));
+  const skin = '#' + new THREE.Color(green ?? PALETTE.gator).lerp(new THREE.Color(PALETTE.ink), 0.72).getHexString();
+  const cream = '#' + new THREE.Color(PALETTE.cream).lerp(new THREE.Color(PALETTE.kraft), 0.12).getHexString();  // the painted jaw's cream
+  const [bw, bh] = BROW, [bx, by] = BROW_AT;
   return [
     { name: 'body', from: P('body'), size: px(210, 231, 1.0), pivot: [0.286, 0.788], at: [0, 0] },
     { name: 'leg_l', from: P('leg_l'), parent: 'body', size: LEG, pivot: LEG_PIVOT, at: [0.001, 0], z: -0.003 },
@@ -155,18 +189,21 @@ export function sideParts(sheet, { pocket = true, backpack = false, head34 = fal
     { name: 'head', from: P('head'), parent: 'body', size: px(206, 176, 0.91), pivot: [0.415, 1.024], at: neck, z: -0.0035 },
     ...(head34 ? [{ name: 'head34', from: ['gator_sheet', 'turn_head34'], parent: 'body', size: px(276, 243, 0.78), pivot: [0.339, 0.865], at: neck, z: -0.0035, hidden: true }] : []),
     { name: 'snout', from: P('snout'), parent: 'head', size: px(296, 108, 0.69), pivot: [0.118, 0.5], at: N(286, 90), z: -0.001 },
+    ...(throat ? [drawn('throat', THROAT, { parent: 'head', z: 0.0009, color: cream, origin: NECK_F })] : []),
     { name: 'jaw', from: P('jaw'), parent: 'head', size: px(268, 105, 0.7), pivot: [0.086, 0.362], at: N(278.5, 133), z: 0.001 },
     { name: 'eyes', from: null, parent: 'head', at: N(258.5, 66), z: 0.002 },
+    ...(brow ? [{ name: 'brow', parent: 'head', z: 0.0025, hidden: true, size: [bw * K, bh * K], pivot: [0.5, 0.5], at: N(bx, by),
+      paper: { path: [[0.03, 0.42], [0.35, 0.2], [0.7, 0.12], [0.97, 0.22], [0.96, 0.62], [0.65, 0.58], [0.33, 0.7], [0.04, 0.9]], color: skin } }] : []),
     { name: 'mouth', from: null, parent: 'head', at: N(318, 124), z: 0.003 },
     { name: 'arm_r', from: P('arm_r'), parent: 'body', reach: ARM, at: SHOULDER, z: 0.012 },
   ];
 }
 const FACES = { eyes: 'open', mouth: 'neutral' };
 
-export async function makeGator(ctx, { seed = 0, scale = 1, green, res = 512, facing = 'side' } = {}) {
+export async function makeGator(ctx, { seed = 0, scale = 1, green, hoodie, res = 512, facing = 'side' } = {}) {
   const G = (piece) => ['gator_sheet', piece];
   let parts;
-  if (facing === 'side') parts = sideParts('gator_sheet', { head34: true });
+  if (facing === 'side') parts = sideParts('gator_sheet', { head34: true, throat: true, brow: true, green });
   // The turnarounds are whole figures at the side figure's scale K (sole to head top 0.096), so s09's side → back swap
   // holds his size. turn_front is painted without arms (the rig adds them at the side rig's shoulder height) and
   // without eyes or mouth: the eyes go on its two eye bumps (figure px 72 and 170, y 38) as a pair, the mouth on the
@@ -180,7 +217,7 @@ export async function makeGator(ctx, { seed = 0, scale = 1, green, res = 512, fa
   ];
   else if (facing === 'back') parts = [{ name: 'body', from: G('turn_back'), size: px(268, 423, 1), pivot: [0.5, 1], at: [0, 0] }];
   else throw new Error(`makeGator: unknown facing "${facing}"`);
-  const rig = await buildRig(ctx, { name: `gator-${facing}`, seed, scale, green, res, parts, faces: facing === 'back' ? null : FACES,
+  const rig = await buildRig(ctx, { name: `gator-${facing}`, seed, scale, green, hoodie, res, parts, faces: facing === 'back' ? null : FACES,
     facePair: facing === 'front' ? 98 / 0.4595 : 0 });
   rig.facing = facing;
   // s14: the 3/4 head replaces head, snout and jaw on one drawing. It has its own painted eyes and smile, so the face
@@ -188,7 +225,8 @@ export async function makeGator(ctx, { seed = 0, scale = 1, green, res = 512, fa
   rig.head34 = (on) => {
     if (facing !== 'side') return;
     rig.meshes.head34.visible = on;
-    for (const p of ['head', 'snout', 'jaw', 'eyes', 'mouth']) rig.meshes[p].visible = !on;
+    for (const p of ['head', 'snout', 'jaw', 'eyes', 'mouth', 'throat']) rig.meshes[p].visible = !on;
+    if (on) rig.meshes.brow.visible = false;  // the 3/4 head has its own face; act() leaves the brow alone while it shows
   };
   return rig;
 }
