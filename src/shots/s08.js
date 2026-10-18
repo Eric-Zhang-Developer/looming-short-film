@@ -24,6 +24,9 @@ export const C2 = { pos: [0.114, 0.074, 0.51], look: [0.114, 0.076, 0.31] };
 const CC = { pos: [ROOM.CAL.friXY[0] + 0.004, ROOM.CAL.friXY[1] + 0.002, 0.075], look: [ROOM.CAL.friXY[0] + 0.004, ROOM.CAL.friXY[1] + 0.002, 0] };
 const setupAt = (T) => (T < 2 ? 'C1' : T < 4 ? 'C2' : T < 5 ? 'CC' : T < 7 ? 'C2' : 'C3');
 export const SPILL_C1 = 1.4;                                 // the clock's spill in its own insert: just enough for the hands (s08.md C1)
+// fix-bedroom: 3 a.m. is the bottom, so it is darker than s07 (it measured 68.17 vs 68.18): every light in the room at
+// DIM of s07's, the ambient at AMB_DIM. The phone is the same phone; the night around it has got deeper.
+export const DIM = 0.4, AMB_DIM = 0.2;
 
 // Breath in breaths per minute, integrated so a rate change never jumps: 8 to 5.0 (held 3.0–3.5), 14 at 5.0 rising to
 // 20 by 6.5, then 20 (s08.md Acting). → phase in cycles at drawing T.
@@ -49,7 +52,7 @@ export async function build(ctx) {
   const q = new THREE.Quaternion(), down = new THREE.Vector3();
   const focusOf = (pos, look, p) => new THREE.Vector3(...p).sub(new THREE.Vector3(...pos)).dot(new THREE.Vector3(...look).sub(new THREE.Vector3(...pos)).normalize());
   const cues = [[0, 'numb'], [3, 'guilt'], [5, 'dread']];
-  R.moonPanes(MOON_PANES);
+  R.moonPanes(DIM * MOON_PANES);
   const headBase = rig.joints.head.position.x;
 
   return {
@@ -95,10 +98,11 @@ export async function build(ctx) {
       exam.update(t, { wobble: 0.8, eyes, look, key: spot });
 
       // ---- light: s07's end state; the spill lifted only in the clock insert ----
-      spot.intensity = SPOT;
-      fill.intensity = FACE_FILL * SPOT;
-      spill.intensity = S === 'C1' ? SPILL_C1 : SPILL;
-      R.face.intensity = FACE_LIGHT;
+      spot.intensity = DIM * SPOT;
+      fill.intensity = DIM * FACE_FILL * SPOT;
+      spill.intensity = DIM * (S === 'C1' ? SPILL_C1 : SPILL);
+      R.face.intensity = DIM * FACE_LIGHT;
+      R.amb.intensity = AMB_DIM * 0.8 * 0.05;
     },
   };
 }

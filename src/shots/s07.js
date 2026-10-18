@@ -215,7 +215,7 @@ export async function bedroom(ctx, ID) {
   };
 
   aim(spill, clock.group);
-  return { T, rig, exam, caster, spot, fill, face, spill, amb, lamp, shadeMat, moonPanes, clock, calendar, circle, phone, glow, phoneDown, backpack, blanket, placeBlob, P, C };
+  return { T, rig, exam, caster, spot, fill, face, spill, amb, lamp, shadeMat, moonPanes, panes, clock, calendar, circle, phone, glow, phoneDown, backpack, blanket, placeBlob, P, C };
 }
 
 // ---------- the close-up heads (closeup_heads, frozen): swaps, not a parts face (brief) ----------
@@ -270,21 +270,29 @@ export const SPOT = 0.9, SPOT_ANGLE = 1.05, FACE_FILL = 0.05, SPILL = 0.40, MOON
 const FLICKS = [...Array.from({ length: 8 }, (_, i) => 0.5 + 0.75 * i), ...Array.from({ length: 7 }, (_, i) => 7.0 + 0.75 * i)].map(F);
 
 const ID = 's07';
+// The cut in (fix-bedroom, cold-v4: "his face is under the covers, so I can't tell whether he's on his phone"): his
+// painted numb head on the pillow at frame left, the glowing phone in both hands at frame right, the thumb on it; the
+// blob's edge just in at the right. Level with his head, in front of the bed.
+const CU = [2.0, 5.5], BODY_FACE_Z = 0.31;
+const CU_CAM = { pos: [0.168, 0.066, 0.48], look: [0.168, 0.068, 0.31] };
 export async function build(ctx) {
   const { camera, post } = ctx;
   const R = await bedroom(ctx, ID), { rig, exam, spot, fill, clock } = R;
-  camera.position.copy(CAM);
-  camera.lookAt(LOOK);
-  post({ focus: new THREE.Vector3(0.12, 0.062, 0.31).sub(CAM).dot(LOOK.clone().sub(CAM).normalize()), aperture: 0.012, lut: 'night' });
+  const H = await closeHeads(ctx, R.T, rig, ['numb']);
+  const WIDE_FOCUS = new THREE.Vector3(0.12, 0.062, 0.31).sub(CAM).dot(LOOK.clone().sub(CAM).normalize());
+  const fx = post({ focus: WIDE_FOCUS, aperture: 0.012, lut: 'night' });
   const cues = [[0, 'numb'], [6, 'guilt'], [6.75, 'numb']];
   R.moonPanes(MOON_PANES);
 
   return {
     ...R,
     update(t) {
-      const T = onTwos(t);
+      const T = onTwos(t), cu = t >= CU[0] - 1e-6 && t < CU[1] - 1e-6;
       R.T.boil(t); clock.boil(t); rig.boil(t, 10);
       clock.set(1, 45, t);
+      // ---- camera: the wide, and (fix-bedroom) one cut in on his face and the phone, 2.0–5.5, cut on the 2.0 flick ----
+      if (cu) { camera.position.set(...CU_CAM.pos); camera.lookAt(...CU_CAM.look); fx.set({ focus: CU_CAM.pos[2] - BODY_FACE_Z, aperture: 0.03 }); }
+      else { camera.position.copy(CAM); camera.lookAt(LOOK); fx.set({ focus: WIDE_FOCUS, aperture: 0.012 }); }
 
       // ---- him: lie_phone, the flicks, the glance (head 4° back, 2-frame anticipation 1° forward at 5.917) ----
       rig.blend({ lie: LIE }, [[0, 'lie']], 0);
@@ -295,6 +303,7 @@ export async function build(ctx) {
       const a = act(rig, t, cues, { slump: 0, tilt: 0, tail: 0, depth: 0, blink: false });
       rig.joints.body.scale.x = 1 + 0.010 * breath;               // lying, the chest rises along the body's x
       if (at2(T, 3.0, 3.17) || at2(T, 9.5, 9.67)) rig.face({ eyes: 'closed', mouth: a.mouth });
+      H.show(cu ? 'numb' : null, { closed: at2(T, 3.0, 3.17) });   // the close-up plays the painted numb head
 
       // ---- the Exam: watching him, follows his glance, gulps at 7.5 (README §1), looks up at its shadow, worries ----
       const g = t >= 7.5 - 1e-6, r = g ? BLOB_R.gulp3 : BLOB_R.start;
