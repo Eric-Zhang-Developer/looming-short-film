@@ -15,9 +15,10 @@ import { mulberry32, seedOf } from '../core/rng.js';
 import { createBlob } from '../blob.js';
 import { makeGator, hipHeight } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
+import { act } from '../characters/acting.js';
 
 const ID = 's04', DEG = Math.PI / 180;
-const BLOB_R = { start: 0.015 };                               // METER.gulp1 (README §1): 1.25× all shot
+const BLOB_R = { start: 0.018 };                               // METER.gulp1 (README §1, v4): 1.5× all shot
 const CAM = new THREE.Vector3(-0.092, 0.068, 0.86), LOOK = new THREE.Vector3(-0.092, 0.072, 0);   // below the ceiling, pitched up ~0.3°: sink at the left edge, fridge at the right
 const CEIL = 0.13;
 const COUNTER_Y = 0.0495;                                     // 91 cm: the counter_run's painted top
@@ -29,16 +30,21 @@ const SEAT_Y = 0.042;                                         // bar-stool seat,
 const L = new THREE.Vector3(0.030, SEAT_Y + 0.005, 0.2763);
 const KEY_I = 0.3, FILL_K = 0.2, FACE_I = 0.014;              // spot (cd), interior fill as a fraction, face fill
 const AMB = 0.7;                                              // ambient: 70% of s02's
-const STOOL_Z = 0.189;                                        // stool cut at the back of its z 0.19..0.21, so the blob is never behind it
 const NEAR_TRIM = 0.15;                                       // albedo trim on the stool, 5–8 cm from the key
 // Fridge: centre, yaw (its mouth turns to −x and 35° toward camera), height. Door hinged on its front edge, swung open.
 const FRIDGE = { x: 0.056, z: 0.276, yaw: -42 * DEG, h: 0.100, doorOpen: 150 * DEG };
 const BODY_Z = 0.30, HIP_X = -0.002;                           // the Student's body plane and root x
 const HAND_DZ = 0.013;                                        // near arm +0.012, hand +0.001 (contracts §characters)
 // Blob contact [x, z] by local t (spec Exam table).
-const BLOB = [[0, [-0.015, 0.19]], [2.17, [-0.015, 0.19]], [2.33, [-0.017, 0.20]], [5.17, [-0.017, 0.20]], [5.33, [-0.020, 0.21]]];
+// v4: the blob is 1.5× (r 0.018) but the wall shadow keeps the spec's 4.0 → 4.5 → 5.2 units (README §1: units = S · r / 0.012). The light
+// stays at the fridge mouth, so each mark's depth is solved from its units: S = units · 0.012 / r, z = L.z · (1 − 1 / S).
+// (G4/v3 had z 0.19 → 0.20 → 0.21 for the 1.25× blob.) x is unchanged, so the shadow sits a little further right than before.
+const UNITS = [4.0, 4.5, 5.2];
+const MARK_Z = UNITS.map((u) => L.z * (1 - BLOB_R.start / (u * 0.012)));
+const STOOL_Z = MARK_Z[0] - 0.001;                              // stool cut 1 mm behind the blob's first mark (v3: 0.189 for 0.19), so the blob is never behind it
+const BLOB = [[0, [-0.015, MARK_Z[0]]], [2.17, [-0.015, MARK_Z[0]]], [2.33, [-0.017, MARK_Z[1]]], [5.17, [-0.017, MARK_Z[1]]], [5.33, [-0.020, MARK_Z[2]]]];
 const step = (t, keys) => keys.reduce((v, [k, x]) => (t >= k ? x : v), keys[0][1]);
-const EYES = [[0, 'open'], [1.5, 'side'], [2.17, 'open'], [5.0, 'closed'], [5.83, 'side'], [6.5, 'closed'], [7.0, 'open']];
+const EYES = [[0, 'open'], [1.5, 'side'], [2.17, 'open'], [5.0, 'closed'], [5.83, 'side'], [6.5, 'closed'], [6.83, 'open']];
 const MOUTH = [[0, 'neutral'], [1.67, 'o'], [2.17, 'neutral'], [5.0, 'smile'], [5.83, 'neutral'], [6.5, 'smile']];
 const BLOB_EYES = [[0, 'side'], [5.0, 'closed'], [5.5, 'open'], [5.83, 'side']];
 
@@ -239,7 +245,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     [2.33, 'place2'], [2.5, 'reach_jar3'], [2.67, 'inspect'], [3.17, 'inspect'], [3.33, 'place3'], [3.42, 'place3'],
     [3.5, 'reach_top'], [3.67, 'shake_a'], [3.83, 'shake_b'], [4.0, 'shake_a'], [4.17, 'shake_b'], [4.33, 'reach_top'],
     [4.5, 'reach_top'], [5.0, 'hips'], [5.83, 'hips'], [6.0, 'nudge_antic'], [6.17, 'nudge'], [6.33, 'nudge'],
-    [6.5, 'hips'], [7.0, 'reach_in'], [8, 'reach_in'],
+    [6.5, 'hips'], [6.83, 'reach_in'], [7, 'reach_in'],   // v4: the reach back into the fridge at 6.83, held to the cut at 7.0
   ];
   // [grab, release] per jar, local s. Jar 3 comes out at 2.50 (two turns to 3.17) and goes in at 3.33.
   const HELD = [[0, 0.83], [1.33, 2.17], [2.5, 3.33]], CARTON_HELD = [3.5, 4.33];
@@ -291,8 +297,10 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
       // Student
       rig.blend(P, KEYS, t);
-      rig.joints.body.rotation.z += 1 * DEG * Math.sin(2 * Math.PI * T / 2.8);   // v3 secondary motion: he breathes, on 2s
       rig.follow('tail', t);
+      // v4 acting: neutral (busy), the content-procrastinator smile at 5.00 (relief's face), neutral on the jar, relief again.
+      // slump 0: his hands are in the fridge and on his hips, so the pose owns the lean. G4's gag eyes and mouths go over the preset's face.
+      act(rig, t, [[0, 'neutral'], [5.0, 'relief'], [5.83, 'neutral'], [6.5, 'relief']], { slump: 0, breath: 5, blink: false });
       if (T >= 5.0 && T < 5.83) rig.joints.tail.rotation.z += 4 * DEG * Math.sin(2 * Math.PI * (T - 5.0) / 0.33);  // happy swish
       rig.face({ eyes: step(t, EYES), mouth: step(t, MOUTH) });
       rig.boil(t, 10);
@@ -330,7 +338,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       spot.target.updateMatrixWorld();
 
       // Window: late-afternoon gold sliding toward evening, at most 20% of the fridge spot at the wall.
-      dawn.update(t, kf(t, [[0, 0.8], [8, 0.5]]));
+      dawn.update(t, kf(t, [[0, 0.8], [7, 0.5]]));
       dawn.light.position.set(0.4, 0.6, -1.0);
       dawn.light.intensity = Math.min(dawn.light.intensity, 0.2 * E_KEY);
     },

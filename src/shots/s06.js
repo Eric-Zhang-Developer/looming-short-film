@@ -12,13 +12,17 @@ import { hash2 } from '../core/rng.js';
 import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
+import { act } from '../characters/acting.js';
 import { DESK, tools, homeDesk, seatReach } from './s02.js';
 import { screenHalo } from './s03.js';
 
 const ID = 's06', DEG = Math.PI / 180;
-const BLOB_R = { start: 0.015, gulp2: 0.018 };            // METER.gulp1 → METER.gulp2 (README §1)
-const MARK_Z = DESK.screenZ * 3.06 / 4.06;                 // 0.01696: S 4.06 from the screen
-const MARK_X = 0.026, GROW_DX = 1.15 * (BLOB_R.gulp2 - BLOB_R.start), HOP_DX = -0.003;   // left edge stays put on the gulp
+const BLOB_R = { start: 0.018, gulp2: 0.024 };            // METER.gulp1 → METER.gulp2 (README §1, v4: 1.5× → 2×)
+// v4: the wall shadow keeps the spec's 5.1 units before the gulp (units = S · r / 0.012), so S = 5.1 · 0.012 / 0.018 = 3.4 and the mark sits
+// at z = screenZ · (1 − 1 / S) = 0.0159 (v3: 0.01696 for S 4.06 on the 1.25× blob). The gulp then swells it by the meter's step, to 6.8 units.
+const UNITS0 = 5.1, S_WALL = UNITS0 * 0.012 / BLOB_R.start;
+const MARK_Z = DESK.screenZ * (1 - 1 / S_WALL);
+const MARK_X = 0.026 + 1.15 * (BLOB_R.start - 0.015), GROW_DX = 1.15 * (BLOB_R.gulp2 - BLOB_R.start), HOP_DX = -0.003;   // v3's left edge (0.0088) stays put, on the gulp too
 const ON = 0.5, OFF = 3.0, GULP = 4.0;                     // lampClickHome, lampOffHome, gulp2 (local)
 const CAM = { pos: [0.05, 0.125, 0.60], look: [0.05, 0.058, 0.02] };   // high and wide enough to hold the 6.1-unit loom
 const FOCUS = 0.58;
@@ -124,6 +128,9 @@ export async function build(ctx) {
       if (f === 13) { gator.joints.arm_r.rotation.z += 15 * DEG; gator.joints.arm_l.rotation.z += 15 * DEG; }
       gator.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * onTwos(t) / 2.8);
       gator.follow('tail', t, { k: 6, w: 18 });
+      // v4 acting: numb, the flinch at 1.083, dread at 1.75, numb again at 3.5. slump 0 (his hand is on the chain and the keys); the spec's
+      // own gag eyes and mouth (the squint, the stare) go over the presets' faces. Breath is the presets' own.
+      act(gator, t, [[0, 'numb'], [F(13), 'flinch'], [F(21), 'dread'], [3.5, 'numb']], { slump: 0, blink: false });
       gator.face({ eyes: eyesAt(f), mouth: mouthAt(f) });
 
       // The Exam: startle squash on the click, blink, nervous wobble, a hopeful 3 mm hop at 2.0, the dark's squash at

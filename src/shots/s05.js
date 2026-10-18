@@ -15,16 +15,21 @@ import { makeGator } from '../characters/gator.js';
 import { makeRoommateTall, makeRoommateRound, HERON_STAND_Y } from '../characters/roommates.js';
 import { POSES, specPose, walk } from '../characters/poses.js';
 import { createBlob } from '../blob.js';
+import { act } from '../characters/acting.js';
 
 const DEG = Math.PI / 180;
 const F = (s) => Math.round(s * 12) / 12;  // spec times (2.67, 3.33, 4.83 ...) are 2s drawings: snap them to twelfths
-const BLOB_R = { start: 0.015 };          // METER.gulp1 (README §1): 1.25× all shot
+const BLOB_R = { start: 0.018 };          // METER.gulp1 (README §1, v4): 1.5× all shot
 // Real heights at the scale table's 0.055 m per real m: couch seat and coffee-table top 45 cm, couch back 88 cm,
 // the pulled-down couch cushion the laptop sits on 18 cm.
 const SEAT = 0.025, BACK = 0.048, TABLE = 0.025, CUSHION = 0.010;
 const TABLE_TRIM = 0.3;                    // coffee-table fascia albedo (ponytail: per-object exposure, by eye)
 const L = [0.075, CUSHION + 0.0075, 0.4148]; // the laptop screen's centre: the key (spec x, z: S = 0.4148 / 0.0648 = 6.40)
-const B = [0.060, TABLE, 0.35];            // blob contact point on the table top
+// v4: the blob is 1.5×, the wall shadow keeps the spec's 8.0 units (README §1): S = 8.0 · 0.012 / r = 5.33, so with the laptop's light
+// where it is (L.z 0.4148) the blob's depth is z = L.z · (1 − 1 / S) = 0.337 (G4: 0.35 for the 1.25× blob). x keeps the shadow's centre
+// where G4 had it: L.x + (x − L.x) · S = 0.075 − 0.015 · 6.4. The blob still sits on the table top (z 0.33…0.36, x 0.025…0.080).
+const UNITS = 8.0, S_WALL = UNITS * 0.012 / BLOB_R.start;
+const B = [L[0] - 0.096 / S_WALL, TABLE, L[2] * (1 - 1 / S_WALL)];   // blob contact point on the table top
 const CAM = { pos: [-0.04, 0.17, 1.15], look: [-0.04, 0.10, 0.15] };
 const KEY = 0.40;                          // phone spot, cd: a cream wall 0.42 m away lands lit but below white (NoToneMapping)
 const TV = 0.36;                           // 25% of the key's irradiance at the wall: 0.25 · 0.40 / 0.42² · 0.80²
@@ -222,6 +227,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       gator.pose(flick ? STUDENT_POSE.flick : STUDENT_POSE.flat);
       gator.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * T / 2.8 + 2.1);   // v3: the Student breathes too
       gator.follow('tail', tLocal, { k: 6, w: 18 });
+      // v4 acting: numb all shot; slump 0 (his hand is on the keys), the spec's snort (the smile) goes over the preset's face.
+      act(gator, tLocal, [[0, 'numb']], { slump: 0, breath: 6, blink: false });
       gator.face({ eyes: 'tired', mouth: T >= F(4.5) && T < F(4.83) ? 'smile' : 'neutral' });
 
       // ---- roommate_round: mashes (arms alternate every 0.25 s), 4.83 dip, 5.00 wins, back to mashing at 6.00.

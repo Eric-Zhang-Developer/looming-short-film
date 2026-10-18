@@ -6,7 +6,8 @@
 // the same room: change it here.
 // The shot: W, a push-in to the calendar insert (calendarZoom 1.5–3.5), the bead on the circle (inkDropForms 5.0), the
 // run, perch and two looks, a cut back to W on the let-go (7.083), the landing, the swell to 1× and two hops to B.
-// He slumps at the desk's left end and never looks up until 9.33. Characters on 2s, light and camera on 1s, boil 10/s.
+// He slumps at the desk's left end and never looks up until 9.33 (v4: numb, one small flinch). The wall clock reads 9:00 beside the
+// calendar. Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
 import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
@@ -16,6 +17,8 @@ import { mulberry32, seedOf } from '../core/rng.js';
 import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { POSES } from '../characters/poses.js';
+import { act } from '../characters/acting.js';
+import { makeClock } from '../clock.js';
 
 const DEG = Math.PI / 180;
 
@@ -207,6 +210,11 @@ const SUN = { k: 0.35, pos: [0.8, 0.6, 0.6], scale: 0.8 };   // the morning wind
 const FACE_I = 0.0045;                            // character fill (README §10)
 
 const F = (n) => n / 12, frameOf = (t) => Math.floor(t * 12 + 1e-6);
+// v4: the wall clock beside the calendar (README §13): 0.014 right of its right edge, 0.70 of its height up, in its plane. 9:00.
+const CLOCK = { at: [C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z], h: 9, m: 0 };
+// v4 acting: numb, one small flinch as the blob arrives (9.33), numb again. act() needs 12 frames between changes, so the flinch
+// holds 0.58 s and the second numb lands on the last drawing (9.92), not the spec's 9.67.
+const ACT = [[0, 'numb'], [9.33, 'flinch'], [9.92, 'numb']];
 
 // The drop on its 2s grid. space 'page' (y on the calendar), 'fall' (k from lip to landing), 'desk' (contact x, z).
 export function examAt(t) {
@@ -245,6 +253,9 @@ export async function build(ctx) {
   const T = tools(ctx, ID);
   await homeDesk(ctx, T);
   const fx = post({ focus: 0.4, aperture: 0.01, lut: 'dawn' });
+  const clock = await makeClock(ctx, { seed: 2 });
+  clock.group.position.set(...CLOCK.at);
+  scene.add(clock.group);
 
   const gator = await makeGator(ctx, { seed: 2 });
   gator.group.position.set(...DESK.hip);
@@ -290,6 +301,7 @@ export async function build(ctx) {
     exam, gator,
     update(t) {
       T.boil(t);
+      clock.boil(t); clock.set(CLOCK.h, CLOCK.m, t);   // the second hand steps on every whole second of the shot
       // Camera on 1s: W, the push to I (calendarZoom 1.5–3.5), I held, cut to W on the let-go (7.083).
       const ins = t >= 3.5 && t < F(85), k = t < 1.5 ? 0 : t < 3.5 ? ease((t - 1.5) / 2) : ins ? 1 : 0;
       P.fromArray(CAM_W.pos).lerp(Pi, k); L.fromArray(CAM_W.look).lerp(Li, k);
@@ -301,8 +313,9 @@ export async function build(ctx) {
       gator.boil(t, 10);
       gator.blend(POSES, SLUMP, t);
       gator.follow('tail', t, { k: 6, w: 18 });
-      gator.joints.tail.rotation.z += 2 * DEG * Math.sin((2 * Math.PI * F(f)) / 2.5);
-      gator.face({ eyes: f >= 112 ? 'side' : f === 12 || f === 47 ? 'closed' : 'tired', mouth: f >= 116 ? 'line' : 'neutral' });
+      // act() adds the tail's idle sway and the breath; slump 0 because the pose already is the slump (chin on fist).
+      const a = act(gator, t, ACT, { slump: 0, breath: 6, blink: false });
+      if (f === 12 || f === 47) gator.face({ eyes: 'closed', mouth: a.mouth });
 
       const e = examAt(t);
       exam.mesh.visible = !!e;

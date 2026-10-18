@@ -20,8 +20,12 @@
 //   PRESETS: numb, guilt, flinch, dread, resolve, relief, pride, neutral (table below). pride is two beats: eyes wide and
 //   mouth open for its first 0.5 s, then the smile.
 //   e.g. act(hero, tLocal, [[0, 'numb'], [2.5, 'dread'], [6, 'resolve']], { slump: 0 })
+import * as THREE from 'three';
 import { onTwos, kf, lerp, ease } from '../core/ease.js';
 import { hash2 } from '../core/rng.js';
+import { PALETTE } from '../core/palette.js';
+import { makePaper, boilSeed } from '../paper.js';
+import { paperMesh, updatePaperMesh } from '../material.js';
 import { FIG_K } from './gator.js';
 
 const D = Math.PI / 180;
@@ -37,12 +41,34 @@ export const PRESETS = Object.freeze({
   guilt: { eyes: 'side', mouth: 'line', brow: [20, 2], tilt: -12, slump: 0.5, tail: -10, breath: 2.6, depth: 0.010 },
   flinch: { eyes: 'gasp', mouth: 'o', brow: [8, -12], tilt: 7, slump: -0.8, tail: 20, breath: 0.9, depth: 0.018 },
   dread: { eyes: 'worried', mouth: 'line', brow: [32, -4], tilt: 2, slump: 0.6, tail: -16, breath: 1.2, depth: 0.018 },
-  resolve: { eyes: 'open', mouth: 'line', brow: [-7, 10], tilt: 2, slump: -0.5, tail: 4, breath: 3.8, depth: 0.010 },
+  // trims-home: brows lower and flatter, and `bar`: the mouth is a torn strip as thick as the brow (see mouthBar), not the
+  // face sheet's hair-thin `line`, so resolve reads against neutral at phone size.
+  resolve: { eyes: 'open', mouth: 'line', bar: true, brow: [-2, 13], tilt: 2, slump: -0.5, tail: 4, breath: 3.8, depth: 0.010 },
   relief: { eyes: 'closed', mouth: 'smile', brow: [12, -7], tilt: 8, slump: 0.2, tail: 8, breath: 5.0, depth: 0.020 },
   pride: { eyes: 'open', mouth: 'smile', brow: [8, -6], tilt: 10, slump: -0.9, tail: 24, breath: 3.0, depth: 0.012,
     first: { eyes: 'gasp', mouth: 'o', for: 0.5 } },
 });
 const NUM = ['tilt', 'slump', 'tail', 'depth'];
+
+// The firm mouth (resolve): one torn strip of the brow's dark green, 78 × 16 figure px (the face sheet's `line` is 73 px
+// long and about 3 px thick), laid over the mouth slot on the head. Built on first use, boiled with the film's 10/s boil.
+const BAR = { size: [78 * FIG_K, 16 * FIG_K], path: [[0.02, 0.5], [0.14, 0.28], [0.5, 0.2], [0.86, 0.28], [0.98, 0.48], [0.96, 0.74], [0.7, 0.82], [0.4, 0.78], [0.1, 0.82]] };
+const bars = new WeakMap();
+function mouthBar(rig, t) {
+  let b = bars.get(rig);
+  if (!b) {
+    const color = '#' + new THREE.Color(PALETTE.gator).lerp(new THREE.Color(PALETTE.ink), 0.72).getHexString();   // sideParts' brow
+    const make = (seed) => makePaper({ path: BAR.path, color, size: BAR.size, key: 'acting-mouthbar', res: 256, seed });
+    const mesh = paperMesh(make(0));
+    mesh.castShadow = false;
+    rig.joints.head.add(mesh);
+    bars.set(rig, b = { mesh, make });
+  }
+  updatePaperMesh(b.mesh, b.make(boilSeed(t, 10)));
+  const m = rig.joints.mouth.position;
+  b.mesh.position.set(m.x, m.y, m.z + 0.0004);
+  return b.mesh;
+}
 
 function check(cues) {
   if (!cues.length) throw new Error('act: cues is empty');
@@ -110,6 +136,11 @@ export function act(rig, t, cues, { breath, depth, slump, tilt, tail, blink = tr
     if (v.brow) { br.rotation.z = v.brow[0] * D; br.position.y = br.userData.restY - v.brow[1] * FIG_K * rig.scale; }
   }
   rig.face({ eyes, mouth });
+  if (J.head && J.mouth && typeof document !== 'undefined' && rig.meshes.mouth) {   // the resolve bar replaces the mouth take
+    const on = !!P.bar && rig.meshes.head.visible;
+    mouthBar(rig, t).visible = on;
+    rig.meshes.mouth.visible = !on && rig.meshes.head.visible;
+  }
   return { name, eyes, mouth };
 }
 

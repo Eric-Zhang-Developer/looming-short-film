@@ -16,15 +16,19 @@ import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
 import { DESK, tools, homeDesk, seatReach } from './s02.js';
 import { loadHand, handFont } from './s17b.js';
+import { act } from '../characters/acting.js';
+import { makeClock } from '../clock.js';
 
 const ID = 's18', DEG = Math.PI / 180;
-const B = SHOTS.find((s) => s.id === ID).beats;   // examCrossedOff 2, blobAbsorbed 5.5, newDate 9.5, dropQuivers 11, tagPenUncap 13.5
-const CUT_I = 3, CUT_I2 = 7, CUT_W = 11.5, FADE = 16;
+const B = SHOTS.find((s) => s.id === ID).beats;   // examCrossedOff 2, blobAbsorbed 5.5, lampSitBack 7.5, newDate 12.5, dropQuivers 14, tagPenUncap 16.5
+// v4 (20 s): W 0–3, I 3–7, W 7–10 (he sits back under the lamp: lampSitBack 7.5), I2 10–14.5, W 14.5–20, the fade 19–20. Every G4 time from 7.0 is +3.0.
+const CUT_I = 3, CUT_SIT = 7, CUT_I2 = 10, CUT_W = 14.5, FADE = 19;
 
 // ---------- tunables ----------
 const BLOB_R = { start: 0.004, examCrossedOff: 0.0015 };   // SHRINK[7] → SHRINK[8], the dot (README §1); soaks away at blobAbsorbed
 const BEAD = 0.17;                                           // the tag's new drop: s02's bead, 0.17 of a 1× (r 0.012) blob
-const LAMP_I = 0.035, AMB = 0.5, FACE_I = 0.008;             // the lamp on (constant), night ambient, warm character fill
+const LAMP_I = 0.035, AMB = 1.25, FACE_I = 0.008;            // the lamp on (constant), v4: a daytime ambient (2.5× G4's 0.5), warm character fill
+const DAY_I = 0.8;                                           // v4: pale window light from the right, an ordinary afternoon (no shadow: the lamp is still the key)
 // v3: the lamp stands 8.5 mm off the wall (15 cm real), in front of the calendar's curled lip, and its bulb is inside the
 // shade (the bell's own axis), not 16 mm out in front of it as in v2. A bulb at the shade means the pool is a real raking light.
 const LAMP_Z = 0.0085;
@@ -35,14 +39,15 @@ const C = DESK.cal, [FX, FY] = C.friXY;
 const LIP_Y = C.y0 + 0.0005 + 0.012 * 0.4;                   // s02's perch on the curl
 const CAM_W = { pos: [0.004, 0.062, 0.40], look: [0.004, 0.030, 0.012] };
 const CAM_I = { pos: [FX, (FY + LIP_Y) / 2 + 0.001, 0.09], look: [FX, (FY + LIP_Y) / 2, 0] };
-const CAM_I2 = { pos: [0.040, 0.0465, 0.104], look: [0.040, 0.046, 0] };   // the lamp's shade stays out of frame
+// v4: widened and moved right so the clock (x 0.062–0.082, y 0.057–0.077) sits inside the frame beside "Final" and its circle (x ≈ 0.026).
+const CAM_I2 = { pos: [0.0535, 0.054, 0.136], look: [0.0535, 0.0535, 0] };
 // The calendar's painted grid (art px of props_kit_calendar, 275 × 292): rows at 92/128/165/202/238/275, columns at
 // 17/51/86/120/155/190/224/258. "Final" goes in row 4, column 3 (the spec's cell), on Friday's clean paper.
 const NEW_CELL = [103, 220], CLEAN = [157, 167, 188, 200];
 const XS = 44, X1 = [[8, 8], [36, 37]], X2 = [[37, 7], [7, 36]];   // the X's canvas (calendar art px) and its two strokes
 const HEAD_X = 12;                                           // the head's pitch while he crosses the exam off (+ chin up)
-const HOME_MIX = 0.5;                                        // grade: amber (act 3) blended this far toward s02's dawn, so the ending stays in the home's palette
-const T_STILL = 14.1, T_TOUCH = 14.55, T_MARK = 15.1;      // after the uncap: held still, the pen goes down, the first mark is done
+const HOME_MIX = 0.8;                                        // grade: amber (act 3) blended this far toward s02's dawn, so the ending stays in the home's palette
+const T_STILL = 17.1, T_TOUCH = 17.55, T_MARK = 18.1;      // after the uncap: held still, the pen goes down, the first mark is done
 const PAD = { x: -0.0155, zf: 0.028, w: 0.016, tilt: 50 };  // the new sheet, propped at 50° so the camera can read a mark on it
 const PH = PAD.w * 366 / 263, PH_RAD = PAD.tilt * DEG;      // the sheet's height and tilt
 // A point on the propped sheet: u from its left edge, v up from its lower edge (both 0–1), in the world.
@@ -53,9 +58,10 @@ const FONT = 17, INK = 'rgb(30, 42, 63)';   // the hand is s17b's bundled Caveat
 const NS = 58, CIRCLE_R = 23, A0 = -2.2;                     // "Final"'s canvas, its red circle (art px), the stroke's start
 
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
+const CLOCK = { at: [C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z], h: 4, m: 10 };   // v4: s02's spot beside the calendar, ~4:10 (README §13)
 const xAt = (tc) => [clamp((tc - 1.5 + F(1)) / F(2)), clamp((tc - 1.833 + F(1)) / F(2))];   // drawings 18–19, 22–23
-const wordAt = (tc) => clamp((tc - 7.5) / 1.25);
-const circleAt = (tc) => (tc < 8.833 ? 0 : clamp((tc - 8.833 + F(2)) / 0.833));            // 4 drawings, closed on 9.5
+const wordAt = (tc) => clamp((tc - 10.5) / 1.25);
+const circleAt = (tc) => (tc < 11.833 ? 0 : clamp((tc - 11.833 + F(2)) / 0.833));          // 4 drawings, closed on 12.5 (newDate)
 
 export async function build(ctx) {
   await loadHand();
@@ -67,6 +73,9 @@ export async function build(ctx) {
   const { props } = set;
   const gsheet = await ctx.assets.load('gator_sheet');
   const fx = post({ focus: 0.39, aperture: 0.01, lut: 'dawn' });
+  const clock = await makeClock(ctx, { seed: 18 });   // the same clock as s02's, on the same wall, at ~4:10
+  clock.group.position.set(...CLOCK.at);
+  scene.add(clock.group);
 
   // ---------- the desk tonight: the graded test, his pen and its cap, the red marker; the laptop shut at the back ----------
   set.page.g.visible = false; set.phone.g.visible = false;
@@ -140,6 +149,8 @@ export async function build(ctx) {
     down: seat({ lean: 4, arm: -60, head: -4 }),
     gaze: seat({ lean: 0, arm: -60, head: 8 }),
     breath: seat({ lean: -1, arm: -62, head: 8 }),
+    sitback: seat({ lean: -8, arm: -62, head: 4 }),                   // v4 lampSitBack: leans back in the chair, head up 4°
+    glance: seat({ lean: -8, arm: -62, head: 9 }),                    // …and lifts it a little toward the clock
     pick: (() => { const r = seatReach(camW, new THREE.Vector3(DESK.pen[0] + 0.003, 0.001, DESK.pen[1]), [0, 30]); return seat({ lean: r.lean, arm: r.arm, head: 0 }); })(),
     level: seat({ lean: 6, arm: -35, far: -32, head: 4 }),
     uncap: seat({ lean: 6, arm: -35, far: -24, head: 4 }),
@@ -148,16 +159,19 @@ export async function build(ctx) {
   };
   // [t, pose, stand (0 seated at DESK.hip … 1 at STAND)], eased between keys and sampled on 2s.
   const KEYS = [[0, 'look', 0], [0.5, 'look', 0], [F(8), 'up', 0.5], [F(16), 'x1a', 1], [F(17), 'x1a', 1], [F(18), 'x1b', 1], [F(19), 'x1b', 1],
-    [F(21), 'x2a', 1], [F(22), 'x2b', 1], [F(23), 'x2b', 1], [F(26), 'down', 0], [CUT_I, 'down', 0],
-    [CUT_W, 'gaze', 0], [12.5, 'gaze', 0], [F(150), 'breath', 0], [F(152), 'pick', 0], [F(154), 'pick', 0], [F(156), 'level', 0],
-    [F(161), 'level', 0], [F(162), 'uncap', 0], [T_STILL, 'uncap', 0], [T_TOUCH - 0.15, 'mark', 0], [T_MARK, 'mark', 0], [T_MARK + 0.35, 'lift', 0], [17, 'lift', 0]];
+    [F(21), 'x2a', 1], [F(22), 'x2b', 1], [F(23), 'x2b', 1], [F(26), 'down', 0], [CUT_I, 'down', 0], [CUT_SIT, 'down', 0],
+    [B.lampSitBack, 'sitback', 0], [8.5, 'sitback', 0], [F(104), 'glance', 0], [F(110), 'glance', 0], [F(112), 'sitback', 0], [CUT_I2, 'sitback', 0],   // 7.5 sits back; 8.5–9.25 the clock; back to the circle
+    [CUT_W, 'gaze', 0], [15.5, 'gaze', 0], [F(186), 'breath', 0], [F(188), 'pick', 0], [F(190), 'pick', 0], [F(192), 'level', 0],
+    [F(197), 'level', 0], [F(198), 'uncap', 0], [T_STILL, 'uncap', 0], [T_TOUCH - 0.15, 'mark', 0], [T_MARK, 'mark', 0], [T_MARK + 0.35, 'lift', 0], [20, 'lift', 0]];
   const poseAt = (tc) => {
     const i = KEYS.findLastIndex(([k]) => k <= tc + 1e-6), [k0, a, h0] = KEYS[i], [k1, b, h1] = KEYS[Math.min(i + 1, KEYS.length - 1)];
     const e = ease(k1 > k0 ? clamp((tc - k0) / (k1 - k0)) : 0);
     return { pose: Object.fromEntries(Object.keys(P[a]).map((j) => [j, lerp(P[a][j], P[b][j] ?? P[a][j], e)])), stand: lerp(h0, h1, e) };
   };
-  const eyesAt = (tc) => (tc < F(26) ? 'open' : tc < 12 ? 'side' : 'open');
-  const mouthAt = (tc) => (tc >= 14.5 ? 'smile' : tc >= 12.5 ? 'neutral' : 'line');
+  // Eyes: on the pen, down at the blob (2.17), half-lidded under the lamp (7.5), the glance up-right at the clock (8.5–9.25), back
+  // on the calendar's circle; the tag's look up at the new drop (14.5), then level. Mouth: the small relief smile at the sit-back.
+  const eyesAt = (tc) => (tc < F(26) ? 'open' : tc < B.lampSitBack ? 'side' : tc < 8.5 ? 'tired' : tc < 9.25 ? 'side' : tc < CUT_W ? 'open' : tc < 15 ? 'side' : 'open');
+  const mouthAt = (tc) => (tc >= 17.5 ? 'smile' : tc >= 15.5 ? 'neutral' : tc >= B.lampSitBack && tc < CUT_I2 ? 'smile' : 'line');
 
   // ---------- the Exam, the dot, its trace, and the new drop ----------
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
@@ -225,7 +239,9 @@ export async function build(ctx) {
   lamp.light.shadow.camera.near = 0.002;
   const face = new THREE.PointLight(Cc('cream').lerp(Cc('lamp'), 0.3), FACE_I, 0.08, 2); face.position.set(-0.035, 0.035, 0.06);
   const amb = ambient(); amb.intensity *= AMB;
-  scene.add(lamp.light, lamp.light.target, face, amb);
+  const day = new THREE.DirectionalLight(Cc('cream').lerp(Cc('phone'), 0.12), DAY_I);   // the window, off right: pale afternoon, no shadow of its own
+  day.position.set(0.8, 0.6, 0.6); day.target.position.set(0.06, 0.05, 0.06); day.castShadow = false;
+  scene.add(lamp.light, lamp.light.target, face, amb, day, day.target);
   {   // s06's: the painted shade's trapezoid, lit from inside
     const k = DESK.lamp.h / 212, s = new THREE.Shape([[-52, 0], [52, 0], [30, 75], [-30, 75]].map(([x, y]) => new THREE.Vector2(x * k * 0.92, y * k * 0.94)));
     const m = new THREE.Mesh(new THREE.ShapeGeometry(s), new THREE.MeshBasicMaterial({ color: PALETTE.lamp, transparent: true, opacity: 0.55, toneMapped: false }));
@@ -244,10 +260,12 @@ export async function build(ctx) {
 
   const c = new THREE.Vector3(), hp = new THREE.Vector3(), look = new THREE.Vector3();
   return {
+    exam,   // read by evidence/trims-home/blobs.js
     update(t) {
       T.boil(t);
+      clock.boil(t); clock.set(CLOCK.h, CLOCK.m, t);   // the second hand steps on every whole second
       const f = fr(t), tc = F(f);
-      const inI = t >= CUT_I && t < CUT_I2, inI2 = t >= CUT_I2 && t < CUT_W, inW = !inI && !inI2;
+      const inI = t >= CUT_I && t < CUT_SIT, inI2 = t >= CUT_I2 && t < CUT_W, inW = !inI && !inI2;
 
       // camera (on 1s), straight cuts; the fade on the grade
       // The tag's W (11.5 on) eases in over four and a half seconds, so the drop, the pen and the first mark are bigger as they land.
@@ -267,15 +285,18 @@ export async function build(ctx) {
       const { pose, stand } = poseAt(tc);
       gator.boil(t, 10);
       gator.blend({ now: pose }, [[0, 'now']], 0);
-      gator.group.position.set(lerp(DESK.hip[0], STAND[0], stand), lerp(DESK.hip[1], STAND[1], stand) - (tc >= 12.5 && tc < F(152) ? 0.0005 : 0), DESK.hip[2]);
-      gator.face({ eyes: eyesAt(tc), mouth: mouthAt(tc) });
+      gator.group.position.set(lerp(DESK.hip[0], STAND[0], stand), lerp(DESK.hip[1], STAND[1], stand) - (tc >= 15.5 && tc < F(188) ? 0.0005 : 0), DESK.hip[2]);
       gator.follow('tail', t, { k: 6, w: 18 });
+      // v4 acting: resolve at the cross-off, relief from the cue that sits him down to the tag, resolve again at the new drop. slump 0:
+      // his hand is on the pen, the calendar and the desk, so the poses own the lean. The face goes over the preset's (the eyes follow the beats above).
+      act(gator, t, [[0, 'resolve'], [F(26), 'relief'], [CUT_W, 'resolve']], { slump: 0, blink: false });
+      gator.face({ eyes: eyesAt(tc), mouth: mouthAt(tc) });
       gator.group.updateMatrixWorld(true);
       gator.hand.getWorldPosition(hp);
       gator.group.visible = inW;
       gator.meshes.leg_l.visible = gator.meshes.leg_r.visible = stand < 0.5;   // behind the desk: no legs over the desktop
       // the pen: in his hand (nib to the sheet) for the X, on the page's front edge, picked up at 12.67, level from 13.0
-      const holding = tc < F(26) || tc >= F(152), level = tc >= F(156), uncapped = tc >= B.tagPenUncap - 1e-6;
+      const holding = tc < F(26) || tc >= F(188), level = tc >= F(192), uncapped = tc >= B.tagPenUncap - 1e-6;
       const a = tc >= T_STILL ? 40 * DEG * ease(clamp((tc - T_STILL) / 0.4)) : level ? 0 : 40 * DEG;   // 40° at first, level for the uncap, then tipped nib-down for the mark
       if (holding) { pen.g.rotation.set(0, 0, a); pen.g.position.set(hp.x + 0.003 * Math.cos(a), hp.y + 0.003 * Math.sin(a), DESK.hip[2] + 0.0128); }
       else { pen.g.rotation.set(-Math.PI / 2, 0, -0.1); pen.g.position.set(...penRest); }
@@ -312,10 +333,10 @@ export async function build(ctx) {
       trace.scale.set(lerp(0.0036, 0.0066, tk), lerp(0.0024, 0.0044, tk), 1);   // the dot's flattened width, spreading as the paper drinks it
 
       // ---- the new drop: beads 10.0–10.67, quivers on 1s from 11.0, still from the uncap's drawing ----
-      drop.mesh.visible = tc >= 10;
+      drop.mesh.visible = tc >= 13;
       dropShadow.visible = drop.mesh.visible;
       if (drop.mesh.visible) {
-        const ds = Math.max(1e-3, BEAD * easeOut((tc - 10) / 0.667));
+        const ds = Math.max(1e-3, BEAD * easeOut((tc - 13) / 0.667));
         drop.mesh.scale.setScalar(ds);
         drop.mesh.position.set(DROP_AT[0], DROP_AT[1] - 0.012 * ds, C.z + 0.0010);
         dropShadow.position.set(DROP_AT[0] + 0.0004, DROP_AT[1] - 0.0005, C.z + 0.0009); dropShadow.scale.set(0.0058 * ds / BEAD, 0.0042 * ds / BEAD, 1);
@@ -324,17 +345,17 @@ export async function build(ctx) {
       }
 
       // ---- the old blob's ghost beside the new drop (I2 only), and the first mark on the propped sheet ----
-      ghost.material.opacity = inI2 ? ease(clamp((tc - 10.5) / 0.4)) : 0;
+      ghost.material.opacity = inI2 ? ease(clamp((tc - 13.5) / 0.4)) : 0;
       pad.g.visible = inW && tc >= CUT_W;
       padInk(inW ? clamp((tc - T_TOUCH) / (T_MARK - T_TOUCH)) : 0);
       // ---- his hand in I2: in 7.0–7.5 with the marker, writes "Final", circles it, leaves after 9.67 ----
-      hand.visible = inI2 && tc >= 7 && tc < 9.833;
+      hand.visible = inI2 && tc >= 10 && tc < 12.833;
       if (hand.visible) {
         let px, py;
-        if (tc < 7.5) { const h = ease((tc - 7) / 0.5); px = lerp(NX - 0.03, NX - finalW / 2 * mpp, h); py = lerp(NY - 0.02, NY, h); }
-        else if (tc < 8.833) { px = NX + (kw - 0.5) * finalW * mpp; py = NY - 0.0003 + 0.0003 * Math.sin(kw * 30); }
-        else if (tc < 9.667) { const an = A0 + 2 * Math.PI * 1.06 * kc; px = NX + Math.cos(an) * CIRCLE_R * mpp; py = NY - Math.sin(an) * CIRCLE_R * 0.92 * mpp; }
-        else { const h = ease((tc - 9.667) / 0.167); px = lerp(NX, NX - 0.03, h); py = lerp(NY, NY - 0.02, h); }
+        if (tc < 10.5) { const h = ease((tc - 10) / 0.5); px = lerp(NX - 0.03, NX - finalW / 2 * mpp, h); py = lerp(NY - 0.02, NY, h); }
+        else if (tc < 11.833) { px = NX + (kw - 0.5) * finalW * mpp; py = NY - 0.0003 + 0.0003 * Math.sin(kw * 30); }
+        else if (tc < 12.667) { const an = A0 + 2 * Math.PI * 1.06 * kc; px = NX + Math.cos(an) * CIRCLE_R * mpp; py = NY - Math.sin(an) * CIRCLE_R * 0.92 * mpp; }
+        else { const h = ease((tc - 12.667) / 0.167); px = lerp(NX, NX - 0.03, h); py = lerp(NY, NY - 0.02, h); }
         hand.position.set(px, py, C.z + 0.004);
       }
     },

@@ -43,6 +43,25 @@ export function greenVariant(i) {
   return '#' + c.getHexString();
 }
 
+// trims-home: a code-drawn part that must read as the painted cream (the throat). A flat fill reads paler, greyer and
+// streaky next to the painted jaw (evidence/trims-home/neck.jpg), so the part takes the painted paper itself: the middle of
+// `piece`'s opaque box, tiled (alternate tiles mirrored, so no seams) over a canvas the shape of `size`, then cut to `path`
+// (0..1, v down). One art pixel of the jaw is 0.7 figure px (sideParts), so the canvas runs at 1 / 0.7 of the figure's.
+function paintedLike(a, piece, path, [w, h]) {
+  const bmp = a.pieces[piece], [u0, v0, u1, v1] = a.visible[piece], bw = bmp.width, bh = bmp.height;
+  const sx = Math.round((u0 + 0.22 * (u1 - u0)) * bw), sy = Math.round((v0 + 0.36 * (v1 - v0)) * bh);
+  const pw = Math.round(0.28 * (u1 - u0) * bw), ph = Math.round(0.2 * (v1 - v0) * bh);
+  const cw = Math.round(w / K / 0.7), ch = Math.round(h / K / 0.7), c = canvas(cw, ch), g = c.getContext('2d');
+  for (let j = 0; j * ph < ch; j++) for (let i = 0; i * pw < cw; i++) {
+    g.save(); g.translate((i + (i & 1)) * pw, (j + (j & 1)) * ph); g.scale(i & 1 ? -1 : 1, j & 1 ? -1 : 1);
+    g.drawImage(bmp, sx, sy, pw, ph, 0, 0, pw, ph); g.restore();
+  }
+  g.globalCompositeOperation = 'destination-in'; g.fillStyle = '#000'; g.beginPath();
+  path.forEach(([x, y], i) => (i ? g.lineTo(x * cw, y * ch) : g.moveTo(x * cw, y * ch)));
+  g.closePath(); g.fill();
+  return c;
+}
+
 // ---------- the generic rig builder ----------
 // parts: [{ name, from: [asset, piece], size: [w, h] at scale 1, pivot: [u, v], parent?, at: [x, y] at scale 1, z = 0,
 //   weight?, turn?: 'mirror' | 'rot90' (applied always) | 'mirrorProxy' (only to proxies, whose tapers point +x),
@@ -67,8 +86,9 @@ export async function buildRig(ctx, { name, seed = 0, scale = 1, green, hoodie, 
     }
     if (p.paper) {
       const key = `${id}-${p.name}`, size = s(p.size);
+      const paper = p.paper.like ? { art: paintedLike(loaded[p.paper.like[0]], p.paper.like[1], p.paper.path, size) } : p.paper;
       defs.push({ name: p.name, parent: p.parent, pivot: p.pivot, at: s(p.at), z: (p.z ?? 0) * scale,
-        sheet: (sd) => makePaper({ ...p.paper, size, key, res, seed: sd }) });
+        sheet: (sd) => makePaper({ ...paper, size, key, res, seed: sd }) });
       continue;
     }
     const [asset, piece] = p.from, a = loaded[asset];
@@ -167,10 +187,10 @@ const HEAD_LIFT = 10;
 // BROW_AT is its centre at rest (figure px), BROW its box; acting.js moves it (figure px × FIG_K) and turns it (degrees).
 export const BROW_AT = [262, 30], BROW = [58, 17];
 // A polygon in figure px → a paper part: its box (plus a 3 px margin to tear on) as size, pivot at the box's top left.
-function drawn(name, poly, { parent, z, color, origin }) {
+function drawn(name, poly, { parent, z, color, like, origin }) {
   const m = 3, xs = poly.map(([x]) => x), ys = poly.map(([, y]) => y);
   const x0 = Math.min(...xs) - m, y0 = Math.min(...ys) - m, w = Math.max(...xs) + m - x0, h = Math.max(...ys) + m - y0;
-  return { name, parent, z, paper: { path: poly.map(([x, y]) => [(x - x0) / w, (y - y0) / h]), color }, size: [w * K, h * K],
+  return { name, parent, z, paper: { path: poly.map(([x, y]) => [(x - x0) / w, (y - y0) / h]), color, like }, size: [w * K, h * K],
     pivot: [0, 0], at: at(x0, y0, origin) };
 }
 export function sideParts(sheet, { pocket = true, backpack = false, head34 = false, throat = false, brow = false, green } = {}) {
@@ -189,7 +209,7 @@ export function sideParts(sheet, { pocket = true, backpack = false, head34 = fal
     { name: 'head', from: P('head'), parent: 'body', size: px(206, 176, 0.91), pivot: [0.415, 1.024], at: neck, z: -0.0035 },
     ...(head34 ? [{ name: 'head34', from: ['gator_sheet', 'turn_head34'], parent: 'body', size: px(276, 243, 0.78), pivot: [0.339, 0.865], at: neck, z: -0.0035, hidden: true }] : []),
     { name: 'snout', from: P('snout'), parent: 'head', size: px(296, 108, 0.69), pivot: [0.118, 0.5], at: N(286, 90), z: -0.001 },
-    ...(throat ? [drawn('throat', THROAT, { parent: 'head', z: 0.0009, color: cream, origin: NECK_F })] : []),
+    ...(throat ? [drawn('throat', THROAT, { parent: 'head', z: 0.0009, color: cream, like: ['gator_sheet', 'jaw'], origin: NECK_F })] : []),
     { name: 'jaw', from: P('jaw'), parent: 'head', size: px(268, 105, 0.7), pivot: [0.086, 0.362], at: N(278.5, 133), z: 0.001 },
     { name: 'eyes', from: null, parent: 'head', at: N(258.5, 66), z: 0.002 },
     ...(brow ? [{ name: 'brow', parent: 'head', z: 0.0025, hidden: true, size: [bw * K, bh * K], pivot: [0.5, 0.5], at: N(bx, by),

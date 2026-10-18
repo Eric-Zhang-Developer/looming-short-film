@@ -26,7 +26,8 @@ function tornArt(art, [w, h]) {
   return { cv, size: [w * cv.width / art.width, h * cv.height / art.height] };
 }
 const DEG = Math.PI / 180;
-const CAM = { pos: [[0, [0, 0.42, 2.5]], [6, [0.17, 0.33, 1.0]]], look: [[0, [0, 0.42, 0]], [6, [0.18, 0.32, 0.6]]] };
+const LEN = 5;   // v4: the shot is 5 s (was 6): the same push on the same path, every local time × 5/6 (docs/shots/s01.md)
+const CAM = { pos: [[0, [0, 0.42, 2.5]], [LEN, [0.17, 0.33, 1.0]]], look: [[0, [0, 0.42, 0]], [LEN, [0.18, 0.32, 0.6]]] };
 const FACADE_Z = 0.6;
 const ROOM_I = 0.05, BOUNCE_I = 0.35;   // his room light behind the pane (cd), the street bounce on the facade
 
@@ -135,7 +136,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   scene.add(oak.group);
   // ±0.6° about the pivot, period 3 s: eased keys between the extremes trace a sine that starts at 0, rising.
   const SWAY = { l: { branch: -0.6 * DEG, sprig: 0 }, r: { branch: 0.6 * DEG, sprig: 0 } };
-  const swayKeys = [-0.75, 0.75, 2.25, 3.75, 5.25, 6.75].map((t, i) => [t, i % 2 ? 'r' : 'l']);
+  const swayKeys = [-0.75, 0.75, 2.25, 3.75, 5.25, 6.75].map((t, i) => [t * LEN / 6, i % 2 ? 'r' : 'l']);   // period 3 s → 2.5 s with the rest
 
   // ---- Key: dawn behind the skyline, about 5° up, so every cardstock layer is a backlit silhouette with a lit rim.
   // Fill: ambient() at its default.
@@ -160,7 +161,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   return {
     update(tLocal) {
       // Light on 1s. dawnLight places itself by k; the spec places it, so the position is set after update.
-      dawn.update(tLocal, kf(tLocal, [[0, 0.1], [6, 0.25]]));
+      dawn.update(tLocal, kf(tLocal, [[0, 0.1], [LEN, 0.25]]));
       dawn.light.position.set(-1.2, 0.5, -1.5);
 
       // Camera on 1s: one eased push, position and look-at together. Focus on the facade plane every frame.

@@ -1,0 +1,39 @@
+trims-home blob sizes, read from the live shot objects (r = created radius × mesh scale; units = S · r / 0.012).
+README §1 ladder (v4 per the brief): s02 1x (0.012) · s03 1 → 1.5x (0.018) · s04/s05 1.5x · s06 1.5x → 2x (0.024) · s18 0.004 → dot 0.0015
+
+s02  t  4.000  before the bead        visible n  r 0.01200 (1.000x)
+s02  t  4.500  bead 4.5               visible y  r 0.00118 (0.098x)
+s02  t  5.000  inkDropForms 5.0       visible y  r 0.00204 (0.170x)
+s02  t  6.500  perched 6.5            visible y  r 0.00480 (0.400x)
+s02  t  8.000  landed, swelling 8.0   visible y  r 0.01283 (1.069x)
+s02  t  8.500  1x 8.5                 visible y  r 0.01200 (1.000x)
+s02  t  9.900  at B 9.9               visible y  r 0.01200 (1.000x)
+
+s03  t  0.500  start                  visible y  r 0.01200 (1.000x)  zL 0.0259 zB 0.0150 S 2.38 units 2.38
+s03  t  1.000  laptopUp 1.0           visible y  r 0.01200 (1.000x)  zL 0.0208 zB 0.0150 S 3.60 units 3.60
+s03  t  4.330  before the swallow 4.33 visible y  r 0.01200 (1.000x)  zL 0.0208 zB 0.0150 S 3.60 units 3.60
+s03  t  4.500  gulp1 4.5              visible y  r 0.01800 (1.500x)  zL 0.0208 zB 0.0150 S 3.60 units 5.40
+s03  t  5.500  settled 5.5            visible y  r 0.01800 (1.500x)  zL 0.0208 zB 0.0150 S 3.60 units 5.40
+s03  t  6.900  hold 6.9               visible y  r 0.01800 (1.500x)  zL 0.0208 zB 0.0150 S 3.60 units 5.40
+
+s04  t  0.500  fridge 0.5             visible y  r 0.01800 (1.500x)  zL 0.2763 zB 0.1727 S 2.67 units 4.00
+s04  t  2.500  scoot 1 (2.5)          visible y  r 0.01800 (1.500x)  zL 0.2763 zB 0.1842 S 3.00 units 4.50
+s04  t  5.500  scoot 2 (5.5)          visible y  r 0.01800 (1.500x)  zL 0.2763 zB 0.1966 S 3.47 units 5.20
+s04  t  6.900  end 6.9                visible y  r 0.01800 (1.500x)  zL 0.2763 zB 0.1966 S 3.47 units 5.20
+
+s05  t  1.000  gameNight 1.0          visible y  r 0.01800 (1.500x)  zL 0.4148 zB 0.3370 S 5.33 units 8.00
+s05  t  4.500  walk-through 4.5       visible y  r 0.01800 (1.500x)  zL 0.4148 zB 0.3370 S 5.33 units 8.00
+s05  t  6.900  end 6.9                visible y  r 0.01800 (1.500x)  zL 0.4148 zB 0.3370 S 5.33 units 8.00
+
+s06  t  0.250  start 0.25             visible y  r 0.01800 (1.500x)  zL 0.0225 zB 0.0159 S 3.40 units 5.10
+s06  t  1.500  lamp on 1.5            visible y  r 0.01800 (1.500x)  zL 0.0225 zB 0.0159 S 3.40 units 5.10  lamp pool 1.77x (mouth y 0.0413)
+s06  t  3.000  lamp off 3.0           visible y  r 0.01800 (1.500x)  zL 0.0225 zB 0.0159 S 3.40 units 5.10
+s06  t  3.800  pre-gulp 3.8           visible y  r 0.01800 (1.500x)  zL 0.0225 zB 0.0159 S 3.40 units 5.10
+s06  t  4.000  gulp2 4.0              visible y  r 0.02400 (2.000x)  zL 0.0225 zB 0.0159 S 3.40 units 6.80
+s06  t  5.000  settled 5.0            visible y  r 0.02400 (2.000x)  zL 0.0225 zB 0.0159 S 3.40 units 6.80
+s06  t  7.900  end 7.9                visible y  r 0.02400 (2.000x)  zL 0.0225 zB 0.0159 S 3.40 units 6.80
+
+s18  t  1.000  start 1.0              visible y  r 0.00400 (0.333x)
+s18  t  2.000  examCrossedOff 2.0     visible y  r 0.00150 (0.125x)
+s18  t  2.500  dot 2.5                visible y  r 0.00150 (0.125x)
+s18  t  5.600  absorbed 5.6           visible n  r 0.00400 (0.333x)
