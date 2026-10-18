@@ -47,6 +47,11 @@ Times are Eastern (EDT), from git commit times and session transcripts.
 | 23:43–00:44 | The v2 shot batches land on the frozen kits. | [11](11-the-overnight-run.md), `b9e7eec`, `331c5db`, `c75dc33` |
 | Oct 16, 01:29–01:32 | v2 renders (3:15). A cold viewer can't say what the shadow's rule is and sees no turning point. | [11](11-the-overnight-run.md), `4b7df3b` |
 | 01:30–01:49 | The v3 polish passes land. v3-readability is still in progress. | [11](11-the-overnight-run.md), `a9378c5`, `f25e8f8`, `6f45587` |
+| Oct 17, 22:33–22:40 | The director's v3 notes ("not the fucking random janitor") become story v4, which he approves. The master drops to 1080p. | [12](12-the-walk.md), `7134553`, `d429d5e`, `dae735a` |
+| Oct 18, 03:10–03:17 | The close-up heads and the wall clock are frozen. The director answers Q16 (2.5×) and Q17 (his nightstand lamp). | [12](12-the-walk.md), `35133b2`, `09bd2ff` |
+| 04:11–04:43 | The climax (two rooms in parallel) and its sound merge. | [12](12-the-walk.md), `228d5b2`, `253f3a5`, `5f80ea1` |
+| 07:33–07:47 | The home and Marston trims merge, and one frame per shot shows all 21 build. | [12](12-the-walk.md), `391aced`, `c762819`, `599444e` |
+| 13:01 | The render script learns to resume after a Chrome crash. | [12](12-the-walk.md), `64c4480` |
 
 ## Chapters
 
@@ -61,6 +66,7 @@ Times are Eastern (EDT), from git commit times and session transcripts.
 9. [The dread meter](09-the-dread-meter.md): watching Act 1, and the story not reading
 10. [Rough first, then final](10-rough-first-then-final.md): the real deadline, the reel, and this record
 11. [The overnight run](11-the-overnight-run.md): the director's notes, five kits by rule, v2, a cold viewer, and v3
+12. [The walk](12-the-walk.md): the director's v3 critique, the clock, the climax built in two rooms, and a swell measured by a machine that can't hear
 
 ## How this stays current
 

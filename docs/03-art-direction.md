@@ -43,7 +43,7 @@ Separate **paper stocks** (the color of things) from **light colors** (the color
 | Paper | Kraft (desks, floors, shelves) | `#A8835A` |
 | Light | Phone Cyan | `#6FD3E3` |
 | Light | Lamp Amber (the home lamp) | `#F0A84A` |
-| Light | Fluorescent (Marston's ceiling light; faint green-cream) | `lerp(Cream, Gator Green, 0.15)` ≈ `#DEDBC3` (shots README §6) |
+| Light | Pendant (Marston's desk light; warm) | `lerp(Lamp Amber, Cream, 0.3)` (shots README, v4 at a glance). The dim distant room light stays `lerp(Cream, Gator Green, 0.15)` ≈ `#DEDBC3` (§6) |
 | Ink | Exam Black | `#0A0A0F` |
 
 The dawn rose is **lamp amber mixed into cream through tissue**, not a new color. Red appears only on the calendar circles: the first exam, and the new circled date at the end (director, Q4).
@@ -54,23 +54,23 @@ The dawn rose is **lamp amber mixed into cream through tissue**, not a new color
 |---|---|---|
 | Act 1 birth | Cool morning plus the first cyan of the phone | Light, curious |
 | Act 2a avoidance | Cyan grows and the room darkens with each dodge; amber flashes once (lamp beat) | Comic, slowly suffocating |
-| Act 2b Marston | Flickering fluorescent green-white, then near-black with a faint cyan | Lonely, heavy |
-| Act 3 first step | The woken desk fluorescent takes the frame back from cyan, from the desk outward (whether it warms toward amber is Q12) | Warm, relieved |
+| Act 2b The bottom | The phone's cyan under the blob's huge ceiling shadow, then near-black at 3 a.m. with only the blob's eyes | Lonely, heavy |
+| Act 3 the walk | The nightstand lamp's amber behind him, then street-lamp pools on a navy path, then Marston's windows glowing warm; at the door the warm light from above floods the frame and takes it back from cyan (Q12 answered warm for v4) | Terrified, then warm and relieved |
 | Quiet 2 dawn | Gold through tissue windows, cold shadows warming | Peaceful |
-| Button | Night navy and one lit pool: the home lamp's amber, then a woken fluorescent zone at Marston | Kind |
+| Button | An ordinary afternoon at home with the lamp on: the light from above, chosen now | Kind |
 
 **Desaturate on the low point.** During Quiet 1 the gator drains slightly toward grey, while the shadow stays rich.
 
 ## Lighting rules
 
 1. **One motivated source per shot.** Every shot names its key light (phone, lamp, fluorescent, window, dawn). Fill comes only from bounce and ambient.
-2. **Light has shape.** Lamp light is a visible vellum cone with a hard pool on the desk and a few dust specks. Phone light is a low wedge. Marston's fluorescent is a louvred trough hung over each desk, with a soft pool and no cone; where the camera sees the trough, its tube shows whether the zone is lit. Draw the light as an object.
+2. **Light has shape.** Lamp light is a visible vellum cone with a hard pool on the desk and a few dust specks. Phone light is a low wedge. Marston's light is a ring pendant hung over each desk: a warm spot from above with a soft pool and no cone, always lit, and kept in frame where it matters so the audience sees the cause. Draw the light as an object.
 3. **Light falls off.** Brightness on each paper layer is computed from its distance to the source. The phone lights the gator's snout and the room fades to navy.
 4. **Light comes through paper.** Thin stock glows when lit from behind: tissue curtains, the lampshade, the window, a lit torn edge. This is the look's signature.
 5. **Light seeps out from behind layers.** Dawn creeps under the apartment door and between the Marston stacks as a hot thin seam along a paper edge.
 6. **Two temperatures, one story.** When phone and lamp (at home) or phone and fluorescent (at Marston) share a room, the direction of the shadow tells you which one is winning.
 7. **No glow without shadow.** Bloom is used sparingly, at the source only. Every glow must also cast a shadow somewhere.
-8. **Marston's light answers movement.** There are no desk lamps at Marston. Each desk has its own ceiling fluorescent on a motion sensor: stillness lets it time out, and movement wakes it with a relay clack and a three-strike stutter. Nobody switches it by hand. The home lamp is the only light anyone clicks. Numbers are in `docs/shots/README.md` §3.
+8. **Marston's light is warm, from above, and stays on.** There are no desk lamps at Marston and no motion sensors (cut in v4: the library's light is the turn). The pendant over each desk is lit before he arrives and nobody ever switches it. The only lights anyone clicks are at home: the desk lamp (s06, clicked on, then off: he refuses it) and his nightstand lamp (s09a, clicked on and left on behind him, the same click). That second lamp is low, so it throws the shadow long down the hall: "I don't have a night light though I have a nightstand lamp" (director, 2026-10-18, Q17). Light held low and close makes the shadow loom, and light from above makes it small, so the walk from the one to the other is the rule and the story at once. Numbers are in `docs/shots/README.md` ("v4 at a glance" and §3).
 
 ## Characters
 

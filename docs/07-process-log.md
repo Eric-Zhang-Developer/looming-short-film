@@ -217,3 +217,18 @@ On v3 the director said the turn was wrong: "the keystone decision in my life to
 
 ## 2026-10-17 · The master is 1080p
 Director: "quick update master render should be in 1080p". This drops the 4K plan (doc 11 §Fidelity), which also removes the overnight-render risk from the schedule. The master is the chunked 1080p render at CRF 18 (or lower) with 256k+ AAC, plus the compressed backup cut from it.
+
+## 2026-10-18 · Close-up heads and the wall clock are frozen, v1_2 of each
+The two v4 kits were painted by `asset-v4-kit` and frozen at 03:10 (`35133b2`) before any climax builder could start, under the director's v4 approval. Picks are in `docs/notes/morning-picks.md`: head sheet v1_2 (all six moods read at phone size, closest eyes) and clock v1_2 (two faces within 0.2% of each other, torn rim like the calendar). **Flagged, not fixed:** all three head variants drift from `gator_hero` (the eye bump rises 2.2–2.5× as much, the snout is 4–9% thicker, the green is brighter), and a re-roll wouldn't fix a drift they share. The clock's hands are about 1.4× too long, so the rig scales them. The director may overrule either pick.
+
+## 2026-10-18 · Q16 and Q17 answered: the peak is 2.5×, and the light at the door is his nightstand lamp
+`spec-v4` had built to its own Recommend lines (a 2× peak; a plug-in night-light by the door) and asked both. Director, verbatim, on Q16: "can we somehow do 2.5x". On Q17: "Q17 is fine uhh I don't have a night light though I have a nightstand lamp." Recorded in `docs/shots/QUESTIONS.md` and the specs (`09bd2ff`).
+- **Q16:** the gulps become half-sizes over the same three, so "one size bigger every time" stays true with no jump: s03 1 → 1.5, s06 → 2, s07 → 2.5. s16 shrinks 2.5 → 1.75 → 1 → 0.75 → 0.58 → 0.42 in its five solves. At the Marston desk the blob's eyes are about level with his.
+- **Q17:** he clicks the nightstand lamp on in s09a (the rhyme with s06's click-off), and it stays on behind him. His door moves to the near end of the hall so the lamp, the doorway, the blob and the hall line up and the shadow runs down the hall. The night-light's hum is dropped from the sound.
+- The `climax-a2` builder was already working to 2× and the night-light. It was told the answers mid-build and re-solved every shadow number for the 2.5× blob (`done/climax-a2.md`).
+
+## 2026-10-18 · out/ becomes a local folder for the v4 render
+The Seagate drive was unplugged, and `out/` was a link to it. Director, verbatim: "Swap the out/ link for a local folder on the internal disk for the v4 render; put the link back later." `NOW.md` (`62649b3`) records the restore step: copy anything worth keeping out of the local folder first, then relink, so the v4 render isn't lost. The earlier cuts (v1–v3) stay on the drive.
+
+## 2026-10-18 · The v4 render lost a chunk to a Chrome crash, and the script learns to resume
+The first v4 full-film render lost its second 30-second chunk to a Chrome "Target closed" crash at frame 722, under heavy swap. The same frames render fine alone, so the cause was the machine, not the shot (`64c4480`). Restarting from zero on deadline day would have redone good chunks, so `tools/render_film.sh` gained `RESUME=1` (keep finished chunks and frames from a crashed run of the same cut) and a short chunk is retried up to twice more. The default behaviour is unchanged. This entry records the fix, not a finished render: no full v4 render is logged here.
