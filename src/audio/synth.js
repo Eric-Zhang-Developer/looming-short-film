@@ -128,18 +128,22 @@ export function musicBox(midi, { vel = 0.6, dur = 1.2, vib = 0, vibHz = 7, vibUn
 }
 
 // Warm pad: three saws per note (−8, 0, +8 cents) through a 2-pole low-pass that opens over the attack.
-// Length = dur + release.
-export function pad(midis, { dur, attack = 1.5, release = 2 } = {}) {
+// Length = dur + release. snd-v4, both optional (without them the samples are exactly as before):
+// bend { voice, at: [[t, semitones], ...] } glides one voice (index into midis) along a piecewise-linear pitch curve;
+// open { from, to, hz } raises the low-pass ceiling by hz between from and to (seconds from the note's start).
+export function pad(midis, { dur, attack = 1.5, release = 2, bend, open } = {}) {
   const n = len(dur + release), out = new Float32Array(n), dets = [-8, 0, 8];
-  const oscs = midis.flatMap((m) => dets.map((c, j) => ({ dt: mtof(m) * 2 ** (c / 1200) / SR, ph: (j * 0.318) % 1 })));
+  const oscs = midis.flatMap((m, v) => dets.map((c, j) => ({ v, dt: mtof(m) * 2 ** (c / 1200) / SR, ph: (j * 0.318) % 1 })));
+  const curve = (k, t) => { if (t <= k[0][0]) return k[0][1]; for (let i = 1; i < k.length; i++) if (t <= k[i][0]) { const [t0, a] = k[i - 1], [t1, b] = k[i]; return a + (b - a) * (t - t0) / (t1 - t0); } return k[k.length - 1][1]; };
   let y1 = 0, y2 = 0;
   for (let i = 0; i < n; i++) {
-    const t = i / SR;
+    const t = i / SR, r = bend ? 2 ** (curve(bend.at, t) / 12) : 1;
     let v = 0;
-    for (const o of oscs) { v += sawBlep(o.ph, o.dt); o.ph += o.dt; if (o.ph >= 1) o.ph -= 1; }
+    for (const o of oscs) { const dt = bend && o.v === bend.voice ? o.dt * r : o.dt; v += sawBlep(o.ph, dt); o.ph += dt; if (o.ph >= 1) o.ph -= 1; }
     v /= oscs.length;
     const e = Math.min(1, t / attack) * (t > dur ? Math.max(0, 1 - (t - dur) / release) : 1);
-    const k = 1 - Math.exp(-TAU * (250 + 950 * Math.min(1, t / attack)) / SR);
+    const lift = open ? open.hz * Math.min(1, Math.max(0, (t - open.from) / (open.to - open.from))) : 0;
+    const k = 1 - Math.exp(-TAU * Math.min(250 + 950 * Math.min(1, t / attack) + lift, SR * 0.45) / SR);
     y1 += k * (v - y1); y2 += k * (y1 - y2);
     out[i] = y2 * e * 0.5;
   }

@@ -524,16 +524,45 @@ function examHush(seed = 1, dur = 4) {
   return norm(fade(out, 0.05), 0.07);
 }
 
-// (seed, dur) => bed. The exam room's wall clock at 1 Hz, a tick on every whole second from 0: a 4.5 kHz escapement tick
-// with a small 2.1 kHz ring, every other one a "tock" a little lower and softer (the clock is a character too).
-function clockTick(seed = 1, dur = 4) {
-  const out = new Float32Array(Math.ceil(dur * SR));
-  for (let k = 0; k < dur - 0.05; k++) {
-    const tock = k % 2, f = tock ? 3800 : 4500;
-    mixInto(out, decay(bandpass(noise(seed + k % 2, 0.02), f, 2), 0.0008), k, tock ? 0.8 : 1);
-    mixInto(out, gen(0.03, (t) => Math.sin(TAU * (tock ? 1900 : 2100) * t) * Math.exp(-t / 0.003)), k, 0.3);
-  }
-  return norm(far(out, 6000), 0.12);
+// snd-v4: the wall clock (README §13) is one paper-and-wood tick, the same buffer everywhere (doc 05). It ignores its seed
+// on purpose, so no cue can make a second clock. The tick: a dry escapement snap, the paper disc's wooden body answering
+// (420 Hz case knock, 1.15 and 2.65 kHz modes) and a grain of paper on top. The joke is the second hand's overshoot
+// (README §13: one frame of +1.5°, back the next): a small, slightly higher rebound tick one frame later, 1/24 s.
+// Placed one cue per whole second of global time (cues.js), so it shares the pulse's 0.5 s grid. (G4's exam-room clock
+// bed, a 4.5 kHz tick/tock, is replaced: doc 05 v4 makes s17b's clock this buffer.)
+const TICK_SEED = 0x71c4;
+function clockTick() {
+  const out = new Float32Array(Math.ceil(0.12 * SR));
+  const tick = (at, g, k, s) => {
+    mixInto(out, decay(bandpass(noise(s, 0.01), 3200 * k, 1.4), 0.0006), at, g);
+    for (const [f, tau, a] of [[420, 0.010, 0.35], [1150, 0.006, 0.6], [2650, 0.003, 0.4]])
+      mixInto(out, gen(0.05, (t) => Math.sin(TAU * f * k * t) * Math.exp(-t / tau)), at, g * a);
+    mixInto(out, decay(bandpass(noise(s + 1, 0.006), 5200, 2), 0.002), at + 0.003, g * 0.25);
+  };
+  tick(0, 1, 1, TICK_SEED);
+  tick(1 / 24, 0.28, 1.12, TICK_SEED + 2);
+  return norm(fade(out, 0.01, 0), 0.9);
+}
+// Distance is filtering, never a different tick: s08 C2 a little further; the room through his door (s08 C3, s09a, s09b);
+// the exam room's reverb (s17b: far()'s two slaps plus a short darkening tail).
+const roomy = (b, sec) => { const o = new Float32Array(Math.ceil(sec * SR)); o.set(b); return o; };
+const clockTickMid = () => lowpass(clockTick(), 4000);
+const clockTickFar = () => { const o = far(roomy(clockTick(), 0.3), 2200); mixInto(o, lowpass(o.slice(), 1500), 0.03, 0.4); return o; };
+const clockTickExam = () => {
+  const o = far(roomy(clockTick(), 0.6), 3500), dry = o.slice(0, Math.round(0.1 * SR));
+  for (let k = 1; k <= 6; k++) mixInto(o, lowpass(dry, 2500 - 250 * k), 0.035 * k, 0.5 ** k);
+  return o;
+};
+
+// The walk's pulse (doc 05, s09c): the tick an octave down (played at half speed) on a soft low thump. The dub is the same
+// buffer, lighter (score.js). A heartbeat built from the clock.
+function pulse() {
+  const t2 = clockTick(), out = new Float32Array(Math.ceil(0.3 * SR));
+  for (let i = 0; i < 2 * t2.length - 2; i++) { const j = i / 2, k = Math.floor(j); out[i] = 0.6 * (t2[k] + (j - k) * (t2[k + 1] - t2[k])); }
+  let ph = 0;
+  mixInto(out, gen(0.25, (t) => { ph += TAU * (48 + 50 * Math.exp(-t / 0.025)) / SR; return Math.sin(ph) * Math.min(1, t / 0.003) * Math.exp(-t / 0.06); }), 0, 0.8);
+  mixInto(out, decay(lowpass(lowpass(noise(TICK_SEED + 9, 0.08), 220), 220), 0.02, 0.002), 0, 2.5);
+  return norm(fade(out, 0.03, 0), 0.9);
 }
 
 // (seed) => one-shot, 0.6 s. One soft cough across the exam room: two noise bursts shaped by three vocal-tract bands
@@ -618,10 +647,160 @@ function markerScratch(seed = 1, dur = 2) {
   return norm(fade(out, 0.01), 0.35);
 }
 
+
+// ───────── snd-v4: the climax's sounds (doc 05 v4, marked "new"). Same toolkit, same habit: one physical joke each ─────────
+
+// A sin^p swell of `len` seconds at t0, added into env.
+const swell = (env, t0, len, g, p = 2) => { const i0 = Math.round(t0 * SR), m = Math.round(len * SR); for (let i = 0; i < m && i0 + i < env.length; i++) env[i0 + i] += g * Math.sin(Math.PI * i / m) ** p; };
+
+// (seed, dur) => breathing at a fixed rate: each cycle an inhale (brighter air, 1.8 + 3.6 kHz) then an exhale (darker,
+// 0.9 + 1.7 kHz), each a swell, levels seeded per breath. nasal: through the nose, narrower, a 2.8 kHz resonance, and
+// the joke: every third in-breath catches a faint nose whistle that slides up.
+function breaths(seed, dur, { period, tin, tout, nasal = false }) {
+  const r = mulberry32(seed), n = Math.ceil(dur * SR), eIn = new Float32Array(n), eOut = new Float32Array(n), whistle = new Float32Array(n);
+  const ni = noise(seed, dur), no = noise(seed + 1, dur);
+  const inA = bandpass(ni, nasal ? 2800 : 1800, nasal ? 4 : 0.9), inB = bandpass(ni, 3600, 1.2);
+  const outA = bandpass(no, nasal ? 1100 : 900, nasal ? 3 : 0.8), outB = bandpass(no, 1700, 1.2);
+  for (let t0 = 0, k = 0; t0 < dur - 0.1; t0 += period, k++) {
+    const g = 0.75 + 0.25 * r();
+    swell(eIn, t0, tin, 0.8 * g, 1.5); swell(eOut, t0 + tin, tout, g);
+    if (nasal && k % 3 === 1) swell(whistle, t0 + 0.2 * tin, 0.6 * tin, 0.12 * g);
+  }
+  let ph = 0;
+  return norm(fade(gen(dur, (t, i) => {
+    ph += TAU * 2900 * (1 + 0.03 * ((t % period) / tin)) / SR;
+    return eIn[i] * (inA[i] + 0.4 * inB[i]) + eOut[i] * (outA[i] + 0.4 * outB[i]) + whistle[i] * Math.sin(ph);
+  }), 0.02), 0.5);
+}
+// s08: nasal, phased to climax-a1's picture (in 1.58 s, out 1.5 s: a 3.08 s cycle, about doc 05's 20/min).
+// s09c: fast, 36/min to the decision, 40/min after (the acting table).
+const breathNasal = (seed = 1, dur = 6) => breaths(seed, dur, { period: 3.08, tin: 1.58, tout: 1.5, nasal: true });
+const breathFast = (seed = 1, dur = 6) => breaths(seed, dur, { period: 60 / 36, tin: 0.5, tout: 0.6 });
+const breathFaster = (seed = 1, dur = 6) => breaths(seed, dur, { period: 60 / 40, tin: 0.45, tout: 0.55 });
+// (seed) => s09a's one slow breath: in 0.75 s, out 0.42 s (breathIn + 0.25 → + 1.42), the decision's breath.
+const breathSlow = (seed = 1) => breaths(seed, 1.2, { period: 2, tin: 0.75, tout: 0.42 });
+// (seed) => s09b's catch at shadowAhead: one quick in-breath, 0.22 s, with a tiny glottal hitch at its start.
+function breathCatch(seed = 1) {
+  const out = new Float32Array(Math.ceil(0.3 * SR)), e = new Float32Array(out.length);
+  swell(e, 0, 0.22, 1, 1);
+  const a = bandpass(noise(seed, 0.3), 2000, 1), b = bandpass(noise(seed + 1, 0.3), 3800, 1.5);
+  for (let i = 0; i < out.length; i++) out[i] = e[i] * (a[i] + 0.5 * b[i]);
+  mixInto(out, decay(bandpass(noise(seed + 2, 0.01), 1200, 2), 0.002), 0, 0.6);
+  return norm(fade(out, 0.02, 0), 0.5);
+}
+// (seed) => the threshold's long exhale (s10 exhale, 107.0), 2.6 s: a quick rise and a long sigh whose air darkens from
+// 1.3 kHz to 700 Hz as the lungs empty. The joke: relief ends in a little lip flutter (24 Hz) on the last half second.
+function exhale(seed = 1) {
+  const d = 2.6, hi = bandpass(noise(seed, d), 1300, 0.9), lo = bandpass(noise(seed + 1, d), 700, 0.9), air = bandpass(noise(seed + 2, d), 3000, 1);
+  return norm(fade(gen(d, (t, i) => {
+    const k = t / d, e = Math.min(1, t / 0.15) * (1 - k) ** 1.3, flutter = t > d - 0.6 ? 0.55 + 0.45 * Math.sin(TAU * 24 * t) : 1;
+    return e * flutter * ((1 - k) * hi[i] + k * lo[i] + 0.3 * air[i]);
+  }), 0.05), 0.5);
+}
+
+// (seed) => s09a's backpackGrab, 0.7 s: a fabric swish, the strap's soft snap, and the zip pulls jingling. The joke: the
+// three clinks rise in pitch like a tiny bell.
+function backpackGrab(seed = 1) {
+  const out = new Float32Array(Math.ceil(0.7 * SR)), sw = bandpass(noise(seed, 0.3), 1300, 0.7);
+  for (let i = 0; i < sw.length; i++) sw[i] *= Math.sin(Math.PI * i / sw.length) ** 2;
+  mixInto(out, sw, 0, 0.6);
+  mixInto(out, decay(lowpass(noise(seed + 1, 0.03), 900), 0.006), 0.12, 0.5);
+  [[0.18, 1, 0.8], [0.27, 1.12, 0.6], [0.4, 1.26, 0.4]].forEach(([at, k, g]) =>
+    mixInto(out, gen(0.15, (t) => (Math.sin(TAU * 3100 * k * t) + 0.6 * Math.sin(TAU * 4740 * k * t) + 0.3 * Math.sin(TAU * 6900 * k * t)) * Math.min(1, t / 0.0005) * Math.exp(-t / 0.035)), at, g * 0.35));
+  return norm(fade(out, 0.03), 0.45);
+}
+
+// (seed) => s09b's doorLatch at doorOpen, 1.1 s: the latch's metal click and release tick, then the hinge: stick-slip pulses
+// through two body bands. The joke: the creak's pitch rises 180 → 420 Hz, like the door asking.
+function doorLatch(seed = 1) {
+  const out = new Float32Array(Math.ceil(1.1 * SR));
+  const clk = (at, g, s) => {
+    mixInto(out, decay(bandpass(noise(s, 0.01), 3000, 1), 0.001), at, g);
+    mixInto(out, gen(0.06, (t) => (Math.sin(TAU * 2200 * t) + 0.5 * Math.sin(TAU * 3900 * t)) * Math.exp(-t / 0.008)), at, g * 0.4);
+  };
+  clk(0, 1, seed); clk(0.06, 0.4, seed + 1);
+  const r = mulberry32(seed), pulses = new Float32Array(out.length);
+  for (let t = 0.12; t < 0.9;) { const k = (t - 0.12) / 0.78; pulses[Math.round(t * SR)] = (0.5 + 0.5 * r()) * Math.sin(Math.PI * k); t += 1 / (180 + 240 * k); }
+  const creak = bandpass(pulses, 900, 3);
+  mixInto(creak, bandpass(pulses, 2000, 4), 0, 0.5);
+  mixInto(out, creak, 0, 6);
+  return norm(fade(out, 0.05, 0), 0.45);
+}
+
+// (seed, dur) => s09b's hall: a low wideband hush (no electric hum: the light is his nightstand lamp, Q17) that swells
+// +6 dB over its first 0.5 s, the house bigger outside his room.
+function hallHum(seed = 1, dur = 4) {
+  const out = highpass(lowpass(lowpass(noise(seed, dur), 1400), 1400), 60);
+  for (let i = 0; i < out.length; i++) { const t = i / SR; out[i] *= (0.5 + 0.5 * Math.min(1, t / 0.5)) * (0.9 + 0.1 * Math.sin(TAU * 0.13 * t)); }
+  return norm(fade(out, 0.05, 0.02), 0.07);
+}
+
+// (seed, dur) => s09c's night: low air, slow gusts in the oaks (leaf hiss riding the gusts), and the joke: one far cricket
+// that chirps in threes now and then.
+function nightAir(seed = 1, dur = 8) {
+  const r = mulberry32(seed), air = highpass(lowpass(lowpass(noise(seed, dur), 600), 600), 40), leaves = bandpass(noise(seed + 1, dur), 3500, 0.7);
+  const gust = lowpass(lowpass(noise(seed + 2, dur), 0.4), 0.4);
+  let gm = 0; for (const v of gust) gm = Math.max(gm, Math.abs(v));
+  const out = gen(dur, (t, i) => { const g = 0.6 + 0.4 * gust[i] / (gm || 1); return air[i] * g + 0.25 * leaves[i] * g * g; });
+  for (let t = 0.8 + 2 * r(); t < dur - 0.5; t += 2.5 + 3 * r())
+    for (let k = 0; k < 3; k++) mixInto(out, gen(0.04, (u) => Math.sin(TAU * 4600 * u) * Math.sin(Math.PI * u / 0.04) ** 2 * (0.5 + 0.5 * Math.sin(TAU * 90 * u))), t + 0.07 * k, 0.04);
+  return norm(fade(out, 0.3), 0.07);
+}
+
+// (seed) => s09b's swallow, 0.25 s: a small dry throat sound. The joke: it is the blob's gulp (inkDrip's falling sine) made
+// dry and small, with a soft click after it.
+function swallow(seed = 1) {
+  let ph = 0;
+  const out = gen(0.25, (t) => { ph += TAU * (160 + 260 * Math.exp(-t / 0.03)) / SR; return Math.sin(ph) * Math.min(1, t / 0.004) * Math.exp(-t / 0.04); });
+  mixInto(out, decay(lowpass(noise(seed, 0.02), 1800), 0.003), 0, 0.4);
+  mixInto(out, decay(bandpass(noise(seed + 1, 0.01), 1400, 2), 0.002), 0.09, 0.3);
+  return norm(fade(out, 0.03, 0), 0.4);
+}
+
+// (seed) => a footstep on paving, 0.2 s: the heel's thump (110 Hz and a dark noise thud) and the toe's grit scuff, levels
+// seeded per step. The joke: he is cardstock, so every step has a tiny paper tap on top.
+function footstep(seed = 1) {
+  const r = mulberry32(seed), out = new Float32Array(Math.ceil(0.2 * SR));
+  mixInto(out, decay(lowpass(lowpass(noise(seed, 0.06), 300), 300), 0.015, 0.002), 0, 3);
+  mixInto(out, gen(0.08, (t) => Math.sin(TAU * 110 * t) * Math.exp(-t / 0.02)), 0, 0.4);
+  mixInto(out, decay(bandpass(noise(seed + 1, 0.01), 2000, 2), 0.002), 0.002, 0.35);
+  const sc = bandpass(noise(seed + 2, 0.05), 3500, 0.8);
+  for (let i = 0; i < sc.length; i++) sc[i] *= Math.sin(Math.PI * i / sc.length);
+  mixInto(out, sc, 0.03 + 0.02 * r(), 0.15 + 0.15 * r());
+  return norm(fade(out, 0.02, 0), (0.5 + 0.1 * r()));
+}
+// (seed) => a footstep on the hall runner or the lobby mat: the same heel, muffled, no grit, a fabric brush.
+function footstepSoft(seed = 1) {
+  const out = lowpass(footstep(seed), 900);
+  mixInto(out, decay(bandpass(noise(seed + 3, 0.06), 1200, 0.7), 0.02, 0.004), 0, 0.08);
+  return norm(out, 0.45);
+}
+
+// (seed) => s10's doorPush, 1.0 s: the push bar's heavy clunk (160, 430 Hz and 1.9 kHz modes), the latch clacking out,
+// then air rushing through the opening seal. The joke: the door sighs first (the hiss slides down 3 kHz → 1.2 kHz, an
+// exhale), four seconds before he does.
+function doorPush(seed = 1) {
+  const out = new Float32Array(Math.ceil(1.0 * SR));
+  mixInto(out, decay(lowpass(noise(seed, 0.04), 1500), 0.008), 0, 0.8);
+  for (const [f, tau, a] of [[160, 0.06, 0.8], [430, 0.04, 0.5], [1900, 0.015, 0.3]]) mixInto(out, gen(0.3, (t) => Math.sin(TAU * f * t) * Math.exp(-t / tau)), 0, a);
+  mixInto(out, decay(bandpass(noise(seed + 1, 0.02), 3500, 1.5), 0.002), 0.03, 0.5);
+  mixInto(out, gen(0.06, (t) => (Math.sin(TAU * 2800 * t) + 0.5 * Math.sin(TAU * 4400 * t)) * Math.exp(-t / 0.01)), 0.03, 0.25);
+  const hiss = noise(seed + 2, 0.9), y = new Float32Array(hiss.length);
+  for (let s = 0; s < 6; s++) {                          // the slide, in six overlapping bands
+    const f = 3000 * (1200 / 3000) ** (s / 5), b = bandpass(hiss, f, 1.2), c = (s + 0.5) / 6;
+    for (let i = 0; i < b.length; i++) { const u = i / b.length; y[i] += b[i] * Math.max(0, 1 - Math.abs(u - c) * 5); }
+  }
+  for (let i = 0; i < y.length; i++) { const t = i / SR; y[i] *= Math.min(1, t / 0.08) * Math.exp(-t / 0.35); }
+  mixInto(out, y, 0.06, 0.35);
+  return norm(fade(out, 0.05, 0), 0.6);
+}
+
 export const FOLEY = {
   lampClick, sensorWake, penUncap, inkDrip, paperRustle, fluorescentHum,
   penScratch, phoneHum, inkRoll, shadowGrowth, fridgeHum, controllerClick, drill,
   fluorescentFlicker, mopOnTile, paperBoil, dawnBirds, roomTone, nightHum, shadowBreath,
   thumbFlick, scrollTick, jarClink, cartonSlosh, tvBloops, roommateStep, winJingle, ladderCreak, rodSnap, curtainSwish, cardTap,
   phoneBuzz, gameBlip, blindRattle, penStroke, penTap, examHush, clockTick, cough, paperSlide, inkSoak, markerScratch,
+  clockTickMid, clockTickFar, clockTickExam, pulse, breathNasal, breathFast, breathFaster, breathSlow, breathCatch, exhale,
+  backpackGrab, doorLatch, hallHum, nightAir, swallow, footstep, footstepSoft, doorPush,
 };

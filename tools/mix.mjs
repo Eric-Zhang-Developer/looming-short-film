@@ -19,7 +19,12 @@ import { writeWav } from '../src/audio/wav.js';
 // still peaks below the lamp click, the loudest transient. It touches only the music stem. snd-g4 raised the makeup
 // 5 → 7.5 dB: the brief's -16 LUFS / -4 dBTP allows a premix PLR of 11.5 dB, and the 3:15 cut measured 12.7 at 5 dB
 // (7 dB gave 11.55, still over; 7.5 gives 11.24).
-const MUSIC_MAKEUP_DB = 7.5, MUSIC_CEIL_DB = -6;
+// snd-v4: the v4 cut trades G4's 12 s of full groove (s07-s08) for the quiet climax, and the premix PLR rose to 12.8 dB.
+// The true peak is the lamp click (measured: -4.8 dBTP at 40.5 and 74.0, every other 10 s span lower), so the fix is the
+// click's level against the film, not the music's against the foley: the click's cue gain went 0.8 → 0.6 (cues.js) and this
+// ceiling moved down with it, to just under the click's new peak (-7.15 dBFS). The makeup stays 7.5, so music and foley
+// keep G4's balance. Measured: PLR 11.3 dB, linear. (Raising the makeup to 8.5 also passed, at +1 dB of music over foley.)
+const MUSIC_MAKEUP_DB = 7.5, MUSIC_CEIL_DB = -7.6;
 function limit(x, makeupDb, lim, att = 0.002, rel = 0.08) {
   const n = x.length, g = new Float64Array(n), k = 10 ** (makeupDb / 20);
   for (let i = 0; i < n; i++) g[i] = Math.min(1, lim / (Math.abs(x[i] * k) || 1e-30));           // gain each sample needs

@@ -21,7 +21,7 @@ The score is small and intimate, like music played in the room.
 
 - **The Exam motif:** four music-box notes rising and falling, played slightly out of tune. It plays when the ink drop forms, and returns softer each time the blob is small.
 - **The gulp** (the meter, doc 02): each of the **three** gulps (v4: `gulp1` s03, `gulp2` s06, `gulp3` s07) plays the Exam motif's **first two notes** (its rising major third) on the music box, the first on the gulp's snap drawing and the second 0.275 s later, half the motif's spacing, so it sounds like a swallow. **Each gulp is one semitone lower than the last:** −1, −2, −3 against the motif's own pitch. The interval stays the motif's, so the ear hears the same creature getting heavier. Velocity 0.30 rising to 0.42, and the second note a few cents flatter each time. A soft `inkDrip` swallow at −18 dB under the first note. The shadow's swell rides on the existing `subSwell` for that dodge; the gulp adds no sub. (G4's `gulp4` and `gulp5` are cut with the blinds and old s11.)
-- **The shrink:** each solved problem in s16 answers with the same two notes falling (second note first), at −6 dB under that problem's theme note, starting 0.25 s after it. v4 has five solves from the 2× peak: **#1 −2** (one above the deepest gulp), **#2 0** (birth size at birth pitch), **#3 +1, #4 +2, #5 +3**; then the test (`testSolved`, **+4**) and the cross-off (`examCrossedOff`, **+5**), just before it soaks back into the calendar.
+- **The shrink:** each solved problem in s16 answers with the same two notes falling (second note first), at −6 dB under that problem's theme note, starting 0.25 s after it. v4 has five solves from the 2.5× peak (Q16): **#1 −2** (one above the deepest gulp), **#2 0** (birth size at birth pitch), **#3 +1, #4 +2, #5 +3**; then the test (`testSolved`, **+4**) and the cross-off (`examCrossedOff`, **+5**), just before it soaks back into the calendar.
 - **The avoidance groove:** a light, bouncy piano figure for the Act 2a montage. Each dodge adds a layer, and the sub swell grows under it with the shadow.
 - **The first step:** **one piano note**, held, at the moment he writes his name. Then the theme enters slowly, one note per solved problem.
 - **The walk build** (v4, s09c–s10): the clock's tick doubles into a **pulse** at `lamp1`, and one layer joins per lamp: pulse, felt piano (the Exam motif **rising**, the gulps' falling pair turned upward), strings pad, the music box (the motif's opening, in tune for the first time), the bass swell. A small dissonance on `blobBlocks` resolves on `stepAround`. The peak is s10's `doorPush`; on `lightFlood` everything cuts to **one held major chord**, then near-silence and a breath. Act 4's theme in major, softly, from s11.
@@ -30,7 +30,7 @@ The score is small and intimate, like music played in the room.
 
 Two sounds carry the story, and they are the most important sounds in the film.
 
-- **The lamp click (home only).** Heard twice, in s06: on, then off. Design it once, carefully: a dry plastic click with a tiny filament "tink" as the light comes up. Both are the identical buffer.
+- **The lamp click (home only).** Heard three times: on, then off, in s06, and on again for the nightstand lamp in s09a (Q17). Design it once, carefully: a dry plastic click with a tiny filament "tink" as the light comes up. All three are the identical buffer, and the beds and music stop for each so it sounds alone.
 - **The clock's tick (`clockTick`, v4).** One dry, close, slightly woody tick, the voice of the wall clock (`docs/shots/README.md` §13). Planted faintly in s02 (−30 dB), the film's loudest small sound in s08 where it plays **alone** at 1 Hz, under s09a–s09b, then **doubled into the walk's pulse** at `lamp1` (s09c), and back slow and calm in the exam room (s17b) and faint in s18. Every tick is on a whole second of global time, so it locks to the pulse's 0.5 s grid. Design it once: every appearance is the same buffer, filtered for distance or the room.
 - **Removed in v4: the sensor relay.** The motion-sensor lights are cut (doc 02), so `sensorWake` (s15's relay clack, ticks and ping), the fluorescent timeout crackle (s11, s14) and the stacks' flicker crackles (s10) have no cue. The `FOLEY.sensorWake` voice can stay in `foley.js` unused or go in the sound pass; nothing in the timeline names it.
 
@@ -132,7 +132,7 @@ The v4 cut, 3:15.
 
 ## Mix
 
-- Deliver at **-14 LUFS integrated**, true peak at or below -1 dBTP (the norm for streaming).
+- Deliver at **-16 LUFS integrated (±1)**, true peak at or below **-4 dBTP**, measured with ffmpeg `ebur128=peak=true` on `out/audio/mix.wav` (the snd-g4 and snd-v4 briefs; the earlier -14 / -1 was the streaming norm). The lamp click is the film's true peak, so the click's level against the film's body is what fits the mix inside that ratio (`tools/mix.mjs`).
 - Export stems (music, foley, ambience) so the mix can be rebalanced without re-synthesizing.
 - Check the mix on laptop speakers and on earbuds. Most judges will watch on one of those.
 - **Accessibility:** prepare a caption file with sound descriptions only (`[lamp clicks]`, `[clock ticking]`, `[heartbeat]`, `[door opens]`, `[a long breath out]`) for Deaf and hard-of-hearing viewers. Burn nothing into the picture.
