@@ -1,0 +1,4 @@
+s03 film 21 (s03 2.0)  r 0.0120  L (0.0067, 0.0073, 0.0208)  zB 0.0150  S 3.600  units 3.600  projected width 3.600 u  centre (0.0906, 0.0243)
+s03 film 24 (s03 5.0)  r 0.0180  L (0.0067, 0.0073, 0.0208)  zB 0.0150  S 3.600  units 5.400  projected width 5.400 u  centre (0.0906, 0.0459)
+s05 film 35 (s05 2.0)  r 0.0180  L (0.0750, 0.0175, 0.4148)  zB 0.3370  S 5.333  units 8.000  projected width 8.000 u  centre (-0.0210, 0.1535)
+s06 film 45 (s06 5.0)  r 0.0240  L (0.0067, 0.0073, 0.0225)  zB 0.0159  S 3.400  units 6.800  projected width 6.800 u  centre (0.0973, 0.0642)

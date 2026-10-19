@@ -17,6 +17,7 @@ import { makeRoommateTall, makeRoommateRound, HERON_STAND_Y } from '../character
 import { POSES, specPose, walk } from '../characters/poses.js';
 import { createBlob } from '../blob.js';
 import { act } from '../characters/acting.js';
+import { DESK, gameScreen, firing } from './s02.js';
 
 const DEG = Math.PI / 180;
 const F = (s) => Math.round(s * 12) / 12;  // spec times (2.67, 3.33, 4.83 ...) are 2s drawings: snap them to twelfths
@@ -26,6 +27,9 @@ const BLOB_R = { start: 0.018 };          // METER.gulp1 (README §1, v4): 1.5×
 const SEAT = 0.025, BACK = 0.048, TABLE = 0.025, CUSHION = 0.010;
 const TABLE_TRIM = 0.3;                    // coffee-table fascia albedo (ponytail: per-object exposure, by eye)
 const L = [0.075, CUSHION + 0.0075, 0.4148]; // the laptop screen's centre: the key (spec x, z: S = 0.4148 / 0.0648 = 6.40)
+// v7-laptop: the laptop at s02's cartoon scale (DESK.laptop), turned further to the camera (v6: 50°, its screen almost edge-on).
+// Its screen's centre stays on L (the base sinks into a thinner cushion), so the key, S and the 8.0 units are v6's exactly.
+const LAP_K = DESK.laptop.scale, LAP_YAW = 35 * DEG;
 // v4: the blob is 1.5×, the wall shadow keeps the spec's 8.0 units (README §1): S = 8.0 · 0.012 / r = 5.33, so with the laptop's light
 // where it is (L.z 0.4148) the blob's depth is z = L.z · (1 − 1 / S) = 0.337 (G4: 0.35 for the 1.25× blob). x keeps the shadow's centre
 // where G4 had it: L.x + (x − L.x) · S = 0.075 − 0.015 · 6.4. The blob still sits on the table top (z 0.33…0.36, x 0.025…0.080).
@@ -121,8 +125,9 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   piece('table_top', { ...torn(0.055, 0.03), color: tableTop, weight: 'kraft' }, { at: [0.0525, TABLE, 0.345], flat: true }).castShadow = false;
   // ---- The Student's floor cushion (z 0.405), and the couch cushion pulled to the floor that the laptop sits on.
   piece('cushion', { ...ellipse(0.06, 0.014), color: PALETTE.kraft, weight: 'kraft' }, { at: [0.12, 0.007, 0.405], tilt: true }).castShadow = false;
-  piece('laptop_cushion', { ...torn(0.032, CUSHION), color: '#' + new THREE.Color(PALETTE.navy).lerp(new THREE.Color(PALETTE.kraft), 0.3).getHexString(), res: 256 },
-    { at: [L[0] - 0.002, CUSHION / 2, L[2] + 0.009], tilt: true }).castShadow = false;
+  const lapCushion = piece('laptop_cushion', { ...torn(0.032, CUSHION), color: '#' + new THREE.Color(PALETTE.navy).lerp(new THREE.Color(PALETTE.kraft), 0.3).getHexString(), res: 256 },
+    { at: [L[0] - 0.002, CUSHION / 2, L[2] + 0.009], tilt: true, fit: [0.032 * LAP_K, CUSHION] });
+  lapCushion.castShadow = false;
 
   // ---- Roommates. roommate_tall at x −0.15 (feet on the floor when standing), roommate_round at x −0.06: the root is
   // its bottom, so the hidden 3 cm sit behind the seat strip and the head top lands at the spec's 0.08.
@@ -158,11 +163,12 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   gator.group.position.x = L[0] + 0.008 - tip.x;
   const STUDENT_POSE = { flat: studentPose(0), flick: studentPose(2) };
 
-  // The laptop (home_kit) on the cushion: screen toward his face (+x), turned 40° toward camera, the screen glowing a game
+  // The laptop (home_kit) on the cushion: screen toward his face (+x), turned 55° toward camera (v7), the screen glowing a game
   // (no text). Nothing on it casts.
   const laptop = new THREE.Group();
   laptop.position.set(L[0], CUSHION, L[2]);
-  laptop.rotation.y = 50 * DEG;
+  laptop.rotation.y = LAP_YAW;
+  laptop.scale.setScalar(LAP_K);
   scene.add(laptop);
   const lap = (name, w, y) => {
     const { opts, vis } = art(home, name), [sw] = home.sizes[name], vw = sw * (vis[2] - vis[0]), k = w / vw;
@@ -172,20 +178,15 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   };
   lap('laptop_base', 0.018, 0.0028);
   const scrH = lap('laptop_screen', 0.0185, 0.0015 + 0.006);
-  const gameArt = (() => {
-    const c = Object.assign(document.createElement('canvas'), { width: 128, height: 80 }), g = c.getContext('2d');
-    const col = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
-    const gr = g.createLinearGradient(0, 0, 0, 80); gr.addColorStop(0, PALETTE.phone); gr.addColorStop(1, col('phone', 'cream', 0.5));
-    g.fillStyle = gr; g.fillRect(0, 0, 128, 80);
-    g.fillStyle = col('navy', 'phone', 0.3);
-    for (const [x, y, w] of [[6, 62, 44], [60, 48, 30], [96, 34, 26], [0, 74, 128]]) g.fillRect(x, y, w, 6);
-    g.fillStyle = PALETTE.cream; g.beginPath(); g.arc(72, 41, 5, 0, 7); g.fill();
-    const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
-    return tex;
-  })();
-  const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.0185 * 0.78, scrH * 0.70), new THREE.MeshBasicMaterial({ map: gameArt }));
+  const game = gameScreen(PALETTE);
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(0.0185 * 0.78, scrH * 0.70), new THREE.MeshBasicMaterial({ map: game.texture }));
   glow.position.set(0, 0.0075 + scrH * 0.03, 0.0006);
   laptop.add(glow);
+  // v7: scaled, the screen's centre would rise 6 mm and put the key above his snout (his head then threw a giant shadow over the
+  // room). The laptop sinks into a thinner cushion instead, so the screen's centre stays on v6's L and the key stays there.
+  laptop.updateMatrixWorld(true);
+  laptop.position.y -= glow.getWorldPosition(new THREE.Vector3()).y - L[1];
+  lapCushion.parent.scale.y *= laptop.position.y / CUSHION; lapCushion.parent.position.y = laptop.position.y / 2;
 
   // ---- The Exam on the coffee table.
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
@@ -268,6 +269,8 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       tall.group.visible = T <= WALK.t1;
       tallCtrlHand.visible = handCtrl;
       tallCtrlCouch.visible = !handCtrl;
+
+      game.fire(firing(tLocal, 0.33, 5.75));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.js: from gameNight + 0.33, in 5.75)
 
       // ---- The Exam: eyes up toward the roommates and the TV (side, −x), track the walker (flip as he passes at 4.5),
       // 5.00 squash, 5.08 hop (4 mm up), 5.17 lands and settles on a spring, 5.50 eyes open on the Student.

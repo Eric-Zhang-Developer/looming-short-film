@@ -12,7 +12,7 @@ import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
-import { DESK, B, tools, homeDesk, seatReach } from './s02.js';
+import { DESK, B, LAPTOP, tools, homeDesk, seatReach, firing } from './s02.js';
 import { banner, todoScreen, COUNTDOWN } from '../props/canvas.js';
 
 const ID = 's03', DEG = Math.PI / 180;
@@ -122,6 +122,8 @@ const FOCUS = [[2.0, 0.455], [3.0, 0.47]];                 // blob → wall over
 const SCREEN_Z = 3.6 * B[2] / (3.6 - 1);
 const SPOT_I = 0.022, FILL_K = 0.15, SUN_K = 0.35, SUN_SCALE = 0.8 * 0.03, SUN_SCALE_OFF = 0.8 * 0.3;   // v3: after the wake the window drops from 30% to 3% so the shadow goes dark, not pink
 const AMB_K = 0.2, AMB_K_OFF = 0.55;                                        // v3: ambient trimmed so the shadow is the darkest thing on the wall
+// v7-laptop: the halo was for a screen too small to read as a light; on the 1.8× screen at full strength it milked the game out.
+export const HALO = 0.45;
 const FLICK = 0.05;                                        // ±5% game flicker per 2s drawing
 const FACE_I = 0.012;                                      // character fill (README §10): cyan-navy, no shadow, dies before the wall
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
@@ -139,7 +141,7 @@ export async function build(ctx) {
   camera.position.set(...CAM.pos);
   camera.lookAt(...CAM.look);
   const T = tools(ctx, ID);
-  const set = await homeDesk(ctx, T);
+  const set = await homeDesk(ctx, T, LAPTOP);
   set.laptop.position.z += SCREEN_Z - DESK.screenZ;
   const fx = post({ focus: FOCUS[0][1], aperture: 0.01, lut: 'dawn' });
 
@@ -150,7 +152,9 @@ export async function build(ctx) {
   const cam = new THREE.Vector3(...CAM.pos), wp = (o, x, y, z) => { set.laptop.updateMatrixWorld(true); return o.localToWorld(new THREE.Vector3(x, y, z)); };
   set.setLid(0);
   const lidEdge = (deg) => { set.setLid(deg); const p = wp(set.lid.g, 0, set.lid.size[1], 0); set.setLid(0); return p; };
-  const keys = wp(set.laptop, 0, 0.0008, 0.002);
+  // v7: the 1.8× deck reaches in front of his hand's plane (z 0.029), so a fingertip solved onto the keys themselves sat under
+  // the deck, hidden; it hovers 3 mm over them instead (the camera ray through it still lands on the keys).
+  const keys = wp(set.laptop, 0, 0.0038, 0.002 * LAPTOP.laptopScale);
   const seat = (o) => specPose({ leg: 60, farLeg: 54, far: -40, ...o });
   const at = (p, range, o = {}) => { const r = seatReach(cam, p, range); return seat({ lean: r.lean, arm: r.arm, ...o }); };
   // [drawing, pose, shoulder drop (m)]. 0–0.17 anticipation, 0.17–0.33 the shrug, 0.42 back, 0.50 hand on the lid's
@@ -227,6 +231,7 @@ export async function build(ctx) {
       set.screenCentre(L);
       set.glow.visible = on;
       set.glow.material.color.setScalar(f >= 12 ? 1 : 0.35 + 0.5 * k);   // full game on laptopUp
+      set.game.fire(firing(t, 1.25, 0));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.js: from laptopUp + 0.25, in 0)
       sun.light.intensity = sunI * (SUN_SCALE_OFF + (SUN_SCALE - SUN_SCALE_OFF) * k);   // before the wake the window is the room; after it the screen is
       amb.intensity = ambI * (AMB_K_OFF + (AMB_K - AMB_K_OFF) * k);
 
@@ -249,7 +254,7 @@ export async function build(ctx) {
       fill.intensity = FILL_K * spot.intensity;
       face.intensity = FACE_I * k;
       halo.position.copy(L).add(new THREE.Vector3(0, 0, 0.002));
-      halo.visible = on; halo.material.opacity = k * flick;
+      halo.visible = on; halo.material.opacity = HALO * k * flick;
       C.set(B[0], r, B[2]);
       hit.subVectors(C, L).multiplyScalar(-L.z / (C.z - L.z)).add(L);
       aim(spot, exam.mesh);

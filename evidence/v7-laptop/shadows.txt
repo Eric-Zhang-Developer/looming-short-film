@@ -1,0 +1,19 @@
+v7-laptop · the blob's wall shadow, v6 against v7, at the same film times.
+Measured from the live shots by evidence/v7-laptop/shadows.mjs (one headless Chrome): each shot is built as film.js builds it, updated to the time,
+and its key light and Exam are read back. units = S · r / 0.012 with S = z_L / (z_L − z_B) (README §1). "width" projects the blob card's body
+circle (radius r, r above its contact, through the mesh's world matrix) from the key's world position onto the wall (z 0) and takes its x extent,
+in units of the 1× blob's diameter (0.024). v6 = this branch's base, 898603c (s02–s06 unchanged since the v6 render); v7 = this branch.
+Film 12 is s02's calendar insert: the laptop is shut and the key is the window (directional, 1×), so there is no screen shadow to measure.
+Raw lines: shadows_v6.txt, shadows_v7.txt.
+
+time      shot    v6 width  v7 width   change   v6 centre (m)       v7 centre (m)       moved
+film 12   s02         n/a       n/a        —   (no screen key)
+film 21   s03        3.600     3.600   +0.00%   (0.0906, 0.0243)    (0.0887, 0.0108)    dx -0.0019 dy -0.0135
+film 24   s03        5.400     5.400   +0.00%   (0.0906, 0.0459)    (0.0887, 0.0324)    dx -0.0019 dy -0.0135
+film 35   s05        8.000     8.000   +0.00%   (-0.0210, 0.1535)    (-0.0210, 0.1535)    dx +0.0000 dy +0.0000
+film 45   s06        6.800     6.800   +0.00%   (0.0973, 0.0642)    (0.1195, 0.0517)    dx +0.0222 dy -0.0125
+
+Every width is unchanged (limit ±5%). The light keeps its depth in every shot, and on a flat card S depends only on depth, so the size holds
+exactly; what moves is the light's height and x (the bigger screen sits higher), and the shadow moves (1 − S) times that across the wall:
+s03 1.35 cm lower; s06 2.2 cm right and 1.25 cm lower (its laptop is also 1 cm further left); s05 not at all (its laptop sinks into a thinner
+cushion so the screen centre stays on v6's L).

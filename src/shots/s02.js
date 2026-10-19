@@ -41,9 +41,15 @@ export const DESK = {
   phone: [0.031, 0.026],           // phone rest (x, z), face-up, long side along x
   pen: [-0.016, 0.0305],
   screenZ: 0.0225,                 // the open laptop screen's centre (the screen light): S 3.0 on s03's blob at z 0.015, S 4.06 on s06's at 0.0170
+  // v7-laptop: the laptop at cartoon scale next to his cartoon head (real scale, 33 cm, read as a phone at 0:20), turned
+  // toward the camera so the lit screen shows (v6: −55°, edge-on). homeDesk's laptopScale/laptopYaw default to v6's for
+  // the shots that don't ask (s00, s18).
+  laptop: { scale: 1.8, yaw: -30 * DEG },
 };
 DESK.lampMouth = [DESK.lamp.x, DESK.lamp.h * 0.646, DESK.lamp.z];
 DESK.bead = [DESK.lamp.x - DESK.lamp.h * 21 / 212, DESK.lamp.h * 0.505, DESK.lamp.z];
+/** homeDesk's options for the v7 laptop (s02, s03, s06). */
+export const LAPTOP = { laptopScale: DESK.laptop.scale, laptopYaw: DESK.laptop.yaw };
 { const c = DESK.cal; c.h = c.w * 292 / 275; c.friXY = [c.x0 + c.fri[0] * c.w, c.y0 + c.h * (1 - c.fri[1])]; }
 
 // Paper helpers shared by the home desk shots (from s04: torn rects, kit pieces cut by their visible box, tiles).
@@ -115,7 +121,7 @@ export function seatReach(cam, p, [l0, l1] = [0, 34], hip = DESK.hip) {
 
 // The room: cream wall, plank floor, desk (top + painted front), chair, lamp, calendar, page, phone, laptop (and pen).
 // Returns handles; each shot animates what it needs (lid, screen glow, phone screen, lamp).
-export async function homeDesk(ctx, T, { laptopAt = [0.0, 0.022], laptopYaw = -55 * DEG, pen = false } = {}) {
+export async function homeDesk(ctx, T, { laptopAt = [0.0, 0.022], laptopYaw = -55 * DEG, laptopScale = 1, pen = false } = {}) {
   const { scene, assets, PALETTE } = ctx;
   const [home, props] = await Promise.all([assets.load('home_kit'), assets.load('props_kit')]);
   const { cut, rect, tiled, paper, group, col } = T;
@@ -164,24 +170,16 @@ export async function homeDesk(ctx, T, { laptopAt = [0.0, 0.022], laptopYaw = -5
   laptop.position.set(laptopAt[0], 0.0004, laptopAt[1]);
   laptop.rotation.y = laptopYaw;
   scene.add(laptop);
-  const LW = 0.018, LD = 0.012;
+  const LW = 0.018 * laptopScale, LD = 0.012 * laptopScale;
   const base = cut(home, 'laptop_base', [LW, LD], 'laptop_base', { parent: laptop });
   base.g.rotation.x = -Math.PI / 2;
   const hinge = new THREE.Group(); hinge.position.set(0, 0.0003, -LD / 2); laptop.add(hinge);
   const lid = cut(home, 'laptop_screen', [LW * 1.02, null], 'laptop_lid', { anchor: [0.5, 0], parent: hinge });
   lid.g.rotation.x = Math.PI / 2;   // lying along +z over the deck, face down
   const LH = lid.size[1];
-  // The screen's glow: an unlit plane over the painted screen with a game on it (shapes only, no text, no logo).
-  const glowTex = (() => {
-    const W = 256, H = 160, c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
-    g.fillStyle = col('phone', 'navy', 0.3); g.fillRect(0, 0, W, H);
-    g.fillStyle = col('phone', 'cream', 0.5); g.fillRect(0, H * 0.78, W, H * 0.22);                     // ground
-    g.fillStyle = PALETTE.lamp; g.beginPath(); g.arc(W * 0.3, H * 0.66, H * 0.11, 0, 7); g.fill();       // the hero
-    g.fillStyle = PALETTE.cream; for (const [x, y, w] of [[0.5, 0.48, 0.16], [0.74, 0.3, 0.14]]) g.fillRect(W * x, H * y, W * w, H * 0.07);
-    g.fillStyle = col('navy', 'phone', 0.2); g.beginPath(); g.moveTo(W * 0.78, H * 0.78); g.lineTo(W * 0.86, H * 0.6); g.lineTo(W * 0.94, H * 0.78); g.fill();
-    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
-  })();
-  const glow = new THREE.Mesh(new THREE.PlaneGeometry(LW * 0.84, LH * 0.62), new THREE.MeshBasicMaterial({ map: glowTex, toneMapped: false }));
+  // The screen's glow: an unlit plane over the painted screen with the shooter on it (gameScreen; no text, no logo).
+  const game = gameScreen(PALETTE);
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(LW * 0.84, LH * 0.62), new THREE.MeshBasicMaterial({ map: game.texture, toneMapped: false }));
   glow.position.set(0, LH * 0.6, 0.0002);
   lid.g.add(glow);
   glow.visible = false;
@@ -193,8 +191,70 @@ export async function homeDesk(ctx, T, { laptopAt = [0.0, 0.022], laptopYaw = -5
   laptop.position.z += DESK.screenZ - screenCentre().z;
   setLid(0);
 
-  return { home, props, desk, chair, lamp, calendar, square, circle, page, pen: penO, phone, laptop, lid, glow, setLid, screenCentre, screenNormal };
+  return { home, props, desk, chair, lamp, calendar, square, circle, page, pen: penO, phone, laptop, lid, glow, game, setLid, screenCentre, screenNormal };
 }
+
+// v7-laptop: his game is a shooter (the director: real CS2 audio "makes it more relatable"), drawn in the paper style: a
+// first-person view down a sandy lane between blocky walls and crates, a crosshair in the middle, his gun at lower right
+// held in a green hand. No logos, no text, no HUD numbers. fire(on) redraws it with a muzzle flash and the gun kicked
+// back (only when the state changes). Shared by every laptop screen (homeDesk's, s05's).
+export function gameScreen(PALETTE) {
+  const W = 320, H = 200, c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
+  const col = (a, b, k) => '#' + new THREE.Color(PALETTE[a] ?? a).lerp(new THREE.Color(PALETTE[b] ?? b), k).getHexString();
+  const r = mulberry32(seedOf('laptop', 'game'));
+  const torn = (pts) => pts.map(([x, y]) => [x + (r() - 0.5) * 2.4, y + (r() - 0.5) * 2.4]);   // cut-paper wobble, fixed once
+  const SHAPES = [   // [fill, points] back to front, in canvas px; the horizon at y 92
+    ['sky', [[0, 0], [W, 0], [W, 96], [0, 96]]],
+    ['sand', [[0, 92], [W, 92], [W, H], [0, H]]],
+    ['wallFar', [[120, 54], [205, 54], [205, 94], [120, 94]]],                  // the far wall, a dark doorway in it
+    ['door', [[150, 66], [172, 66], [172, 94], [150, 94]]],
+    ['wallL', [[0, 10], [122, 50], [122, 96], [0, 150]]],                       // the near-left wall, receding
+    ['wallLtop', [[0, 10], [122, 50], [122, 56], [0, 26]]],
+    ['wallR', [[W, 24], [203, 52], [203, 95], [W, 132]]],                      // the near-right building
+    ['wallRtop', [[W, 24], [203, 52], [203, 58], [W, 40]]],
+    ['crate', [[214, 82], [240, 82], [240, 108], [214, 108]]],                  // two crates on the right
+    ['crate2', [[232, 92], [256, 92], [256, 116], [232, 116]]],
+  ];
+  const FILL = {
+    sky: col('phone', 'cream', 0.25), sand: col('cream', 'phone', 0.3), wallFar: col('kraft', 'cream', 0.15), door: col('navy', 'ink', 0.2),
+    wallL: col('kraft', 'navy', 0.15), wallLtop: col('kraft', 'cream', 0.3), wallR: col('kraft', 'navy', 0.3), wallRtop: col('kraft', 'cream', 0.2),
+    crate: col('kraft', 'lamp', 0.25), crate2: col('kraft', 'navy', 0.1),
+  };
+  const shapes = SHAPES.map(([k, p]) => [FILL[k], k === 'sky' || k === 'sand' ? p : torn(p)]);
+  const gun = torn([[318, 200], [236, 200], [214, 172], [196, 150], [205, 142], [226, 152], [262, 150], [292, 166], [318, 168]]);   // the receiver and barrel, aimed in
+  const hand = torn([[250, 200], [238, 176], [256, 166], [282, 176], [290, 200]]);
+  const star = (k0, k1) => Array.from({ length: 10 }, (_, i) => { const a = -2.4 + i * Math.PI / 5, k = i % 2 ? k0 : k1; return [200 + k * Math.cos(a), 146 + k * Math.sin(a)]; });
+  const flash = star(14, 36), core = star(6, 16);   // at the barrel's tip
+  const poly = (fill, pts, dx = 0, dy = 0) => {
+    g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x + dx, y + dy) : g.moveTo(x + dx, y + dy))); g.closePath();
+    g.fillStyle = fill; g.fill();
+    g.strokeStyle = 'rgba(242,232,213,0.5)'; g.lineWidth = 1; g.stroke();   // the pale torn rim
+  };
+  const draw = (on) => {
+    for (const [f, p] of shapes) poly(f, p);
+    g.strokeStyle = col('navy', 'kraft', 0.3); g.lineWidth = 2;                // the crates' cross-braces
+    for (const [x0, y0, s] of [[214, 82, 26], [232, 92, 24]]) { g.beginPath(); g.moveTo(x0 + 3, y0 + 3); g.lineTo(x0 + s - 3, y0 + s - 3); g.moveTo(x0 + s - 3, y0 + 3); g.lineTo(x0 + 3, y0 + s - 3); g.stroke(); }
+    const [dx, dy] = on ? [6, 7] : [0, 0];                                     // the kick: back and down
+    if (on) { poly(PALETTE.lamp, flash); poly(PALETTE.cream, core); }
+    poly(col('navy', 'ink', 0.3), gun, dx, dy);
+    poly(col('gator', 'navy', 0.15), hand, dx, dy);
+    g.fillStyle = PALETTE.cream;                                               // the crosshair: four bars, a gap
+    g.strokeStyle = PALETTE.navy; g.lineWidth = 2;
+    for (const [x, y, w, h] of [[W / 2 - 20, H / 2 - 2.5, 14, 5], [W / 2 + 6, H / 2 - 2.5, 14, 5], [W / 2 - 2.5, H / 2 - 20, 5, 14], [W / 2 - 2.5, H / 2 + 6, 5, 14]]) { g.strokeRect(x, y, w, h); g.fillRect(x, y, w, h); }
+  };
+  const texture = new THREE.CanvasTexture(c); texture.colorSpace = THREE.SRGBColorSpace;
+  let state = null;
+  const fire = (on) => { if (on === state) return; state = on; draw(on); texture.needsUpdate = true; };
+  fire(false);
+  return { texture, fire };
+}
+// The CS2 clip's bursts of fire, in the clip's own seconds (v7-laptop: its loudness envelope at 1/24 s, assets/raw/reels/cs2.mp3).
+// cues.js plays it from `inSec` at shot-local `from`; firing(t, from, inSec) is on during a burst, flashing on alternate 2s drawings.
+const CS2_BURSTS = [[1.38, 1.82], [3.44, 4.70], [9.95, 10.72], [11.38, 12.0]];
+export const firing = (t, from, inSec) => {
+  const c = t - from + inSec, f = Math.floor(t * 12 + 1e-6);
+  return t >= from && CS2_BURSTS.some(([a, b]) => c >= a && c < b) && f % 2 === 0;
+};
 
 // ---------- s02 ----------
 const ID = 's02';
@@ -310,7 +370,7 @@ export async function build(ctx) {
   const { scene, camera, PALETTE, post } = ctx;
   scene.background = new THREE.Color(PALETTE.navy);
   const T = tools(ctx, ID);
-  const room = await homeDesk(ctx, T);
+  const room = await homeDesk(ctx, T, LAPTOP);
   const drip = wordDrip(room, PALETTE);
   const fx = post({ focus: 0.4, aperture: 0.01, lut: 'dawn' });
   const clock = await makeClock(ctx, { seed: 2 });

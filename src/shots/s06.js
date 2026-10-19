@@ -14,8 +14,8 @@ import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
-import { DESK, tools, homeDesk, seatReach } from './s02.js';
-import { screenHalo, reminderInsert } from './s03.js';
+import { DESK, LAPTOP, tools, homeDesk, seatReach, firing } from './s02.js';
+import { screenHalo, reminderInsert, HALO } from './s03.js';
 import { COUNTDOWN } from '../props/canvas.js';
 
 const ID = 's06', DEG = Math.PI / 180;
@@ -25,6 +25,8 @@ const BLOB_R = { start: 0.018, gulp2: 0.024 };            // METER.gulp1 → MET
 const UNITS0 = 5.1, S_WALL = UNITS0 * 0.012 / BLOB_R.start;
 const MARK_Z = DESK.screenZ * (1 - 1 / S_WALL);
 const MARK_X = 0.026 + 1.15 * (BLOB_R.start - 0.015), GROW_DX = 1.15 * (BLOB_R.gulp2 - BLOB_R.start), HOP_DX = -0.003;   // v3's left edge (0.0088) stays put, on the gulp too
+// v7-laptop: the 1.8× laptop centred 1 cm nearer him than s02's, so its lid clears the blob's left edge (0.0088).
+const LAPTOP_AT = [-0.010, 0.022];
 const ON = 0.5, OFF = 3.0, GULP = 4.0;                     // lampClickHome, lampOffHome, gulp2 (local)
 const CAM = { pos: [0.05, 0.125, 0.60], look: [0.05, 0.058, 0.02] };   // high and wide enough to hold the 6.1-unit loom
 const FOCUS = 0.58;
@@ -47,7 +49,7 @@ export async function build(ctx) {
   camera.position.set(...CAM.pos);
   camera.lookAt(...CAM.look);
   const T = tools(ctx, ID);
-  const set = await homeDesk(ctx, T, { pen: true });
+  const set = await homeDesk(ctx, T, { ...LAPTOP, laptopAt: LAPTOP_AT, pen: true });
   set.setLid(110);
   set.glow.visible = true;
   const fx = post({ focus: FOCUS, aperture: 0.012, lut: 'night' });
@@ -60,7 +62,7 @@ export async function build(ctx) {
   set.lamp.g.scale.multiplyScalar(LAMP.h / DESK.lamp.h);
   const cam = new THREE.Vector3(...CAM.pos), bead = new THREE.Vector3(...LAMP_BEAD);
   set.laptop.updateMatrixWorld(true);
-  const keys = set.laptop.localToWorld(new THREE.Vector3(0, 0.0008, 0.002));
+  const keys = set.laptop.localToWorld(new THREE.Vector3(0, 0.0038, 0.002 * LAPTOP.laptopScale));   // v7: hovering 3 mm over the 1.8× deck (s03)
   const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
   const at = (p, range, o = {}) => { const r = seatReach(cam, p, range); return seat({ lean: r.lean, arm: r.arm, ...o }); };
   const up = (dy) => bead.clone().add(new THREE.Vector3(0, dy, 0));
@@ -69,8 +71,8 @@ export async function build(ctx) {
     reach: at(up(0.003), [8, 30]), touch: at(bead, [8, 30]), press: at(up(-0.0015), [8, 30]),
     recoil: seat({ lean: -6, arm: -55, far: -60, head: 4, tail: 12 }), stare: seat({ lean: -6, arm: -70, head: 4 }),
     away: seat({ lean: -9, arm: -70, head: 4 }),
-    grab: at(keys.clone().add(new THREE.Vector3(-0.003, 0.004, 0)), [14, 34], { head: -6 }),
-    keys: at(keys, [18, 36], { head: -12 }),
+    grab: at(keys.clone().add(new THREE.Vector3(-0.003, 0.004, 0)), [4, 34], { head: -6 }),   // v7: the laptop is 1 cm nearer him, so he leans less
+    keys: at(keys, [4, 36], { head: -12 }),
   };
   P.tap = { ...P.keys, arm_r: P.keys.arm_r + 2 * DEG };
   const press = (t0) => ['rest', 'rest', 'antic', 'lift', 'reach', 'touch', 'press', 'touch'].map((n, i) => [t0 + F(i), n]);
@@ -187,7 +189,8 @@ export async function build(ctx) {
       lamp.light.target.position.copy(foot); lamp.light.target.updateMatrixWorld();
       lamp.update(t);
       shadeGlow.visible = lk > 0;
-      halo.material.opacity = (lit ? 0.15 : 1) * flick;
+      halo.material.opacity = HALO * (lit ? 0.15 : 1) * flick;
+      set.game.fire(firing(t, GULP + 0.5, 0));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.js: from gulp2 + 0.5, in 0)
       face.color.copy(lit ? faceCream : faceCyan);
       face.intensity = lit ? FACE_LAMP : FACE_SCREEN;
       phoneLit.visible = phoneHalo.visible = t >= PH_ON - 1e-6 && t < GULP - 1e-6;
