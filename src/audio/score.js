@@ -146,6 +146,9 @@ export const SCORE = [
   ev('lightFlood', 0, 'pad', [48, 55, 64, 72], { dur: 0.3, attack: 0.15, release: 2.2, gain: 0.3, motif: 'chord' }),
   // The blob blinks: one music-box note at its birth pitch, very soft. Confused, not gone.
   ev('blobBlinks', 0, 'box', EXAM[0][0], { vel: 0.2, dur: 1.2, motif: 'exam' }),
+  // 1:52–1:56.5 The stacks (v6): the chord's near-silence keeps its breath, then a low C-major pad comes in under the
+  // first strip light and carries him to the desk, so the 6 s the stacks added aren't 9.5 s of no music.
+  ev('underLight1', 0, 'pad', [36, 48, 55, 64], { dur: beat('deskSit') - beat('underLight1'), attack: 2, release: 1.5, gain: 0.3 }),
 
   // 1:50–2:02 Under the light (v4): Act 4's theme in major, softly: its first phrase on felt piano, one note every two
   // seconds over major chords, and the music box answering with the motif's first note when the blob settles. The s13
