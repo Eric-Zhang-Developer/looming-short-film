@@ -49,7 +49,8 @@ Each dodge is one obvious idea, and the blob is one size bigger every time.
 - **1:42 · s10 ★ The threshold (8 s).** He pushes Marston's door. **Warm light from above floods him, and the shadow snaps to a puddle.** The pulse resolves into a single held chord, then near-silence. The blob blinks, suddenly small and confused at his feet. He closes his eyes and exhales. *Face: resolve → relief (eyes closed, brows up).* Close-up on `gator_hero`.
 
 ### Act 4 · Under the light (1:50–2:38)
-- **1:50 · s11 ✎** He sits at a window desk (the perforated cubicle, the ring pendant above). The blob climbs onto the desk beside him: big, but nothing like its shadow, and a little nervous.
+- **1:50 · s10b ✎ The stacks (6 s, v6).** v3's walk down a stacks aisle toward the lens, brought back and flipped: he glances at his phone and slides it into his hoodie pocket; one warm strip light per bay keys him from above, and under each the blob's shadow is only a small pool on the carpet. *Face: resolve → relief, then eyes open on a small smile; slow breath.*
+- **1:56 · s11 ✎** He sits at a window desk (the perforated cubicle, the ring pendant above). The blob climbs onto the desk beside him: big, but nothing like its shadow, and a little nervous.
 - **1:57 · s13 ✎ Everyone has one (5 s).** Top-down over the reading room: other gators studying, each with a small blob under their own light. He's not alone, and they're working.
 - **2:02 · s15 ✎ The name (8 s).** He uncaps the pen and writes his name at the top of the page. The blob flinches. *Face: resolve → a small, surprised smile.* (No sensor; the light is already on.)
 - **2:10 · s16 ✎ Practice (16 s).** ∫x·eˣ dx with the crossing-out and the check, the blob shrinking a step per problem; the series; a short montage. *The comedy beat: "That was it?"*

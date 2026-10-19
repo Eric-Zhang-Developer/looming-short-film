@@ -1,13 +1,13 @@
 // @ts-check
 // Single source of timing truth (contracts.md). Data only: no clocks, no rendering.
-// The v4 cut (spec-v4, story approved by the director 2026-10-17): 3:15. Shots and beats from docs/02-story.md's beat
+// The v4 cut (spec-v4, story approved by the director 2026-10-17): 3:15; v6 adds s10b (the stacks, 6 s): 3:21. Shots and beats from docs/02-story.md's beat
 // sheet and docs/shots/sNN.md (local seconds); a letter after a number means a shot added after the numbering froze
-// (s00 before s01; s09a-c after s08; s17b after s17). Cut since G4: s09 (Marston exterior), s12 (quiet 1), s14 (custodian);
+// (s00 before s01; s09a-c after s08; s10b after s10; s17b after s17). Cut since G4: s09 (Marston exterior), s12 (quiet 1), s14 (custodian);
 // s07, s08 and s10 keep their file names for new shots (bed rot, 3 a.m., the threshold).
 // The climax runs on two grids: the clock's tick at 1 s (s08 from 60.0) and the walk's pulse at 0.5 s (s09c from 84.0),
 // so every lamp, the block, the door push and the light land on whole half-seconds of global time.
 // Durations are written out (not derived) so tools/check_timeline.mjs can catch gaps and overlaps.
-export const DURATION = 195;
+export const DURATION = 201;
 
 export const SHOTS = [
   { id: 's00',  start: 0,   duration: 4,  beats: { notifyBuzz: 0.5 } },                                   // 0:00 cold open
@@ -23,14 +23,15 @@ export const SHOTS = [
   { id: 's09b', start: 76,  duration: 6,  beats: { doorOpen: 1, shadowAhead: 2.5, stepIntoShadow: 4.5 } }, // 1:16 the door
   { id: 's09c', start: 82,  duration: 20, beats: { walkStart: 0, lamp1: 2, lamp2: 5.5, lamp3: 8.5, blobBlocks: 10, stepAround: 12, lamp4: 13.5, lamp5: 15, marstonSeen: 16 } }, // 1:22 the walk
   { id: 's10',  start: 102, duration: 8,  beats: { doorPush: 1, lightFlood: 1.5, blobBlinks: 2.5, exhale: 5 } }, // 1:42 the threshold
-  { id: 's11',  start: 110, duration: 7,  beats: { deskSit: 0.5, blobClimbs: 3, blobSettles: 5 } },     // 1:50
-  { id: 's13',  start: 117, duration: 5,  beats: { headLift: 0.5, revealDrinks: 1.5, revealFreshman: 2.75 } }, // 1:57
-  { id: 's15',  start: 122, duration: 8,  beats: { penUncap: 1.5, nameWritten: 4.5, nameSmile: 5.5 } },  // 2:02
-  { id: 's16',  start: 130, duration: 16, beats: { crossOut: 4.6, problemOneSolved: 6.5, problemSolved2: 11.5, problemSolved3: 13, problemSolved4: 14, problemSolved5: 15 } }, // 2:10
-  { id: 's17',  start: 146, duration: 12, beats: { quiet2Start: 0, dawnBird1: 3, dawnBird2: 7, dawnBird3: 10 } },   // 2:26
-  { id: 's17b', start: 158, duration: 10, beats: { examRoom: 0, testRecognise: 4, testSmile: 5.5, testSolved: 9.5 } }, // 2:38
-  { id: 's17c', start: 168, duration: 7,  beats: { gradeSlide: 0.5, gradeReveal: 2, gradeGrin: 4 } },   // 2:48
-  { id: 's18',  start: 175, duration: 20, beats: { examCrossedOff: 2, blobAbsorbed: 5.5, lampSitBack: 7.5, newDate: 12.5, dropQuivers: 14, tagPenUncap: 16.5 } }, // 2:55 → 3:15
+  { id: 's10b', start: 110, duration: 6,  beats: { pocketPhone: 1, underLight1: 2, underLight2: 4.5 } }, // 1:50 the stacks (v6: v3's walk, under the light)
+  { id: 's11',  start: 116, duration: 7,  beats: { deskSit: 0.5, blobClimbs: 3, blobSettles: 5 } },     // 1:56
+  { id: 's13',  start: 123, duration: 5,  beats: { headLift: 0.5, revealDrinks: 1.5, revealFreshman: 2.75 } }, // 2:03
+  { id: 's15',  start: 128, duration: 8,  beats: { penUncap: 1.5, nameWritten: 4.5, nameSmile: 5.5 } },  // 2:08
+  { id: 's16',  start: 136, duration: 16, beats: { crossOut: 4.6, problemOneSolved: 6.5, problemSolved2: 11.5, problemSolved3: 13, problemSolved4: 14, problemSolved5: 15 } }, // 2:16
+  { id: 's17',  start: 152, duration: 12, beats: { quiet2Start: 0, dawnBird1: 3, dawnBird2: 7, dawnBird3: 10 } },   // 2:32
+  { id: 's17b', start: 164, duration: 10, beats: { examRoom: 0, testRecognise: 4, testSmile: 5.5, testSolved: 9.5 } }, // 2:44
+  { id: 's17c', start: 174, duration: 7,  beats: { gradeSlide: 0.5, gradeReveal: 2, gradeGrin: 4 } },   // 2:54
+  { id: 's18',  start: 181, duration: 20, beats: { examCrossedOff: 2, blobAbsorbed: 5.5, lampSitBack: 7.5, newDate: 12.5, dropQuivers: 14, tagPenUncap: 16.5 } }, // 3:01 → 3:21
 ];
 
 export function shotAt(t) {

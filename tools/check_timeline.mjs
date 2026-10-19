@@ -1,7 +1,8 @@
 // @ts-check
 // node tools/check_timeline.mjs [--file=path/to/timeline.js]
 // Fails on gaps, overlaps, total outside TARGET ±5 s, duplicate beat names, beats outside their shot.
-// TARGET is the director's runtime: 3:15, inside his 3:10–3:20 (G4, 2026-10-15; was 180).
+// TARGET is the director's runtime: 3:21 (v6-stacks: he approved "Runtime goes to 3:21" for the stacks walk, 2026-10-18;
+// was 3:15 from G4, 2026-10-15, and 180 before that).
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
@@ -14,7 +15,7 @@ const errs = [];
 const seen = new Map();
 const rows = [];
 const E = 1e-6;
-const TARGET = 195;
+const TARGET = 201;
 let end = 0;
 for (const s of SHOTS) {
   if (s.start > end + E) errs.push(`gap: ${end}s to ${s.start}s before ${s.id}`);
