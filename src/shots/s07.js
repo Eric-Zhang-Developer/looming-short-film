@@ -25,6 +25,7 @@ export const at2 = (T, a, b) => T >= F(a) - 1e-6 && T < F(b) - 1e-6;
 // ---------- the bedroom (m; back wall z 0, floor y 0, the kits' 1 real m = 0.055 film m) ----------
 const BED = { x0: 0.125, w: 0.120, z: 0.355, back: 0.27, matB: 0.021, matH: 0.016 };
 const MT = BED.matB + BED.matH;                               // mattress top, 0.037 (67 cm)
+const DUVET_TUCK = 0.010;                                     // the duvet card's bottom, under the mattress top (v6-bed)
 export const ROOM = {
   CEIL: 0.145, BED, MT,
   WIN: { A: -0.168, B: -0.088, y: 0.068, h: 0.062, hw: 0.0245 },
@@ -49,8 +50,11 @@ export const CAM = new THREE.Vector3(0.255, 0.040, 0.90), LOOK = new THREE.Vecto
 // ---------- him, lying (lie_phone, built here with specPose: brief) ----------
 // On his back, head on the pillow at the bed's left end, snout up: the body turned +90° (lean −90), so his front faces
 // the ceiling and his feet point +x. Both arms up to the phone on his chest; legs forward under the blanket.
+// LIE_HEAD (v6-bed): the head lies back on the pillow, snout tilted ~40° up toward the phone. At −14° the snout stood on
+// end (76°) and the eye dome dropped beside the headboard, reading as two heads. Every lying pose uses it.
 export const HIP = /** @type {Vec3} */ ([0.195, MT + 0.011, ROOM.BODY_Z]);
-export const LIE = specPose({ lean: -90, arm: 0, far: 10, head: -14, leg: 80, farLeg: 84, tail: -88 });
+export const LIE_HEAD = -50;
+export const LIE = specPose({ lean: -90, arm: 0, far: 10, head: LIE_HEAD, leg: 80, farLeg: 84, tail: -88 });
 const FLICK = 1.8;                                            // thumb flick: 1 mm at the near arm's tip (0.032)
 // ---------- the Exam on his knees ----------
 export const BLOB_R = { start: 0.024, gulp3: 0.030 };         // 2× → 2.5× (README §1, Q16 answered 2.5×)
@@ -110,6 +114,10 @@ export async function bedroom(ctx, ID) {
   cut(home, 'bed_pillow', [0.036, null], 'bed_pillow', { anchor: [0.5, 0] }).g.position.set(0.143, MT - 0.003, 0.296);
   const blanket = cut(home, 'bed_blanket', [0.086, null], 'bed_blanket', { anchor: [0.5, 1], weight: 'tissue' });
   blanket.g.position.set(0.211, KNEE[1] + 0.001, ROOM.BLANKET_Z);
+  // v6-bed (director: "you see how the gator is floating"): at its art's height the card stopped about 5 mm short of the
+  // mattress, and his boots and the wall showed under it. Stretched down from its top (anchor [0.5, 1]) to DUVET_TUCK under
+  // the mattress top, where the mattress face in front hides its edge, it drapes onto the bed.
+  blanket.g.scale.y = (blanket.g.position.y - (MT - DUVET_TUCK)) / blanket.size[1];
   cut(home, 'laundry_pile', [0.030, null], 'laundry', { anchor: [0.5, 0], tilt: true }).g.position.set(0.100, 0, 0.36);
 
   // The nightstand and its lamp (procedural paper; s09a clicks it on). Kraft box, navy base and stem, tissue shade.

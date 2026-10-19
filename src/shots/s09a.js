@@ -13,7 +13,7 @@ import { act } from '../characters/acting.js';
 import { hipHeight } from '../characters/gator.js';
 import { specPose, POSES } from '../characters/poses.js';
 import { DIM, AMB_DIM } from './s08.js';
-import { bedroom, closeHeads, ROOM, CAM, LOOK, LIE, KNEE, HIP, PHONE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT } from './s07.js';
+import { bedroom, closeHeads, ROOM, CAM, LOOK, LIE, LIE_HEAD, KNEE, HIP, PHONE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT } from './s07.js';
 
 const ID = 's09a', DEG = Math.PI / 180;
 export const BLOB_R = { start: 0.030 };                       // 2.5× (README §1, Q16)
@@ -28,7 +28,7 @@ const inC4 = (T) => T >= 1.5 - 1e-6 && T < 4.25 - 1e-6;
 // REACH_LIE above); EDGE: sitting on the bed's near edge, legs down; STAND, GRAB (bent to the backpack),
 // LIFT, SLUNG (backpack on), STEP (walk contact).
 // REACH_LIE (fix-bedroom): still lying, the near arm out and down to frame right, to the lamp's switch under the shade.
-const REACH_LIE = specPose({ lean: -90, arm: 35, far: 10, head: -14, leg: 80, farLeg: 84, tail: -88 });
+const REACH_LIE = specPose({ lean: -90, arm: 35, far: 10, head: LIE_HEAD, leg: 80, farLeg: 84, tail: -88 });   // the head stays on the pillow (v6-bed)
 const SIT = specPose({ lean: 0, arm: -40, far: -50, head: 0, leg: 80, farLeg: 84, tail: -60 });
 const EDGE = specPose({ lean: 4, arm: -70, far: -80, head: 0, leg: 70, farLeg: 66, tail: -40 });
 const STAND_ANTIC = specPose({ lean: 18, arm: -80, far: -90, leg: 20, farLeg: 16, tail: -20 });
@@ -57,7 +57,7 @@ const GLOW = 0.3;                                            // the blob's eyes 
 export async function build(ctx) {
   const { scene, camera, post, PALETTE } = ctx;
   const R = await bedroom(ctx, ID), { T: tl, rig, exam, caster, spot, fill, spill, lamp, shadeMat, clock, phone, glow, phoneDown, backpack, blanket } = R;
-  const blanketY = blanket.g.position.y;
+  const blanketY = blanket.g.position.y, blanketSY = blanket.g.scale.y;
   const H = await closeHeads(ctx, tl, rig, ['dread', 'resolve']);
   const ph = phone.children.filter((c) => c !== glow && c !== phoneDown.g);
   const fx = post({ focus: 0.6, aperture: 0.012, lut: 'night' });
@@ -152,7 +152,11 @@ export async function build(ctx) {
       H.show(c4 ? (T < 3 - 1e-6 ? 'dread' : 'resolve') : null, { closed });
 
       // ---- the blanket drops to his lap when he sits up (3.5), so the blob at the bed's foot shows over it ----
-      blanket.g.position.y = blanketY - (T >= UP - 1e-6 ? 0.02 : 0);
+      // v6-bed: the card now reaches under the mattress top, so it drops by getting 2 cm shorter: its top falls to his lap
+      // and its bottom stays tucked behind the mattress face, not hanging 2 cm below it.
+      const drop = T >= UP - 1e-6 ? 0.02 : 0;
+      blanket.g.position.y = blanketY - drop;
+      blanket.g.scale.y = blanketSY - drop / blanket.size[1];
 
       // ---- the phone: lift 2 mm (0.25), on edge (0.417), face down on his chest (0.5); slides onto the blanket (4.25) ----
       phone.position.set(...PHONE.at);
