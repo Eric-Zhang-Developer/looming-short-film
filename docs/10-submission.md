@@ -24,7 +24,7 @@ Alternatives, if a subtitle helps: *Looming: a paper film about the first step*,
 ## Project Synopsis
 > Provide a brief description of the project and its goals.
 
-*Looming* is a 3:15 wordless animated short about a UF student, a small gator, and the exam he keeps avoiding. The exam is a drop of ink that rolls off his calendar and becomes a little blob with eyes. Every time he looks away from it, it grows half a size, up to two and a half times. Its shadow grows far more: under the low glow of his laptop or phone it fills the wall and the ceiling, and under light from above it shrinks to a puddle. [now: all 21 shots built; final master rendered 2026-10-18, `out/looming_final.mp4`]
+*Looming* is a 3:15 wordless animated short about a UF student, a small gator, and the exam he keeps avoiding. The exam is a drop of ink that rolls off his calendar and becomes a little blob with eyes. Every time he looks away from it, it grows half a size, up to two and a half times. Its shadow grows far more: under the low glow of his laptop or phone it fills the wall and the ceiling, and under light from above it shrinks to a puddle. [now: all 21 shots built; final master rendered 2026-10-18, `out/looming_v5.mp4`]
 
 The film runs on one physical rule: **light held low and close makes the shadow loom; light from above makes it small.** The shadows are not drawn. They are real light computed in code, so the film's metaphor is literally the algorithm.
 

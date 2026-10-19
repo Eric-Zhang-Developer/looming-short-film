@@ -3,8 +3,8 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-18
 
-## FINAL (2026-10-18, 22:03): the master is rendered (walk redone and spliced in) · submission is the director's · due 11:59 PM tonight
-**Read `docs/notes/submit-tonight.md` first.** Ready: `out/looming_final.mp4` (1080p, 3:15, −15.9 LUFS / −4.8 dBTP; for YouTube), `out/looming_final_backup.mp4` (720p, 8.65 MB; the ProposalSpace upload), `out/stills/` (three PNGs). Everything is merged and pushed on `wave/3-assets`; no task worktrees are left. Fix round 1 (four builders after `evidence/cold-v4/report.md`) is merged; what's left is in `docs/notes/v4-fixlist.md`.
+## v5 (2026-10-18, 22:03; was "final"): the master is rendered (walk redone and spliced in) · submission is the director's · due 11:59 PM tonight
+**Read `docs/notes/submit-tonight.md` first.** Ready: `out/looming_v5.mp4` (1080p, 3:15, −15.9 LUFS / −4.8 dBTP; for YouTube), `out/looming_v5_backup.mp4` (720p, 8.65 MB; the ProposalSpace upload), `out/stills/` (three PNGs). Everything is merged and pushed on `wave/3-assets`; no task worktrees are left. Fix round 1 (four builders after `evidence/cold-v4/report.md`) is merged; what's left is in `docs/notes/v4-fixlist.md`.
 - **The director's, not the orchestrator's:** watch with sound (no agent has listened), upload to YouTube, confirm the flagged lines in doc 10 (and cut "captions" and "flash check": they don't exist), fill and submit the form. After: a PR from `wave/3-assets` to `main`, a tag and release, the `@ts-check` pass (plan step 9, a frame-hash no-op, deferred until after the deadline).
 - **`out/` is a local folder** while the Seagate drive is unplugged. To restore after copying the finals across: `mv out out.local && ln -s "/Volumes/Seagate Storage/Media/Looming/out" out`.
 

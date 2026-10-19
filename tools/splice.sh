@@ -1,10 +1,10 @@
 #!/bin/zsh
 # Re-render one span of a finished master and splice it in by stream copy, instead of re-rendering the film.
-#   tools/splice.sh <a> <b> [master=out/looming_final.mp4]   (a, b: seconds; both must be keyframes in the master)
+#   tools/splice.sh <a> <b> [master=out/looming_v5.mp4]   (a, b: seconds; both must be keyframes in the master)
 # The master is concat'd 30 s x264 chunks (closed GOPs), so its keyframes are IDR and cut cleanly with -c copy.
 # The span is encoded with render_film.sh's settings; the mix is remuxed so the audio is untouched.
 set -e
-A=${1:?a}; B=${2:?b}; M=${3:-out/looming_final.mp4}; cd ${0:A:h}/..
+A=${1:?a}; B=${2:?b}; M=${3:-out/looming_v5.mp4}; cd ${0:A:h}/..
 KEYS=$(ffprobe -v error -select_streams v -skip_frame nokey -show_entries frame=pts_time -of default=nw=1:nk=1 $M)
 for t in $A $B; do echo "$KEYS" | grep -qx "$t.000000" || { echo "$t s is not a keyframe in $M"; exit 1; }; done
 DUR=$(node -e "import('./src/timeline.js').then(m=>console.log(m.DURATION))")
