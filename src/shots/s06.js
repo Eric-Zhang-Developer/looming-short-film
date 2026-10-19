@@ -15,7 +15,8 @@ import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
 import { DESK, tools, homeDesk, seatReach } from './s02.js';
-import { screenHalo } from './s03.js';
+import { screenHalo, reminderInsert } from './s03.js';
+import { COUNTDOWN } from '../props/canvas.js';
 
 const ID = 's06', DEG = Math.PI / 180;
 const BLOB_R = { start: 0.018, gulp2: 0.024 };            // METER.gulp1 → METER.gulp2 (README §1, v4: 1.5× → 2×)
@@ -109,6 +110,17 @@ export async function build(ctx) {
   })();
   scene.add(shadeGlow);
   const halo = screenHalo(PALETTE); halo.position.copy(L).add(new THREE.Vector3(0, 0, 0.002)); scene.add(halo);
+  // v6-canvas-b: gulp2's cause. As the lamp goes off (3.0) the phone face up on the desk lights with the reminder (a pale
+  // screen and a small halo in the wide); an insert of the phone 3.167–4.0 (the banner, his thumb on it at 3.583, swiped
+  // off to the left 3.75–3.92), cut back to the wide on the gulp (4.0), so the swipe lands on it. The lamp-off and the
+  // loom's spring-back keep 3.0–3.167 in the wide, so the banner reads about 0.6 s, not the 1 s the others get.
+  const PH_ON = 3.0, INS = [F(38), GULP];
+  const [pw, phh] = set.phone.size;
+  const phoneLit = new THREE.Mesh(new THREE.PlaneGeometry(pw * 0.8, phh * 0.82), new THREE.MeshBasicMaterial({ color: new THREE.Color(PALETTE.cream).lerp(new THREE.Color(PALETTE.phone), 0.3), toneMapped: false }));
+  phoneLit.position.z = 0.0002; set.phone.g.add(phoneLit);
+  const phoneHalo = screenHalo(PALETTE, 0.012); set.phone.g.updateMatrixWorld(true); phoneLit.getWorldPosition(phoneHalo.position); phoneHalo.position.y += 0.001; scene.add(phoneHalo);
+  const ins = reminderInsert(ctx, { body: COUNTDOWN.s06, back: PALETTE.kraft });
+  scene.add(ins.group);
   const faceCream = new THREE.Color(PALETTE.cream), faceCyan = new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.navy), 0.4);
 
   const C = new THREE.Vector3(), hit = new THREE.Vector3(), foot = new THREE.Vector3();
@@ -178,6 +190,10 @@ export async function build(ctx) {
       halo.material.opacity = (lit ? 0.15 : 1) * flick;
       face.color.copy(lit ? faceCream : faceCyan);
       face.intensity = lit ? FACE_LAMP : FACE_SCREEN;
+      phoneLit.visible = phoneHalo.visible = t >= PH_ON - 1e-6 && t < GULP - 1e-6;
+      const insert = t >= INS[0] - 1e-6 && t < INS[1] - 1e-6;
+      if (insert) fx.set({ focus: 0.06, aperture: 0.002 }); else fx.set({ focus: FOCUS, aperture: 0.012 });
+      ins.update(camera, { on: insert, arrive: f < 39 ? 0.5 : 1, touch: f === 42 ? 0.5 : f >= 43 ? 1 : 0, swipe: f === 45 ? 0.35 : f === 46 ? 0.75 : f >= 47 ? 1 : 0 });
     },
   };
 }

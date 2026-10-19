@@ -17,6 +17,8 @@ import { specPose } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
 import { makeClock } from '../clock.js';
 import { tools } from './s02.js';
+import { reminderInsert } from './s03.js';
+import { COUNTDOWN } from '../props/canvas.js';
 
 const DEG = Math.PI / 180;
 const F = (s) => Math.round(s * 12) / 12;                    // spec times are 2s drawings
@@ -285,6 +287,10 @@ const ID = 's07';
 // blob's edge just in at the right. Level with his head, in front of the bed.
 const CU = [2.0, 5.5], BODY_FACE_Z = 0.31;
 const CU_CAM = { pos: [0.168, 0.066, 0.48], look: [0.168, 0.068, 0.31] };
+// v6-canvas-b: gulp3's cause. Mid-glance the phone buzzes and the reminder slides in at the top of his screen: an insert
+// of the phone 6.25–7.5 (the banner in at 6.25, read to 7.25, his thumb on it at 7.083 and swiping it up 7.25–7.42),
+// cut back to the wide on the gulp (7.5), so the swipe lands on it.
+const INS = [6.25, 7.5];
 export async function build(ctx) {
   const { camera, post } = ctx;
   const R = await bedroom(ctx, ID), { rig, exam, spot, fill, clock } = R;
@@ -294,6 +300,8 @@ export async function build(ctx) {
   /** @type {[number, string][]} */
   const cues = [[0, 'numb'], [6, 'guilt'], [6.75, 'numb']];
   R.moonPanes(MOON_PANES);
+  const ins = reminderInsert(ctx, { body: COUNTDOWN.s07, screen: R.glow.material.map, back: ctx.PALETTE.navy, dir: [0, 1] });
+  ctx.scene.add(ins.group);
 
   return {
     ...R,
@@ -304,6 +312,10 @@ export async function build(ctx) {
       // ---- camera: the wide, and (fix-bedroom) one cut in on his face and the phone, 2.0–5.5, cut on the 2.0 flick ----
       if (cu) { camera.position.set(...CU_CAM.pos); camera.lookAt(...CU_CAM.look); fx.set({ focus: CU_CAM.pos[2] - BODY_FACE_Z, aperture: 0.03 }); }
       else { camera.position.copy(CAM); camera.lookAt(LOOK); fx.set({ focus: WIDE_FOCUS, aperture: 0.012 }); }
+      const insert = t >= INS[0] - 1e-6 && t < INS[1] - 1e-6;
+      if (insert) fx.set({ focus: 0.06, aperture: 0.002 });
+      ins.update(camera, { on: insert, arrive: T < F(6.333) ? 0.5 : 1,
+        touch: at2(T, 7.083, 7.167) ? 0.5 : T >= F(7.167) ? 1 : 0, swipe: at2(T, 7.25, 7.333) ? 0.3 : at2(T, 7.333, 7.417) ? 0.7 : T >= F(7.417) ? 1 : 0 });
 
       // ---- him: lie_phone, the flicks, the glance (head 4° back, 2-frame anticipation 1° forward at 5.917) ----
       rig.blend({ lie: LIE }, [[0, 'lie']], 0);

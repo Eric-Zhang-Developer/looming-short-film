@@ -1,11 +1,12 @@
 // @ts-check
-// s09a · The choice (docs/shots/s09a.md, v4, with the director's 2026-10-18 block: 2.5×, the nightstand lamp). He turns
-// the phone face down and the room goes black: the ceiling shadow dies with the light that made it, on the same frame.
+// s09a · The choice (docs/shots/s09a.md, v4, with the director's 2026-10-18 block: 2.5×, the nightstand lamp; v6: the
+// Canvas reminder comes once more and he taps it open, 0.0–1.5, see INSERT below). He turns
+// the phone face down (2.75) and the room goes black: the ceiling shadow dies with the light that made it, on the same frame.
 // Only the blob's eyes are left. One slow breath (eyes closed), his face sets (dread → resolve), and still lying, in the
 // same close-up, his hand reaches to the lamp and clicks it ON (lampOn, the rhyme with s06's click-off): the shade and
 // his face light on one frame. Cut to the wide: he sits up in a room lit low and warm from the nightstand, a dark window
 // at frame left, the blob's shadow the biggest of the film on the wall behind the bed. He gets up anyway, grabs his
-// backpack and takes the first step toward the door. Setups: C3 (s07's camera) 0–1.5, C4 (his face, close) 1.5–4.25,
+// backpack and takes the first step toward the door. Setups (v6): the phone insert 0–1.5, C4 (his face, close) 1.5–2.5 and 3.0–4.25, C3 (s07's camera) 2.5–3.0,
 // C5 (C3 panned left) 4.25–6. Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { onTwos, lerp } from '../core/ease.js';
@@ -14,6 +15,8 @@ import { hipHeight } from '../characters/gator.js';
 import { specPose, POSES } from '../characters/poses.js';
 import { DIM, AMB_DIM } from './s08.js';
 import { bedroom, closeHeads, ROOM, CAM, LOOK, LIE, LIE_HEAD, KNEE, HIP, PHONE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT } from './s07.js';
+import { reminderInsert } from './s03.js';
+import { COUNTDOWN } from '../props/canvas.js';
 
 const ID = 's09a', DEG = Math.PI / 180;
 export const BLOB_R = { start: 0.030 };                       // 2.5× (README §1, Q16)
@@ -23,7 +26,12 @@ const F = (s) => Math.round(s * 12) / 12;
 const C4 = { pos: [0.148, 0.032, 0.52], look: [0.148, 0.072, 0.31] };
 // C5 (fix-bedroom, 4.25–6.0): C3 panned 0.085 left, so window B is in frame, dark, beside the lamp-lit room: it's night.
 const C5 = { pos: [CAM.x - 0.085, CAM.y, CAM.z], look: [LOOK.x - 0.085, LOOK.y, LOOK.z] };
-const inC4 = (T) => T >= 1.5 - 1e-6 && T < 4.25 - 1e-6;
+// v6-canvas-b: the reminder comes once more and he taps it open (phoneFaceDown keeps its name: the tap). The insert holds
+// the phone 0.0–1.5 (the banner in at 0.0, his thumb on it at 0.417, the tap and the exam's row at 0.5, read to 1.5);
+// C4 1.5–2.5 is his face still lit by it, the breath in; C3 2.5–3.0 he turns it face down (2.75) and the light and the
+// ceiling shadow die on one frame, in the wide, as before; C4 from 3.0 is the resolve in the dark.
+const INSERT = 1.5, DOWN = F(2.75);
+const inC4 = (T) => (T >= 1.5 - 1e-6 && T < 2.5 - 1e-6) || (T >= 3 - 1e-6 && T < 4.25 - 1e-6);
 // Poses (specPose). SIT: upright in bed, legs forward under the blanket, hands in his lap (he reaches lying now:
 // REACH_LIE above); EDGE: sitting on the bed's near edge, legs down; STAND, GRAB (bent to the backpack),
 // LIFT, SLUNG (backpack on), STEP (walk contact).
@@ -109,20 +117,26 @@ export async function build(ctx) {
   const c4lamp = new THREE.PointLight(LAMPC0(PALETTE), 0, 0.2, 2);
   c4lamp.position.set(sx, sy, knob.z - 0.004);
   scene.add(c4lamp);
+  const ins = reminderInsert(ctx, { body: COUNTDOWN.s09a, back: PALETTE.navy, todo: true });
+  scene.add(ins.group);
   const bag = new THREE.Group(); scene.add(bag);              // the backpack follows his hand, then his back
   backpack.g.removeFromParent(); bag.add(backpack.g); backpack.g.position.set(0, 0, 0);
 
   return {
     ...R, heads: H, rim, patch,
     update(t) {
-      const T = onTwos(t), c4 = inC4(t), dark = t >= 0.5 - 1e-6, lit = t >= 4 - 1e-6;
+      const T = onTwos(t), c4 = inC4(t), dark = t >= DOWN - 1e-6, lit = t >= 4 - 1e-6, insert = t < INSERT - 1e-6;
       tl.boil(t); clock.boil(t); rig.boil(t, 10);
       clock.set(3, 0, 10 + t);                                // 3:00:10 at 0.0: s08's clock, still going
 
       // ---- camera: C3 (s07's) and C4 ----
       const cam = c4 ? C4 : lit ? C5 : { pos: CAM.toArray(), look: LOOK.toArray() };
       camera.position.set(...cam.pos); camera.lookAt(...cam.look);
-      fx.set(c4 ? { focus: 0.21, aperture: 0.03 } : { focus: new THREE.Vector3(0.2, 0.06, 0.33).sub(CAM).dot(LOOK.clone().sub(CAM).normalize()), aperture: 0.012 });
+      fx.set(insert ? { focus: 0.06, aperture: 0.002 } : c4 ? { focus: 0.21, aperture: 0.03 } : { focus: new THREE.Vector3(0.2, 0.06, 0.33).sub(CAM).dot(LOOK.clone().sub(CAM).normalize()), aperture: 0.012 });
+      // The insert, on 2s: the banner slides in (0.0), the thumb comes in (0.25) and lands (0.417), the tap opens it (0.5,
+      // 0.583), the thumb leaves (0.667, 0.75).
+      ins.update(camera, { on: insert, arrive: T < F(0.083) ? 0.5 : 1, open: T < F(0.5) ? 0 : T < F(0.583) ? 0.6 : 1,
+        touch: at2(T, 0.25, 0.417) ? 0.5 : at2(T, 0.417, 0.667) ? 1 : at2(T, 0.667, 0.75) ? 0.5 : 0 });
 
       // ---- him ----
       rig.group.position.set(...HIP);
@@ -158,15 +172,15 @@ export async function build(ctx) {
       blanket.g.position.y = blanketY - drop;
       blanket.g.scale.y = blanketSY - drop / blanket.size[1];
 
-      // ---- the phone: lift 2 mm (0.25), on edge (0.417), face down on his chest (0.5); slides onto the blanket (4.25) ----
+      // ---- the phone: lift 2 mm (2.583), on edge (2.667), face down on his chest (2.75); slides onto the blanket (4.25) ----
       phone.position.set(...PHONE.at);
       phone.rotation.set(0, -55 * DEG, 78 * DEG);
-      const down = T >= 0.5 - 1e-6;
+      const down = T >= DOWN - 1e-6;
       for (const m of ph) m.visible = !down;
       glow.visible = !down;
       phoneDown.g.visible = down;
-      if (at2(T, 0.25, 0.5)) phone.position.y += 0.002;
-      if (at2(T, 0.417, 0.5)) phone.rotateX(90 * DEG);
+      if (at2(T, 2.583, 2.75)) phone.position.y += 0.002;
+      if (at2(T, 2.667, 2.75)) phone.rotateX(90 * DEG);
       if (down) phone.rotation.set(-75 * DEG, 0, 4 * DEG);
       if (down && T >= UP - 1e-6) phone.visible = T >= 4.25 - 1e-6;   // it rides his chest up out of the sit-up's way; off the cut it's on the blanket
       else phone.visible = true;
@@ -193,7 +207,7 @@ export async function build(ctx) {
       R.placeBlob(BLOB_R.start, contact);
       exam.update(t, { wobble: 0.8, eyes, look, squash, key: lit ? lamp : dark ? null : spot });
 
-      // ---- light. 0.5: the phone spot, its fill and its spill go to 0 on one frame, and the ceiling shadow with them.
+      // ---- light. 2.75 (was phoneFaceDown 0.5): the phone spot, its fill and its spill go to 0 on one frame, and the ceiling shadow with them.
       // 4.0 lampOn: the nightstand lamp, low and warm; only the blob casts (its own field now: the lamp sees its face). ----
       spot.intensity = dark ? 0 : DIM * SPOT;                 // 0–0.5 is s08's (dimmed, fix-bedroom) light
       fill.intensity = dark ? 0 : DIM * FACE_FILL * SPOT;

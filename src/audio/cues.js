@@ -155,13 +155,25 @@ export const CUES = [
   bed('breathNasal', 'foley', ['clockThree', 5.67], ['breathIn', 0.25], dB(-24)),
   // s09a, new: the phone face down on his hoodie (the card tap); the slow breath, in 71.75-72.5, out 72.5-72.92, -20 dB;
   // the blanket as he sits up (ends 0.15 s before the lamp click, so the click's window stays its own); the backpack.
-  { beat: 'phoneFaceDown', sound: 'cardTap', gain: GAIN.cardTap },
+  // v6-canvas-b: phoneFaceDown is now his thumb tapping the reminder open (a tap on glass); the phone meets his hoodie at
+  // 72.75, in the wide, where the light dies.
+  { beat: 'phoneFaceDown', sound: 'scrollTick', gain: dB(-18), seed: 30 },
+  { beat: 'phoneFaceDown', offset: 2.25, sound: 'cardTap', gain: GAIN.cardTap },
   { beat: 'breathIn', offset: 0.25, sound: 'breathSlow', gain: dB(-20) },
   { beat: 'sitUp', sound: 'paperRustle', dur: 0.35, gain: 0.3, seed: 12 },
   { beat: 'backpackGrab', sound: 'backpackGrab', gain: 0.6 },
   // climax-a1 as built: his first step at 75.75 (his room's floor: the soft step) and the blob's hop landing at 76.0.
   { beat: 'backpackGrab', offset: 0.75, sound: 'footstepSoft', gain: dB(-20), seed: 5 },
   { beat: 'backpackGrab', offset: 1, sound: 'inkDrip', gain: 0.2, seed: 39 },
+  // v6-canvas-b: the Canvas reminder, four times, one chime: two high gameBlip notes 80 ms apart, the same pair each time
+  // (the same notification every time; phoneBuzz stays s00's two). On arrival: s03 22.25 (the laptop), s06 43.21 (the
+  // phone on the desk lights with the lamp-off at 43.0; the chime waits out the click's 0.17 s window so the three clicks
+  // stay identical), s07 54.25, s09a 70.0 (on the tick). Each swipe is a soft thumbFlick as the banner starts to go,
+  // 0.25 s before its gulp, clear of the gulp's frame.
+  ...(/** @type {[string, number][]} */ ([['gulp1', -1.25], ['lampOffHome', 0.21], ['gulp3', -1.25], ['phoneFaceDown', -0.5]])).flatMap(([b, o]) => [
+    { beat: b, offset: o, sound: 'gameBlip', gain: 0.1, seed: 105 },
+    { beat: b, offset: o + 0.08, sound: 'gameBlip', gain: 0.1, seed: 107 }]),
+  ...['gulp1', 'gulp2', 'gulp3'].map((b, k) => ({ beat: b, offset: -0.25, sound: 'thumbFlick', gain: dB(-24), seed: 40 + k })),
   // s09b, new: the latch and hinge on doorOpen (the hall swells under it, above); the blob lands on the threshold at 78.167;
   // one quick breath on the shadow; the swallow in C5, 79.667; his first footsteps, on the runner.
   { beat: 'doorOpen', sound: 'doorLatch', gain: 0.6 },

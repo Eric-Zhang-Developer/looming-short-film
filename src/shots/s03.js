@@ -13,6 +13,7 @@ import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
 import { DESK, B, tools, homeDesk, seatReach } from './s02.js';
+import { banner, todoScreen, COUNTDOWN } from '../props/canvas.js';
 
 const ID = 's03', DEG = Math.PI / 180;
 
@@ -28,6 +29,88 @@ export function screenHalo(PALETTE, size = 0.022) {
     transparent: true, depthWrite: false, toneMapped: false }));
   s.scale.setScalar(size); s.castShadow = false;
   return s;
+}
+const card = (W, H, draw) => {
+  const c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
+  draw(g, W, H);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+};
+const rr = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+
+// v6-canvas-b: the reminder as an insert. The banner has to read at 400 px, and on a phone 8 mm long or a laptop 18 mm
+// wide in a wide shot it can't, so each reminder cuts to the screen: the device fills the frame, drawn over the shot's
+// scene in front of its camera (unlit: screens are self-lit; the thumb is lit by the screen). Everything is in frame
+// units (1 = the frame's height) and the group is scaled to the frustum at D, so it frames the same at any camera.
+// update(camera, { on, arrive, swipe, open, touch }): arrive 0..1 slides the banner in; swipe 0..1 flicks it along
+// `dir`; touch 0..1 brings the thumb from off frame onto the banner. todo: true (s09a) makes the phone's screen
+// v6-canvas-a's To-do screen with the banner drawn in it, so open 0..1 expands it into the exam's detail (the module's
+// set(); its swipe goes right); otherwise the module's banner card rides on its own plane over the shot's screen.
+export function reminderInsert({ PALETTE }, { body, kind = 'phone', screen = null, back = PALETTE.navy, dir = [-1, 0], todo = false }) {
+  const D = 0.06, g = new THREE.Group(); g.visible = false;
+  let order = 1000;
+  /** @param {number} w @param {number} h @param {THREE.Texture} map @param {number[]} at */
+  const plane = (w, h, map, at) => {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map, toneMapped: false, transparent: true, depthTest: false }));
+    m.renderOrder = order++; m.position.set(at[0], at[1], 0); g.add(m); return m;
+  };
+  const bg = new THREE.Color(back), hex = (c) => '#' + c.getHexString();
+  plane(2.4, 1.4, card(64, 64, (x) => {
+    const r = x.createRadialGradient(32, 26, 4, 32, 32, 46);
+    r.addColorStop(0, hex(bg.clone().lerp(new THREE.Color(PALETTE.cream), 0.2))); r.addColorStop(1, hex(bg.clone().multiplyScalar(0.35)));
+    x.fillStyle = r; x.fillRect(0, 0, 64, 64);
+  }), [0, 0]);
+  const solid = (c) => card(8, 8, (x) => { x.fillStyle = c; x.fillRect(0, 0, 8, 8); });
+  const roundCard = (w, h, r, fill) => card(256, Math.round(256 * h / w), (x, W, H) => { rr(x, 0, 0, W, H, r * W / w); x.fillStyle = fill; x.fill(); });
+  // The device: a phone's top (w 1.7) or a laptop screen's top-right corner; the banner's rest box [cx, top, w].
+  let rest;
+  const scr = todo ? todoScreen() : null;
+  if (scr) {   // the To-do screen, w 1.5, its top at 0.46: down to the detail's due line (242 pt of 390) in frame
+    const sw = 1.5, sh = sw * scr.H / 390;
+    plane(sw + 0.1, sh + 0.1, roundCard(sw + 0.1, sh + 0.1, 0.2, '#16182A'), [0, 0.51 - (sh + 0.1) / 2]);
+    plane(sw, sh, scr.texture, [0, 0.46 - sh / 2]);
+    rest = [0, 0.46, sw];
+  } else if (kind === 'phone') {
+    plane(1.7, 2.6, roundCard(1.7, 2.6, 0.2, '#16182A'), [0, 0.47 - 1.3]);
+    plane(1.6, 2.5, screen ?? solid('#2A3A66'), [0, 0.42 - 1.25]);
+    rest = [0, 0.37, 1.5];
+  } else {
+    plane(3.34, 2.14, roundCard(3.34, 2.14, 0.06, '#202231'), [0.86 - 1.6, 0.44 - 1.0 + 0.04]);
+    plane(3.2, 2.0, screen ?? solid('#2A3A66'), [0.86 - 1.6, 0.44 - 1.0]);
+    rest = [0.06, 0.38, 1.5];
+  }
+  const B = banner({ body });
+  const ban = plane(1, 1, B.texture, [0, 0]);
+  ban.visible = !scr;
+  // The thumb: gator green, darkened (lit only by the screen), a lighter nail; it comes in from the bottom right.
+  const thumb = plane(0.42, 0.84, card(256, 512, (x) => {
+    x.fillStyle = hex(new THREE.Color(PALETTE.gator).multiplyScalar(0.8));
+    rr(x, 28, 10, 200, 560, 100); x.fill(); x.lineWidth = 8; x.strokeStyle = '#2C3A26'; x.stroke();
+    x.fillStyle = hex(new THREE.Color(PALETTE.gator).lerp(new THREE.Color(PALETTE.cream), 0.45));
+    rr(x, 70, 40, 116, 130, 50); x.fill();
+  }), [0, 0]);
+  thumb.rotation.z = 0.45;
+  const fwd = new THREE.Vector3();
+  return {
+    group: g,
+    /** @param {THREE.PerspectiveCamera} camera @param {{ on?: boolean, arrive?: number, swipe?: number, open?: number, touch?: number }} s */
+    update(camera, { on = false, arrive = 1, swipe = 0, open = 0, touch = 0 } = {}) {
+      g.visible = on;
+      if (!on) return;
+      camera.updateMatrixWorld(); camera.getWorldDirection(fwd);
+      g.position.copy(camera.position).addScaledVector(fwd, D); g.quaternion.copy(camera.quaternion);
+      g.scale.setScalar(2 * D * Math.tan(camera.fov * Math.PI / 360));
+      if (scr) scr.set(0, { banner: arrive > 0 ? B : null, swipe, open, clock: '3:00' });
+      // (todo) the banner sits in the texture at x 14, y 52 pt, 362 × 82: the plane below only places the thumb on it.
+      const [cx, top, w] = scr ? [0, rest[1] - 52 * rest[2] / 390 + rest[2] * 362 / 390 * B.h / B.w / 2, rest[2] * 362 / 390] : rest, h = w * B.h / B.w;
+      ban.scale.set(w, h, 1);
+      ban.position.set(cx + dir[0] * 2.2 * swipe, top - h / 2 + 0.14 * (1 - arrive) + dir[1] * 1.2 * swipe, 0);
+      ban.material.opacity = arrive * (1 - 0.6 * swipe);
+      // The thumb's tip rests on the banner's right third, and rides it while swiping.
+      const tx = ban.position.x + 0.22 * w + 0.17, ty = ban.position.y - 0.05 - 0.38, ox = 1.3, oy = -1.0;
+      thumb.visible = touch > 0;
+      thumb.position.set(ox + (tx - ox) * touch, oy + (ty - oy) * touch, 0);
+    },
+  };
 }
 const BLOB_R = { start: 0.012, gulp1: 0.018 };            // METER.birth → METER.gulp1 (README §1, v4: 1.5×)
 // v3-readability: the light now sits at the *open* screen's centre (v3 lit from the closed lid's, S ≈ 2.5 in practice),
@@ -111,6 +194,12 @@ export async function build(ctx) {
   const ambI = amb.intensity;
   scene.add(spot, spot.target, fill, sun.light, sun.light.target, amb);
   const halo = screenHalo(PALETTE); scene.add(halo);
+  // v6-canvas-b: gulp1's cause. Mid-game the Canvas reminder pops top-right on his screen: an insert of the laptop's
+  // screen 3.25–4.5 (the banner in at 3.25, read to 4.25, flicked off to the right 4.25–4.42, his trackpad swipe), cut
+  // back to the wide on the gulp (4.5), so the swipe lands on it.
+  const ins = reminderInsert(ctx, { body: COUNTDOWN.s03, kind: 'laptop', screen: set.glow.material.map, dir: [1, 0] });
+  scene.add(ins.group);
+  const INS = [3.25, 4.5];
 
   const C = new THREE.Vector3(), hit = new THREE.Vector3();
   return {
@@ -169,7 +258,9 @@ export async function build(ctx) {
       spot.target.position.copy(hit);
       spot.target.updateMatrixWorld();
 
-      fx.set({ focus: kf(t, FOCUS, ease) });
+      const insert = t >= INS[0] - 1e-6 && t < INS[1] - 1e-6;
+      fx.set(insert ? { focus: 0.06, aperture: 0.002 } : { focus: kf(t, FOCUS, ease), aperture: 0.01 });
+      ins.update(camera, { on: insert, arrive: f < 40 ? 0.5 : 1, swipe: f === 51 ? 0.35 : f === 52 ? 0.75 : f >= 53 ? 1 : 0 });
     },
   };
 }
