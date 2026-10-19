@@ -146,9 +146,14 @@ export const SCORE = [
   ev('lightFlood', 0, 'pad', [48, 55, 64, 72], { dur: 0.3, attack: 0.15, release: 2.2, gain: 0.3, motif: 'chord' }),
   // The blob blinks: one music-box note at its birth pitch, very soft. Confused, not gone.
   ev('blobBlinks', 0, 'box', EXAM[0][0], { vel: 0.2, dur: 1.2, motif: 'exam' }),
-  // 1:52–1:56.5 The stacks (v6): the chord's near-silence keeps its breath, then a low C-major pad comes in under the
-  // first strip light and carries him to the desk, so the 6 s the stacks added aren't 9.5 s of no music.
-  ev('underLight1', 0, 'pad', [36, 48, 55, 64], { dur: beat('deskSit') - beat('underLight1'), attack: 2, release: 1.5, gain: 0.3 }),
+  // 1:52–1:56.5 The stacks (v6): the chord's near-silence keeps its breath, then Act 4's theme arrives with the library,
+  // before the desk: its first two notes on felt piano, softer than the desk's statement, one per strip light, over a low
+  // C-major pad that carries him to the desk, where the phrase is stated in full.
+  ev('underLight1', 0, 'pad', [36, 48, 55, 64], { dur: beat('deskSit') - beat('underLight1'), attack: 2, release: 1.5, gain: 0.2 }),
+  ...[['underLight1', 0, 2.4], ['underLight2', 1, 2]].flatMap(([b, k, dur]) => [
+    ev(b, 0, 'piano', THEME[k], { vel: 0.24, dur, motif: 'theme' }),
+    ev(b, 0, 'piano', HARM[k], { vel: 0.19, dur }),
+  ]),
 
   // 1:50–2:02 Under the light (v4): Act 4's theme in major, softly: its first phrase on felt piano, one note every two
   // seconds over major chords, and the music box answering with the motif's first note when the blob settles. The s13
@@ -199,7 +204,13 @@ export const SCORE = [
   // The tag: a new drop beads. The motif's first two notes at the birth pitch, softer than at inkDropForms, trembling
   // (vibrato) until the uncap's frame, where the tremble stops dead and the note rings on still. Then s15's held note.
   ...EXAM.slice(0, 2).map(([m, dt], j) => ev('dropQuivers', 0.3 + dt, 'box', m, { vel: 0.3, dur: j ? 2.4 : 1.4, vib: 25, vibTo: 'tagPenUncap', motif: 'reprise' })),
-  ev('tagPenUncap', 0.5, 'piano', THEME[0], { vel: 0.4, dur: 3, motif: 'theme' }),
+  // v6: the drop becomes his first mark, and its voice becomes home. It blinks at him (0.75) on its birth pitch, a little
+  // sharp as ever; landing on the nib (1.25, the plip) the same note comes back in tune, C, resolved; and the "1." (1.917)
+  // gets the film's home chord, C major, felt piano and pad, ringing into the fade.
+  ev('tagPenUncap', 0.75, 'box', EXAM[0][0], { vel: 0.28, dur: 0.45, motif: 'exam' }),
+  ev('tagPenUncap', 1.25, 'box', 72, { vel: 0.35, dur: 1.6, motif: 'exam-resolved' }),
+  ev('tagPenUncap', 1.917, 'piano', [36, 43, 52, 60, 67, 76], { vel: 0.42, dur: 1.6, gain: 0.35, motif: 'chord' }),
+  ev('tagPenUncap', 1.917, 'pad', [48, 55, 64, 72], { dur: 1.2, attack: 0.3, release: 1.2, gain: 0.35, motif: 'chord' }),
 ];
 
 // Music sits under the foley: the lamp click (about -5 dBFS in the foley stem) stays the loudest transient.
