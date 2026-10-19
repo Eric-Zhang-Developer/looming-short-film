@@ -16,13 +16,13 @@ const args = Object.fromEntries(process.argv.slice(2).map(a => {
   const [k, ...v] = a.replace(/^--/, '').split('=');
   return [k, v.length ? v.join('=') : true];
 }));
-const OUT = args.out ? resolve(args.out) : join(ROOT, 'assets/cut');
+const OUT = args.out ? resolve(/** @type {string} */ (args.out)) : join(ROOT, 'assets/cut');
 const die = msg => { console.error(`cut: ${msg}`); process.exit(1); };
 if (!args.in || (!args.boxes && !args.auto)) die('usage: node tools/cut.mjs --in=<png> (--boxes=<json> | --auto [--boxes=<json>])');
 
-const input = resolve(ROOT, args.in);
+const input = resolve(ROOT, /** @type {string} */ (args.in));
 const stem = basename(input).replace(/\.\w+$/, '');
-const boxesPath = resolve(ROOT, args.boxes ?? `assets/cut/${stem}.boxes.json`);
+const boxesPath = resolve(ROOT, /** @type {string} */ (args.boxes) ?? `assets/cut/${stem}.boxes.json`);
 
 // Decode to raw RGBA with ffmpeg (no image library in this repo).
 const [{ width: W, height: H }] = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0',

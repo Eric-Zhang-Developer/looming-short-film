@@ -44,6 +44,20 @@ export function clearPaperCache() {
   sheets.clear(); bases.clear(); texels = 0;
 }
 
+/**
+ * @typedef {object} PaperOptions
+ * @property {HTMLCanvasElement | ImageBitmap | HTMLImageElement | OffscreenCanvas} [art] painted art (alpha is the silhouette)
+ * @property {number[][]} [path] a plain shape when there's no art: polygon of [x, y] in 0..1 of the sheet
+ * @property {string} [color] fill for a plain shape
+ * @property {string} [weight] a WEIGHTS key
+ * @property {number[]} [size] [w, h] in meters
+ * @property {string} [key] names the cache entry
+ * @property {number} [seed] boil seed
+ * @property {number} [res] px on the long edge
+ * @property {'auto' | 'none' | 'broken'} [rim]
+ */
+
+/** @param {PaperOptions} [opts] */
 export function makePaper({ art, path, color, weight = 'cardstock', size, key, seed = 0, res = 1024, rim = 'auto' } = {}) {
   if (!key) throw new Error('makePaper: key is required (it names the cache entry)');
   if (!art && !path) throw new Error('makePaper: pass art or path');
@@ -160,8 +174,8 @@ function makeBase({ art, path, color, W8, size, key, res }) {
 
   // Signed distance (px, + inside), its gradient (inward normal) and the band of pixels any tear can reach.
   const N = W * H, inside = new Uint8Array(N);
-  for (let i = 0; i < N; i++) inside[i] = ma[i * 4 + 3] >= 128;
-  const dOut = edt(inside.map((v) => !v), W, H), dIn = edt(inside, W, H);
+  for (let i = 0; i < N; i++) inside[i] = /** @type {any} */ (ma[i * 4 + 3] >= 128);
+  const dOut = edt(inside.map((v) => /** @type {any} */ (!v)), W, H), dIn = edt(inside, W, H);
   const sdf = new Float32Array(N);
   for (let i = 0; i < N; i++) sdf[i] = inside[i] ? Math.sqrt(dOut[i]) - 0.5 : 0.5 - Math.sqrt(dIn[i]);
   const reach = (W8.tearAmp[0] + 1.5 * W8.tearAmp[1] + 1.5 * W8.rimPx[1] + 2) * k;  // |cut| + rim + hair can't pass this

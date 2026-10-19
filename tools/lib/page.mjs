@@ -29,8 +29,8 @@ export async function serve() {
     res.writeHead(200, { 'content-type': TYPES[path.extname(p)] || 'application/octet-stream' });
     fs.createReadStream(p).pipe(res);
   });
-  await new Promise((r) => server.listen(0, '127.0.0.1', r));
-  return { server, base: `http://127.0.0.1:${server.address().port}` };
+  await /** @type {Promise<void>} */ (new Promise((r) => server.listen(0, '127.0.0.1', r)));
+  return { server, base: `http://127.0.0.1:${/** @type {import('node:net').AddressInfo} */ (server.address()).port}` };
 }
 
 export async function launch() {

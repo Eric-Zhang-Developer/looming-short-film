@@ -11,6 +11,7 @@ const SIDE = {
   neighbor: { green: 5, body: [0.043, 0.048], head: [0.036, 0.0248] },   // 275×308 and 448×308 visible px
   sleeper: { green: 6, body: [0.052, 0.047], head: [0.036, 0.0220] },    // 334×302 and 451×275
 };
+/** @param {import('../assets.js').AssetCtx} ctx @param {string} who @param {{ seed?: number, scale?: number, green?: string, res?: number }} [opts] */
 export function makeCrowd(ctx, who, { seed = 0, scale = 1, green, res = 512 } = {}) {
   if (!SIDE[who]) throw new Error(`makeCrowd: unknown figure "${who}"`);
   const P = (piece) => ['crowd_sheet', `${who}_${piece}`];

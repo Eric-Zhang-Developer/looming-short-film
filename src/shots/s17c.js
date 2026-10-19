@@ -28,9 +28,9 @@ const SLIDE_FROM = 0.045, SKID = 0.001;                   // the slide starts ab
 const NINETY_FOUR = [214, 58];                            // the circled 94 on graded_test, art px (measured on the cut PNG)
 
 const CU = [3, 6], TAP = 6.25;                             // the close-up's cut in and out; the tap on the 94
-const CU_AT = [0.6, 0, 0];                                  // the CU set, off to the side of the page set
-const CU_HIP = [-0.054, -0.0134, 0.074];                    // s17b's seat at the exam desk
-const CAM_CU = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };   // s15's CU framing
+const CU_AT = /** @type {Vec3} */ ([0.6, 0, 0]);                                  // the CU set, off to the side of the page set
+const CU_HIP = /** @type {Vec3} */ ([-0.054, -0.0134, 0.074]);                    // s17b's seat at the exam desk
+const CAM_CU = /** @type {CamKey} */ ({ pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] });   // s15's CU framing
 const CU_KEY = 0.024, CU_AMB = 0.8;
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
 

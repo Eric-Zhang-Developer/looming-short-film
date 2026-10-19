@@ -22,12 +22,12 @@ import { tools } from './s02.js';
 const ID = 's17b', DEG = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;          // examRoom 0, testRecognise 4, testSmile 5.5, testSolved 9.5
 const CUT_T1 = 1, CUT_T2 = 3, CUT_T3 = 5, CUT_BACK = 6.5, HOLD_HERO = 1.75;
-const CLOCK = { at: [0.12, 0.10, 0.0008], d: 0.014, reads: [9, 0], s0: 12 };   // T1's far wall, upper right (README §13); s0: the second
+const CLOCK = { at: /** @type {Vec3} */ ([0.12, 0.10, 0.0008]), d: 0.014, reads: [9, 0], s0: 12 };   // T1's far wall, upper right (README §13); s0: the second
 // hand starts at :12, so it isn't hidden under the minute hand at 12 for the whole of K (9:00:12 still reads 9:00)
 // Camera K: face-on to the dial, close enough that it fills ~70% of the frame height (fov 20)
 // fix-payoff: the dial fills 84% of the frame height, easing in to 92% over the hold (it was a flat 70%: "I can't read the clock")
 const KFILL = [0.84, 0.92], kZ = (fill) => 0.0008 + 0.014 / fill / (2 * Math.tan(10 * Math.PI / 180));
-const CAM_K = { pos: [0.12, 0.10, kZ(KFILL[0])], look: [0.12, 0.10, 0.0008] };
+const CAM_K = /** @type {CamKey} */ ({ pos: [0.12, 0.10, kZ(KFILL[0])], look: [0.12, 0.10, 0.0008] });
 
 // ---------- tunables ----------
 const BLOB_R = { start: 0.005, testSolved: 0.004 };      // SHRINK[6] → SHRINK[7] (README §1; exam.js has no SHRINK ladder yet)
@@ -36,7 +36,7 @@ const ROOM = { table: 0.041, rows: [0.25, 0.19, 0.13, 0.07], x: [-0.32, 0.32], d
 const HIP_DROP = -0.0134, SEAT_BACK = 0.024;                                 // the seated figure's hip below the table top (T3's), and the seat backs' height
 const FLUOR_I = 0.8, WIN_I = 0.15, AMB_K = 0.6;          // T1 (window fill ≤ 30% of the fluorescent); v3: the room is dim, he is the lit one
 const CROWD_DIM = 0.45, HERO_I = 3.2;                    // the crowd is tinted toward navy; his spot (cold viewer v2: "a lecture hall of frogs")
-const CAM_HERO = { pos: [0.0, 0.115, 0.42], look: [0.004, 0.05, 0.093] };   // the establishing beat: on him, then the room
+const CAM_HERO = /** @type {CamKey} */ ({ pos: [0.0, 0.115, 0.42], look: [0.004, 0.05, 0.093] });   // the establishing beat: on him, then the room
 const SPOT_I = 0.2, AMB_P = 0.45, FILL_T3 = 0.006;        // T2/T3: the overhead spot, ambient, T3 character fill
 const ARM_LEN = 0.020;                                    // the flat near arm in the insert (gator_sheet arm_r at insert scale)
 
@@ -74,11 +74,11 @@ export function drawInt(g, x, y, px) {   // baseline y; a slanted stem with a ho
 export const BLOB_AT = [-0.002, 0.098];                   // the page-corner mark (x, z): 2 mm in from 0.000 so it sits on the exam desk's top
 // Camera P: high over the lower page (problem 3 and the working), tilted 18° off vertical toward camera so the blob,
 // which stands on the page, still shows its face. Cap height 11 px of art ≈ 0.0009 m → ≈ 45 px at 1080p.
-export const CAM_P = { pos: [-0.012, 0.0814, 0.1221], look: [-0.012, 0.0003, 0.0965] };
-const CAM_T1 = { pos: [0.0, 0.29, 0.70], look: [0.0, 0.045, 0.125] };
-const CAM_T3 = { pos: [-0.015, 0.055, 0.400], look: [-0.015, 0.018, 0.086] };
+export const CAM_P = /** @type {CamKey} */ ({ pos: [-0.012, 0.0814, 0.1221], look: [-0.012, 0.0003, 0.0965] });
+const CAM_T1 = /** @type {CamKey} */ ({ pos: [0.0, 0.29, 0.70], look: [0.0, 0.045, 0.125] });
+const CAM_T3 = /** @type {CamKey} */ ({ pos: [-0.015, 0.055, 0.400], look: [-0.015, 0.018, 0.086] });
 const DESK_K = 1.2;                                       // the exam desk art at 1.2× its scale-table size, so its top holds the page and the blob
-const HIP = [-0.054, -0.0134, 0.074];                     // on the chair's seat at DESK_K (seat top −0.0144)
+const HIP = /** @type {Vec3} */ ([-0.054, -0.0134, 0.074]);                     // on the chair's seat at DESK_K (seat top −0.0144)
 
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
 
@@ -188,7 +188,7 @@ export async function build(ctx) {
     for (const x of [-0.20, 0.23]) {
       const frame = T.rect(`win${x}`, PALETTE.kraft, [0.062, 0.122], [x, 0.105, 0.0005], { parent: t1 });
       const pane = T.rect(`pane${x}`, '#' + WIN.getHexString(), [0.054, 0.114], [x, 0.105, 0.0009], { parent: t1, weight: 'tissue' });
-      const m = pane.children[0].material; m.emissive.copy(WIN); m.emissiveIntensity = 0.8;
+      const m = /** @type {THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>} */ (pane.children[0]).material; m.emissive.copy(WIN); m.emissiveIntensity = 0.8;
       T.rect(`mull${x}`, PALETTE.kraft, [0.003, 0.114], [x, 0.105, 0.0012], { parent: t1 });
       T.rect(`mullh${x}`, PALETTE.kraft, [0.054, 0.003], [x, 0.12, 0.0012], { parent: t1 });
       frame.children[0].receiveShadow = false;
@@ -208,10 +208,11 @@ export async function build(ctx) {
   }
   // Rows of long tables, three or four gators a row from behind, each with a test page and their own small blob.
   const rng = mulberry32(seedOf(ID, 'room'));
-  const figures = [], bobbers = [], blobs1 = [];
+  const figures = /** @type {any[] & { hero?: any }} */ ([]), bobbers = [], blobs1 = [];
   const tableCol = '#' + C('kraft').lerp(C('cream'), 0.25).getHexString();
   const seatCol = '#' + C('navy').lerp(C('kraft'), 0.15).getHexString();
   // long thin strips: T.rect's tear margin scales with the long side, which ate a 2 cm deep table; this one is fixed
+  /** @param {string} key @param {string} color @param {number[]} wh @param {Vec3} at @param {{ rot?: Vec3, weight?: string }} o */
   const strip = (key, color, [w, h], at, { rot, weight = 'cardstock' }) => {
     const m = 0.0015, W = w + 2 * m, H = h + 2 * m;
     return T.group(T.paper(key, { path: [[m / W, m / H], [1 - m / W, m / H], [1 - m / W, 1 - m / H], [m / W, 1 - m / H]], size: [W, H], color, weight, res: 2048 }),
@@ -237,7 +238,8 @@ export async function build(ctx) {
       fig.group.position.set(x - 0.03 * sc, ROOM.table + HIP_DROP * sc, z + ROOM.depth / 2 + 0.012);
       fig.group.rotation.y = hero ? -10 * DEG : (rng() < 0.5 ? -1 : 1) * (12 + 20 * rng()) * DEG;
       fig.group.scale.setScalar(sc);
-      fig.pose = seat({ lean: hero ? 12 : 8 + 8 * rng(), arm: -26, head: hero ? -8 : -4 - 8 * rng() });
+      // pose angles, stored over the rig's pose() method (blend() uses its own closure, so the method isn't needed here)
+      /** @type {any} */ (fig).pose = seat({ lean: hero ? 12 : 8 + 8 * rng(), arm: -26, head: hero ? -8 : -4 - 8 * rng() });
       fig.eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';   // down at the page
       t1.add(fig.group); figures.push(fig);
       if (hero) figures.hero = fig; else if (bobbers.length < 2 && rng() < 0.5) bobbers.push(fig);
@@ -300,6 +302,7 @@ export async function build(ctx) {
   const P3 = { write: seat({ lean: 12, arm: -26, head: -8 }), breath: seat({ lean: 11, arm: -27, head: -8 }), lean: seat({ lean: 16, arm: -22, head: -10 }) };
   const BODY3 = [[0, 'write'], [5.333, 'write'], [5.334, 'breath'], [5.999, 'breath'], [6.0, 'lean'], [7, 'lean']];
   // The acting kit on T3: calm resolve, then pride's wide → smile on testSmile (held small: the preset's own mouth).
+  /** @type {[number, string][]} */
   const CUES3 = [[-0.1, 'resolve'], [B.testSmile, 'pride']];
 
   // ---- the pen's path over the page (T2), in page-art px ----
@@ -346,8 +349,8 @@ export async function build(ctx) {
       if (inT1) {
         // 1.0–1.75 held on him; then it eases out to the wide (the room, with him still front and centre). On 1s.
         const k = ease(clamp((t - HOLD_HERO) / (CUT_T2 - HOLD_HERO)));
-        camera.position.set(...CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k)));
-        camera.lookAt(look.set(...CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k))));
+        camera.position.set(.../** @type {Vec3} */ (CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k))));
+        camera.lookAt(look.set(.../** @type {Vec3} */ (CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k)))));
         fx.set({ focus: camera.position.distanceTo(hp.set(0, 0.05, 0.093)), aperture: lerp(0.004, 0.009, k) });
         // he reads: 3 more degrees of head-down at 2.5; two pens bob on 2s
         for (const fig of figures) { fig.boil(t, 10); fig.blend({ s: fig === figures.hero && tc >= 2.5 ? { ...fig.pose, head: fig.pose.head - 3 * DEG } : fig.pose }, [[0, 's']], 0);

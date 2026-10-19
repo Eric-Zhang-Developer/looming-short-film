@@ -80,7 +80,7 @@ export async function build(ctx) {
     hunch: at(keys, [22, 34], { head: -14 }),
   };
   P.tap = { ...P.hunch, arm_r: P.hunch.arm_r + 2 * DEG };
-  for (const [, deg] of LID) P['lid' + deg] = at(lidEdge(deg), [6, 30], { head: -8 - 2 * (deg < 30) });
+  for (const [, deg] of LID) P['lid' + deg] = at(lidEdge(deg), [6, 30], { head: -8 - 2 * /** @type {any} */ (deg < 30) });
   const KEYS = [[0, 'slump'], [F(1), 'antic'], [F(3), 'shrug'], [F(4), 'back'], ...LID.slice(0, -1).map(([n, deg]) => [F(n), 'lid' + deg]),
     [F(12), 'keys'], [F(24), 'hunch'], ...TAPS.flatMap((n) => [[F(n - 1), 'hunch'], [F(n), 'tap'], [F(n + 1), 'hunch']]), [7, 'hunch']];
 

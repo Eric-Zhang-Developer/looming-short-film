@@ -37,6 +37,7 @@ const shrink = ([b, k]) => [[1, 0.25, 0.5], [0, 0.525, 0.9]].map(([j, at, dur]) 
 // so each dodge's last bar is cut to its first half (a 2/4 bar) and the next dodge still lands on a downbeat. The groove
 // ends at bedRot, where s07 thins it to one dyad.
 const BAR = 2, BAR0 = -0.5;
+/** @type {[string, number][]} */
 const DODGES = [['fridge', -8], ['gameNight', -4], ['lampClickHome', 0], ['bedRot', 4]];
 const dodge = (n) => DODGES.findLast(([, k]) => n >= k);
 const bar = (n, sec = 0) => { // → [beat, offset] of second `sec` in bar n

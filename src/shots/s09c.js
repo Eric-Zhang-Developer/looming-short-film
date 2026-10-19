@@ -61,6 +61,14 @@ const BLOCK_PAN = [[9.0, 0], [B.blobBlocks, 0.085], [B.stepAround + 0.5, 0.085],
 const HOP = 0.5, HOP_H = 0.003;
 
 // A lamppost from marston_ext_kit, globe centre at the light point. Returns its glowing material.
+/**
+ * @param {import('../assets.js').Kit} ext marston_ext_kit
+ * @param {Function} art kitTools' art
+ * @param {THREE.Object3D} parent
+ * @param {string} key
+ * @param {number[]} xz [x, z]
+ * @param {THREE.ColorRepresentation} color
+ */
 export function lamppost(ext, art, parent, key, [x, z], color) {
   const img = ext.pieces.lamppost_black, k = mppOf(ext, 'lamppost_black');
   const GLOBE = [22, 13];                                // the globe's centre in the 44 × 163 cut (px)
@@ -212,6 +220,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const fx = post({ focus: 0.7, aperture: 0.012, maxblur: 0.008, lut: 'night' });
   const P = POSES, STAND = specPose({ lean: 0, arm: -92, far: -92, head: 0, leg: 0, farLeg: 8 });
   const RECOIL = specPose({ lean: -2, arm: -98, far: -98, head: 2, leg: 0, farLeg: 8 });
+  /** @type {[number, string][]} */
   const CUES = [[0, 'dread'], [B.blobBlocks, 'flinch'], [B.blobBlocks + 7 / 12, 'dread'], [DECIDE, 'resolve']];
   const camX = (t) => {                                   // the blob's x + 0.02, smoothed: a 1 s box average of x(t). Before
     let s = 0; for (let i = -5; i <= 5; i++) s += X(Math.min(t, TURN) + i * 0.1);   // lamp 1 it sits 3 cm further back, so the
@@ -227,6 +236,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     // ---------- the Student, on 2s
     const turned = T >= TURN;
     side.group.visible = !turned; back.group.visible = turned;
+    /** @type {Vec3} */
     let root;
     const close = t >= CU[0] && t < CU[1];
     if (!turned) {
@@ -315,7 +325,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
     // ---------- light, on 1s
     const mix = keyMix(t);
-    [[keyA, mix[0]], [keyB, mix[1]]].forEach(([k, [i, w]]) => {
+    /** @type {[THREE.SpotLight, number[]][]} */ ([[keyA, mix[0]], [keyB, mix[1]]]).forEach(([k, [i, w]]) => {
       if (i < 0) { k.intensity = 0; return; }
       k.position.set(LAMP_X[i], LAMP_H, LAMP_Z);
       k.target.position.set(LAMP_X[i], 0, LAMP_Z); k.target.updateMatrixWorld();

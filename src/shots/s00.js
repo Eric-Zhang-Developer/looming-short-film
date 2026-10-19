@@ -35,6 +35,7 @@ export async function build(ctx) {
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   };
   const CW = 0.0062, CH = CW * ((v1 - v0) * bmp.height) / ((u1 - u0) * bmp.width), BADGE = 0.25;   // badge: the card's left quarter
+  /** @param {THREE.Texture | null} map @param {THREE.ColorRepresentation} [color] */
   const unlit = (map, color = 0xffffff) => new THREE.MeshBasicMaterial({ map, color, transparent: true, toneMapped: false });
   const screen = new THREE.Group();
   screen.position.set(px, 0.0009, pz);
@@ -47,7 +48,7 @@ export async function build(ctx) {
   const badge = new THREE.Mesh(new THREE.PlaneGeometry(CW * BADGE, CH), unlit(crop(0, BADGE)));
   badge.position.set(0.0003 - CW * (1 - BADGE) / 2, 0.0004, 0.0001);
   screen.add(face, card, badge);
-  const mats = [face, card, badge].map((m) => [m.material, m.material.color.clone()]);
+  const mats = [face, card, badge].map((m) => /** @type {[THREE.MeshBasicMaterial, THREE.Color]} */ ([m.material, m.material.color.clone()]));
 
   const glow = new THREE.PointLight(PALETTE.phone, 0, 0.06, 2);
   glow.position.set(px, 0.004, pz);

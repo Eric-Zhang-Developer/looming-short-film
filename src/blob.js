@@ -272,7 +272,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     let key = null, best = -1;
     mesh.getWorldPosition(at);
     uniforms.uAmb.value.setRGB(0, 0, 0);
-    scene.traverseVisible((o) => {
+    scene.traverseVisible((/** @type {any} */ o) => {  // any light kind
       if (!o.isLight || o.intensity <= 0) return;
       if (o.isAmbientLight) uniforms.uAmb.value.add(tmpColor.copy(o.color).multiplyScalar(o.intensity));
       else if (o.isHemisphereLight) uniforms.uAmb.value.add(tmpColor.copy(o.color).lerp(o.groundColor, 0.5).multiplyScalar(o.intensity));
@@ -292,12 +292,18 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   };
 
   // Every material running the field; update() flips EYE_LIDS on all of them when a lidded eye comes or goes.
+  /** @type {THREE.Material[]} */
   const shaders = [mat, depth];
   let lidded = false;
 
+  /**
+   * @param {number} tLocal
+   * @param {{ squash?: number, wobble?: number, eyes?: string, look?: number, key?: THREE.Light | null, left?: number }} [opts]
+   */
   function update(tLocal, { squash = 0, wobble = 1, eyes = 'open', look = 1, key = null, left } = {}) {
     keyOverride = key;
     const t = onTwos(tLocal);   // a character: it moves on 2s like the puppets (doc 03 · Motion)
+    /** @type {[number, number, number, number][]} */
     const balls = [[0, 0.88 + 0.015 * wobble * Math.sin(6.283 * breath.f * t + breath.p), 2, 1]];
     for (const l of lobes) {
       const a = l.a + 0.22 * wobble * Math.sin(6.283 * l.fa * t + l.pa);

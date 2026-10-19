@@ -58,7 +58,7 @@ const FONT = 17, INK = 'rgb(30, 42, 63)';   // the hand is s17b's bundled Caveat
 const NS = 58, CIRCLE_R = 23, A0 = -2.2;                     // "Final"'s canvas, its red circle (art px), the stroke's start
 
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
-const CLOCK = { at: [C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z], h: 4, m: 10 };   // v4: s02's spot beside the calendar, ~4:10 (README §13)
+const CLOCK = { at: /** @type {Vec3} */ ([C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z]), h: 4, m: 10 };   // v4: s02's spot beside the calendar, ~4:10 (README §13)
 const xAt = (tc) => [clamp((tc - 1.5 + F(1)) / F(2)), clamp((tc - 1.833 + F(1)) / F(2))];   // drawings 18–19, 22–23
 const wordAt = (tc) => clamp((tc - 10.5) / 1.25);
 const circleAt = (tc) => (tc < 11.833 ? 0 : clamp((tc - 11.833 + F(2)) / 0.833));          // 4 drawings, closed on 12.5 (newDate)
@@ -89,7 +89,7 @@ export async function build(ctx) {
   // The pen (mirrored so its nib points +x, origin at the nib) and its cap (open end on the nib).
   const pen = T.cut(props, 'pen', [0.0075, null], 'pen', { anchor: [1, 0.5], flip: true });
   const cap = T.cut(props, 'pen_cap', [0.0034, null], 'pen_cap', { anchor: [0.75, 0.5], flip: true });
-  const penRest = [DESK.pen[0] + 0.0075, 0.0006, DESK.pen[1]];   // nib of the pen lying on the page's front edge
+  const penRest = /** @type {Vec3} */ ([DESK.pen[0] + 0.0075, 0.0006, DESK.pen[1]]);   // nib of the pen lying on the page's front edge
 
   // ---------- the calendar's new marks: the X (his pen), "Final" and its red circle (code, drawn on the sheet) ----------
   const cal = props.pieces.calendar, [cu0, cv0, cu1, cv1] = props.visible.calendar, AW = cal.width, AH = cal.height;
@@ -106,8 +106,10 @@ export async function build(ctx) {
   };
   // The X over Friday's square (placed at s02's friXY, so the X is too).
   const xo = overlay([XS, XS], [FX, FY], 0.0011);
+  /** @param {CanvasRenderingContext2D} g @param {number[][]} ab [[a, b], [c, d]] @param {number} k */
   const seg = (g, [[a, b], [c, d]], k) => { if (k <= 0) return; g.beginPath(); g.moveTo(a, b); g.lineTo(lerp(a, c, k), lerp(b, d, k)); g.stroke(); };
   const drawX = (k1, k2) => xo(`${k1}|${k2}`, (g) => { g.strokeStyle = INK; g.lineWidth = 1.8; g.lineCap = 'round'; seg(g, X1, k1); seg(g, X2, k2); });
+  /** @param {number[]} p @returns {Vec3} */
   const xw = ([px, py]) => [FX + (px - XS / 2) * mpp, FY - (py - XS / 2) * mpp, C.z];
   // "Final" on a clean cell (Friday's empty paper over the printed glyph), and its red circle.
   const [NX, NY] = artToWorld(...NEW_CELL);
@@ -132,7 +134,7 @@ export async function build(ctx) {
   const gator = await makeGator(ctx, { seed: 2 });
   gator.group.position.set(...DESK.hip); scene.add(gator.group);
   // v3: he casts. The bulb is behind him now (z 0.0090 against his 0.016), so his shadow falls forward onto the desk, not up the wall.
-  gator.group.traverse((o) => { if (o.isMesh) o.castShadow = true; });
+  gator.group.traverse((/** @type {THREE.Object3D & { isMesh?: boolean }} */ o) => { if (o.isMesh) o.castShadow = true; });
   const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
   const camW = new THREE.Vector3(...CAM_W.pos);
     // v3 restage: v2 kept his legs on show above the desktop as he rose, which read as a gator standing on his desk. He now
@@ -158,6 +160,7 @@ export async function build(ctx) {
     lift: seat({ lean: 5, arm: 18, far: -24, head: 4 }),   // the pen comes up off the sheet and holds, so the mark shows
   };
   // [t, pose, stand (0 seated at DESK.hip … 1 at STAND)], eased between keys and sampled on 2s.
+  /** @type {[number, string, number][]} */
   const KEYS = [[0, 'look', 0], [0.5, 'look', 0], [F(8), 'up', 0.5], [F(16), 'x1a', 1], [F(17), 'x1a', 1], [F(18), 'x1b', 1], [F(19), 'x1b', 1],
     [F(21), 'x2a', 1], [F(22), 'x2b', 1], [F(23), 'x2b', 1], [F(26), 'down', 0], [CUT_I, 'down', 0], [CUT_SIT, 'down', 0],
     [B.lampSitBack, 'sitback', 0], [8.5, 'sitback', 0], [F(104), 'glance', 0], [F(110), 'glance', 0], [F(112), 'sitback', 0], [CUT_I2, 'sitback', 0],   // 7.5 sits back; 8.5–9.25 the clock; back to the circle
@@ -260,7 +263,7 @@ export async function build(ctx) {
       // The tag's W (11.5 on) eases in over four and a half seconds, so the drop, the pen and the first mark are bigger as they land.
       const push = t >= CUT_W ? ease(clamp((t - CUT_W) / (FADE - CUT_W))) : 0;
       const cam = inI ? CAM_I : inI2 ? CAM_I2 : CAM_W;
-      camera.position.set(...cam.pos.map((v, i) => lerp(v, PUSH.pos[i], push))); camera.lookAt(look.set(...cam.look.map((v, i) => lerp(v, PUSH.look[i], push))));
+      camera.position.set(.../** @type {Vec3} */ (cam.pos.map((v, i) => lerp(v, PUSH.pos[i], push)))); camera.lookAt(look.set(.../** @type {Vec3} */ (cam.look.map((v, i) => lerp(v, PUSH.look[i], push)))));
       const k = t < FADE ? -1 : Math.min(23, Math.round((t - FADE) * 24));
       fx.set({ focus: inW ? camera.position.distanceTo(look) : camera.position.z - C.z, aperture: inW ? 0.01 : 0.003, lut: k < 0 ? baseLUT : fadeLUT(k), grain: k === 23 ? 0 : 0.04 });
 

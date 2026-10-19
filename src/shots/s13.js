@@ -144,6 +144,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const cast = [];   // (who, pose, mirror, turn, scale): read by evidence/anim-s13/measure.html
   for (const [key, d] of Object.entries(CROWD)) {
     const i = Number(key.slice(1)) - 1, cx = XS[i % 5], cy = YS[Math.floor(i / 5)], f = d.f;
+    /** @param {number[]} xy */
     const at = ([x, y]) => [cx + f * x, cy + f * y], facing = f < 0 ? Math.PI : 0;
     const [sx, sy] = at(SEAT_AT), rot = facing + (figRng() * 16 - 8) * DEG;
     const fig = place(piece(art(figs, d.pose, `${ID}-${key}-${d.pose}`)), sx, sy, 0.048 + 0.002 * n++, rot);

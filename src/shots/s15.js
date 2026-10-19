@@ -26,10 +26,10 @@ const on2s = (t) => Math.floor(t * 12 + 1e-4) / 12;          // onTwos, but 100.
 // ---------- the pre-G4 master numbers (imported by s16; not this shot's staging) ----------
 export const UNIT = {
   hip: [-0.075, -0.012], bodyZ: 0.074,                       // gator root (makeGator puts the near arm at +0.012 → z 0.086)
-  camA: { pos: [-0.010, 0.118, 0.392], look: [-0.010, 0.0385, 0.080] },   // spec look y 0.030, tilted up 1.45° (loom fix)
-  camB: { pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] },
-  focus: [-0.024, 0.020, 0.086], aperture: 0.02, maxblur: 0.01,
-  fill: [-0.046, 0.040, 0.114],                             // character fill (README §10): before him, just above eye line
+  camA: /** @type {CamKey} */ ({ pos: [-0.010, 0.118, 0.392], look: [-0.010, 0.0385, 0.080] }),   // spec look y 0.030, tilted up 1.45° (loom fix)
+  camB: /** @type {CamKey} */ ({ pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] }),
+  focus: /** @type {Vec3} */ ([-0.024, 0.020, 0.086]), aperture: 0.02, maxblur: 0.01,
+  fill: /** @type {Vec3} */ ([-0.046, 0.040, 0.114]),                             // character fill (README §10): before him, just above eye line
   tube: [0, 0.127, 0.040],                                   // the pendant's light (README §3's trough position)
   blob: [0, 0.012, 0.0884], phone: [-0.010, 0.0015, 0.116], phoneLight: [-0.014, 0.006, 0.116],
   press: 0.5,                                                // G4's press drawing (kept for the importers' numbers)
@@ -41,14 +41,14 @@ const BLOB_R = { start: 0.030 };                             // 2.5×, the v4 pe
 // 2.5× blob. 0 puts it back on the spec's mark. s11 and s13 use the same spot.
 export const BLOB_DX = 0.016;
 export const BLOB_AT = (r) => { const m = MARK(r); return [m[0] + BLOB_DX, 0, m[2]]; };
-export const PHONE = [-0.010, 0.0015, 0.114], PHONE_L = [-0.010, 0.004, 0.114];   // rest spot (and G4's light above it)
-export const CAM_A2 = { pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] };    // Camera A′ (README §8; G4's opening)
-export const CAM_B2 = { pos: [-0.010, 0.112, 0.358], look: [-0.010, 0.020, 0.084] };  // Camera B′
-export const PAGE = [-0.0205, 0.0003, 0.095];                // page centre (x −0.033…−0.008, z 0.080…0.110)
+export const PHONE = /** @type {Vec3} */ ([-0.010, 0.0015, 0.114]), PHONE_L = [-0.010, 0.004, 0.114];   // rest spot (and G4's light above it)
+export const CAM_A2 = /** @type {CamKey} */ ({ pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] });    // Camera A′ (README §8; G4's opening)
+export const CAM_B2 = /** @type {CamKey} */ ({ pos: [-0.010, 0.112, 0.358], look: [-0.010, 0.020, 0.084] });  // Camera B′
+export const PAGE = /** @type {Vec3} */ ([-0.0205, 0.0003, 0.095]);                // page centre (x −0.033…−0.008, z 0.080…0.110)
 const CU = [B.nameSmile, 7.5];                               // the close-up's cut in and out
 // CU: level with his head from in front, close enough that the painted head fills the frame's left half and the blob's
 // eyes are in at the right, so "he and the blob look at each other" holds in one frame.
-const CAM_CU = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };
+const CAM_CU = /** @type {CamKey} */ ({ pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] });
 const WARM = 0.3;                                            // v4 Marston warm: lerp(lamp, cream, 0.3) (README v4)
 // Intensities, by eye on the sheet: G4's lit zone (the old lamp pool at the blob), its fill and ambient.
 const ZONE_I = 0.25, FLUOR_I = 0.25, AMB_K = 0.6, FILL_I = 0.02, CU_KEY = 0.010;   // ZONE_I: s11's 0.8 blew the desk out from B′'s height
@@ -77,8 +77,10 @@ const HEAD = [[dr(54), 0], [dr(56), -4], [B.nameSmile - dr(1), -4], [B.nameSmile
 // The acting kit: quiet resolve; the smile is pride's wide → smile (README §12), played on the painted head in the CU;
 // resolve again for the brace. The 4-drawing flicker of dread (2.00–2.33) is too short for a preset (12-frame hold), so
 // it's the brow alone, set after act(): brows up.
+/** @type {[number, string][]} */
 const CUES = [[-0.1, 'resolve'], [B.nameSmile, 'pride'], [7.5, 'resolve']];
 const FLICKER = [2.0, NAME[0]], DREAD_BROW = [32, -4];
+/** @type {[number, number, string][]} */
 const EYES = [[5.0, B.nameSmile, 'side']];                  // 5.0: eyes to the blob (it just flinched)
 
 // The blob's startle and flinch: spring()'s own damping (k 6, w 18) in cosine phase, so the kick peaks on the beat frame.
@@ -125,6 +127,7 @@ function unmix(img) {
 // draw(spans, extra): spans = [[box, layer (0 navy, 1 grey, 2 healed navy), fraction revealed left to right]]; extra(g, K)
 // draws code pen strokes in sheet pixels (K = canvas px per sheet px). heal: the strike's rows; layer 2 is both layers
 // with those rows replaced by the rows above and below (the letters' strokes carried across, the strike gone).
+/** @param {{ props: any, sheet: Function, which: string, at: Vec3, key: string, parent: THREE.Object3D, heal?: number[] }} o */
 export function practiceSheet({ props, sheet, which, at, key, parent, heal }) {
   const img = props.pieces[which], [w, h] = props.sizes[which], [u0, v0, u1, v1] = props.visible[which];
   const holder = new THREE.Group(); holder.rotation.x = -Math.PI / 2; holder.position.set(...at); parent.add(holder);
@@ -190,6 +193,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const { pendant } = await marstonDesk({ scene, assets, PALETTE, tools, ID });
   const [props, kitp] = await Promise.all(['study_props_sheet', 'props_kit'].map((n) => assets.load(n)));
   // An asset piece in a holder whose origin is the centre of the piece's visible shape, so the spec's boxes place it.
+  /** @param {import('../assets.js').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D, key?: string }} [o] */
   const cut = (a, name, { weight, res = 512, parent = scene, key = name } = {}) => {
     const holder = new THREE.Group(), [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [w, h], key: `${ID}-${key}`, weight, res }, holder);

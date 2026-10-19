@@ -84,7 +84,7 @@ ok('every foley sound renders, deterministic and finite', () => {
   for (const [k, f] of Object.entries(FOLEY)) { const x = f(7), y = f(7); assert.deepEqual(x, y, k); assert.ok(x.every(Number.isFinite) && x.some((v) => v !== 0), k); }
 });
 
-for (const [sound, n, label] of [['lampClick', Math.round(CLICK_CMP * SR), 'lamp clicks']]) {
+for (const [sound, n, label] of /** @type {[string, number, string][]} */ ([['lampClick', Math.round(CLICK_CMP * SR), 'lamp clicks']])) {
   ok(`the three ${label} are identical within ±1 LSB in out/audio/mix.wav (over the first ${(n / SR).toFixed(2)} s)`, () => {
     const b = readFileSync(`${out}/mix.wav`), d = b.indexOf('data') + 8;              // 16-bit stereo, 48 kHz
     const L = (i) => b.readInt16LE(d + i * 4);

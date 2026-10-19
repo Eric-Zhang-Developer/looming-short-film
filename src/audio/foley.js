@@ -795,6 +795,7 @@ function doorPush(seed = 1) {
   return norm(fade(out, 0.05, 0), 0.6);
 }
 
+/** @type {Record<string, (seed?: number, dur?: number) => Float32Array>} */
 export const FOLEY = {
   lampClick, sensorWake, penUncap, inkDrip, paperRustle, fluorescentHum,
   penScratch, phoneHum, inkRoll, shadowGrowth, fridgeHum, controllerClick, drill,

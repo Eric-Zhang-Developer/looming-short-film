@@ -151,6 +151,9 @@ export const PIECES = {
   },
 };
 
+/** @typedef {Awaited<ReturnType<typeof loadUncached>>} Kit a loaded asset: piece bitmaps and their sizes and visible boxes */
+/** @typedef {{ assets: { load(name: string): Promise<Kit> } }} AssetCtx what makeGator and friends take as ctx */
+/** @type {Map<string, Promise<Kit>>} */
 const cache = new Map();  // name → Promise of the load result
 export function load(name) {
   if (!PIECES[name]) return Promise.reject(new Error(`assets: unknown asset "${name}" (docs/assets.md)`));
@@ -159,7 +162,7 @@ export function load(name) {
 }
 
 async function loadUncached(name) {
-  const table = PIECES[name], pieces = {};
+  const table = PIECES[name], pieces = /** @type {Record<string, ImageBitmap>} */ ({});
   const boxes = await fetch(`/assets/cut/${name}.boxes.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const frozen = boxes && (await fetch(`/assets/frozen/${name}.png`, { method: 'HEAD' }).then((r) => r.ok, () => false));
   if (frozen) {

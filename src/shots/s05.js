@@ -29,7 +29,7 @@ const L = [0.075, CUSHION + 0.0075, 0.4148]; // the laptop screen's centre: the 
 // where it is (L.z 0.4148) the blob's depth is z = L.z · (1 − 1 / S) = 0.337 (G4: 0.35 for the 1.25× blob). x keeps the shadow's centre
 // where G4 had it: L.x + (x − L.x) · S = 0.075 − 0.015 · 6.4. The blob still sits on the table top (z 0.33…0.36, x 0.025…0.080).
 const UNITS = 8.0, S_WALL = UNITS * 0.012 / BLOB_R.start;
-const B = [L[0] - 0.096 / S_WALL, TABLE, L[2] * (1 - 1 / S_WALL)];   // blob contact point on the table top
+const B = /** @type {Vec3} */ ([L[0] - 0.096 / S_WALL, TABLE, L[2] * (1 - 1 / S_WALL)]);   // blob contact point on the table top
 const CAM = { pos: [-0.04, 0.17, 1.15], look: [-0.04, 0.10, 0.15] };
 const KEY = 0.40;                          // phone spot, cd: a cream wall 0.42 m away lands lit but below white (NoToneMapping)
 const TV = 0.36;                           // 25% of the key's irradiance at the wall: 0.25 · 0.40 / 0.42² · 0.80²
@@ -56,11 +56,17 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   camera.position.set(...CAM.pos);
   camera.lookAt(...CAM.look);
 
+  /** @returns {Vec3} */
   const tiltOf = (layer) => { const r = mulberry32(seedOf('s02', layer)); return [(2 * r() - 1) * 1.5 * DEG, (2 * r() - 1) * 1.5 * DEG, 0]; };
   const boiling = [];
   // One paper piece. `at` is where the VISIBLE shape's centre goes (`vis` is its uv box inside the padded bitmap),
   // `flat` lays it on the floor/table (normal +y), `tilt` applies s02's seeded tilt, `fit` squeezes it to [w, h].
   // Returns the mesh; mesh.parent is the placed group.
+  /**
+   * @param {string} layer
+   * @param {import('../paper.js').PaperOptions} opts
+   * @param {{ at: Vec3, flat?: boolean, tilt?: boolean, boil?: boolean, rotZ?: number, vis?: number[], parent?: THREE.Object3D, fit?: number[], [mat: string]: any }} o the rest goes to paperMesh
+   */
   function piece(layer, opts, { at, flat = false, tilt = false, boil = true, rotZ = 0, vis = [0, 0, 1, 1], parent = scene, fit, ...mat }) {
     const make = (s) => makePaper({ ...opts, key: `s05-${layer}`, seed: s });
     const sheet = make(0), mesh = paperMesh(sheet, mat), [w, h] = sheet.size;
@@ -126,6 +132,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   round.group.position.set(-0.06, SEAT - 0.03, 0.09);   // its bottom 3 cm behind the seat strip
   // Controllers (apt_props_sheet) in the near hands; the tall one's goes to the couch arm at 2.67.
   const props = await assets.load('apt_props_sheet');
+  /** @param {string} layer @param {string} name @param {THREE.Object3D} parent @param {Vec3} [at] */
   const ctrl = (layer, name, parent, at = [0, 0, 0]) => {
     const { opts, vis } = art(props, name);
     const m = piece(layer, opts, { at, vis, parent });
@@ -254,7 +261,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       tall.blend(POSES_5, keys, tLocal);
       tall.follow('tail', tLocal, { k: 6, w: 18 });
       if (T >= WALK.t0) tall.joints.head.rotation.z += HEAD_BOB * Math.sin(2 * Math.PI * (T - WALK.t0) / (1 / 3));   // a nod per step
-      for (const [r, ph] of [[tall, 0], [round, 1.3]]) r.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * T / 2.8 + ph);
+      for (const [r, ph] of /** @type {[import('../puppet.js').Puppet, number][]} */ ([[tall, 0], [round, 1.3]])) r.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * T / 2.8 + ph);
       tall.face(T < F(2.67) ? { eyes: 'open', mouth: 'line' } : { eyes: 'open', mouth: 'neutral' });
       tall.group.position.set(x, y, z);
       tall.group.visible = T <= WALK.t1;

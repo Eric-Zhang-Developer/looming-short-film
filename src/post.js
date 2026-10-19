@@ -75,7 +75,8 @@ export function createPost(stage, { focus = 2, aperture = 0.02, maxblur = 0.01, 
   const composer = new EffectComposer(renderer, rt);
   composer.setPixelRatio(1); composer.setSize(size.x, size.y);
 
-  const bokeh = new BokehPass(scene, camera, { focus, aperture, maxblur });
+  // @types/three types BokehPass.uniforms as `object`; it holds IUniforms like any ShaderPass.
+  const bokeh = /** @type {BokehPass & { uniforms: Record<string, THREE.IUniform> }} */ (new BokehPass(scene, camera, { focus, aperture, maxblur }));
   // Bokeh's depth pass clears to scene.background's color, which would be read as depth. Hide it for that pass only.
   const bokehRender = bokeh.render.bind(bokeh);
   bokeh.render = (...a) => { const bg = scene.background; scene.background = null; bokehRender(...a); scene.background = bg; };
@@ -88,6 +89,7 @@ export function createPost(stage, { focus = 2, aperture = 0.02, maxblur = 0.01, 
   composer.addPass(lutPass);
   composer.addPass(gv);
 
+  /** @param {{ focus?: number, aperture?: number, maxblur?: number, grain?: number, vignette?: number, lut?: string | THREE.Texture | null }} [o] */
   const set = (o = {}) => {
     if ('focus' in o) bokeh.uniforms.focus.value = o.focus;
     if ('aperture' in o) bokeh.uniforms.aperture.value = o.aperture;

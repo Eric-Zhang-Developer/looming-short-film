@@ -14,6 +14,7 @@ export function examRadius(shot, solved = 0) {
 }
 
 // The blob is built at the shot's starting radius; s16's steps are a mesh scale on top of it.
+/** @param {{ shot?: string, seed?: number }} [opts] */
 export function makeExam({ shot, seed = 1 } = {}) {
   const radius = examRadius(shot);
   return { ...createBlob({ radius, seed }), radius, scaleAt: (solved) => examRadius(shot, solved) / radius };

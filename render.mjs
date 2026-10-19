@@ -20,10 +20,10 @@ const FRAMES_DIR = 'out/frames';
 const pagePath = typeof args.page === 'string' ? args.page : 'index.html';
 const span = (s) => String(s).split(':').map(Number);
 const type = (out) => (/\.png$/i.test(out) ? 'png' : 'jpeg');
-const run = (cmd, a) => new Promise((ok, bad) => {
+const run = (cmd, a) => /** @type {Promise<void>} */ (new Promise((ok, bad) => {
   const p = spawn(cmd, a, { stdio: 'inherit' });
   p.on('error', bad); p.on('close', (c) => (c ? bad(new Error(`${cmd} exited ${c}`)) : ok()));
-});
+}));
 
 if (args.encode) {
   const out = args.out || 'out/film.mp4', fps = String(args.fps || 24);

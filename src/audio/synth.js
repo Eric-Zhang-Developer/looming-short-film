@@ -131,7 +131,11 @@ export function musicBox(midi, { vel = 0.6, dur = 1.2, vib = 0, vibHz = 7, vibUn
 // Length = dur + release. snd-v4, both optional (without them the samples are exactly as before):
 // bend { voice, at: [[t, semitones], ...] } glides one voice (index into midis) along a piecewise-linear pitch curve;
 // open { from, to, hz } raises the low-pass ceiling by hz between from and to (seconds from the note's start).
-export function pad(midis, { dur, attack = 1.5, release = 2, bend, open } = {}) {
+/**
+ * @param {number[]} midis
+ * @param {{ dur: number, attack?: number, release?: number, bend?: { voice: number, at: number[][] }, open?: { from: number, to: number, hz: number } }} opts
+ */
+export function pad(midis, { dur, attack = 1.5, release = 2, bend, open } = /** @type {any} */ ({})) {  // dur has no default: pass it
   const n = len(dur + release), out = new Float32Array(n), dets = [-8, 0, 8];
   const oscs = midis.flatMap((m, v) => dets.map((c, j) => ({ v, dt: mtof(m) * 2 ** (c / 1200) / SR, ph: (j * 0.318) % 1 })));
   const curve = (k, t) => { if (t <= k[0][0]) return k[0][1]; for (let i = 1; i < k.length; i++) if (t <= k[i][0]) { const [t0, a] = k[i - 1], [t1, b] = k[i]; return a + (b - a) * (t - t0) / (t1 - t0); } return k[k.length - 1][1]; };

@@ -56,6 +56,7 @@ function torn(w, h) {
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const col = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
+  /** @returns {Vec3} */
   const tiltOf = (k) => { const r = mulberry32(seedOf(ID, k)); return [(2 * r() - 1) * 1.2 * DEG, (2 * r() - 1) * 1.2 * DEG, 0]; };
   scene.background = new THREE.Color(PALETTE.navy);
   camera.position.copy(CAM);
@@ -70,6 +71,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     boiling.push([mesh, make]);
     return mesh;
   };
+  /** @param {THREE.Object3D} mesh @param {Vec3} at @param {{ tilt?: string | null, rot?: Vec3 | null, parent?: THREE.Object3D }} [o] */
   const group = (mesh, at, { tilt = null, rot = null, parent = scene } = {}) => {
     const g = new THREE.Group();
     g.add(mesh); g.position.set(...at);
@@ -285,6 +287,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   post({ focus: new THREE.Vector3(0.02, 0.05, BODY_Z).sub(CAM).dot(look), aperture: 0.012, lut: 'night' });
 
   const v = new THREE.Vector3(), B = new THREE.Vector3(), hitW = new THREE.Vector3();
+  /** @param {any} o @param {number[]} uy [u, y] */
   const inFridge = (o, [u, y]) => { o.g.position.copy(fridgePt(u, y)); o.g.rotation.set(0, FRIDGE.yaw, 0); };
   const inHand = (o, hand) => { o.g.position.set(hand.x, hand.y - 0.003, HAND_Z - 0.0005); o.g.rotation.set(0, 0, 0); };
 

@@ -38,9 +38,9 @@ const SLUNG = specPose({ lean: 2, arm: -90, far: -95, head: 2, leg: 0, farLeg: 8
 const STEP = POSES.walk_side_a;
 const UP = F(4.25);                                           // the sit-up's first drawing, on the cut to the wide (fix-bedroom)
 const STAND_AT = [0.150, 0, 0.385];                           // on the floor in front of the bed, left of the blob
-const EDGE_AT = [0.175, ROOM.MT + 0.006, 0.352];
-const FOOT = [0.232, ROOM.MT + 0.001, 0.300];                 // the blob, slid off his knees to the bed's foot (3.5–3.67), back on the mattress
-const FLOOR = [0.236, 0, 0.368];                              // ...and hopped down after him (5.75–6.0)
+const EDGE_AT = /** @type {Vec3} */ ([0.175, ROOM.MT + 0.006, 0.352]);
+const FOOT = /** @type {Vec3} */ ([0.232, ROOM.MT + 0.001, 0.300]);                 // the blob, slid off his knees to the bed's foot (3.5–3.67), back on the mattress
+const FLOOR = /** @type {Vec3} */ ([0.236, 0, 0.368]);                              // ...and hopped down after him (5.75–6.0)
 // Light levels.
 // fix-bedroom: the lamp-lit room read as day at 1:14 (cold-v4), so after lampOn the lamp is lower (0.32 → LAMP), the
 // ambient nearly gone (5% → 0.8% of s02's) and the fill a third: the light falls off from the nightstand to dark corners.
@@ -60,6 +60,7 @@ export async function build(ctx) {
   const H = await closeHeads(ctx, tl, rig, ['dread', 'resolve']);
   const ph = phone.children.filter((c) => c !== glow && c !== phoneDown.g);
   const fx = post({ focus: 0.6, aperture: 0.012, lut: 'night' });
+  /** @type {[number, string][]} */
   const cues = [[0, 'dread'], [3, 'resolve']];
   R.moonPanes(MOON_PANES);
   const headBase = rig.joints.head.position.x;
@@ -103,7 +104,7 @@ export async function build(ctx) {
   tl.rect('c4-lamp-stem', tl.col('navy', 'kraft', 0.2), [0.0012, 0.04], [sx, sy - sh / 2 - 0.02, knob.z - 0.001], { parent: cheat });
   const cShade = tl.group(tl.paper('c4-lamp-shade', { path: [[0.22, 0.04], [0.78, 0.04], [0.97, 0.96], [0.03, 0.96]], color: PALETTE.cream, weight: 'tissue', size: ROOM.SHADE, res: 512 },
     { translucency: 0.9 }), [sx, sy, knob.z], { parent: cheat });
-  const cShadeMat = cShade.children[0].material, cShadeBase = cShadeMat.emissive.clone();
+  const cShadeMat = /** @type {THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>} */ (cShade.children[0]).material, cShadeBase = cShadeMat.emissive.clone();
   const c4lamp = new THREE.PointLight(LAMPC0(PALETTE), 0, 0.2, 2);
   c4lamp.position.set(sx, sy, knob.z - 0.004);
   scene.add(c4lamp);
@@ -179,8 +180,8 @@ export async function build(ctx) {
       // ---- the Exam: its eyes in the black, a blink at 1.0; slides to the bed's foot as he sits up (3.5–3.67); gasps at
       // 4.25; watches him to the backpack; hops down after him (5.75–6.0) ----
       let contact = KNEE, eyes = 'open', look = 1, squash = 0;
-      if (T >= UP - 1e-6) contact = T < F(4.417) ? KNEE.map((v, i) => lerp(v, FOOT[i], (T - UP + 1 / 12) / (1 / 6)) + (i === 1 ? 0.006 : 0)) : FOOT;
-      if (T >= F(5.75)) { const k = Math.min(1, (T - 5.75) / 0.25); contact = FOOT.map((v, i) => lerp(v, FLOOR[i], k) + (i === 1 ? 0.01 * Math.sin(Math.PI * k) : 0)); squash = k >= 1 ? 0.15 : -0.1; }
+      if (T >= UP - 1e-6) contact = T < F(4.417) ? /** @type {Vec3} */ (KNEE.map((v, i) => lerp(v, FOOT[i], (T - UP + 1 / 12) / (1 / 6)) + (i === 1 ? 0.006 : 0))) : FOOT;
+      if (T >= F(5.75)) { const k = Math.min(1, (T - 5.75) / 0.25); contact = /** @type {Vec3} */ (FOOT.map((v, i) => lerp(v, FLOOR[i], k) + (i === 1 ? 0.01 * Math.sin(Math.PI * k) : 0))); squash = k >= 1 ? 0.15 : -0.1; }
       if (at2(T, 1.0, 1.08)) eyes = 'closed';
       if (T >= 4.25 - 1e-6) eyes = 'gasp';
       if (T >= 5 - 1e-6) { eyes = 'side'; look = -1; }

@@ -35,6 +35,11 @@ const LEAN = 7, DROP = 8, SAG = 0.04;   // per unit of slump: body lean °, head
 
 // brow: [angle °, + = the snout end up (worried); dy figure px, + = down] or null (hidden: the painted design has none).
 // breath: seconds per breath. depth: body y-scale swing.
+/**
+ * @typedef {{ eyes: string, mouth: string, bar?: boolean, brow: number[] | null, tilt: number, slump: number, tail: number,
+ *   breath: number, depth: number, first?: { eyes: string, mouth: string, for: number } }} Preset
+ */
+/** @type {Readonly<Record<string, Preset>>} */
 export const PRESETS = Object.freeze({
   neutral: { eyes: 'open', mouth: 'neutral', brow: [0, 0], tilt: 0, slump: 0, tail: 0, breath: 3.2, depth: 0.010 },
   numb: { eyes: 'tired', mouth: 'neutral', brow: [-3, 7], tilt: -6, slump: 0.9, tail: -14, breath: 4.2, depth: 0.006 },
@@ -100,6 +105,12 @@ function blinking(T, seed) {
   return false;
 }
 
+/**
+ * @param {import('../puppet.js').Puppet & { scale: number }} rig
+ * @param {number} t shot-local seconds
+ * @param {[number, string][]} cues
+ * @param {{ breath?: number, depth?: number, slump?: number, tilt?: number, tail?: number, blink?: boolean, seed?: number }} [opts]
+ */
 export function act(rig, t, cues, { breath, depth, slump, tilt, tail, blink = true, seed = 0 } = {}) {
   check(cues);
   const T = onTwos(t), over = { depth, slump, tilt, tail };
@@ -147,7 +158,7 @@ export function act(rig, t, cues, { breath, depth, slump, tilt, tail, blink = tr
 // The self-check the brief's timing rules lean on: node src/characters/acting.js (no browser; a stub rig).
 if (typeof process !== 'undefined' && import.meta.url === `file://${process.argv[1]}`) {
   const j = () => ({ rotation: { z: 0 }, scale: { y: 1 }, position: { y: 0 }, userData: {} });
-  const rig = { scale: 1, joints: { body: j(), head: j(), tail: j(), brow: j() }, meshes: { brow: {}, head: { visible: true } }, face(f) { this.f = f; } };
+  const rig = /** @type {any} */ ({ scale: 1, joints: { body: j(), head: j(), tail: j(), brow: j() }, meshes: { brow: {}, head: { visible: true } }, face(f) { this.f = f; } });
   const at = (t, cues, o) => { for (const k of Object.values(rig.joints)) { k.rotation.z = 0; } return act(rig, t, cues, { blink: false, ...o }); };
   const C = [[0, 'numb'], [2, 'dread'], [4, 'pride']];
   console.assert(at(1, C).eyes === 'tired', 'numb holds');

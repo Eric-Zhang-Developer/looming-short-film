@@ -30,7 +30,7 @@ export const MARK = (r) => [1.15 * (r - 0.012), 0, 0.074];   // README §1 Marst
 // s11 uses the same spot so the s11 → s13 → s15 cuts don't move it.
 const BLOB_DX = 0.016, AT = [MARK(BLOB_R.start)[0] + BLOB_DX, 0, 0.074];
 const HIP = [-0.075, -0.012, 0.074], FLOOR = -0.034;
-const PHONE = [-0.010, 0.0015, 0.114], PAGE = [-0.0205, 0.0003, 0.095];
+const PHONE = /** @type {Vec3} */ ([-0.010, 0.0015, 0.114]), PAGE = [-0.0205, 0.0003, 0.095];
 const CAM = [0.020, 0.033], CAM_Z = [[3.0, 0.668], [7.0, 0.628]];
 const WARM = 0.3;                                      // v4 Marston warm: lerp(PALETTE.lamp, PALETTE.cream, 0.3) (README v4)
 // Intensities, by eye on the sheet: s15's built exposure (the old lamp pool at the blob), its fill and ambient.
@@ -60,7 +60,9 @@ const BODY = [
 ];
 // The acting kit: resolve softening to neutral on the sit (its anticipation is the dip), quiet resolve at the page,
 // neutral watching the blob, resolve back to the page. The first cue sits before 0 so the sit's change keeps its hold.
+/** @type {[number, string][]} */
 const CUES = [[-0.1, 'resolve'], [B.deskSit, 'neutral'], [B.blobClimbs, 'resolve'], [B.blobSettles, 'neutral'], [6.25, 'resolve']];
+/** @type {[number, number, string][]} */
 const LOOKS = [[2.0, 2.5, 'side'], [3.25, 5.0, 'side']];   // eyes down at the phone; down-right at the blob climbing
 
 // ---------- the Exam: hops in at his heels, waits on the floor in front of the desk, climbs, settles ----------
@@ -99,14 +101,21 @@ export const idle = (rig, t, { breath = 0.012, period = 3.2, sway = 0.06, swayPe
 };
 
 // Paper bookkeeping: every sheet re-tears on the boil; a lit fixture's glow (emissiveMap) follows its map.
+/** @typedef {{ translucency?: number, edgeCatch?: number }} PaperMat paperMesh's material options */
 export function kitTools(ID) {
   const boiling = [];
   let last = null;
+  /** @param {import('../paper.js').PaperOptions & { mat?: PaperMat }} opts @param {THREE.Object3D} parent */
   const sheet = (opts, parent) => {
     const mesh = paperMesh(makePaper({ ...opts, seed: 0 }), opts.mat);
     boiling.push({ mesh, opts }); parent.add(mesh); return mesh;
   };
   // A bitmap at mpp metres per pixel, in a holder whose origin is the bitmap pixel `anchor` (default: its centre).
+  /**
+   * @param {HTMLCanvasElement | ImageBitmap} img
+   * @param {string} key
+   * @param {{ mpp: number, sx?: number, sy?: number, anchor?: number[], weight?: string, res?: number, parent: THREE.Object3D, mat?: PaperMat }} o
+   */
   const art = (img, key, { mpp, sx = 1, sy = 1, anchor = [img.width / 2, img.height / 2], weight, res = 512, parent, mat }) => {
     const holder = new THREE.Group(), w = img.width * mpp, h = img.height * mpp;
     const mesh = sheet({ art: img, size: [w, h], key: `${ID}-${key}`, weight, res, mat }, holder);
@@ -136,6 +145,7 @@ export const glow = (holder) => {   // the painted face lights itself (a lit fix
 
 // Navy wall from the kit's wall_strip: its painted navy tiled at the kit's scale, the cream baseboard along the bottom,
 // and `holes` ([x0, y0, x1, y1] in wall metres from its bottom-left) cleared for windows. pxm: canvas pixels per metre.
+/** @param {import('../assets.js').Kit} kit @param {number[]} WH [W, H] @param {number[][]} [holes] @param {number} [pxm] */
 export function wallCanvas(kit, [W, H], holes = [], pxm = 1500) {
   const img = kit.pieces.wall_strip, k = mppOf(kit, 'wall_strip') * pxm, c = canvas(W * pxm, H * pxm), g = c.getContext('2d');
   const [x0, y0, x1, y1] = [8, 10, 373, 90], tw = (x1 - x0) * k, th = (y1 - y0) * k, base = 15 * k;
@@ -227,6 +237,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const { pendant, wall } = await marstonDesk({ scene, assets, PALETTE, tools, ID });
   const [props, kitp] = await Promise.all([assets.load('study_props_sheet'), assets.load('props_kit')]);
   // An asset piece in a holder whose origin is the centre of its visible shape (s15's cut()).
+  /** @param {import('../assets.js').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D }} [o] */
   const cut = (a, name, { weight, res = 512, parent = scene } = {}) => {
     const holder = new THREE.Group(), [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [w, h], key: `${ID}-${name}`, weight, res }, holder);
@@ -246,7 +257,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // The backpack: on his back for the walk-in (on the body joint), then on the floor behind the chair from 0.75.
   const pack = cut(props, 'backpack_side'), [pw, ph] = pack.userData.vis;
   pack.scale.set(0.035 / pw, 0.04 / ph, 1);
-  const PACK_FLOOR = [-0.145, FLOOR + 0.02, 0.028];
+  const PACK_FLOOR = /** @type {Vec3} */ ([-0.145, FLOOR + 0.02, 0.028]);
   // The page (blank at this distance; s15's practice sheet), the capped pen, the phone with its two faces.
   const page = flat(cut(kitp, 'blank_page', { res: 1024 })); page.position.set(...PAGE);
   { const [w] = page.userData.vis; page.scale.setScalar(0.025 / w); }

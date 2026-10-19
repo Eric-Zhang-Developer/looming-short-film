@@ -47,10 +47,11 @@ export async function build(ctx) {
   // The sweat drop (6.5): one drawn tissue drop at his temple on the dread head, sliding 1.5 mm down by 7.0.
   const drop = tl.paper('sweat', { path: [[0.5, 0.02], [0.8, 0.5], [0.85, 0.75], [0.5, 0.98], [0.15, 0.75], [0.2, 0.5]], color: '#' + new THREE.Color(ctx.PALETTE.cream).lerp(new THREE.Color(ctx.PALETTE.phone), 0.35).getHexString(), weight: 'vellum', size: [0.0024, 0.0034], res: 256 });
   H.group.add(drop);
-  const DROP_AT = [(75 - 120) * H.k, (317 - 62) * H.k, 0.0006];   // head px (75, 62): the temple, behind the brow
+  const DROP_AT = /** @type {Vec3} */ ([(75 - 120) * H.k, (317 - 62) * H.k, 0.0006]);   // head px (75, 62): the temple, behind the brow
   const fx = post({ focus: 0.5, aperture: 0.012, lut: 'night' });
   const q = new THREE.Quaternion(), down = new THREE.Vector3();
   const focusOf = (pos, look, p) => new THREE.Vector3(...p).sub(new THREE.Vector3(...pos)).dot(new THREE.Vector3(...look).sub(new THREE.Vector3(...pos)).normalize());
+  /** @type {[number, string][]} */
   const cues = [[0, 'numb'], [3, 'guilt'], [5, 'dread']];
   R.moonPanes(DIM * MOON_PANES);
   const headBase = rig.joints.head.position.x;

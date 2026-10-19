@@ -8,6 +8,10 @@ import { hipHeight } from './gator.js';
 
 const D = Math.PI / 180;
 
+/**
+ * @param {{ lean?: number, arm?: number, far?: number | null, head?: number, jaw?: number, tail?: number, leg?: number, farLeg?: number }} [opts]
+ * @returns {Record<string, number>} part → radians
+ */
 export function specPose({ lean = 0, arm = -70, far = arm - 10, head = 0, jaw, tail, leg, farLeg = leg } = {}) {
   const p = { body: -lean * D, arm_r: (arm + lean) * D, head: head * D };
   if (far !== null) p.arm_l = (far + lean) * D;

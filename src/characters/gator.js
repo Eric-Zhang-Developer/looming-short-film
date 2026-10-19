@@ -21,7 +21,7 @@ const rot90 = (img) => {  // clockwise: a piece pointing +x now points down
 function tint(img, green, hoodie) {
   const c = canvas(img.width, img.height), g = c.getContext('2d');
   g.drawImage(img, 0, 0);
-  const S = THREE.SRGBColorSpace, rgb = (x) => new THREE.Color(x).getRGB({}, S);  // pixels are sRGB
+  const S = THREE.SRGBColorSpace, rgb = (x) => new THREE.Color(x).getRGB(/** @type {THREE.RGB} */ ({}), S);  // pixels are sRGB
   const ratio = (to, from) => (to ? [to.r / from.r, to.g / from.g, to.b / from.b] : [1, 1, 1]);
   const k = ratio(green && rgb(green), rgb(PALETTE.gator)), kh = ratio(hoodie && rgb(hoodie), rgb(PALETTE.cream));
   const d = g.getImageData(0, 0, c.width, c.height), p = d.data;
@@ -35,6 +35,7 @@ function tint(img, green, hoodie) {
 const HOODIE = new Set(['body', 'arm_l', 'arm_r', 'pocket']);  // gator_sheet pieces that are hoodie, not skin
 
 // Mixed from PALETTE so no hex is typed here. Crowds are never cloned: every figure gets its own i.
+/** @type {[string, number][]} */
 const MIX = [['navy', 0.22], ['kraft', 0.3], ['cream', 0.2], ['ink', 0.3], ['kraft', 0.55], ['navy', 0.4], ['cream', 0.35], ['phone', 0.14]];
 export function greenVariant(i) {
   const c = new THREE.Color(PALETTE.gator), [a, ka] = MIX[i % MIX.length];
@@ -71,6 +72,26 @@ function paintedLike(a, piece, path, [w, h]) {
 // (path in 0..1, v down, as makePaper takes it).
 // faces: true adds eyes and mouth slots from face_sheet (parts named eyes/mouth must be in `parts`, from: null).
 // facePair: draw every eye take as a front-view pair this many face px apart (makeFaces).
+/**
+ * @typedef {object} PartSpec
+ * @property {string} name
+ * @property {string[] | null} [from] [asset, piece]; null makes a face slot
+ * @property {{ path: number[][], color?: string, weight?: string, like?: string[] }} [paper] a part drawn in code
+ * @property {number[]} [size]
+ * @property {number[]} [pivot]
+ * @property {string} [parent]
+ * @property {number[]} [at]
+ * @property {number} [z]
+ * @property {string} [weight]
+ * @property {string} [turn] 'mirror' | 'rot90' | 'mirrorProxy'
+ * @property {number} [reach]
+ * @property {boolean} [hidden]
+ */
+/**
+ * @param {import('../assets.js').AssetCtx} ctx
+ * @param {{ name: string, seed?: number, scale?: number, green?: string, hoodie?: string, res?: number, parts: PartSpec[],
+ *   faces?: Record<string, string> | null, facePair?: number }} opts
+ */
 export async function buildRig(ctx, { name, seed = 0, scale = 1, green, hoodie, res = 512, parts, faces = null, facePair = 0 }) {
   const id = `${name}${seed}`;
   const loaded = {};
@@ -131,6 +152,7 @@ export async function buildRig(ctx, { name, seed = 0, scale = 1, green, hoodie, 
 // (worried: the eye, not the eye plus its sweat drops). pair: the front view's two eyes, `pair` face px apart, the
 // right one mirrored so both look at the camera.
 const EYES = ['open', 'closed', 'tired', 'gasp', 'worried', 'side'], MOUTHS = ['neutral', 'smile', 'o', 'line'];
+/** @type {Record<string, [string[], number[]]>} */
 const SLOTS = { eyes: [EYES, [232, 160]], mouth: [MOUTHS, [232, 100]] };
 const ANCHOR = { eyes_worried: [22, 0] };
 async function makeFaces(ctx, { id, scale, res, pair = 0 }) {
@@ -193,6 +215,11 @@ function drawn(name, poly, { parent, z, color, like, origin }) {
   return { name, parent, z, paper: { path: poly.map(([x, y]) => [(x - x0) / w, (y - y0) / h]), color, like }, size: [w * K, h * K],
     pivot: [0, 0], at: at(x0, y0, origin) };
 }
+/**
+ * @param {string} sheet
+ * @param {{ pocket?: boolean, backpack?: boolean, head34?: boolean, throat?: boolean, brow?: boolean, green?: string }} [opts]
+ * @returns {PartSpec[]}
+ */
 export function sideParts(sheet, { pocket = true, backpack = false, head34 = false, throat = false, brow = false, green } = {}) {
   const P = (piece) => [sheet, piece], N = (x, y) => at(x, y, NECK_F), neck = at(NECK_F[0], NECK_F[1] - (throat ? HEAD_LIFT : 0));
   const skin = '#' + new THREE.Color(green ?? PALETTE.gator).lerp(new THREE.Color(PALETTE.ink), 0.72).getHexString();
@@ -220,6 +247,10 @@ export function sideParts(sheet, { pocket = true, backpack = false, head34 = fal
 }
 const FACES = { eyes: 'open', mouth: 'neutral' };
 
+/**
+ * @param {import('../assets.js').AssetCtx} ctx
+ * @param {{ seed?: number, scale?: number, green?: string, hoodie?: string, res?: number, facing?: 'side' | 'front' | 'back' }} [opts]
+ */
 export async function makeGator(ctx, { seed = 0, scale = 1, green, hoodie, res = 512, facing = 'side' } = {}) {
   const G = (piece) => ['gator_sheet', piece];
   let parts;

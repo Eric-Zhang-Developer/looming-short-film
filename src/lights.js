@@ -49,6 +49,11 @@ export function placeForScale({ subjectPos, wallZ, scale, height = 0, side = 0 }
 // near is tabletop-scale (min(4 mm, d/20)) so a caster just in front of the light is inside the frustum; pass
 // { nearest } (m, the closest caster to the light) to set it explicitly.
 const _box = new THREE.Box3(), _sphere = new THREE.Sphere(), _lp = new THREE.Vector3();
+/**
+ * @param {THREE.SpotLight} spot
+ * @param {any} target a Vector3 or an Object3D
+ * @param {{ nearest?: number }} [opts]
+ */
 export function aim(spot, target, { nearest } = {}) {
   if (target.isObject3D) _box.setFromObject(target).getBoundingSphere(_sphere);
   else _sphere.set(_lp.copy(target), 0);
@@ -70,6 +75,7 @@ export function aim(spot, target, { nearest } = {}) {
 
 // Low, close, wide cyan wedge. Shadow on. Place it with placeForScale, then aim it at the subject.
 // penumbra near 1 turns the hard fan on the desk into a soft fall-off.
+/** @param {{ color?: THREE.ColorRepresentation, intensity?: number, angle?: number, distance?: number, penumbra?: number }} [opts] */
 export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle = 1.2, distance = 0.6, penumbra = 0.45 } = {}) {
   return shadowed(new THREE.SpotLight(c, intensity, distance, angle, penumbra, 2), { bias: -0.0004 });
 }
@@ -83,6 +89,7 @@ export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle =
 // light, like the blob in its pool, hides the vellum behind it instead of wearing an amber film. Its sides fade to
 // nothing by view angle, over a width that wanders with the vellum's frost, so they read as light, not mesh lines.
 // Add light, light.target, cone and dust to the scene root (dust is in world space).
+/** @param {{ color?: THREE.ColorRepresentation, intensity?: number, angle?: number, penumbra?: number, seed?: number, reach?: number }} [opts] */
 export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.6, penumbra = 0.5, seed = 1, reach = 2.5 } = {}) {
   const light = shadowed(new THREE.SpotLight(c, intensity, 0, angle, penumbra, 2), { radius: 2, bias: -0.0003 });
 
@@ -190,6 +197,7 @@ const TIMEOUT = 0.8;
 //   wake      time of the relay clack, or undefined. With a wake, the zone is dark before it.
 //   timeoutAt time the chatter starts, or undefined. Without one the zone never times out.
 // No wake: lit (1) until timeoutAt. Wake and timeout may both be given (s14: woken at 1.0, times out at 4.2).
+/** @param {number} t @param {{ wake?: number, timeoutAt?: number, seed?: number }} [opts] */
 export function sensorLevel(t, { wake, timeoutAt, seed = SENSOR_SEED } = {}) {
   if (wake !== undefined) {
     if (t < wake) return 0;

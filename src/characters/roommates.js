@@ -35,6 +35,11 @@ function proportion(parts, { body: [bx, by], leg, arm }) {
   });
 }
 
+/**
+ * @param {import('../assets.js').AssetCtx} ctx
+ * @param {string} who
+ * @param {{ seed?: number, scale?: number, green?: string, hoodie?: string, res?: number, root?: number[] }} opts
+ */
 async function makeRoommate(ctx, who, { seed = 0, scale = 1, green, hoodie, res = 512, root = [0, 0] }) {
   const b = BUILD[who], g = green ?? b.green;
   const parts = proportion(sideParts('gator_sheet', { throat: true, brow: true, green: g }), b);

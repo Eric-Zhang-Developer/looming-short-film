@@ -36,9 +36,9 @@ const radiusAfter = (n) => (n ? BLOB_R[STEPS[n - 1]] : BLOB_R.start);
 const markOf = (r) => (r > 0.012 + 1e-9 ? BLOB_AT(r) : [0, 0, 0.098]);
 const FLIPS = [9, 14.5];                               // page to the stack
 const CUTS = { P: [0.5, B.problemOneSolved], P2: [9.5, B.problemSolved2], D: 9 };
-const CAM_D = { pos: [0.168, 0.230, 1.010], look: [0.168, 0.040, 0.080], focus: [0.168, 0.020, 0.086] };
+const CAM_D = /** @type {CamKey} */ ({ pos: [0.168, 0.230, 1.010], look: [0.168, 0.040, 0.080], focus: [0.168, 0.020, 0.086] });
 // Camera P: straight down on the page from 0.075 (README §8), centred on the written lines (sheet rows 38–298)
-const CAM_P = { pos: [-0.0205, 0.0753, 0.0934], look: [-0.0205, 0.0003, 0.0934] };
+const CAM_P = /** @type {CamKey} */ ({ pos: [-0.0205, 0.0753, 0.0934], look: [-0.0205, 0.0003, 0.0934] });
 const WARM = 0.3;                                      // v4 Marston warm: lerp(lamp, cream, 0.3) (README v4)
 // The pendant per camera: B′ at s15's exposure (so the cut in matches), the page inserts inside the pool's core at G4's
 // 0.8 × 0.18 (or the page clips), the wide D in between. Same light; an exposure change per setup.
@@ -46,9 +46,9 @@ const ZONE_I = { B: 0.25, P: 0.8 * 0.18, D: 0.5 };
 const FLUOR_I = 0.25, AMB_K = 0.6, FILL_I = 0.02;
 const FILL_OFF = [0.029, 0.040, 0.114];                // character fill: x off the hip, then world y, z (s15's (−0.046, 0.040, 0.114))
 const MIR = 0.350;                                     // neighbor unit: x' = MIR − x
-const N = { hip: [0.425, -0.012], blob: [0.350, OTHER_R.neighbor, 0.098], phone: [0.360, 0.0015, 0.114] };
+const N = { hip: [0.425, -0.012], blob: [0.350, OTHER_R.neighbor, 0.098], phone: /** @type {Vec3} */ ([0.360, 0.0015, 0.114]) };
 const VIEW_GLOW = [0.3, 0.45];
-const INSERT_TINT = [0.62, 0.85, 0.9];
+const INSERT_TINT = /** @type {Vec3} */ ([0.62, 0.85, 0.9]);
 const INSERT_ARM = [0.030, -35, -0.006, 0.0014, 0.0022];   // the insert's sleeve: reach (m), turn (deg), hand behind the nib (m), arm height, pen height (m)
 
 // ---------- the hero ----------
@@ -56,9 +56,11 @@ const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
 const P = { ...POSES, line1: seat({ lean: 14, arm: -21 }), antic: seat({ lean: 10, arm: -21 }),
   still: seat({ lean: 18, arm: -22 }) };               // 6.5: the brace with the pen lifted 2 mm
 // The montage (v4): pops on a 0.5 s grid, each pose held 6 drawings. 9.5–11.5 is the P2 insert (he's off screen).
+/** @type {[number, string][]} */
 const POPS = [[9, 'flip'], [9.5, 'write_a'], [10, 'write_b'], [10.5, 'write_c'], [11, 'write_a'],
   [11.5, 'solve'], [12, 'write_c'], [12.5, 'write_a'], [13, 'solve'], [13.5, 'write_b'], [14, 'solve'], [14.5, 'flip'],
   [15, 'solve'], [15.5, 'write_a']];
+/** @param {[number, string][]} pops @returns {[number, string][]} */
 const held = (pops) => pops.flatMap(([t, n], i) => (i + 1 < pops.length ? [[t, n], [pops[i + 1][0] - dr(1), n]] : [[t, n]]));   // pop, hold, pop
 const BODY = [[0, 'line1'], [dr(1), 'line1'], [dr(2), 'antic'], [dr(3), 'brace'], [6.5, 'brace'], [6.5 + 1e-3, 'still'], [9 - dr(1), 'still'], ...held(POPS)];
 const popAt = (tc) => (tc < 9 ? null : POPS.findLast(([t]) => tc >= t - 1e-6)?.[1]);
@@ -66,6 +68,7 @@ const isWrite = (n) => !!n?.startsWith('write');
 // Head on body (deg): s15 ends at −4; the brace 4 more; 7.167 another −4; montage −8, think +6
 const headAt = (tc) => (tc < 9 ? kf(tc, [[0, -4], [dr(2), -4], [dr(3), -8], [dr(85), -8], [dr(86), -12]]) : -8);
 // The acting kit carries brows, breath and the anticipations; the eyes and mouth follow the spec's own table on top.
+/** @type {[number, string][]} */
 const CUES = [[-0.1, 'resolve'], [7.0, 'pride'], [9.0, 'neutral']];
 const eyesAt = (tc) => (tc < 7 ? 'worried' : tc < 8 ? 'gasp' : tc < 9 ? 'side' : 'open');
 const mouthAt = (tc) => { const p = popAt(tc);
@@ -74,7 +77,7 @@ const mouthAt = (tc) => { const p = popAt(tc);
 
 // ---------- the neighbor (crowd_sheet, mirrored to face −x), working from the first frame ----------
 const NP = { ...POSES, n_write2: specPose({ lean: 16, arm: -22, far: null, head: -12 }) };
-const NPOPS = [[0, 'crowd_write'], ...Array.from({ length: 14 }, (_, i) => [9 + 0.5 * i, i % 2 ? 'crowd_write' : 'n_write2'])];
+const NPOPS = /** @type {[number, string][]} */ ([[0, 'crowd_write'], ...Array.from({ length: 14 }, (_, i) => [9 + 0.5 * i, i % 2 ? 'crowd_write' : 'n_write2'])]);
 
 const kick = (t, t0, a) => (t < t0 ? 0 : a * Math.exp(-6 * (t - t0)) * Math.cos(18 * (t - t0)));   // s15's: peaks on the beat
 
@@ -106,6 +109,7 @@ function page1(tc, t) {
 }
 // the pen tip in P, in sheet pixels: along the line being written, over the '+' in the pause, along the strike and check
 function tip1(tc, t) {
+  /** @param {number[]} box @param {number} f */
   const along = ([x0, , x1, y1], f) => [x0 + (x1 - x0) * f, y1 - 4];
   if (tc < A[0]) return [I1.a[0], I1.a[3] - 4];
   if (tc < A[1]) return along(I1.a, span(tc, ...A));
@@ -166,6 +170,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const { pendant: nPendant } = await marstonDesk({ scene: nRoom, assets, PALETTE, tools, ID: `${ID}-nbr` });
   for (const c of nRoom.children) if (c.position.z < 0.03 || (c.rotation.x < 0 && c.position.y < -0.03) || c.position.x === 0.150) c.visible = false;
   const [props, kitp, gsheet] = await Promise.all(['study_props_sheet', 'props_kit', 'gator_sheet'].map((n) => assets.load(n)));
+  /** @param {import('../assets.js').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D, key?: string }} [o] */
   const cut = (a, name, { weight, res = 512, parent = scene, key = name } = {}) => {   // s15's: origin at the visible centre
     const holder = new THREE.Group(), [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [w, h], key: `${ID}-${key}`, weight, res }, holder);
@@ -209,7 +214,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     ip.rotation.x = -Math.PI / 2; ip.position.y = INSERT_ARM[4]; }   // the pen over the hand, so the hand reads as gripping it
   { const arm = gsheet.pieces.arm_r, ia = art(arm, 'insert-arm', { mpp: INSERT_ARM[0] / arm.width, anchor: [arm.width - 10, arm.height / 2], parent: ihand });
     ia.rotation.x = -Math.PI / 2; ia.position.set(INSERT_ARM[2], INSERT_ARM[3], 0.0004);
-    ia.children[0].material.color.setRGB(...INSERT_TINT); }   // the amber grade and the pool's glare turned the felt lime; this pulls it back to gator green
+    /** @type {THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>} */ (ia.children[0]).material.color.setRGB(...INSERT_TINT); }   // the amber grade and the pool's glare turned the felt lime; this pulls it back to gator green
 
   // ---------- characters ----------
   const hero = await makeGator({ assets }, { res: 1024 });

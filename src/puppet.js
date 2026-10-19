@@ -20,6 +20,8 @@ import * as THREE from 'three';
 
 const DT = 1 / 240;  // follow() integration step (s)
 
+/** @typedef {ReturnType<typeof definePuppet>} Puppet */
+
 export function definePuppet({ name, parts, faces = {} }) {
   const group = new THREE.Group();
   group.name = name;

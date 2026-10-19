@@ -54,6 +54,7 @@ export async function makeClock(ctx, { seed = 0, diameter = KIT_D, face = 'home'
     return mesh;
   };
   // A kit piece, its opaque box scaled to the PIECES size × k, placed so bitmap point [u, v] sits at the origin of `holder`.
+  /** @param {string} name @param {number[]} uv [u, v] @param {number} z */
   const piece = (name, [u, v], z) => {
     const bmp = kit.pieces[name], [sw, sh] = kit.sizes[name];
     const mesh = sheet(name, { art: bmp, size: [sw * k, sh * k], res: name.startsWith('face') ? 1024 : 512 });

@@ -33,10 +33,16 @@ const ROOM_I = 0.05, BOUNCE_I = 0.35;   // his room light behind the pane (cd), 
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const hex = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
+  /** @returns {Vec3} */
   const tiltOf = (layer) => { const r = mulberry32(seedOf('s01', layer)); return [(2 * r() - 1) * 1.5 * DEG, (2 * r() - 1) * 1.5 * DEG, 0]; };
   scene.background = new THREE.Color(PALETTE.navy);
 
   const boiling = [];  // [mesh, seed => PaperSheet], re-torn every boil step
+  /**
+   * @param {string} layer
+   * @param {import('../paper.js').PaperOptions} opts
+   * @param {{ at?: Vec3, parent?: THREE.Object3D, tilt?: boolean, [mat: string]: any }} [o] the rest goes to paperMesh
+   */
   const sheet = (layer, opts, { at, parent = scene, tilt = true, ...mat } = {}) => {
     const make = (s) => makePaper({ ...opts, key: `s01-${layer}`, seed: s });
     const mesh = paperMesh(make(0), mat);
@@ -68,6 +74,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     m.position.x += (0.5 - (u0 + u1) / 2) * sw * k; m.position.y += ((v0 + v1) / 2 - 0.5) * sh * k;
     return m;
   };
+  /** @type {[string, number, number][]} */
   const FAR = [['facade_block', 0.95, -0.50], ['stepped_bay', 0.36, 0.52], ['century_tower', 0.07, -0.18]];   // [piece, visible width, centre x]
   for (const [p, w, x] of FAR) {
     const h = w * ext.sizes[p][1] * (ext.visible[p][3] - ext.visible[p][1]) / (ext.sizes[p][0] * (ext.visible[p][2] - ext.visible[p][0]));

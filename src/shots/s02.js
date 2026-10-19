@@ -26,7 +26,7 @@ const DEG = Math.PI / 180;
 export const DESK = {
   floor: -0.0413,                  // the desk's painted height (75 cm): its top edge is y 0
   x0: -0.033, w: 0.0768, d: 0.033, // painted desk front (mirrored: drawers right, kneehole left by him), 60 cm deep
-  hip: [-0.056, -0.0135, 0.016],   // seated hip on the desk_chair's cushion; body plane z 0.016 (near arm +0.012)
+  hip: /** @type {Vec3} */ ([-0.056, -0.0135, 0.016]),   // seated hip on the desk_chair's cushion; body plane z 0.016 (near arm +0.012)
   chair: { h: 0.0495, x: -0.061, z: 0.008 },
   // A tall table lamp (home_kit's "floor_lamp" art at 80 cm; v3: it was a 120 cm cartoon allowance so its shade cleared his
   // head). Now a normal tall table lamp, moved right of his snout so the shade stays visible, behind the blob's mark;
@@ -53,6 +53,7 @@ function torn(w, h) {
 }
 export function tools({ scene, PALETTE }, ID) {
   const col = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
+  /** @returns {Vec3} */
   const tiltOf = (k, deg = 1.5) => { const r = mulberry32(seedOf(ID, k)); return [(2 * r() - 1) * deg * DEG, (2 * r() - 1) * deg * DEG, 0]; };
   const boiling = [];
   const paper = (key, opts, mat) => {
@@ -62,6 +63,7 @@ export function tools({ scene, PALETTE }, ID) {
     boiling.push([mesh, make]);
     return mesh;
   };
+  /** @param {THREE.Object3D} mesh @param {Vec3} at @param {{ rot?: Vec3 | null, parent?: THREE.Object3D }} [o] */
   const group = (mesh, at, { rot = null, parent = scene } = {}) => {
     const g = new THREE.Group(); g.add(mesh); g.position.set(...at);
     if (rot) g.rotation.set(...rot);
@@ -211,9 +213,10 @@ const FACE_I = 0.0045;                            // character fill (README §10
 
 const F = (n) => n / 12, frameOf = (t) => Math.floor(t * 12 + 1e-6);
 // v4: the wall clock beside the calendar (README §13): 0.014 right of its right edge, 0.70 of its height up, in its plane. 9:00.
-const CLOCK = { at: [C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z], h: 9, m: 0 };
+const CLOCK = { at: /** @type {Vec3} */ ([C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z]), h: 9, m: 0 };
 // v4 acting: numb, one small flinch as the blob arrives (9.33), numb again. act() needs 12 frames between changes, so the flinch
 // holds 0.58 s and the second numb lands on the last drawing (9.92), not the spec's 9.67.
+/** @type {[number, string][]} */
 const ACT = [[0, 'numb'], [9.33, 'flinch'], [9.92, 'numb']];
 
 // The drop on its 2s grid. space 'page' (y on the calendar), 'fall' (k from lip to landing), 'desk' (contact x, z).

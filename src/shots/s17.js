@@ -22,7 +22,7 @@ const ID = 's17', D = Math.PI / 180, RATE = 4;
 // ---------- tunables (the final pass changes these, not the staging) ----------
 const BLOB_R = { start: 0.005 };                        // SHRINK[6], s16's last step (README §1)
 const BLOB = [0.000, 0.098];                            // the page-corner mark (x, z)
-const HIP = [-0.075, -0.012, 0.074];                    // s11's seat (UNIT.hip, bodyZ)
+const HIP = /** @type {Vec3} */ ([-0.075, -0.012, 0.074]);                    // s11's seat (UNIT.hip, bodyZ)
 // The neighbor's unit is mirrored about x 0.155 (x' = 0.310 − x), not s16's 0.350: at 0.350 the sleeping neighbor and
 // their chair fell just outside the locked frame, leaving only their blob at the edge.
 const NB = 0.310, EMPTY_DX = -0.25;                     // the empty desk Δx
@@ -33,8 +33,8 @@ const NB_BLOB = [NB, 0.098], NB_PHONE = [NB + 0.010, 0.0015, 0.114], NB_HIP = [N
 // his desk (the empty desk is cut by the left edge: it only has to read as empty), and the blob's one look at him (7.0–8.5)
 // gets Camera E, a close two-shot of the blob on the page corner and his face above it, so the size he shrank to reads next to him.
 // v4: E's window is G4's × 2/3 like every other time here.
-const CAM = { pos: [0.100, 0.250, 0.950], look: [0.100, 0.058, 0.062] }, FOCUS = [0.000, 0.010, 0.098];
-const CAM_E = { pos: [-0.030, 0.028, 0.338], look: [-0.030, 0.028, 0.098], focus: [0.000, 0.010, 0.098] }, E_WINDOW = [4.5, 5.833];
+const CAM = /** @type {CamKey} */ ({ pos: [0.100, 0.250, 0.950], look: [0.100, 0.058, 0.062] }), FOCUS = /** @type {Vec3} */ ([0.000, 0.010, 0.098]);
+const CAM_E = /** @type {CamKey} */ ({ pos: [-0.030, 0.028, 0.338], look: [-0.030, 0.028, 0.098], focus: [0.000, 0.010, 0.098] }), E_WINDOW = [4.5, 5.833];
 const GOLD_AT = 10.667;                                 // elevation, k, panes and grade ramps end here (G4's 16 × 2/3), then hold
 const WARM = 0.3;                                       // v4 Marston warm: lerp(lamp, cream, 0.3) (README v4)
 const ZONE_I = 0.35, FLUOR_I = 0.35, AMB_K = 0.45, FILL_I = 0.02, DAWN_K = 9;   // DAWN_K: dawn overtakes the pendants by ~9 s (by eye)
@@ -59,6 +59,7 @@ const P = {
 const BODY = [[0, 'write_a'], [23 / 12, 'write_a'], [2, 'antic'], [28 / 12, 'back1'], [32 / 12, 'back2'], [3, 'sit_back'], [40 / 12, 'settle']];
 // The acting kit: neutral with G4's small smile, relief from the sit-back (its anticipation is the lean in at 2.917).
 // relief's own eyes are closed, so they're half-lid (tired) for the sit-back, to the blob at 4.0, and closed from 6.0.
+/** @type {[number, string][]} */
 const CUES = [[-0.1, 'neutral'], [3, 'relief']];
 const heroEyes = (t) => (t < 3 ? null : t < 4 ? 'tired' : t < 6 ? 'side' : 'closed');
 const PEN_DOWN = 25 / 12;                               // 2.083
@@ -76,6 +77,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
   const flat = (g) => { g.rotation.x = -Math.PI / 2; return g; };
   // An asset piece in a holder whose origin is the centre of its visible shape; [w] sets its visible width.
+  /** @param {import('../assets.js').Kit} a @param {string} name @param {{ w?: number, weight?: string, res?: number, parent?: THREE.Object3D, tag?: string }} [o] */
   const cut = (a, name, { w, weight, res = 512, parent = scene, tag = '' } = {}) => {
     const holder = new THREE.Group(), [sw, sh] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [sw, sh], key: `${ID}-${name}${tag}`, weight, res }, holder);
@@ -157,6 +159,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
   // ---------- camera (locked), post ----------
   const dir = new THREE.Vector3(), V3 = new THREE.Vector3();
+  /** @param {CamKey} cam */
   const aimCam = ({ pos, look, focus }) => {   // sets the camera and returns the focus distance along its axis
     camera.position.set(...pos); camera.lookAt(...look); camera.updateMatrixWorld(true);
     return camera.getWorldDirection(dir).dot(V3.set(...focus).sub(camera.position));
