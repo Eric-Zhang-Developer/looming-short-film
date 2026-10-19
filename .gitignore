@@ -5,3 +5,8 @@ out/
 assets/raw/*
 !assets/raw/thumbs/
 assets/cut/*.png
+
+# Worktrees for builder agents
+.claude/worktrees/
+# Previews muxed with third-party clips (assets/raw/reels) stay local
+evidence/*/preview.mp4
