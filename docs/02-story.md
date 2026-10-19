@@ -29,9 +29,9 @@ One plain analog wall clock: tick marks, no numbers, the same paper style as the
 ## Beat sheet (3:21) · ★ new · ✎ rewritten · = kept
 
 ### Act 1 · Birth (0:00–0:26)
-- **0:00 · s00 =** Black. A phone buzzes: **"Calc 2 Exam · Fri"**.
+- **0:00 · s00 ✎** Black. A phone buzzes and wakes on the Canvas To-do list (light mode): **"MAC2312 · Calc 2 Exam · Tomorrow 9:00 AM"**. A second buzz drops the reminder banner in and marks the row red.
 - **0:04 · s01 =** Dawn skyline, push in to his window.
-- **0:09 · s02 ✎** The desk. The calendar, with **the clock beside it at ~9:00**. Push in to the circled "Calc 2 exam". The ink drop is born from the circle and wobbles toward him. *Face: numb → small flinch.*
+- **0:09 · s02 ✎** The desk. The calendar, with **the clock beside it at ~9:00**. Push in to the circled "Calc 2 exam". **The ink runs out of the words** and gathers into a drop on the circle: the blob is made of the exam's name. It wobbles toward him. *Face: numb → small flinch.*
 - **0:19 · s03 =** He opens the laptop and plays a game. **The rule, first time:** in the screen's low glow the shadow climbs the wall. The blob gulps and grows. *Face: guilt glance, then away.*
 
 ### Act 2 · Avoidance, plain (0:26–1:10)

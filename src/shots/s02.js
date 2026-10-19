@@ -251,11 +251,67 @@ export function examAt(t) {
     s: 1, squash, eyes: 'open', look: -1 };
 }
 
+// v6-canvas-a: the word drips. The ink of "Calc 2 exam" runs out of the letters (DRIP, on 2s) and gathers into the bead
+// as it swells (4.33–5.0), so the blob is visibly made of the exam's name; the square is left with a ghost of the words.
+// An overlay on the square's tilted frame, in front of the red circle (the drips run over its line): each ink pixel of
+// the painted letters is covered with the square's paper (GHOST of it left) when it leaves, and travels down to the
+// bead, straight first and converging late, lower pixels first and columns staggered so the letters run in streaks.
+const DRIP = [3.5, 5.0], GHOST = 0.18, RUNS = 0.55, K = 4;   // window (s), ghost alpha, one pixel's run (of the window), canvas px per art px
+function wordDrip({ square, props }, PALETTE) {
+  const bmp = props.pieces.calc_exam_square, [sw, sh] = props.sizes.calc_exam_square, [u0, v0, u1, v1] = props.visible.calc_exam_square;
+  const bw = bmp.width, bh = bmp.height, m = square.mesh, px = m.scale.x * sw / bw, py = m.scale.y * sh / bh;
+  const src = Object.assign(document.createElement('canvas'), { width: bw, height: bh }).getContext('2d');
+  src.drawImage(bmp, 0, 0);
+  const img = src.getImageData(0, 0, bw, bh).data;
+  // The letters: dark pixels (their antialiased edges too, so no outline stays) inside the square's border (14% inset); the paper: the mean of the light ones there.
+  const ink = [], paper = [0, 0, 0, 0], r = mulberry32(seedOf(ID, 'drip')), cols = Array.from({ length: bw }, () => r());
+  const [i0, i1, j0, j1] = [u0 + 0.14 * (u1 - u0), u1 - 0.14 * (u1 - u0), v0 + 0.14 * (v1 - v0), v1 - 0.14 * (v1 - v0)].map((u, k) => Math.round(u * (k < 2 ? bw : bh)));
+  for (let j = j0; j < j1; j++) for (let i = i0; i < i1; i++) {
+    const o = 4 * (j * bw + i), lum = 0.3 * img[o] + 0.59 * img[o + 1] + 0.11 * img[o + 2];
+    if (img[o + 3] < 128) continue;
+    if (lum < 170) ink.push({ i, j, c: `rgb(${img[o]},${img[o + 1]},${img[o + 2]})` });
+    else if (lum > 180) { paper[0] += img[o]; paper[1] += img[o + 1]; paper[2] += img[o + 2]; paper[3]++; }
+  }
+  const pap = `rgb(${paper.slice(0, 3).map((v) => Math.round(v / paper[3])).join(',')})`;
+  // The overlay's box (inner-local m): the art's width, from its top down past the bead.
+  const xL = m.position.x - m.scale.x * sw / 2, yT = m.position.y + m.scale.y * sh / 2, bead = [FX - square.g.position.x, BEAD_AT + 0.0006 - square.g.position.y];
+  const yB = bead[1] - 0.0012, H = Math.ceil((yT - yB) / py);
+  const c = Object.assign(document.createElement('canvas'), { width: bw * K, height: H * K }), g = c.getContext('2d');
+  const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
+  const plane = new THREE.Mesh(new THREE.PlaneGeometry(bw * px, H * py), new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false }));
+  plane.position.set(xL + bw * px / 2, yT - H * py / 2, 0.0005);   // in front of the circle (square + 0.0003)
+  plane.receiveShadow = true;
+  square.inner.add(plane);
+  const bx = (bead[0] - xL) / px, by = (yT - bead[1]) / py, top = Math.min(...ink.map((q) => q.j)), bot = Math.max(...ink.map((q) => q.j));
+  for (const q of ink) q.d = 0.3 * (bot - q.j) / Math.max(1, bot - top) + 0.15 * cols[q.i];   // lower pixels and staggered columns first
+  let last = -1;
+  return (t) => {
+    const f = Math.floor(t * 12 + 1e-6), p = clamp((f / 12 - DRIP[0]) / (DRIP[1] - DRIP[0]));
+    plane.visible = p > 0;
+    if (!plane.visible || f === last) return;
+    last = f;
+    g.clearRect(0, 0, c.width, c.height);
+    for (const q of ink) {                       // the hole each pixel leaves: paper, a ghost of the letter showing
+      if (p <= q.d) continue;
+      g.fillStyle = pap; g.globalAlpha = 1 - GHOST; g.fillRect(q.i * K - 1, q.j * K - 1, K + 2, K + 2);
+    }
+    g.globalAlpha = 1;
+    for (const q of ink) {                       // and the pixel on its way to the bead
+      const k = clamp((p - q.d) / RUNS);
+      if (k <= 0 || k >= 1) continue;
+      const x = lerp(q.i, bx, k ** 3), y = lerp(q.j, by, easeIn(k));
+      g.fillStyle = q.c; g.fillRect(x * K - 1, y * K - K * 4 * k, K + 2, K * (1 + 4 * k));   // a streak, longer as it runs
+    }
+    tex.needsUpdate = true;
+  };
+}
+
 export async function build(ctx) {
   const { scene, camera, PALETTE, post } = ctx;
   scene.background = new THREE.Color(PALETTE.navy);
   const T = tools(ctx, ID);
-  await homeDesk(ctx, T);
+  const room = await homeDesk(ctx, T);
+  const drip = wordDrip(room, PALETTE);
   const fx = post({ focus: 0.4, aperture: 0.01, lut: 'dawn' });
   const clock = await makeClock(ctx, { seed: 2 });
   clock.group.position.set(...CLOCK.at);
@@ -305,6 +361,7 @@ export async function build(ctx) {
     exam, gator,
     update(t) {
       T.boil(t);
+      drip(t);
       clock.boil(t); clock.set(CLOCK.h, CLOCK.m, t);   // the second hand steps on every whole second of the shot
       // Camera on 1s: W, the push to I (calendarZoom 1.5–3.5), I held, cut to W on the let-go (7.083).
       const ins = t >= 3.5 && t < F(85), k = t < 1.5 ? 0 : t < 3.5 ? ease((t - 1.5) / 2) : ins ? 1 : 0;
