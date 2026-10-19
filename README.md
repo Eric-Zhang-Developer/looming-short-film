@@ -35,7 +35,7 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 
 | Decision | Choice |
 |---|---|
-| Runtime | 3:21 (v6, s10b added; was 3:15 from G4, 2026-10-15) |
+| Runtime | 3:24 (v7, s13 back to v3's build; 3:21 in v6, 3:15 from G4) |
 | Dialogue | None. A few hand-lettered words on screen where the story needs them (exam, math, grade). |
 | Characters | Paper-cutout gators. The Exam is the only thing made of ink. |
 | Look | Lit paper diorama: torn-paper cutouts on separate depth planes, real light, real shadows |
