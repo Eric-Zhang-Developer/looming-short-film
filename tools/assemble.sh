@@ -3,6 +3,8 @@
 #   tools/assemble.sh <old.mp4> <new.mp4> <spec>       spec lines, in output order:
 #     old <a> <b>    copy [a, b) of the OLD master (its times; a and b keyframes in it, or its start/end)
 #     new <a> <b>    render [a, b) of the CURRENT timeline (whole seconds)
+#   WORKERS=2 renders two frames at once (one Chrome, two pages; watch memory). Commands in the spec loops read
+#   /dev/null, not the spec: ffmpeg reads stdin by default and would swallow the remaining spec lines.
 #   PARTS_ONLY=1 renders the new spans and stops (they're kept in out/parts/, so a later run reuses them).
 # Works across a timeline shift: shots run on local time, so a shot that moved keeps its frames and only moves.
 # The old master is concat'd closed-GOP x264, cut exactly at its IDR packets by the segment muxer (see splice.sh).
@@ -19,12 +21,12 @@ while read -r kind a b; do
     p=out/parts/new_${a}_${b}.mp4; [ -s $p ] && { echo "== new $a:$b  kept"; continue; }
     echo "== new $a:$b  $(date +%H:%M)"; rm -rf out/frames; mkdir -p out/frames
     for try in 1 2 3; do
-      node render.mjs --page=index.html --frames --range=$a:$b --workers=1 2>&1 | grep -E 'ms/frame|Error' | tail -2 || true
+      node render.mjs --page=index.html --frames --range=$a:$b --workers=${WORKERS:-1} < /dev/null 2>&1 | grep -E 'ms/frame|Error' | tail -2 || true
       [ $(ls out/frames | grep -c jpg) -ge $(((b-a)*24)) ] && break
       [ $try = 3 ] && { echo "span $a:$b incomplete after 3 tries"; exit 1; }
     done
-    ffmpeg -v error -y -framerate 24 -start_number $((a*24)) -i out/frames/%06d.jpg -frames:v $(((b-a)*24)) -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p $p
-    rm -f out/frames/*.jpg
+    ffmpeg -nostdin -v error -y -framerate 24 -start_number $((a*24)) -i out/frames/%06d.jpg -frames:v $(((b-a)*24)) -c:v libx264 -crf 18 -preset slow -pix_fmt yuv420p $p.tmp.mp4
+    mv $p.tmp.mp4 $p; rm -f out/frames/*.jpg   # a part only counts as kept once it's whole
   else
     for t in $a $b; do
       [ $t = 0 ] || [ $t = $OLD_DUR ] || echo "$KEYS" | grep -qx "$t.000000" || { echo "$t s is not a keyframe in $OLD"; exit 1; }
