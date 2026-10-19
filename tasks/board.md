@@ -88,7 +88,7 @@
 - reel-s15 · builder · `src/shots/s15.js` (sensor turn: pen trips the light) · built (merged, v1 reel) · evidence/reel-s15/sheet.jpg
 
 ## v7 · polish pass (director, 2026-10-19: "your goal is to get version 7")
-- v7-bed · builder · `src/shots/s07.js`, `src/shots/s08.js`, docs s07/s08 · dispatched
-- v7-s13 · builder · `src/shots/s13.js`, `src/timeline.js`, s13 in score/cues · dispatched
-- v7-laptop · builder · `src/shots/s02.js` (laptop), `s03.js`, `s05.js`, `s06.js` · queued
-- v7-fridge · builder · `src/shots/s04.js`, s04 cues · queued
+- v7-bed · builder · `src/shots/s07.js`, `src/shots/s08.js`, docs s07/s08 · built (merged 140cc7a) · evidence/v7-bed/hues.jpg
+- v7-s13 · builder · `src/shots/s13.js`, `src/timeline.js`, s13 in score/cues · built (merged 898603c; 8 s, runtime 3:24) · evidence/v7-s13/v3_vs_v7.jpg
+- v7-laptop · builder · `src/shots/s02.js` (laptop), `s03.js`, `s05.js`, `s06.js` · built (merged 82d004f) · evidence/v7-laptop/before_after.jpg
+- v7-fridge · builder · `src/shots/s04.js`, s04 cues · built, partial evidence (merged c66dd73; no preview) · evidence/v7-fridge/sheet.jpg
