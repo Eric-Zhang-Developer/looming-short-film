@@ -9,7 +9,7 @@
 // A point is [beatName, offsetSeconds]. bed() runs a bed from one point to another, so a bed that stops 0.5 s before a
 // beat is still hung on beats and moves when they move. Sources: doc 05's v4 table and docs/shots/sNN.md §Sound (the v4 cut, 3:15).
 // The music stem (score.js) is not placed here.
-import { beat, DURATION } from '../timeline.js';
+import { beat, DURATION, S13_DESKS } from '../timeline.js';
 
 const at = ([b, o = 0]) => beat(b) + o;
 const bed = (sound, stem, from, to, gain, extra) => ({ beat: from[0], offset: from[1] ?? 0, dur: at(to) - at(from), sound, stem, gain, ...extra });
@@ -215,8 +215,10 @@ export const CUES = [
   { beat: 'deskSit', offset: 0.25, sound: 'footstepSoft', gain: 0.25, seed: 4 },
   { beat: 'deskSit', offset: 2, sound: 'cardTap', gain: GAIN.cardTap / 2 },
   ...[0, 0.5, 0.83].map((o, k) => ({ beat: 'blobClimbs', offset: o, sound: 'inkDrip', gain: 0.1, seed: 42 + k })),
-  // s13: one very soft rustle as the head lifts.
+  // s13: one very soft rustle as the head lifts. v7: each crowd phone going face down (S13_DESKS) is s11's card tap, -6 dB
+  // further off again (across the room), on the frame its shadow collapses and its note sounds.
   { beat: 'headLift', dur: 0.6, sound: 'paperRustle', gain: 0.25, seed: 7 },
+  ...Object.values(S13_DESKS).map(({ down: [b, o] }, k) => ({ beat: b, offset: o, sound: 'cardTap', gain: GAIN.cardTap / 4, seed: 50 + k })),
   // s15: uncap, the pen on the first word (penUncap + 0.833 to nameWritten), the flinch under the held note.
   { beat: 'penUncap', sound: 'penUncap', gain: 0.7 },
   bed('penScratch', 'foley', ['penUncap', 0.833], ['nameWritten'], 0.5),

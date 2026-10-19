@@ -4,7 +4,7 @@
 // never a global time, so retiming a shot moves its music. `motif` tags which leitmotif a note belongs to.
 // Voices are doc 05's four, from synth.js: felt piano, music box, warm pad, sub swell; plus v4's pulse, built from the
 // clock's tick (foley.js). An event may carry until: '<beat>' to stop dead on that beat. Mono, 48 kHz.
-import { beat } from '../timeline.js';
+import { beat, S13_DESKS } from '../timeline.js';
 import { SR, feltPiano, musicBox, pad, subSwell, mixInto } from './synth.js';
 import { FOLEY } from './foley.js';
 
@@ -107,6 +107,35 @@ const WALK = [
   W('doorPush', 0, 'piano', [31, 43, 50, 55, 59, 62], { vel: 0.8, dur: 0.6, gain: 0.2, motif: 'peak' }),
 ];
 
+// ───────── s13 (v7): a note on every shadow event ─────────
+// Every crowd desk in S13_DESKS (timeline.js) wakes on a note and goes face down on a note, read from that one table.
+// Build (v3's, the one the director called "timed with the music"): the three featured wakes get v3's three chords, the
+// bass stepping down A, F, E (Am, Fmaj7, E7: everyone stuck, left on the dominant); the room's seven wakes climb E7 one
+// note each on the music box, the blobs' voice (on the piano they sank into the held E7: the stem's first-difference
+// level rose 0.3-2.7 dB on them, against 4-10 on the chords), over a sub swell from the head lift (the shadows growing,
+// doc 05) that stops dead on the turn. Turn: Act 4's
+// theme in major, C E A G, a theme note and its chord on the first phone of each pair, a chord tone above on the second;
+// so the E7 opens onto C instead of resolving to A minor. The last two phones land on the home chord and its top note,
+// and a pad holds that C into s15, where the theme goes on at nameWritten.
+const S13_WAKE = { d2: [45, 52, 60], d4: [41, 48, 57, 64], d15: [40, 47, 56, 62], d1: 64, d11: 68, d5: 71, d12: 74, d14: 76, d7: 80, d9: 83 };
+const S13_DOWN = { d7: [THEME[0], HARM[0]], d9: [67], d2: [THEME[1], HARM[1]], d12: [72], d4: [THEME[2], HARM[2]], d14: [72],
+  d1: [THEME[3], HARM[3]], d11: [76], d5: [72, [36, 43, 52, 60, 67]], d15: [76] };
+const FEATURED = { revealSleeper: 2.2, revealDrinks: 2.2, revealFreshman: beat('phonesDown') - beat('revealFreshman') };   // chord lengths
+const s13Keys = (o) => Object.keys(o).sort().join();
+if (s13Keys(S13_WAKE) !== s13Keys(S13_DESKS) || s13Keys(S13_DOWN) !== s13Keys(S13_DESKS)) throw new Error('score: every s13 desk needs a wake note and a down note');
+const S13 = [
+  ev('headLift', 0, 'sub', null, { hz: 45, dur: beat('phonesDown') - beat('headLift'), attack: 3, gain: 0.15, until: 'phonesDown', motif: 'swell' }),
+  ...Object.entries(S13_DESKS).map(([d, { wake: [b, at] }]) => b in FEATURED
+    ? ev(b, at, 'piano', S13_WAKE[d], { vel: 0.35, dur: FEATURED[b] })
+    : ev(b, at, 'box', S13_WAKE[d], { vel: 0.3 + 0.03 * at / 0.125, dur: 0.6, motif: 'loom' })),   // louder as the room fills
+  ...Object.entries(S13_DESKS).flatMap(([d, { down: [b, at] }]) => {
+    const [m, chord] = S13_DOWN[d], home = b === 'homeChord', dur = home ? 2.5 : 1.2;
+    return chord ? [ev(b, at, 'piano', m, { vel: 0.42, dur, gain: 0.7, motif: 'theme' }), ev(b, at, 'piano', chord, { vel: home ? 0.35 : 0.32, dur, gain: 0.7 })]
+      : [ev(b, at, 'piano', m, { vel: 0.3, dur: home ? 2.5 : 0.8, gain: 0.7 })];
+  }),
+  ev('homeChord', 0, 'pad', [48, 55, 64, 72], { dur: 4, attack: 0.8, release: 2.5, gain: 0.3, motif: 'chord' }),
+];
+
 export const SCORE = [
   // 0:00–0:19 Birth. A dawn pad drains away as the ink drop forms; the Exam motif enters on the music box.
   ev('inkDropForms', -10, 'pad', [48, 55, 64, 74], { dur: 8, attack: 3, release: 3, gain: 0.5 }),
@@ -156,15 +185,14 @@ export const SCORE = [
   ]),
 
   // 1:50–2:02 Under the light (v4): Act 4's theme in major, softly: its first phrase on felt piano, one note every two
-  // seconds over major chords, and the music box answering with the motif's first note when the blob settles. The s13
-  // reveals get one chord each, in major. At rest by penUncap.
+  // seconds over major chords, and the music box answering with the motif's first note when the blob settles.
   ...[[0, 0], [2, 1], [4, 2], [6, 3]].flatMap(([at, k]) => [
     ev('deskSit', at, 'piano', THEME[k], { vel: 0.35, dur: 1.8, motif: 'theme' }),
     ev('deskSit', at, 'piano', HARM[k], { vel: 0.28, dur: 1.8 }),
   ]),
   ev('blobSettles', 0, 'box', EXAM[0][0], { vel: 0.3, dur: 1.4, motif: 'exam' }),
-  ev('revealDrinks', 0, 'piano', [41, 48, 57, 64], { vel: 0.35, dur: 1.2 }),
-  ev('revealFreshman', 0, 'piano', [40, 48, 55, 64], { vel: 0.35, dur: 2 }),
+  // 2:03–2:11 Everyone has one (v7, S13 above): v3's build, then the turn.
+  ...S13,
 
   // 2:02–2:26 First step. One held note when he writes his name; then a theme note per solved problem (five in v4); the
   // phrase completes on #5 (F, then D half a beat later) and is released by s17's first frame.
