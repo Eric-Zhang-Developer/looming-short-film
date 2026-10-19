@@ -228,6 +228,8 @@ export const CUES = [
   { beat: 'lampSitBack', sound: 'exhale', gain: dB(-20), seed: 2 },
   { beat: 'newDate', offset: -2, dur: 2, sound: 'markerScratch', gain: 0.5 },
   { beat: 'tagPenUncap', sound: 'penUncap', gain: 0.7 },
+  { beat: 'tagPenUncap', offset: 1.25, sound: 'inkDrip', gain: 0.3, seed: 32 },               // v6-ending: the drop lands on the nib (s18 17.75), a soft plip
+  { beat: 'tagPenUncap', offset: 1.917, sound: 'penStroke', dur: 0.42, gain: 0.45, seed: 6 },  // v6-ending: "1." in its ink (18.42–18.83)
   // ───────── snd-foley-2 ─────────
   // s04: jar clinks at 0.83, 2.17, 3.33; three carton sloshes over 3.50-4.00.
   ...[0.83, 2.17, 3.33].map((o, k) => ({ beat: 'fridge', offset: o, sound: 'jarClink', gain: GAIN.jarClink, seed: k + 1 })),

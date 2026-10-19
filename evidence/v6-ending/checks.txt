@@ -1,0 +1,10 @@
+ok (21 shots, 70 beats, 195.0s)
+t=189.5  99644b6a8c1fd6fe 99644b6a8c1fd6fe 99644b6a8c1fd6fe  PASS
+t=192  df8751aed143979d df8751aed143979d df8751aed143979d  PASS
+t=193.5  39047ddd9e1b3a40 39047ddd9e1b3a40 39047ddd9e1b3a40  PASS
+determinism: PASS
+tsc: clean
+t=176  d94d2c73056f2bca d94d2c73056f2bca d94d2c73056f2bca  PASS
+t=182  1f648276619e9c26 1f648276619e9c26 1f648276619e9c26  PASS
+determinism: PASS
+pre-tag unchanged: t=176 d94d2c73056f2bca and t=182 1f648276619e9c26 are identical with the change stashed (base) and applied

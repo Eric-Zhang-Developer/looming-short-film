@@ -21,6 +21,7 @@ import { act } from '../characters/acting.js';
 import { makeClock } from '../clock.js';
 
 const ID = 's18', DEG = Math.PI / 180;
+const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
 const B = SHOTS.find((s) => s.id === ID).beats;   // examCrossedOff 2, blobAbsorbed 5.5, lampSitBack 7.5, newDate 12.5, dropQuivers 14, tagPenUncap 16.5
 // v4 (20 s): W 0–3, I 3–7, W 7–10 (he sits back under the lamp: lampSitBack 7.5), I2 10–14.5, W 14.5–20, the fade 19–20. Every G4 time from 7.0 is +3.0.
 const CUT_I = 3, CUT_SIT = 7, CUT_I2 = 10, CUT_W = 14.5, FADE = 19;
@@ -48,17 +49,19 @@ const NEW_CELL = [103, 220], CLEAN = [157, 167, 188, 200];
 const XS = 44, X1 = [[8, 8], [36, 37]], X2 = [[37, 7], [7, 36]];   // the X's canvas (calendar art px) and its two strokes
 const HEAD_X = 12;                                           // the head's pitch while he crosses the exam off (+ chin up)
 const HOME_MIX = 0.8;                                        // grade: amber (act 3) blended this far toward s02's dawn, so the ending stays in the home's palette
-const T_STILL = 17.1, T_TOUCH = 17.55, T_MARK = 18.1;      // after the uncap: held still, the pen goes down, the first mark is done
+// v6-ending: after the uncap he half-stands and holds the nib out by the drop (T_REACH); it blinks up at him (T_BLINK, one),
+// hops onto the nib (T_HOP → T_LAND, squash on landing) and sinks into it (T_IN); he sits and writes "1." in its ink.
+const T_REACH = F(205), T_BLINK = F(207), T_HOP = F(209), T_LAND = F(213), T_IN = F(216), T_TOUCH = F(221), T_MARK = F(226);
+const REACH_UP = 0.5;                                        // how far up out of the chair he comes (0 seated … 1 STAND): the drop is beyond a seated reach
+const DROP_INK = 'rgb(12, 10, 20)';                          // the blob's ink (near-black), not the pen's navy
 const PAD = { x: -0.0155, zf: 0.028, w: 0.016, tilt: 50 };  // the new sheet, propped at 50° so the camera can read a mark on it
 const PH = PAD.w * 366 / 263, PH_RAD = PAD.tilt * DEG;      // the sheet's height and tilt
 // A point on the propped sheet: u from its left edge, v up from its lower edge (both 0–1), in the world.
 const padPoint = (u, v) => new THREE.Vector3(PAD.x + (u - 0.5) * PAD.w, 0.0004 + v * PH * Math.sin(PH_RAD), PAD.zf - v * PH * Math.cos(PH_RAD));
-const markAt = (k) => padPoint(0.17 + 0.36 * k, 0.74);       // where the nib is while "1." goes down
 const PUSH = { pos: [-0.008, 0.052, 0.24], look: [-0.008, 0.030, 0.012] };   // W's slow push-in over the tag (11.5–16)
 const FONT = 17, INK = 'rgb(30, 42, 63)';   // the hand is s17b's bundled Caveat
 const NS = 58, CIRCLE_R = 23, A0 = -2.2;                     // "Final"'s canvas, its red circle (art px), the stroke's start
 
-const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
 const CLOCK = { at: /** @type {Vec3} */ ([C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z]), h: 4, m: 10 };   // v4: s02's spot beside the calendar, ~4:10 (README §13)
 const xAt = (tc) => [clamp((tc - 1.5 + F(1)) / F(2)), clamp((tc - 1.833 + F(1)) / F(2))];   // drawings 18–19, 22–23
 const wordAt = (tc) => clamp((tc - 10.5) / 1.25);
@@ -157,8 +160,13 @@ export async function build(ctx) {
     pick: (() => { const r = seatReach(camW, new THREE.Vector3(DESK.pen[0] + 0.003, 0.001, DESK.pen[1]), [0, 30]); return seat({ lean: r.lean, arm: r.arm, head: 0 }); })(),
     level: seat({ lean: 6, arm: -35, far: -32, head: 4 }),
     uncap: seat({ lean: 6, arm: -35, far: -24, head: 4 }),
-    mark: (() => { const r = seatReach(camW, markAt(0.0), [0, 30]); return seat({ lean: r.lean, arm: r.arm, far: -24, head: -6 }); })(),
+    // v6-ending: aimed left of the sheet, so the nib (3 mm past the hand, tipped down) lands on it, not past its right edge
+    mark: (() => { const r = seatReach(camW, padPoint(-0.15, 0.70), [0, 30]); return seat({ lean: r.lean, arm: r.arm, far: -24, head: -6 }); })(),
     lift: seat({ lean: 5, arm: 18, far: -24, head: 4 }),   // the pen comes up off the sheet and holds, so the mark shows
+    // v6-ending: half up out of the chair, the nib held level just left of and below the drop (the hand is 3 mm behind the nib)
+    offer: (() => { const hip = /** @type {Vec3} */ (DESK.hip.map((v, i) => lerp(v, STAND[i], REACH_UP))), at = artToWorld(...NEW_CELL);
+      const r = seatReach(camW, new THREE.Vector3(at[0] - 0.0100, at[1] - CIRCLE_R * 0.92 * mpp - 0.0012, C.z), [-10, 20], hip);
+      return specPose({ lean: r.lean, arm: r.arm, far: -85, head: 12, leg: 0, farLeg: 8 }); })(),
   };
   // [t, pose, stand (0 seated at DESK.hip … 1 at STAND)], eased between keys and sampled on 2s.
   /** @type {[number, string, number][]} */
@@ -166,7 +174,8 @@ export async function build(ctx) {
     [F(21), 'x2a', 1], [F(22), 'x2b', 1], [F(23), 'x2b', 1], [F(26), 'down', 0], [CUT_I, 'down', 0], [CUT_SIT, 'down', 0],
     [B.lampSitBack, 'sitback', 0], [8.5, 'sitback', 0], [F(104), 'glance', 0], [F(110), 'glance', 0], [F(112), 'sitback', 0], [CUT_I2, 'sitback', 0],   // 7.5 sits back; 8.5–9.25 the clock; back to the circle
     [CUT_W, 'gaze', 0], [15.5, 'gaze', 0], [F(186), 'breath', 0], [F(188), 'pick', 0], [F(190), 'pick', 0], [F(192), 'level', 0],
-    [F(197), 'level', 0], [F(198), 'uncap', 0], [T_STILL, 'uncap', 0], [T_TOUCH - 0.15, 'mark', 0], [T_MARK, 'mark', 0], [T_MARK + 0.35, 'lift', 0], [20, 'lift', 0]];
+    [F(197), 'level', 0], [F(198), 'uncap', 0], [F(200), 'uncap', 0], [T_REACH, 'offer', REACH_UP], [T_IN, 'offer', REACH_UP],
+    [T_TOUCH, 'mark', 0], [T_MARK, 'mark', 0], [T_MARK + 0.33, 'lift', 0], [20, 'lift', 0]];
   const poseAt = (tc) => {
     const i = KEYS.findLastIndex(([k]) => k <= tc + 1e-6), [k0, a, h0] = KEYS[i], [k1, b, h1] = KEYS[Math.min(i + 1, KEYS.length - 1)];
     const e = ease(k1 > k0 ? clamp((tc - k0) / (k1 - k0)) : 0);
@@ -174,7 +183,7 @@ export async function build(ctx) {
   };
   // Eyes: on the pen, down at the blob (2.17), half-lidded under the lamp (7.5), the glance up-right at the clock (8.5–9.25), back
   // on the calendar's circle; the tag's look up at the new drop (14.5), then level. Mouth: the small relief smile at the sit-back.
-  const eyesAt = (tc) => (tc < F(26) ? 'open' : tc < B.lampSitBack ? 'side' : tc < 8.5 ? 'tired' : tc < 9.25 ? 'side' : tc < CUT_W ? 'open' : tc < 15 ? 'side' : 'open');
+  const eyesAt = (tc) => (tc < F(26) ? 'open' : tc < B.lampSitBack ? 'side' : tc < 8.5 ? 'tired' : tc < 9.25 ? 'side' : 'open');   // v6-ending: from 14.5 a straight, held look at the drop (no glance away)
   const mouthAt = (tc) => (tc >= CUT_W || (tc >= B.lampSitBack && tc < CUT_I2) ? 'smile' : 'line');   // fix-payoff: the small smile from the sit-back, again from the tag's first frame to the end
 
   // ---------- the Exam, the dot, its trace, and the new drop ----------
@@ -211,11 +220,24 @@ export async function build(ctx) {
     const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
     const m = new THREE.Mesh(new THREE.PlaneGeometry(PAD.w, PH), new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
     m.position.z = 0.00003; pad.mesh.add(m);
-    let drawn = -1;
+    let drawn = '';
     const MARK_PX = 120;   // the "1." is about 120 px tall on a 256 px sheet
-    return (k) => { const id = Math.round(k * 200); if (id === drawn) return; drawn = id; g.clearRect(0, 0, W, H);
-      if (k > 0) { g.save(); g.beginPath(); g.rect(0, 0, W * (0.17 + 0.36 * k), H); g.clip(); g.font = handFont(MARK_PX); g.fillStyle = INK; g.strokeStyle = INK; g.lineWidth = 1.2;
-        g.fillText('1.', W * 0.17, H * 0.27); g.strokeText('1.', W * 0.17, H * 0.27); g.restore(); }
+    // v6-ending: the "1." is written where the nib really is (the ray from the camera through the nib, onto the sheet), ending
+    // on its dot, so the stroke comes out of the nib instead of from under his hand. k: how much of it is down.
+    return (k, at) => {
+      let ex = 0, ey = 0;
+      if (k > 0 && !at) k = 0;
+      if (k > 0) {   // the sheet's plane (a plane, not a mesh hit, so its edges and facing can't drop the stroke)
+        const n = new THREE.Vector3(0, 0, 1).transformDirection(m.matrixWorld), o = new THREE.Vector3().setFromMatrixPosition(m.matrixWorld);
+        const q = new THREE.Ray(at.cam, at.nib.clone().sub(at.cam).normalize()).intersectPlane(new THREE.Plane().setFromNormalAndCoplanarPoint(n, o), new THREE.Vector3());
+        if (q) { const l = m.worldToLocal(q); ex = Math.round((l.x / PAD.w + 0.5) * W); ey = Math.round((0.5 - l.y / PH) * H); } else k = 0; }
+      const id = `${Math.round(k * 200)}|${ex}|${ey}`; if (id === drawn) return; drawn = id; g.clearRect(0, 0, W, H);
+      if (k > 0) { g.font = handFont(MARK_PX); const w = g.measureText('1.').width, x0 = ex - w, y0 = ey + 4;
+        g.save(); g.beginPath(); g.rect(0, 0, x0 + (w + 8) * k, H); g.clip(); g.fillStyle = DROP_INK; g.strokeStyle = DROP_INK; g.lineWidth = 5;
+        g.fillText('1.', x0, y0); g.strokeText('1.', x0, y0);
+        // the drop's ink, so the blob's gloss: a pale highlight up and left inside the stroke
+        g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(235, 230, 255, 0.45)'; g.fillText('1.', x0 - 4, y0 - 5);
+        g.fillStyle = DROP_INK; g.fillText('1.', x0 + 1, y0 + 1); g.restore(); }
       tex.needsUpdate = true; }; })();
   const DROP_AT = [NX, NY - CIRCLE_R * 0.92 * mpp];              // on the new circle's bottom line, under the word
 
@@ -252,7 +274,8 @@ export async function build(ctx) {
   const fadeLUT = (k) => fades[k] ??= lutOf(Uint8Array.from(base, (v, i) => (i % 4 === 3 ? 255 : Math.round(v * (1 - k / 23)))));
 
   const c = new THREE.Vector3(), hp = new THREE.Vector3(), look = new THREE.Vector3();
-  return {
+  let anchor = null;   // the nib and the camera at the end of the stroke (filled below by one dry run of update), so the ink stays put when the pen lifts
+  const shot = {
     exam,   // read by evidence/trims-home/blobs.js
     update(t) {
       T.boil(t);
@@ -285,19 +308,22 @@ export async function build(ctx) {
       // his hand is on the pen, the calendar and the desk, so the poses own the lean. The face goes over the preset's (the eyes follow the beats above).
       act(gator, t, [[0, 'resolve'], [F(26), 'relief']], { slump: 0, tilt: 0, breath: 5, blink: false });
       gator.face({ eyes: eyesAt(tc), mouth: mouthAt(tc) });
+      // v6-ending: the warm smile as the drop lands on the nib: the smile take drawn bigger (it reads at 400 px), held to the end
+      { const grin = tc >= T_LAND; gator.meshes.mouth.scale.set(grin ? 1.9 : 1, grin ? 1.7 : 1, 1); }
       gator.group.updateMatrixWorld(true);
       gator.hand.getWorldPosition(hp);
       gator.group.visible = inW;
       gator.meshes.leg_l.visible = gator.meshes.leg_r.visible = stand < 0.5;   // behind the desk: no legs over the desktop
       // the pen: in his hand (nib to the sheet) for the X, on the page's front edge, picked up at 12.67, level from 13.0
       const holding = tc < F(26) || tc >= F(188), level = tc >= F(192), uncapped = tc >= B.tagPenUncap - 1e-6;
-      const a = tc >= T_STILL ? 40 * DEG * ease(clamp((tc - T_STILL) / 0.4)) : level ? 0 : 40 * DEG;   // 40° at first, level for the uncap, then tipped nib-down for the mark
+      const a = tc >= T_IN ? -40 * DEG * ease(clamp((tc - T_IN) / (T_TOUCH - T_IN))) : level ? 0 : 40 * DEG;   // 40° at first, level for the uncap and the offer, then tipped nib-down for the mark
       if (holding) { pen.g.rotation.set(0, 0, a); pen.g.position.set(hp.x + 0.003 * Math.cos(a), hp.y + 0.003 * Math.sin(a), DESK.hip[2] + 0.0128); }
       else { pen.g.rotation.set(-Math.PI / 2, 0, -0.1); pen.g.position.set(...penRest); }
       cap.g.rotation.set(0, 0, level ? 0 : 40 * DEG);   // the far hand keeps the cap, so it doesn't follow the nib down
       cap.g.position.set(hp.x + 0.003 * Math.cos(level ? 0 : 40 * DEG), hp.y + 0.003 * Math.sin(level ? 0 : 40 * DEG), pen.g.position.z);
       if (uncapped) cap.g.position.x += 0.005;   // s15's uncap drawing: the far hand jerks back with the cap
       if (holding) cap.g.position.z -= 0.0002;
+      if (tc >= F(202)) { cap.g.rotation.set(-Math.PI / 2, 0, -0.1); cap.g.position.set(penRest[0] - 0.004, 0.0006, penRest[2]); }   // v6-ending: the cap set down on the desk
       pen.g.visible = cap.g.visible = inW;
 
       // ---- the Exam ----
@@ -333,14 +359,30 @@ export async function build(ctx) {
         const ds = Math.max(1e-3, BEAD * easeOut((tc - 13) / 0.667));
         drop.mesh.scale.setScalar(ds);
         drop.mesh.position.set(DROP_AT[0], DROP_AT[1] - 0.012 * ds, C.z + 0.0010);
-        dropShadow.position.set(DROP_AT[0] + 0.0004, DROP_AT[1] - 0.0005, C.z + 0.0009); dropShadow.scale.set(0.0058 * ds / BEAD, 0.0042 * ds / BEAD, 1);
+        // v6-ending: light from above, so its shadow is a dot, smaller than the drop, just under it (it never grows: he's looking)
+        { const y = DROP_AT[1] - 0.0042 * ds / BEAD, kc = clamp((C.y0 + C.lip - y) / C.lip); dropShadow.position.set(DROP_AT[0] + 0.0002, y, C.z + 0.0012 + C.lipZ * kc); }
+        dropShadow.scale.set(0.0034 * ds / BEAD, 0.0017 * ds / BEAD, 1);   // on the curl, which comes forward here
+        dropShadow.material.opacity = 1;
         const quiver = tc >= B.dropQuivers && !uncapped;
-        drop.update(quiver ? 2 * t : uncapped ? 2 * B.tagPenUncap : t, { wobble: quiver ? 1.6 : 0.4, eyes: 'closed', key: lamp.light });
+        let squash = 0, eyes = tc >= T_REACH && inW ? (tc >= T_BLINK && tc < T_BLINK + F(1) ? 'closed' : 'open') : 'closed';   // it opens its eyes at the nib, blinks once
+        if (tc >= T_HOP) {   // the hop: a small arc off the circle onto the nib, stretched in the air, squash on landing, then into the nib
+          const nib = pen.g.position, h = clamp((tc - T_HOP) / (T_LAND - T_HOP)), e = ease(h);
+          const sink = clamp((tc - T_LAND - F(1)) / (T_IN - T_LAND - F(1)));
+          drop.mesh.position.set(lerp(DROP_AT[0], nib.x, e), lerp(DROP_AT[1] - 0.012 * ds, nib.y + 0.0003, e) + 0.0012 * Math.sin(Math.PI * h), lerp(C.z + 0.001, nib.z + 0.0004, e));
+          squash = h < 1 ? -0.25 : 0.5 * Math.exp(-8 * (tc - T_LAND));
+          drop.mesh.scale.setScalar(Math.max(1e-3, ds * (1 - sink)));
+          drop.mesh.visible = sink < 1; dropShadow.visible = false; eyes = sink > 0 ? 'closed' : 'open';
+        }
+        drop.update(quiver ? 2 * t : uncapped ? 2 * B.tagPenUncap : t, { wobble: quiver ? 1.6 : 0.4, squash, eyes, look: -1, key: lamp.light });
       }
 
       // ---- the first mark (fix-payoff: the dashed ghost of the old blob is gone, cold viewer: "its old size, or the next one forming?") on the propped sheet ----
       pad.g.visible = inW && tc >= CUT_W;
-      padInk(inW ? clamp((tc - T_TOUCH) / (T_MARK - T_TOUCH)) : 0);
+      const kMark = inW ? clamp((tc - T_TOUCH) / (T_MARK - T_TOUCH)) : 0;
+      if (kMark > 0) pad.g.updateMatrixWorld(true);
+      padInk(kMark, anchor);
+      // the nib follows the stroke: from the top of the "1" down to its dot (where the ink is anchored), then rests there
+      if (kMark > 0 && kMark < 1 && holding) pen.g.position.add(new THREE.Vector3(-0.003 * (1 - kMark), 0.004 * (1 - kMark), 0));
       // ---- his hand in I2: in 7.0–7.5 with the marker, writes "Final", circles it, leaves after 9.67 ----
       hand.visible = inI2 && tc >= 10 && tc < 12.833;
       if (hand.visible) {
@@ -353,4 +395,7 @@ export async function build(ctx) {
       }
     },
   };
+  shot.update(T_MARK - 1e-4);
+  anchor = { nib: pen.g.position.clone(), cam: camera.position.clone() };
+  return shot;
 }
