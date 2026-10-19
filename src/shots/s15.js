@@ -18,6 +18,8 @@ import { act } from '../characters/acting.js';
 import { SHOTS } from '../timeline.js';
 import { kitTools, marstonDesk, MARK, castOnly } from './s11.js';
 import { closeupRig, HEAD_AT } from './s09b.js';
+import { loadHand, handFont, runParts, drawInt } from './s17b.js';
+import { mulberry32, seedOf } from '../core/rng.js';
 
 const ID = 's15', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;            // penUncap 1.5, nameWritten 4.5, nameSmile 5.5
@@ -88,11 +90,14 @@ const EYES = [[5.0, B.nameSmile, 'side']];                  // 5.0: eyes to the 
 const kick = (t, t0, a) => (t < t0 ? 0 : a * Math.exp(-6 * (t - t0)) * Math.cos(18 * (t - t0)));
 
 // ---------- the practice sheet (props_kit practice_1 / practice_2), shared with s16 ----------
-// The frozen sheets come with the writing already painted. To let him write it, each sheet is split into blank paper
-// (props_kit blank_page) and an ink overlay: every pixel is unmixed into paper, navy pen and grey pencil (two linear
-// equations: brightness r+g+b and blue lead b−r), so a line can be revealed left to right and the grey strike-through on
-// problem 1's wrong line can wait for the cross-out. Boxes are [x0, y0, x1, y1] in the sheet's own pixels (measured on the
-// cut PNGs). plus: the x of the two '+' stems on the struck line, whose cross bars lie under the strike.
+// The frozen sheets come with the writing already painted, but at ~300 px a sheet its pen lines blur in the inserts.
+// So the painting supplies only the paper (props_kit blank_page, the same sheet with nothing on it) and the writing is
+// drawn by code in his hand at K = 4 canvas px per sheet px, the way s17b draws the test page: Caveat (s17b's
+// handFont), the ∫ and Σ and → as stroked paths. Each line sits in its painted box (SHEET_INK, [x0, y0, x1, y1] in the
+// sheet's own pixels, measured on the cut PNGs), so the reveals and the insert's pen keep their places. Layers: 0 navy
+// pen, 1 grey pencil (the name, and problem 1's strike-through, waiting for the cross-out), 2 = 0 (it was the painting
+// with the strike healed out; drawn, the navy layer never had it). plus/plusY/heal/strike: the painted '+' stems and
+// strike rows, kept for importers.
 export const SHEET_INK = {
   practice_1: { name: [27, 38, 114, 56], problem: [31, 76, 158, 132], a: [26, 162, 262, 210], b: [28, 225, 230, 250],
     strike: [6, 236, 244, 245], heal: [24, 237, 234, 244], c: [33, 273, 206, 298], plus: [118, 180], plusY: 240 },
@@ -100,57 +105,118 @@ export const SHEET_INK = {
     word: [34, 255, 143, 278] },
 };
 const NAVY = [30, 42, 63], GREY = [95, 92, 90];   // medians measured on practice_1 (pen ink, the strike)
-const INK_GAIN = 1.6;                              // ink alpha × this: the struck line is painted lighter than the rest
-function unmix(img) {
-  const W = img.width, H = img.height, c = Object.assign(document.createElement('canvas'), { width: W, height: H });
-  const g = c.getContext('2d'); g.drawImage(img, 0, 0);
-  const src = g.getImageData(0, 0, W, H).data;
-  const bright = [[], [], []];   // paper: the median of the bright opaque pixels
-  for (let i = 0; i < src.length; i += 16) if (src[i + 3] === 255 && src[i] + src[i + 1] + src[i + 2] > 600) for (let k = 0; k < 3; k++) bright[k].push(src[i + k]);
-  const P = bright.map((v) => v.sort((a, b) => a - b)[v.length >> 1]);
-  const f = (q) => [q[0] + q[1] + q[2], q[2] - q[0]], [Lp, cp] = f(P), [Ln, cn] = f(NAVY), [Lg, cg] = f(GREY);
-  const a11 = Ln - Lp, a12 = Lg - Lp, a21 = cn - cp, a22 = cg - cp, det = a11 * a22 - a12 * a21;
-  const out = [new ImageData(W, H), new ImageData(W, H)];
-  for (let i = 0; i < src.length; i += 4) {
-    if (src[i + 3] < 128) continue;
-    const dL = src[i] + src[i + 1] + src[i + 2] - Lp, dc = src[i + 2] - src[i] - cp;
-    let a = clamp((dL * a22 - a12 * dc) / det), b = clamp((a11 * dc - a21 * dL) / det);
-    if (a + b < 0.12) continue;                        // paper grain
-    a = clamp(a * INK_GAIN); b = clamp(b * INK_GAIN);   // the painted pen is thin and half-transparent at this size
-    if (a + b > 1) { const s = a + b; a /= s; b /= s; }
-    [a, b].forEach((v, k) => { const d = out[k].data, col = k ? GREY : NAVY;
-      d[i] = col[0]; d[i + 1] = col[1]; d[i + 2] = col[2]; d[i + 3] = Math.round(255 * v); });
+const K = 4, PX = 30 * K, BOLD = 0.035;   // canvas px per sheet px; the hand on the work canvas (fitted down); its stroke (em)
+// What's written, copied from the paintings (done/spec-g4.md has the math; line b is wrong on purpose, a sign error).
+// A token is text (∫ inside is a stroke), [text, 1] a superscript, { sum }, { arrow }, { frac: [num, den] } or
+// { scribble } (the name: the painting's pencil squiggle, not letters).
+const X = /** @type {[string, number]} */ (['x', 1]);
+const WRITING = {
+  practice_1: [
+    ['name', 1, [{ scribble: 1 }]],
+    ['problem', 0, ['1.  ∫ x e', X, ' dx']],
+    ['a', 0, ['∫ x e', X, ' dx = x e', X, ' − ∫ e', X, ' dx']],
+    ['b', 0, ['= x e', X, ' + e', X, ' + C']],
+    ['c', 0, ['= x e', X, ' − e', X, ' + C']],
+  ],
+  practice_2: [
+    ['name', 1, [{ scribble: 2 }]],
+    ['problem', 0, ['2. ', { sum: 1 }, ' ', { frac: [['n'], ['2', ['n', 1]]] }]],
+    ['frac', 0, [{ frac: [['(n + 1)'], ['2n']] }]],
+    ['arrow', 0, [{ arrow: 1 }, ' ', { frac: [['1'], ['2']] }, '  < 1']],
+    ['word', 0, ['converges']],
+  ],
+};
+// Draws tokens at baseline y from x on g (work-canvas px, hand size px); returns the advance.
+function typeset(g, toks, px, x, y, col) {
+  const x0 = x, lw = px * 0.075;
+  g.fillStyle = g.strokeStyle = col; g.lineWidth = BOLD * px; g.lineCap = g.lineJoin = 'round';
+  for (const t of toks) {
+    if (typeof t === 'string' || Array.isArray(t)) {
+      const [s, sup] = typeof t === 'string' ? [t, 0] : t, q = sup ? px * 0.62 : px, yy = y - (sup ? px * 0.46 : 0);
+      if (sup) x += px * 0.09;   // Caveat's letters lean right: a superscript set flush sits on the e
+      for (const p of runParts(g, s, q, x)) {
+        if (p.s === '∫') drawInt(g, p.x, yy, q);
+        else { g.font = handFont(q); g.fillStyle = g.strokeStyle = col; g.lineWidth = BOLD * q; g.fillText(p.s, p.x, yy); g.strokeText(p.s, p.x, yy); }
+        x = p.x + p.w;
+      }
+      g.fillStyle = g.strokeStyle = col;
+    } else if (t.sum) {   // Σ: top bar, in to the waist, out to the foot
+      const w = px * 0.55, top = y - px * 0.72, bot = y + px * 0.04;
+      g.lineWidth = lw; g.beginPath(); g.moveTo(x + w, top + px * 0.06); g.lineTo(x + w * 0.96, top); g.lineTo(x, top);
+      g.lineTo(x + w * 0.55, (top + bot) / 2); g.lineTo(x, bot); g.lineTo(x + w, bot); g.lineTo(x + w * 1.02, bot - px * 0.07); g.stroke();
+      x += w + px * 0.1;
+    } else if (t.arrow) {
+      const w = px * 0.8, ay = y - px * 0.3, hd = px * 0.2;
+      g.lineWidth = lw * 0.8; g.beginPath(); g.moveTo(x, ay); g.lineTo(x + w, ay);
+      g.moveTo(x + w - hd, ay - hd * 0.85); g.lineTo(x + w, ay); g.lineTo(x + w - hd, ay + hd * 0.85); g.stroke();
+      x += w + px * 0.1;
+    } else if (t.frac) {   // numerator over a bar over the denominator, both centred, at 0.85 size
+      const q = px * 0.85, meas = (tk) => { const c = document.createElement('canvas').getContext('2d'); return typeset(c, tk, q, 0, 0, col); };
+      const [wn, wd] = t.frac.map(meas), bw = Math.max(wn, wd) + px * 0.25, bar = y - px * 0.3;
+      typeset(g, t.frac[0], q, x + (bw - wn) / 2, bar - px * 0.16, col);
+      typeset(g, t.frac[1], q, x + (bw - wd) / 2, bar + px * 0.72, col);
+      g.lineWidth = lw * 0.8; g.beginPath(); g.moveTo(x, bar); g.lineTo(x + bw, bar); g.stroke();
+      x += bw + px * 0.08;
+    } else if (t.scribble) {   // a cursive pencil squiggle: a lead-in and four humps trailing off
+      const r = mulberry32(seedOf('practice-name', t.scribble)), h = px * 0.32;
+      g.lineWidth = px * 0.06; g.beginPath(); g.moveTo(x, y);
+      g.quadraticCurveTo(x + px * 0.1, y - h * 1.6, x + px * 0.28, y - h * 1.4);
+      let cx = x + px * 0.28;
+      for (let i = 0; i < 5; i++) {
+        const hw = px * (0.26 + 0.06 * r()), hh = h * (1.1 - 0.12 * i + 0.2 * r());
+        g.bezierCurveTo(cx + hw * 0.2, y - hh * 1.3, cx + hw * 0.8, y - hh * 1.3, cx + hw, y - h * 0.1);
+        cx += hw;
+      }
+      g.quadraticCurveTo(cx + px * 0.3, y - h * 0.9, cx + px * 0.55, y - h * 0.7);
+      g.stroke(); x = cx + px * 0.55;
+    }
   }
-  return out.map((d) => { const l = Object.assign(document.createElement('canvas'), { width: W, height: H }); l.getContext('2d').putImageData(d, 0, 0); return l; });
+  return x - x0;
+}
+// Ink bounds of a canvas (alpha > 8) as [x0, y0, x1, y1].
+function bounds(c) {
+  const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+  let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 8) {
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  return [x0, y0, x1 + 1, y1 + 1];
+}
+// The sheet's writing as [navy, grey, navy] canvases at W·K × H·K. Each line at the largest size that fits its painted
+// box (so the sizes are the painting's), left-aligned in it and centred on it vertically.
+function inkLayers(which, W, H) {
+  const out = [0, 1].map(() => Object.assign(document.createElement('canvas'), { width: W * K, height: H * K }));
+  const lines = WRITING[which] ?? [], box = SHEET_INK[which];
+  const cut = lines.map(([k, l, toks]) => {
+    const c = Object.assign(document.createElement('canvas'), { width: PX * 14, height: PX * 3 }), g = c.getContext('2d');
+    typeset(g, toks, PX, PX * 0.5, PX * 2, `rgb(${l ? GREY : NAVY})`);
+    return { b: box[k], l, c, r: bounds(c) };
+  });
+  const fit = ({ b, r }) => Math.min((b[2] - b[0]) * K / (r[2] - r[0]), (b[3] - b[1]) * K / (r[3] - r[1]));
+  for (const q of cut) {
+    const k = fit(q), [x0, y0, x1, y1] = q.r, w = (x1 - x0) * k, h = (y1 - y0) * k;
+    out[q.l].getContext('2d').drawImage(q.c, x0, y0, x1 - x0, y1 - y0, q.b[0] * K, ((q.b[1] + q.b[3]) / 2) * K - h / 2, w, h);
+  }
+  if (which === 'practice_1') {   // the strike-through: one fast grey pencil stroke, a little uphill, across line b
+    const g = out[1].getContext('2d'), [x0, , x1] = box.strike, y = 240.5;
+    g.strokeStyle = `rgb(${GREY})`; g.lineCap = 'round'; g.lineWidth = 5 * K; g.beginPath();
+    g.moveTo((x0 + 3) * K, (y + 0.8) * K); g.quadraticCurveTo(((x0 + x1) / 2) * K, (y + 0.2) * K, (x1 - 3) * K, (y - 1) * K); g.stroke();
+  }
+  return [...out, out[0]];
 }
 // A sheet lying flat at `at` (centre), top edge toward the wall: blank paper that boils with the set, and an ink plane
-// over it whose canvas is redrawn only when the reveal state changes.
-// draw(spans, extra): spans = [[box, layer (0 navy, 1 grey, 2 healed navy), fraction revealed left to right]]; extra(g, K)
-// draws code pen strokes in sheet pixels (K = canvas px per sheet px). heal: the strike's rows; layer 2 is both layers
-// with those rows replaced by the rows above and below (the letters' strokes carried across, the strike gone).
-/** @param {{ props: any, sheet: Function, which: string, at: Vec3, key: string, parent: THREE.Object3D, heal?: number[] }} o */
-export function practiceSheet({ props, sheet, which, at, key, parent, heal }) {
+// over it whose canvas is redrawn only when the reveal state changes. The hand font must be loaded (s17b's loadHand).
+// draw(spans, extra): spans = [[box, layer (0 navy, 1 grey, 2 navy), fraction revealed left to right]]; extra(g, K)
+// draws code pen strokes in sheet pixels (K = canvas px per sheet px).
+/** @param {{ props: any, sheet: Function, which: string, at: Vec3, key: string, parent: THREE.Object3D }} o */
+export function practiceSheet({ props, sheet, which, at, key, parent }) {
   const img = props.pieces[which], [w, h] = props.sizes[which], [u0, v0, u1, v1] = props.visible[which];
   const holder = new THREE.Group(); holder.rotation.x = -Math.PI / 2; holder.position.set(...at); parent.add(holder);
   const [bw, bh] = props.sizes.blank_page, [b0, c0, b1, c1] = props.visible.blank_page;
   const blank = sheet({ art: props.pieces.blank_page, size: [bw, bh], key, res: 1024 }, holder);
   blank.position.set((0.5 - (b0 + b1) / 2) * bw, ((c0 + c1) / 2 - 0.5) * bh, 0);
-  const layers = props.proxy ? null : unmix(img), K = 2;
-  if (layers && heal) {
-    const [x0, y0, x1, y1] = heal, c = Object.assign(document.createElement('canvas'), { width: img.width, height: img.height });
-    const g = c.getContext('2d'); g.drawImage(layers[0], 0, 0); g.drawImage(layers[1], 0, 0);
-    const d = g.getImageData(0, 0, c.width, c.height), a = (x, y) => d.data[(y * c.width + x) * 4 + 3];
-    for (let x = x0; x <= x1; x++) {
-      const top = a(x, y0 - 1), bot = a(x, y1 + 1);
-      for (let y = y0; y <= y1; y++) {
-        const k = (y - y0 + 1) / (y1 - y0 + 2), i = (y * c.width + x) * 4;
-        d.data[i] = NAVY[0]; d.data[i + 1] = NAVY[1]; d.data[i + 2] = NAVY[2]; d.data[i + 3] = (1 - k) * top + k * bot;
-      }
-    }
-    g.putImageData(d, 0, 0); layers.push(c);
-  }
+  const layers = props.proxy ? null : inkLayers(which, img.width, img.height);
   const ink = Object.assign(document.createElement('canvas'), { width: img.width * K, height: img.height * K });
-  const tex = new THREE.CanvasTexture(ink); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  const tex = new THREE.CanvasTexture(ink); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
   const plane = new THREE.Mesh(new THREE.PlaneGeometry(w, h),
     new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
   plane.position.set((0.5 - (u0 + u1) / 2) * w, ((v0 + v1) / 2 - 0.5) * h, 0.00005);
@@ -163,7 +229,8 @@ export function practiceSheet({ props, sheet, which, at, key, parent, heal }) {
     if (layers) for (const [[x0, y0, x1, y1], l, fr] of spans) {
       const xe = x0 - 1 + (x1 - x0 + 3) * clamp(fr);
       if (xe <= x0 - 1) continue;
-      g.drawImage(layers[l], x0 - 1, y0 - 1, xe - x0 + 1, y1 - y0 + 3, (x0 - 1) * K, (y0 - 1) * K, (xe - x0 + 1) * K, (y1 - y0 + 3) * K);
+      const sx = (x0 - 1) * K, sy = (y0 - 1) * K, sw = (xe - x0 + 1) * K, sh = (y1 - y0 + 3) * K;
+      g.drawImage(layers[l], sx, sy, sw, sh, sx, sy, sw, sh);
     }
     if (extra) { g.save(); g.lineCap = g.lineJoin = 'round'; extra(g, K); g.restore(); }
     tex.needsUpdate = true;
@@ -186,6 +253,7 @@ export function penLine(g, K, pts, f = 1, width = 2.6) {
 }
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
+  await loadHand();
   const C = (k) => new THREE.Color(PALETTE[k]);
   scene.background = C('navy').lerp(C('ink'), 0.5);
   const V = (a) => new THREE.Vector3(...a);

@@ -1,0 +1,3 @@
+s17b t=172.5 before (base 1a23caa, unmodified tree): ca4a22061e57c84e  PASS
+s17b t=172.5 after  (this branch):                  ca4a22061e57c84e  PASS (determinism.txt)
+s17b.js: no diff (git diff --stat below)

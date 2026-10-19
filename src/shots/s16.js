@@ -19,6 +19,7 @@ import { POSES, specPose } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
 import { SHOTS } from '../timeline.js';
 import { UNIT, BLOB_AT, PHONE, PAGE, CAM_B2, practiceSheet, SHEET_INK, penLine } from './s15.js';
+import { loadHand } from './s17b.js';
 import { kitTools, marstonDesk, mppOf, idle, castOnly } from './s11.js';
 
 const ID = 's16', D = Math.PI / 180;
@@ -84,8 +85,8 @@ const kick = (t, t0, a) => (t < t0 ? 0 : a * Math.exp(-6 * (t - t0)) * Math.cos(
 
 // ---------- the pages ----------
 // Problem 1 in P (practice_1, sheet pixels): line a 0.5–3.1, line b 3.1–4.1, the pause and the tap (4.333), the strike
-// on crossOut (two drawings), line c 4.75–6.1, the check 6.167 / 6.333. Code strokes: the two '+' bars under the painted
-// strike (until it lands) and the check. Problem 2 in P2 (practice_2): one part per pop. The time-lapse writes scribble
+// on crossOut (two drawings), line c 4.75–6.1, the check 6.167 / 6.333. All of it is s15's code-drawn hand (practiceSheet),
+// the check a code stroke. Problem 2 in P2 (practice_2): one part per pop. The time-lapse writes scribble
 // lines on page 2 (below the problem) and on a blank page 3, each whole on its pop, with a check on each solve.
 const I1 = SHEET_INK.practice_1, I2 = SHEET_INK.practice_2;
 const CHECK1 = [[216, 284], [223, 293], [240, 270]], CHECK2 = [[154, 266], [160, 274], [176, 252]];
@@ -99,10 +100,6 @@ function page1(tc, t) {
     spans: [...both(I1.name, 1), ...both(I1.problem, 1), ...both(I1.a, span(tc, ...A)), ...(strike ? [[I1.b, 0, 1], [I1.b, 1, strike]] : [[I1.b, 2, fb]]),
       ...both(I1.c, span(tc, ...LC))],
     extra: (g, K) => {
-      if (strike < 1) for (const x of I1.plus) {   // the '+' bars the painted strike covers, drawn as the pen passes them
-        const f = clamp(((I1.b[0] + (I1.b[2] - I1.b[0]) * fb) - (x - 7)) / 14);
-        penLine(g, K, [[x - 7, I1.plusY], [x + 7, I1.plusY]], f, 2.4);
-      }
       penLine(g, K, CHECK1.slice(0, 2), tc >= CHK[0] - 1e-6 ? 1 : 0);
       penLine(g, K, CHECK1.slice(1), tc >= CHK[1] - 1e-6 ? 1 : 0);
     },
@@ -159,6 +156,7 @@ function scribbles(g, K, page, { lines, checks }, tc) {
 }
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
+  await loadHand();
   const C = (k) => new THREE.Color(PALETTE[k]);
   scene.background = C('navy').lerp(C('ink'), 0.5);
   const V = (a) => new THREE.Vector3(...a);
@@ -189,7 +187,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   { const c = flat(cut(kitp, 'pen_cap')); c.scale.x = -1; c.position.set(-0.030, 0.0008, 0.100); }   // where s15 set it down
   // the pages: problem 1's sheet, problem 2's, then a blank sheet for the time-lapse; the finished stack beside the page
   const pages = [
-    practiceSheet({ props: kitp, sheet, which: 'practice_1', at: PAGE, key: `${ID}-page1`, parent: scene, heal: I1.heal }),
+    practiceSheet({ props: kitp, sheet, which: 'practice_1', at: PAGE, key: `${ID}-page1`, parent: scene }),
     practiceSheet({ props: kitp, sheet, which: 'practice_2', at: PAGE, key: `${ID}-page2`, parent: scene }),
     practiceSheet({ props: kitp, sheet, which: 'blank_page', at: PAGE, key: `${ID}-page3`, parent: scene }),
   ];
