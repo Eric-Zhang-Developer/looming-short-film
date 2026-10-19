@@ -130,9 +130,8 @@ export const CUES = [
   { beat: 'inkDropForms', offset: 4.83, sound: 'inkDrip', gain: 0.3 },
   // Shadow-growth rustles (the sub is in the score): s03, s04 x3, s05, s06 spring-back, s07's gulp, s09b's hallway shadow.
   { beat: 'laptopUp', sound: 'paperRustle', gain: 0.4 },
-  { beat: 'fridge', sound: 'paperRustle', gain: 0.5 },
-  { beat: 'fridge', offset: 2.33, sound: 'paperRustle', gain: 0.3, seed: 2 },
-  { beat: 'fridge', offset: 5.33, sound: 'paperRustle', gain: 0.3, seed: 3 },
+  // v7-fridge: s04's three on the three fridge opens (s04.js OPENS), where the shadow springs up, a little louder each time it's bigger.
+  ...[0.17, 2.5, 4.67].map((o, k) => ({ beat: 'fridge', offset: o, sound: 'paperRustle', gain: 0.4 + 0.05 * k, ...(k ? { seed: k + 1 } : {}) })),
   { beat: 'gameNight', sound: 'paperRustle', gain: 0.5, seed: 4 },
   { beat: 'lampOffHome', offset: 0.17, sound: 'paperRustle', gain: 0.4, seed: 5 },
   { beat: 'gulp3', sound: 'paperRustle', gain: 0.35, seed: 9 },
@@ -260,9 +259,17 @@ export const CUES = [
   { beat: 'tagPenUncap', offset: 1.25, sound: 'inkDrip', gain: 0.3, seed: 32 },               // v6-ending: the drop lands on the nib (s18 17.75), a soft plip
   { beat: 'tagPenUncap', offset: 1.917, sound: 'penStroke', dur: 0.42, gain: 0.45, seed: 6 },  // v6-ending: "1." in its ink (18.42–18.83)
   // ───────── snd-foley-2 ─────────
-  // s04: jar clinks at 0.83, 2.17, 3.33; three carton sloshes over 3.50-4.00.
-  ...[0.83, 2.17, 3.33].map((o, k) => ({ beat: 'fridge', offset: o, sound: 'jarClink', gain: GAIN.jarClink, seed: k + 1 })),
-  ...[3.5, 3.67, 3.83].map((o, k) => ({ beat: 'fridge', offset: o, sound: 'cartonSlosh', gain: GAIN.cartonSlosh, seed: k + 1 })),
+  // s04 (v7-fridge): the fridge loop's door, from sounds already here, mirroring s04.js OPENS. Open at 0.17, 2.5, 4.67: the
+  // seal peeling and the door swinging to its stop (paperSlide), the jars in the door ticking together. Shut at 1.58, 3.83:
+  // the seal's thud (cardTap), the carton in the door sloshing, a jar clink. One seed for all of them, so every open
+  // and every shut is the same sound: nothing changes, that's the joke.
+  ...[0.17, 2.5, 4.67].flatMap((o) => [
+    { beat: 'fridge', offset: o, sound: 'paperSlide', gain: 0.4, seed: 7 },
+    { beat: 'fridge', offset: o + 0.08, sound: 'jarClink', gain: GAIN.jarClink * 0.4, seed: 7 }]),
+  ...[1.58, 3.83].flatMap((o) => [
+    { beat: 'fridge', offset: o, sound: 'cardTap', gain: 0.8, seed: 7 },
+    { beat: 'fridge', offset: o + 0.02, sound: 'cartonSlosh', gain: GAIN.cartonSlosh * 0.5, seed: 7 },
+    { beat: 'fridge', offset: o + 0.03, sound: 'jarClink', gain: GAIN.jarClink * 0.5, seed: 8 }]),
   // s05: TV bloops through the shot, paused for the win jingle at 5.0 and back when he resumes mashing at 6.0;
   // the roommate's paper-tap footsteps every 1/3 s over 3.33-6.33, all alike (they must not change in the shadow).
   bed('tvBloops', 'foley', ['gameNight'], ['gameNight', 4.9], GAIN.tvBloops),

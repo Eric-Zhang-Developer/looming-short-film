@@ -1,12 +1,13 @@
 // @ts-check
-// s04 · The fridge dodge (docs/shots/s04.md, G4). v2 on the frozen kitchen_kit: a counter run along the back wall
-// (sink under a window, counter, stove with the microwave over it, upper cabinets, tiled backsplash) and a full-height
-// fridge standing out at the right, turned to show its open, lit inside. He stands at it, bent in, sorting jars.
-// Key: the fridge light just outside the mouth, aimed every frame along L → blob to its wall hit. The blob holds 1.25×
-// and scoots toward the light twice, so its shadow on the kitchen wall grows 4.0 → 4.5 → 5.2 units by the light rule
-// alone (no gulp: he never looks at it). He stands in front of the light (z 0.30 > L.z), so he throws nothing on the wall.
-// Sizes are the scale table's (evidence/asset-home-kit/scale_table.md: 1 real m = 0.055 film m against the 0.096 m
-// gator), so the counter is at his chest and the fridge is taller than he is. Characters on 2s, light at 24, boil 10/s.
+// s04 · The fridge loop (docs/shots/s04.md, v7). On the frozen kitchen_kit: a counter run along the back wall (sink under
+// a window, counter, stove with the microwave over it, upper cabinets, tiled backsplash) and a full-height fridge at the
+// right, turned to show its lit inside. v7: he opens the fridge, stares, closes it, turns away, comes back and opens it
+// again, three times, blank-faced; nothing inside changes. The fridge light is the low, close key and it only exists while
+// the door is open: open, the blob's shadow springs up across the cabinets; shut, the kitchen goes dim and the shadow is
+// gone. Between opens the blob (1.5×, METER.gulp1, no gulp) scoots toward the light, so each time the light comes back the
+// shadow is bigger: 4.0 → 4.5 → 5.2 units by the light rule alone. He stands in front of the light (z 0.30 > L.z), so he
+// throws nothing on the wall. Sizes are the scale table's (evidence/asset-home-kit/scale_table.md: 1 real m = 0.055 film
+// m against the 0.096 m gator). Characters and the door on 2s, the light switches with the door, boil 10/s.
 import * as THREE from 'three';
 import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
@@ -15,7 +16,7 @@ import { kf, onTwos } from '../core/ease.js';
 import { mulberry32, seedOf } from '../core/rng.js';
 import { createBlob } from '../blob.js';
 import { makeGator, hipHeight } from '../characters/gator.js';
-import { specPose } from '../characters/poses.js';
+import { specPose, walk, POSES } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
 
 const ID = 's04', DEG = Math.PI / 180;
@@ -43,11 +44,17 @@ const HAND_DZ = 0.013;                                        // near arm +0.012
 const UNITS = [4.0, 4.5, 5.2];
 const MARK_Z = UNITS.map((u) => L.z * (1 - BLOB_R.start / (u * 0.012)));
 const STOOL_Z = MARK_Z[0] - 0.001;                              // stool cut 1 mm behind the blob's first mark (v3: 0.189 for 0.19), so the blob is never behind it
-const BLOB = [[0, [-0.015, MARK_Z[0]]], [2.17, [-0.015, MARK_Z[0]]], [2.33, [-0.017, MARK_Z[1]]], [5.17, [-0.017, MARK_Z[1]]], [5.33, [-0.020, MARK_Z[2]]]];
-const step = (t, keys) => keys.reduce((v, [k, x]) => (t >= k ? x : v), keys[0][1]);
-const EYES = [[0, 'open'], [1.5, 'side'], [2.17, 'open'], [5.0, 'closed'], [5.83, 'side'], [6.5, 'closed'], [6.83, 'open']];
-const MOUTH = [[0, 'neutral'], [1.67, 'o'], [2.17, 'neutral'], [5.0, 'smile'], [5.83, 'neutral'], [6.5, 'smile']];
-const BLOB_EYES = [[0, 'side'], [5.0, 'closed'], [5.5, 'open'], [5.83, 'side']];
+// v7 timing (local s, on 2s). OPENS: [door starts to open, door shut]. The door takes two drawings each way; the light is
+// on whenever the door is off its seal. The shot opens on two dark drawings so the first open shows the rule; the third holds to the cut.
+const OPENS = [[0.17, 1.58], [2.5, 3.83], [4.67, 7.5]];
+const DOOR_IN = [0.6, 1], DOOR_OUT = [0.6, 0.2];               // door fraction open on the two drawings after/before
+// The blob scoots in the dark, between opens, where he isn't covering it (the first once he has walked back past the stool).
+const BLOB = [[0, [-0.015, MARK_Z[0]]], [2.25, [-0.015, MARK_Z[0]]], [2.42, [-0.017, MARK_Z[1]]], [4.08, [-0.017, MARK_Z[1]]], [4.25, [-0.020, MARK_Z[2]]]];
+const LANDS = [2.42, 4.25];
+const fr = (s) => Math.round(s * 12);                           // a time on 2s → its drawing number (12/s)
+// Turned away (rig mirrored, facing −x): after each close until he turns back. WALKS: [t0, t1, from x, to x] on 2s steps.
+const AWAY = [[1.67, 2.17], [3.92, 4.33]];
+const WALKS = [[1.67, 2.0, 0, -0.014], [2.17, 2.42, -0.014, 0]];
 
 const PAD = 0.04;   // a shape that fills its canvas has no edge to tear, so rects are inset 4% of the long side
 function torn(w, h) {
@@ -182,15 +189,14 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   fridge.updateMatrixWorld(true);
   const fridgePt = (u, y) => fridge.localToWorld(new THREE.Vector3(u, y, 0.003));
 
-  // ---------- the jars (the kit's jar ×3 at falling sizes) and the carton (the kit has none: its cereal box) ----------
+  // ---------- what he stares at: three jars in size order on the middle shelf, the carton (the kit's cereal box) and a mug
+  // up top. Nothing in here changes between opens: that's the joke.
   const prop = (p, h, key) => cut(kit, p, [null, h], key, { anchor: [0.5, 0] });
-  const JARS = [
-    { h: 0.0095, home: [-0.012, SHELF[2]], spots: [[0, [-0.014, SHELF[1]]]] },
-    { h: 0.0078, home: [0.0, SHELF[2]], spots: [[0, [-0.003, SHELF[1]]], [6.17, [-0.005, SHELF[1]]]] },   // set 2 mm out of line, nudged back
-    { h: 0.0062, home: [0.011, SHELF[2]], spots: [[0, [0.007, SHELF[1]]]] },
-  ].map((j, i) => ({ ...j, ...prop('jar', j.h, `jar_${i}`) }));
-  const carton = { ...prop('cereal_box', 0.012, 'carton'), home: [0.011, SHELF[0]] };
-  { const m = prop('mug', 0.005, 'fridge_mug'); m.g.position.copy(fridgePt(-0.012, SHELF[0])); m.g.rotation.y = FRIDGE.yaw; }
+  /** @param {any} o @param {number[]} uy [u, y] */
+  const inFridge = (o, [u, y]) => { o.g.position.copy(fridgePt(u, y)); o.g.rotation.set(0, FRIDGE.yaw, 0); };
+  [[0.0095, -0.014], [0.0078, -0.003], [0.0062, 0.007]].forEach(([h, u], i) => inFridge(prop('jar', h, `jar_${i}`), [u, SHELF[1]]));
+  inFridge(prop('cereal_box', 0.012, 'carton'), [0.011, SHELF[0]]);
+  inFridge(prop('mug', 0.005, 'fridge_mug'), [-0.012, SHELF[0]]);
 
   // ---------- the bar stool (procedural kraft: a round seat, two splayed legs, a footrest) ----------
   const STOOL_H = SEAT_Y * 512 / 494;   // the canvas is 512 px tall, the seat's top at px 18
@@ -206,7 +212,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   group(stoolMesh, [-0.02, STOOL_H / 2 - (STOOL_H - SEAT_Y) + 0.0002, STOOL_Z]);
   stoolMesh.material.color.setScalar(NEAR_TRIM / 0.15 * 0.4);
 
-  // ---------- the Student, standing at the mouth, bent in, facing +x ----------
+  // ---------- the Student, standing at the mouth, upright, facing +x into the fridge ----------
   const rig = await makeGator({ assets }, { seed: 4 });
   scene.add(rig.group);
   const up = (o) => specPose({ leg: 0, farLeg: 8, far: -100, ...o });
@@ -226,32 +232,24 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     }
     return up({ lean: best.lean, arm: best.arm, ...extra });
   }
+  // The door's handle (near its free edge, at shelf height) with the door 60% open: where his hand pulls and pushes.
+  const doorAt = (k) => { hinge.rotation.y = Math.PI + k * FRIDGE.doorOpen; fridge.updateMatrixWorld(true); };
+  doorAt(0.6);
+  const HANDLE = hinge.localToWorld(new THREE.Vector3(0.9 * FW, SHELF[1], 0.002));
+  doorAt(1);
+  // Blank, every time: the stare is the same drawing in all three opens (the third leans in a hair, nothing else).
   const P = {
-    reach_in: reachTo(fridgePt(-0.012, SHELF[2] + 0.004)),
-    reach_jar2: reachTo(fridgePt(0.0, SHELF[2] + 0.004)),
-    reach_jar3: reachTo(fridgePt(0.011, SHELF[2] + 0.004)),
-    reach_top: reachTo(fridgePt(0.011, SHELF[0] + 0.005)),
-    place1: reachTo(fridgePt(-0.014, SHELF[1] + 0.005)),
-    place2: reachTo(fridgePt(-0.003, SHELF[1] + 0.004)),
-    place3: reachTo(fridgePt(0.007, SHELF[1] + 0.003)),
-    nudge: reachTo(fridgePt(-0.005, SHELF[1] + 0.004), { far: -150 }),
-    antic: up({ lean: 27, arm: -40 }),
-    inspect: up({ lean: 8, arm: 40, head: 8 }),
-    shake_a: up({ lean: 8, arm: 50 }),
-    shake_b: up({ lean: 8, arm: 30 }),
-    hips: up({ lean: -10, arm: -150, far: -150, head: 4 }),   // straightened up, hands on his hips
-    nudge_antic: up({ lean: 0, arm: -60, far: -150 }),
+    ...POSES,
+    stare: up({ lean: 4, arm: -95, head: -6 }),
+    stare_in: up({ lean: 7, arm: -95, head: -8 }),
+    handle: reachTo(HANDLE),
+    stand: up({ lean: 0, arm: -95, head: 0 }),
   };
   const KEYS = [
-    [0, 'reach_in'], [0.5, 'reach_in'], [0.67, 'antic'], [0.83, 'place1'], [1.0, 'place1'],
-    [1.33, 'reach_jar2'], [1.5, 'inspect'], [2.0, 'inspect'], [2.17, 'place2'],
-    [2.33, 'place2'], [2.5, 'reach_jar3'], [2.67, 'inspect'], [3.17, 'inspect'], [3.33, 'place3'], [3.42, 'place3'],
-    [3.5, 'reach_top'], [3.67, 'shake_a'], [3.83, 'shake_b'], [4.0, 'shake_a'], [4.17, 'shake_b'], [4.33, 'reach_top'],
-    [4.5, 'reach_top'], [5.0, 'hips'], [5.83, 'hips'], [6.0, 'nudge_antic'], [6.17, 'nudge'], [6.33, 'nudge'],
-    [6.5, 'hips'], [6.83, 'reach_in'], [7, 'reach_in'],   // v4: the reach back into the fridge at 6.83, held to the cut at 7.0
+    [0, 'handle'], [0.17, 'handle'], [0.33, 'stare'], [1.42, 'stare'], [1.5, 'handle'], [1.58, 'handle'], [1.67, 'stand'],
+    [2.42, 'handle'], [2.58, 'handle'], [2.75, 'stare'], [3.67, 'stare'], [3.75, 'handle'], [3.83, 'handle'], [3.92, 'stand'],
+    [4.33, 'stand'], [4.5, 'handle'], [4.75, 'handle'], [4.92, 'stare'], [5.75, 'stare'], [6.0, 'stare_in'], [7.5, 'stare_in'],
   ];
-  // [grab, release] per jar, local s. Jar 3 comes out at 2.50 (two turns to 3.17) and goes in at 3.33.
-  const HELD = [[0, 0.83], [1.33, 2.17], [2.5, 3.33]], CARTON_HELD = [3.5, 4.33];
 
   // ---------- the Exam on the stool (ink, code) ----------
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
@@ -287,49 +285,53 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const look = LOOK.clone().sub(CAM).normalize();
   post({ focus: new THREE.Vector3(0.02, 0.05, BODY_Z).sub(CAM).dot(look), aperture: 0.012, lut: 'night' });
 
-  const v = new THREE.Vector3(), B = new THREE.Vector3(), hitW = new THREE.Vector3();
-  /** @param {any} o @param {number[]} uy [u, y] */
-  const inFridge = (o, [u, y]) => { o.g.position.copy(fridgePt(u, y)); o.g.rotation.set(0, FRIDGE.yaw, 0); };
-  const inHand = (o, hand) => { o.g.position.set(hand.x, hand.y - 0.003, HAND_Z - 0.0005); o.g.rotation.set(0, 0, 0); };
+  const B = new THREE.Vector3(), hitW = new THREE.Vector3();
+  // Door fraction open at drawing F (12/s): two drawings to open (DOOR_IN), wide open, two drawings to shut (DOOR_OUT), shut.
+  const doorOpen = (F) => {
+    for (const [o, c] of OPENS) {
+      const i = F - fr(o), j = fr(c) - F;
+      if (i < 0 || j <= 0) continue;
+      return j <= 2 ? DOOR_OUT[2 - j] : i < 2 ? DOOR_IN[i] : 1;
+    }
+    return 0;
+  };
 
   return {
     exam, rig, spot, face,
     update(t) {
-      const T = onTwos(t);
+      const T = onTwos(t), F = fr(T);
       const seed = boilSeed(t, 10);
       for (const [mesh, make] of boiling) updatePaperMesh(mesh, make(seed));
 
-      // Student
-      rig.blend(P, KEYS, t);
+      // The door (on 2s) and the light with it: on whenever the door is off its seal, so the shadow comes and goes with it.
+      const door = doorOpen(F);
+      doorAt(door);
+      spot.intensity = door > 0 ? KEY_I : 0;
+      fill.intensity = door > 0 ? FILL_K * KEY_I : 0;
+
+      // Student: stare, push it shut, turn away (mirrored; the first time he walks off two steps), turn back, pull it open.
+      const inside = ([a, b]) => F >= fr(a) && F < fr(b);
+      const w = WALKS.find(inside);
+      rig.group.scale.x = AWAY.some(inside) ? -1 : 1;
+      if (w) {
+        const wk = walk(T, { set: 'side', step: 1 / 6, t0: w[0] });
+        rig.blend(P, wk.keys, t);
+        rig.group.position.set(HIP_X + kf(T, [[w[0], w[2]], [w[1], w[3]]], (x) => x), wk.hip, BODY_Z);
+      } else {
+        rig.blend(P, KEYS, t);
+        rig.group.position.set(HIP_X + (inside([WALKS[0][1], WALKS[1][0]]) ? WALKS[0][3] : 0), HIP_Y, BODY_Z);
+      }
       rig.follow('tail', t);
-      // v4 acting: neutral (busy), the content-procrastinator smile at 5.00 (relief's face), neutral on the jar, relief again.
-      // slump 0: his hands are in the fridge and on his hips, so the pose owns the lean. G4's gag eyes and mouths go over the preset's face.
-      act(rig, t, [[0, 'neutral'], [5.0, 'relief'], [5.83, 'neutral'], [6.5, 'relief']], { slump: 0, breath: 5, blink: false });
-      if (T >= 5.0 && T < 5.83) rig.joints.tail.rotation.z += 4 * DEG * Math.sin(2 * Math.PI * (T - 5.0) / 0.33);  // happy swish
-      rig.face({ eyes: step(t, EYES), mouth: step(t, MOUTH) });
+      // His face never changes: neutral, eyes open, no blinks, no acting beats. That's the joke.
+      act(rig, t, [[0, 'neutral']], { slump: 0, breath: 5, blink: false });
+      rig.face({ eyes: 'open', mouth: 'neutral' });
       rig.boil(t, 10);
-      rig.group.updateMatrixWorld(true);
-      const hand = rig.hand.getWorldPosition(v);
 
-      // Jars: on the bottom shelf, in his hand, then in a row along the middle shelf's lip.
-      JARS.forEach((j, i) => {
-        const [g0, g1] = HELD[i];
-        if (T < g0) inFridge(j, j.home);
-        else if (T < g1) inHand(j, hand);
-        else inFridge(j, step(T, j.spots));
-      });
-      JARS[2].inner.scale.x = T >= 2.5 && T < 3.17 ? Math.cos(2 * Math.PI * (T - 2.5) / 0.333) : 1;   // two turns
-      if (T >= CARTON_HELD[0] && T < CARTON_HELD[1]) {
-        inHand(carton, hand);
-        if (T >= 3.67) carton.g.rotation.z = rig.joints.arm_r.rotation.z + rig.joints.body.rotation.z - 40 * DEG;   // ±10° shakes
-      } else inFridge(carton, carton.home);
-
-      // Exam: scoots on 2s, squash 0.2 for one drawing as it lands at 2.33 and 5.33; a hopeful stretch at 5.83, sags at 6.5.
+      // Exam: scoots on 2s while the door is shut, squash 0.2 for the drawing it lands on; eyes on him throughout.
       const [bx, bz] = kf(T, BLOB);
       exam.mesh.position.set(bx, SEAT_Y, bz);
-      const land = (T >= 2.33 && T < 2.4) || (T >= 5.33 && T < 5.4);
-      const squash = land ? 0.2 : T >= 5.83 && T < 6.5 ? -0.1 : T >= 6.5 && T < 6.67 ? 0.1 : 0;
-      exam.update(t, { squash, wobble: 1, eyes: step(T, BLOB_EYES), look: 1, key: spot });
+      const squash = LANDS.some((l) => F === fr(l)) ? 0.2 : 0;
+      exam.update(t, { squash, wobble: 1, eyes: 'side', look: 1, key: spot });
       exam.mesh.updateMatrixWorld();
 
       // Key aimed along L → blob centre to its wall hit (aim() at the blob first so its frustum holds it).

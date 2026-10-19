@@ -1,0 +1,4 @@
+        dropQuivers          local  14.0  global  198.0
+        tagPenUncap          local  16.5  global  200.5
+
+ok (22 shots, 77 beats, 204.0s)
