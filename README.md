@@ -21,7 +21,7 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 | Doc | What it covers |
 |---|---|
 | [01 Competition](docs/01-competition.md) | Brief, criteria, category, AI framing, submission answers |
-| [02 Story](docs/02-story.md) | Logline, the visual rule, characters, 3:15 beat sheet |
+| [02 Story](docs/02-story.md) | Logline, the visual rule, characters, 3:21 beat sheet |
 | [03 Art Direction](docs/03-art-direction.md) | Paper diorama look, materials, palette, lighting, references |
 | [04 Technical](docs/04-technical.md) | three.js 2.5D architecture, paper generator, render pipeline |
 | [05 Sound](docs/05-sound.md) | Code-synthesized score, foley, mix |
@@ -35,7 +35,7 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 
 | Decision | Choice |
 |---|---|
-| Runtime | 3:15 (G4, 2026-10-15; was 3:00) |
+| Runtime | 3:21 (v6, s10b added; was 3:15 from G4, 2026-10-15) |
 | Dialogue | None. A few hand-lettered words on screen where the story needs them (exam, math, grade). |
 | Characters | Paper-cutout gators. The Exam is the only thing made of ink. |
 | Look | Lit paper diorama: torn-paper cutouts on separate depth planes, real light, real shadows |

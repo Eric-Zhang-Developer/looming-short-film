@@ -26,7 +26,7 @@ One plain analog wall clock: tick marks, no numbers, the same paper style as the
 
 **Sound:** the tick is a foley cue. At 3 a.m. it plays alone. On the walk it doubles into a heartbeat pulse, and the climax's music is built on it. At Marston's door it resolves into one held chord.
 
-## Beat sheet (3:15) · ★ new · ✎ rewritten · = kept
+## Beat sheet (3:21) · ★ new · ✎ rewritten · = kept
 
 ### Act 1 · Birth (0:00–0:26)
 - **0:00 · s00 =** Black. A phone buzzes: **"Calc 2 Exam · Fri"**.
@@ -48,21 +48,21 @@ Each dodge is one obvious idea, and the blob is one size bigger every time.
 - **1:22 · s09c ★ The walk (20 s).** Campus at night, an empty path of street lamps, Century Tower ahead. **Each lamp is a heartbeat:** the shadow stretches long as he approaches, shrinks under his feet, then stretches again. The tick has become a pulse, and the score adds one layer per lamp, climbing (the opposite of the blob's falling gulp motif). His pace quickens. Once, the blob plants itself in his path, huge shadow and all, and he looks at it, then **steps around it**. Then Marston's ribbon windows appear across the plaza, glowing warm. *Face: dread → resolve, sweat, never a smile yet.*
 - **1:42 · s10 ★ The threshold (8 s).** He pushes Marston's door. **Warm light from above floods him, and the shadow snaps to a puddle.** The pulse resolves into a single held chord, then near-silence. The blob blinks, suddenly small and confused at his feet. He closes his eyes and exhales. *Face: resolve → relief (eyes closed, brows up).* Close-up on `gator_hero`.
 
-### Act 4 · Under the light (1:50–2:38)
+### Act 4 · Under the light (1:50–2:44)
 - **1:50 · s10b ✎ The stacks (6 s, v6).** v3's walk down a stacks aisle toward the lens, brought back and flipped: he glances at his phone and slides it into his hoodie pocket; one warm strip light per bay keys him from above, and under each the blob's shadow is only a small pool on the carpet. *Face: resolve → relief, then eyes open on a small smile; slow breath.*
 - **1:56 · s11 ✎** He sits at a window desk (the perforated cubicle, the ring pendant above). The blob climbs onto the desk beside him: big, but nothing like its shadow, and a little nervous.
-- **1:57 · s13 ✎ Everyone has one (5 s).** Top-down over the reading room: other gators studying, each with a small blob under their own light. He's not alone, and they're working.
-- **2:02 · s15 ✎ The name (8 s).** He uncaps the pen and writes his name at the top of the page. The blob flinches. *Face: resolve → a small, surprised smile.* (No sensor; the light is already on.)
-- **2:10 · s16 ✎ Practice (16 s).** ∫x·eˣ dx with the crossing-out and the check, the blob shrinking a step per problem; the series; a short montage. *The comedy beat: "That was it?"*
-- **2:26 · s17 ✎ Quiet: dawn (12 s, cut from 18).** Gold light through the ribbon windows. He sits back and closes his eyes. The blob, hamster-sized, dozes on his page.
+- **2:03 · s13 ✎ Everyone has one (5 s).** Top-down over the reading room: other gators studying, each with a small blob under their own light. He's not alone, and they're working.
+- **2:08 · s15 ✎ The name (8 s).** He uncaps the pen and writes his name at the top of the page. The blob flinches. *Face: resolve → a small, surprised smile.* (No sensor; the light is already on.)
+- **2:16 · s16 ✎ Practice (16 s).** ∫x·eˣ dx with the crossing-out and the check, the blob shrinking a step per problem; the series; a short montage. *The comedy beat: "That was it?"*
+- **2:32 · s17 ✎ Quiet: dawn (12 s, cut from 18).** Gold light through the ribbon windows. He sits back and closes his eyes. The blob, hamster-sized, dozes on his page.
 
-### Payoff (2:38–2:55)
-- **2:38 · s17b ✎ Test day (10 s).** He's front row and lit. The exam room's clock ticks **slow and calm**. He recognises the problem, smiles, and writes it in one pass.
-- **2:48 · s17c = Grade (7 s).** The 94. Still beat, wide eyes, then a grin. *Face: pride.*
+### Payoff (2:44–3:01)
+- **2:44 · s17b ✎ Test day (10 s).** He's front row and lit. The exam room's clock ticks **slow and calm**. He recognises the problem, smiles, and writes it in one pass.
+- **2:54 · s17c = Grade (7 s).** The 94. Still beat, wide eyes, then a grin. *Face: pride.*
 
-### Ending (2:55–3:15)
-- **2:55 · s18 ✎** Home, daytime, lamp on: the light from above, chosen now. He crosses off the exam. The ink soaks back into the calendar.
-- **3:05 · Tag.** The clock reads an ordinary afternoon. He letters **"Final"**, circles it, and a tiny drop quivers. He uncaps the pen and makes a first mark. Black.
+### Ending (3:01–3:21)
+- **3:01 · s18 ✎** Home, daytime, lamp on: the light from above, chosen now. He crosses off the exam. The ink soaks back into the calendar.
+- **3:11 · Tag.** The clock reads an ordinary afternoon. He letters **"Final"**, circles it, and a tiny drop quivers. He uncaps the pen and makes a first mark. Black.
 
 ## The acting map (one expression per beat, held at least half a second)
 numb (bed, the birth) · guilt (glances at the calendar/clock) · flinch (the lamp, the birth) · dread (3 a.m., the walk) · **resolve** (the choice → the threshold) · **relief** (the threshold) · surprise → smile (the name, "that was it?") · pride (the 94). Plus brows, blinks, breathing (fast on the walk, slow at the threshold), slump in bed against upright on the walk, tail droop against curl. Close-ups on `gator_hero` at: the clock glance, sitting up, the door, the threshold, the 94.
