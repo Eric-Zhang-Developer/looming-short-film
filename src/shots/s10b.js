@@ -1,7 +1,7 @@
 // @ts-check
 // s10b · The stacks (docs/shots/s10b.md, v6). v3's s10 walk (git 228d5b2^:src/shots/s10.js) brought back after the
 // threshold, with its meaning flipped by the v4 rule. Same locked camera down a Marston stacks aisle, the same kit bays as
-// wings and coffered ceiling strips as borders; he walks toward the lens with the 2.5× blob waddling behind his right side.
+// wings and coffered ceiling strips as borders; he walks toward the lens with the 2.5× blob waddling behind him. v6-stacks-2: the side rig turned 50° to us, so the snout reads.
 // v3 lit him from the phone, low, and threw the blob's shadow huge on the end wall. Now he looks at the phone once and
 // slides it into the hoodie pocket (pocketPhone 1.0), and the light comes from above: one warm strip light per bay, each a
 // downward spot, so as the blob passes under one its shadow is a small pool on the carpet just ahead of it (underLight1,
@@ -12,7 +12,7 @@ import { ambient } from '../lights.js';
 import { kf, ease, onTwos, clamp } from '../core/ease.js';
 import { mulberry32, seedOf } from '../core/rng.js';
 import { SHOTS } from '../timeline.js';
-import { makeGator, HIP } from '../characters/gator.js';
+import { makeGator, hipHeight } from '../characters/gator.js';
 import { POSES, walk } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
 import { createBlob } from '../blob.js';
@@ -22,19 +22,23 @@ const ID = 's10b';
 const B = SHOTS.find((s) => s.id === ID).beats;          // pocketPhone 1, underLight1 2, underLight2 4.5
 const BLOB_R = { start: 0.030 };                         // 2.5×, its size in s10 and s11 (README §1, Q16)
 const STEP = 1 / 3, HOP = 2 / 3, HOP_H = 0.004;          // calmer than v3's 0.25: a footfall every 1/3 s; a hop per two steps
-const V = 0.04, Z0 = 0.06;
-const zG = (t) => Z0 + V * t;                            // his walk line toward the camera: z 0.06 → 0.30
-const CAM = [0, 0.085, 0.95];
-const BLOB = [-0.052, 0, -0.015];                        // behind his right side (screen left), v3's offset widened for 2.5×
-const PHONE = [-0.040, 0.019, 0.035], POCKET = [-0.006, HIP + 0.012, 0.006];   // offsets from his root (the feet)
-const WING_Z = [0.09, 0.19, 0.29, 0.39], AISLE = 0.09;   // wings at these depths, inner edge ±0.09
-// One strip light per bay, 0.1 apart. On underLight1 and underLight2 the blob has just passed under tube 1 and tube 2
-// (1.5 cm ahead of it): a light straight over a cutout casts a line, so the pool shows once the blob is ahead of the tube,
-// laid forward on the carpet where the camera sees it, and grows to about 2 cm as he walks on.
-const UNDER = (b) => zG(b) + BLOB[2] - 0.015;
+// v6-stacks-2: he comes on to z 0.45 (was 0.30), so his height on screen grows 0.89/0.50 ≈ 1.8× (was 1.37×), drifting
+// 3 cm left to right across the aisle along the way he faces.
+const V = 0.065, Z0 = 0.06, X0 = -0.03, VX = 0.01;
+const zG = (t) => Z0 + V * t;                            // his walk line toward the camera: z 0.06 → 0.45
+const xG = (t) => X0 + VX * t;
+const D = Math.PI / 180;
+const TURN_Y = -50;   // v6-stacks-2: the side rig turned 50° toward the lens (s10's fix for "front-on reads as a frog"): the snout shows
+const CAM = [0, 0.125, 0.95], PITCH = -6;                // v6-stacks-2: 4 cm higher and tipped 6° down, so the pools open up
+const BLOB = [-0.052, 0, -0.015];                        // behind him on screen left (he faces right), v3's offset widened for 2.5×
+const WING_Z = [0.09, 0.19, 0.29, 0.39, 0.49], AISLE = 0.09;   // wings at these depths, inner edge ±0.09
+// One strip light per bay. On underLight1 and underLight2 the blob has just passed under tube 1 and tube 2 (3 cm ahead
+// of it; v6-stacks had 1.5, a sliver): a light straight over a cutout casts a line, so the pool shows once the blob is
+// ahead of the tube, laid forward on the carpet where the camera sees it.
+const UNDER = (b) => zG(b) + BLOB[2] - 0.03;
 const TUBE_Z = [UNDER(B.underLight1) - 0.1, UNDER(B.underLight1), UNDER(B.underLight2), UNDER(B.underLight2) + 0.1], HEADER_Y = 0.16;
 const CEILING_K = 0.45, TUBE_GLOW = 0.75;                // coffers dimmed under the lit tubes; the tube's painted glow
-const KEY_I = 0.2, SET_I = 1.0, AMB_K = 0.55, FILL_I = 0.006;   // by eye on the sheet
+const KEY_I = 0.6, SET_I = 0.75, AMB_K = 0.4, FILL_I = 0.006;   // by eye on the sheet
 
 export async function build({ scene, camera, assets, PALETTE, post }) {
   const col = (k) => new THREE.Color(PALETTE[k]);
@@ -78,10 +82,10 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     glow(strip).emissiveIntensity = TUBE_GLOW;
   });
 
-  // ---- The Student, front view, root at the feet. His right side is screen left (−x).
-  const gator = await makeGator({ assets }, { seed: 10, facing: 'front', res: 1024 });
+  // ---- The Student, the side rig (root at the hip) turned TURN_Y toward the lens, facing screen right; the blob trails
+  // him on screen left. v6-stacks used the front turnaround, which reads as a frog (no snout).
+  const gator = await makeGator({ assets }, { seed: 10, res: 1024 });
   scene.add(gator.group);
-  const eyes0 = gator.joints.eyes.position.y, mouth0 = gator.joints.mouth.position.y;
   const props = await assets.load('study_props_sheet');
   const prop = (name) => {
     const [w, h] = props.sizes[name], [u0, v0, u1, v1] = props.visible[name], g = new THREE.Group();
@@ -89,13 +93,15 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     m.position.set(-((u0 + u1) / 2 - 0.5) * w, ((v0 + v1) / 2 - 0.5) * h, 0);
     return g;
   };
-  { const pack = prop('backpack_front'); pack.position.set(-0.020, 0.048, -0.030); gator.joints.body.add(pack); }
+  { const pk = (await assets.load('props_kit')).pieces.backpack, pack = art(pk, 'pack', { mpp: 0.034 / pk.height, sx: -1, parent: gator.joints.body });
+    pack.position.set(-0.020, 0.026, -0.0045); }        // s09c's side backpack, hip space, behind the body plane
   const phone = new THREE.Group();
   {
     const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.0125, 0.0058), new THREE.MeshBasicMaterial({ color: PALETTE.phone }));
     screen.position.z = 0.0006;
     phone.add(prop('phone_face'), screen);
-    scene.add(phone);
+    phone.scale.setScalar(0.8);
+    gator.hand.add(phone);                               // in his near hand
   }
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
   scene.add(exam.mesh);
@@ -103,22 +109,23 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
   // ---- Light. Key: one downward spot per strip light, warm, each casting the blob's pool on the carpet below it.
   const tubes = TUBE_Z.map((z) => {
-    const s = new THREE.SpotLight(WARM, KEY_I, 0.5, 0.9, 0.6, 2);
+    const s = new THREE.SpotLight(WARM, KEY_I, 0.3, 0.6, 0.6, 2);
     s.position.set(0, HEADER_Y - 0.008, z); s.target.position.set(0, 0, z + 0.04);   // leaning a little toward the lens, so the tube ahead of him lights his face
     s.castShadow = true; s.shadow.camera.near = 0.004; s.shadow.camera.far = 0.5; s.shadow.mapSize.set(1024, 1024); s.shadow.radius = 3; s.shadow.bias = -0.0004;
     scene.add(s, s.target);
     return s;
   });
   const set = new THREE.DirectionalLight(WARM, SET_I);   // the room's spill on the shelves, front and high (v3's tube angle)
-  set.position.set(0, 1.5, 1.0); set.target.position.set(0, 0, 0.2); scene.add(set, set.target);
+  set.position.set(0, 0.45, 1.0); set.target.position.set(0, 0, 0.2); scene.add(set, set.target);
   const fill = new THREE.PointLight(PALETTE.phone, FILL_I, 0.06, 2);   // the phone's glow on his face, until it's pocketed
   scene.add(fill);
   const amb = ambient(); amb.intensity *= AMB_K; scene.add(amb);
 
   const fx = post({ focus: CAM[2] - zG(0), aperture: 0.02, maxblur: 0.01, lut: 'amber' });
   const root = new THREE.Vector3(), P = new THREE.Vector3();
-  // The phone on 2s, as an offset from his root: held low and looked at, a beat, then up and into the pocket by 0.917.
-  const PH = [[0, PHONE], [0.5, PHONE], [0.75, [-0.022, 0.026, 0.020]], [0.917, POCKET]];
+  // The near arm on 2s (absolute degrees, 0 = forward, −95 hanging): the phone held up before him and looked at, a beat,
+  // then down to the hoodie pocket by 0.917; from pocketPhone the walk takes the arm back over 0.25 s.
+  const ARM = [[0, -35], [0.5, -35], [0.75, -60], [0.917, -88]];
   // Face: resolve on the phone (from s10's close-up), relief on the first light (eyes closed, the slow breath), then eyes
   // open on relief's small smile for the rest of the walk.
   /** @type {[number, string][]} */
@@ -129,42 +136,37 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     parts: { exam, gator, phone, tubes, wall, zG },
     update(tLocal) {
       camera.position.set(...CAM);   // locked
-      camera.rotation.set(0, 0, 0);
+      camera.rotation.set(PITCH * D, 0, 0);
       fx.set({ focus: CAM[2] - zG(tLocal) });
       boil(tLocal, 10);
 
       // Characters on 2s.
-      const T = onTwos(tLocal);
+      const T = onTwos(tLocal), j = gator.joints;
       gator.boil(tLocal, 10);
-      const w = walk(tLocal, { set: 'front', step: STEP });
+      const w = walk(tLocal, { set: 'side', step: STEP });
       gator.blend(POSES, w.keys, tLocal);
-      root.set(0, w.lift, zG(T));
-      gator.group.position.copy(root);
       const f = act(gator, tLocal, CUES, { seed: 101 });
-      if (T >= OPEN) gator.face({ eyes: 'open', mouth: f.mouth });
+      gator.face({ eyes: T >= OPEN ? 'open' : f.eyes, mouth: f.mouth });
+      // The root's height from the final legs (after act's lean), so the lower foot stays on the carpet.
+      root.set(xG(T), hipHeight({ body: j.body.rotation.z, leg_r: j.leg_r.rotation.z, leg_l: j.leg_l.rotation.z }), zG(T));
+      gator.group.position.copy(root);
+      gator.group.rotation.y = TURN_Y * D;
 
-      // The phone: arm_r points at it from its shoulder until the pocket, then hands back to the walk over 0.25 s.
-      const off = kf(T, PH, ease);
+      // The phone: the near arm holds it up, then puts it in the pocket; it hands back to the walk over 0.25 s.
       const held = T < B.pocketPhone;
       phone.visible = held;
-      P.set(root.x + off[0], root.y + off[1], root.z + off[2]);
-      phone.position.copy(P);
-      phone.rotation.set(kf(T, [[0.5, -1.0], [0.917, 0]], ease), 0, 0);   // screen up to his face, then upright into the pocket
-      const rb = gator.joints.body.rotation.z, sx = -0.0175, sy = HIP + 0.030;
-      const vx = off[0] - (sx * Math.cos(rb) - sy * Math.sin(rb)), vy = off[1] - w.lift - (sx * Math.sin(rb) + sy * Math.cos(rb));
       const k = 1 - clamp((T - B.pocketPhone) / 0.25);
-      gator.joints.arm_r.rotation.z += k * (Math.atan2(vx, -vy) - rb - gator.joints.arm_r.rotation.z);
+      j.arm_r.rotation.z += k * (kf(T, ARM, ease) * D - j.body.rotation.z - j.arm_r.rotation.z);
+      phone.rotation.z = -(j.body.rotation.z + j.arm_r.rotation.z);   // upright in the hand, face to us
+      phone.getWorldPosition(P);
       fill.position.copy(P); fill.intensity = held ? FILL_I : 0;
-      // Head: the front turnaround has no head joint, so the face slides on the body: down at the phone, level after.
-      const head = kf(T, [[0, -12], [0.5, -12], [0.583, 0]], ease);
-      gator.joints.eyes.position.y = eyes0 + 0.00012 * head;
-      gator.joints.mouth.position.y = mouth0 + 0.00012 * head;
+      // Head: down at the phone, level after.
+      j.head.rotation.z += kf(T, [[0, -12], [0.5, -12], [0.583, 0]], ease) * D;
 
-      // The blob rides his root behind his right side, one hop per two of his steps, squashing on landing.
+      // The blob rides his root behind him, one hop per two of his steps, squashing on landing.
       const ph = (T % HOP) / HOP, land = ph < 1 / 8 + 1e-6;
       exam.mesh.position.set(root.x + BLOB[0], HOP_H * Math.sin(Math.PI * ph), root.z + BLOB[2]);
-      const near = tubes.reduce((a, s) => (Math.abs(s.position.z - exam.mesh.position.z) < Math.abs(a.position.z - exam.mesh.position.z) ? s : a));
-      exam.update(tLocal, { wobble: 0.8, squash: land ? 0.12 : 0, eyes: 'open', key: near });
+      exam.update(tLocal, { wobble: 0.8, squash: land ? 0.12 : 0, eyes: 'open' });   // key: the tube that lights it most (v6-stacks-2: the cones are narrower now)
     },
   };
 }
