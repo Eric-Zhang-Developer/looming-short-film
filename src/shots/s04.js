@@ -1,3 +1,4 @@
+// @ts-check
 // s04 · The fridge dodge (docs/shots/s04.md, G4). v2 on the frozen kitchen_kit: a counter run along the back wall
 // (sink under a window, counter, stove with the microwave over it, upper cabinets, tiled backsplash) and a full-height
 // fridge standing out at the right, turned to show its open, lit inside. He stands at it, bent in, sorting jars.

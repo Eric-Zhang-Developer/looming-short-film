@@ -1,3 +1,4 @@
+// @ts-check
 // s17c · The grade comes back (docs/shots/s17c.md, v4). 7 s. G4's 0–3 on s17b's Camera P, days later: the paper slides
 // in face-down (gradeSlide 0.5), his hand turns it over, and it lands face-up exactly where he wrote it (gradeReveal
 // 2.0): props_kit's graded_test with its painted red checks and circled 94, carrying his own three lines from s17b (the

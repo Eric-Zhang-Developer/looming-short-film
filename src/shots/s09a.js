@@ -1,3 +1,4 @@
+// @ts-check
 // s09a · The choice (docs/shots/s09a.md, v4, with the director's 2026-10-18 block: 2.5×, the nightstand lamp). He turns
 // the phone face down and the room goes black: the ceiling shadow dies with the light that made it, on the same frame.
 // Only the blob's eyes are left. One slow breath (eyes closed), his face sets (dread → resolve), and still lying, in the

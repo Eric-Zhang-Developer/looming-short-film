@@ -1,3 +1,4 @@
+// @ts-check
 // WAV writer: 32-bit float PCM (format 3), 48 kHz. Channels are mono Float32Arrays of equal length.
 import { writeFileSync } from 'node:fs';
 import { SR } from './synth.js';

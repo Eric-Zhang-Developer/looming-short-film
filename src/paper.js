@@ -1,3 +1,4 @@
+// @ts-check
 // paper.js: painted art or a plain shape → a torn sheet of paper (doc 04 §paper.js, contract in docs/contracts.md).
 //
 // How the edge is torn: rasterize the silhouette (art alpha or `path`), take its exact signed distance field,

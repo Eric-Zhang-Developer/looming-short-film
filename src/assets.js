@@ -1,3 +1,4 @@
+// @ts-check
 // Asset loader (contract: docs/contracts.md §assets). Frozen art when it has been cut, flat proxies until then.
 // Proxies are a palette-coloured silhouette on transparent canvas, so they go through makePaper exactly like real
 // art and blocking reads. The `proxy` flag is the label: frames never carry text.

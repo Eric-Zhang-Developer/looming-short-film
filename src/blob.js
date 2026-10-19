@@ -1,3 +1,4 @@
+// @ts-check
 // The Exam: the one thing in the film that isn't paper. A vertical plane carrying a 2D metaball field, drawn as a flat
 // drop of matte ink (Q7 b): no 3D shading, pigment pooled darker at its edge, a faint grain, one painted cream
 // highlight up and left of the eyes, and two cream eyes near its top.

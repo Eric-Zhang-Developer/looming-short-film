@@ -1,3 +1,4 @@
+// @ts-check
 // The named pose library (contract: docs/contracts.md §characters). Poses are plain { part: radians } objects for
 // Puppet.blend() and Puppet.pose(). Side-rig poses are written in the s15 convention through specPose():
 // lean = body about the hip, + forward (toward +x); arm / far = the near / far arm's WORLD angle, 0 = +x, − = down;

@@ -1,3 +1,4 @@
+// @ts-check
 // s08 · 3:00 a.m., rock bottom (docs/shots/s08.md, v4; brief climax-a1). s07's bedroom, unchanged: him on his back with
 // the phone on under his chin, the Exam at 2.5× on his knees and its shadow over the ceiling. The music is out; the clock
 // ticks alone. Four setups, cut on ticks:

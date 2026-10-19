@@ -1,3 +1,4 @@
+// @ts-check
 // The film's score (doc 05 §Leitmotifs, §Structure by section): a flat list of note events plus one renderer.
 // Every event is { beat, at, voice, midi, ... }: a beat name from src/timeline.js plus an offset in seconds,
 // never a global time, so retiming a shot moves its music. `motif` tags which leitmotif a note belongs to.

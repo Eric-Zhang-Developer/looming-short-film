@@ -1,3 +1,4 @@
+// @ts-check
 // s11 · Under the light: the desk (docs/shots/s11.md, v4). Act 4 opens: Marston is the reward now, not the bottom.
 // The Marston hero desk unit (docs/shots/README.md §2) seen side-on: maple desk row with its grey privacy panel, the
 // perforated cubicle panel at its end, the Y-back chair, the ribbon window with the night view, and the ring pendant over

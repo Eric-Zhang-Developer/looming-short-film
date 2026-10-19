@@ -1,3 +1,4 @@
+// @ts-check
 // Cue sheet: sounds placed by beat name (src/timeline.js), never by raw time. Moving a beat moves its sound.
 // stem: 'foley' (default) | 'ambience' | 'music'. seed: defaults to seedOf(sound) in tools/mix.mjs,
 // so the two lamp clicks share one seed and are sample-identical (doc 05).

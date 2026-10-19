@@ -1,3 +1,4 @@
+// @ts-check
 // Single source of timing truth (contracts.md). Data only: no clocks, no rendering.
 // The v4 cut (spec-v4, story approved by the director 2026-10-17): 3:15. Shots and beats from docs/02-story.md's beat
 // sheet and docs/shots/sNN.md (local seconds); a letter after a number means a shot added after the numbering froze

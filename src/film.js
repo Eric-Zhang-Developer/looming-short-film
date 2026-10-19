@@ -1,3 +1,4 @@
+// @ts-check
 // The whole film by time (contract: docs/contracts.md §film, §shots). Each shot gets its own scene and camera on the
 // one shared renderer, so nothing a shot does can leak into another, and any t renders the same in any order.
 import * as THREE from 'three';

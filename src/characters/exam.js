@@ -1,3 +1,4 @@
+// @ts-check
 // The Exam: a thin wrapper over createBlob that fixes the film-wide size (docs/shots/README.md §1).
 // Q5 is answered (a) until the director says otherwise: the body stays EXAM_R through Act 2 and shrinks only in s16,
 // one step per solved problem. If the answer changes, change examRadius() and nothing else.

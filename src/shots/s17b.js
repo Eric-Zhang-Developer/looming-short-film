@@ -1,3 +1,4 @@
+// @ts-check
 // s17b · Test day: he recognizes it (docs/shots/s17b.md, v4). 10 s: a 1 s insert on the exam room's wall clock first
 // (Camera K, 0–1, reading 9:00, the film's one clock with the exam face), then G4's shot 1 s later. Three setups after it
 // (README §8): T1 the exam room wide from the back (1–3), T2 his test page from above (3–5, 6.5–10), T3 his profile at

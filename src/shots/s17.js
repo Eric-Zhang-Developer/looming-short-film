@@ -1,3 +1,4 @@
+// @ts-check
 // s17 · Quiet 2: the dawn reading room (docs/shots/s17.md, v4). 12 s (G4's 18 × 2/3), locked but for one two-shot.
 // Morning comes, the morning of the exam. He puts the pen down and sits back (3.0), looks once at the blob (small now,
 // asleep on his page's corner), and closes his eyes (6.0); it opens its eyes once, looks up at him, and sleeps again.

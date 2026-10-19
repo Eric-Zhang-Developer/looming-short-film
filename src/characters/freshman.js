@@ -1,3 +1,4 @@
+// @ts-check
 // The Freshman (s18): the Student's side rig rebuilt from freshman_sheet at 0.85×, with the oversized backpack
 // behind and no hoodie pocket. Same part names and the same s15 convention, so every gator pose works on it.
 import { buildRig, sideParts } from './gator.js';

@@ -1,3 +1,4 @@
+// @ts-check
 // One renderer, scene and camera per page. renderFrame(t) is the only entry point.
 import * as THREE from 'three';
 

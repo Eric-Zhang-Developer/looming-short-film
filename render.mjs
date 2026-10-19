@@ -1,3 +1,4 @@
+// @ts-check
 // render.mjs: renders any Looming page (one that exposes window.renderFrame(t)) in headless Chrome.
 // Port of the KnightHacks render.mjs. Pages: --page=<repo-relative html> (default index.html).
 //

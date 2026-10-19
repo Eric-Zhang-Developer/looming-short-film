@@ -1,3 +1,4 @@
+// @ts-check
 // s01 · Dawn skyline, push to the window (docs/shots/s01.md). v2: the apartment is built from home_kit (frames, door,
 // glass) on a brick-kraft facade. v3: the skyline and oaks are marston_ext_kit's (century tower, facade block, stepped bay,
 // oak canopy) instead of the random proxy rooflines; skyline_sheet and foliage_sheet were never painted.

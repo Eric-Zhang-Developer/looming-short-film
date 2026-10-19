@@ -1,3 +1,4 @@
+// @ts-check
 // The roommates (s05), rig-v4: two gators built from the Student's own side rig (gator_sheet), because in a film where
 // everyone is a gator a heron and a bear read as a mistake (director, 2026-10-17). They differ from him, and from each
 // other, by hoodie colour, green and proportions, so they read as three different gators at a glance:

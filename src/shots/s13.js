@@ -1,3 +1,4 @@
+// @ts-check
 // s13 · Everyone has one (docs/shots/s13.md, v4). One locked top-down shot of the Marston reading room, 5 s. G4's room
 // read "everyone is stuck"; v4 reads it the other way: every occupied desk is lit from above by its own pendant, every
 // blob is small and its shadow a pool under it, and everyone is working. He lifts his head (headLift 0.5), glances at the

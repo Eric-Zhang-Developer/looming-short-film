@@ -1,3 +1,4 @@
+// @ts-check
 // node src/core/selftest.js — invariants of the core module. Exits non-zero on the first failure.
 // Expected rng values were produced by 1776's original src/rng.ts, so these also pin the port as bit-identical.
 import assert from 'node:assert/strict';

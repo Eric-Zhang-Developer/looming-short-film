@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 // Split a sheet into parts: each box's RGBA crop goes to assets/cut/<part>.png.
 //   node tools/cut.mjs --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.json     boxes: { part: [x, y, w, h] }
 //   node tools/cut.mjs --in=... --auto [--boxes=...] [--pad=4] [--min-area=500]           propose boxes from alpha islands, write them, then cut

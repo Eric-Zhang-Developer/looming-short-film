@@ -1,3 +1,4 @@
+// @ts-check
 // node tools/mix.mjs [--range=a:b]
 // Renders CUES (by beat name) and the score (src/audio/score.js) onto the timeline, writes
 // out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav normalized to -16 LUFS / -4 dBTP (snd-g4's brief)

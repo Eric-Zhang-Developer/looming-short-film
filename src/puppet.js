@@ -1,3 +1,4 @@
+// @ts-check
 // Jointed paper cutouts (doc 04 · Puppets, contract in docs/contracts.md).
 //
 // Each part is a joint Group at its pivot, holding a paper mesh offset so the pivot lands on the joint.

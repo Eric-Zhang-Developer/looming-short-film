@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 // Doc 08 loop for one asset: assemble the five-block prompt, run `codex exec` once per variant
 // in a fresh temp dir, copy each image into assets/raw/, write a thumb + sidecar, print a contact sheet.
 //   node tools/gen.mjs --asset=<name> [--variants=N] [--dry-run]

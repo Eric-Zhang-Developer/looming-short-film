@@ -1,3 +1,4 @@
+// @ts-check
 // The Custodian and his cart (s14), from custodian_sheet. He faces +x; s14 walks him −x with group.scale.x = −1.
 // The mop is his (it trails him at x_k + 0.020), hung from the handle top so a small angle swings its head.
 // v3 (v3-fix-marston): the painter drew the pieces off the PIECES aspect ratios (asset-cast-kit/aspect_table.md: the mop

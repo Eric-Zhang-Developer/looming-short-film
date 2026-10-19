@@ -1,3 +1,4 @@
+// @ts-check
 // s09c · The walk (docs/shots/s09c.md, v4; climax-a2). Campus at night, side on: a straight paver path under five
 // low street lamps, Century Tower ahead, the oaks and the campus roofs behind. He walks to Marston on the pulse. Every
 // lamp is a heartbeat: under a lamp the light is overhead and the blob's shadow is a puddle; between lamps the light is

@@ -1,3 +1,4 @@
+// @ts-check
 // s03 · The laptop: the shadow climbs (docs/shots/s03.md, G4). v2 on the real-scale home desk (s02.js's unit).
 // He shrugs off the blob's look, opens his laptop and plays. The screen is a low, close light (README §4: a spot at
 // the screen centre, aimed screen → blob → wall), so the blob's shadow climbs the wall at 3× (S = screenZ / (screenZ −

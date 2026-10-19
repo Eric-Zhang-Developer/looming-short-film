@@ -1,3 +1,4 @@
+// @ts-check
 // Shot stub (contract: docs/contracts.md §shots). Copy to sNN.js, set the three constants, then replace the body.
 // What a stub shows: navy wall, kraft desk strip, one proxy (or real art) for the shot, the shot number as cream dots
 // (rows of 6) and tLocal as a cream bar filling left to right. No text: frames never carry legible text.

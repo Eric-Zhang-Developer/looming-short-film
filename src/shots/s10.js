@@ -1,3 +1,4 @@
+// @ts-check
 // s10 · The threshold (docs/shots/s10.md, v4; climax-a2). Rebuilt under the old file name (the stacks shot is cut).
 // Marston's entrance vestibule at night, from inside, looking out through the glass doors at the plaza he crossed, lamp 5
 // behind him. He pushes the door; on lightFlood he and the blob stand under the warm overhead panel and the shadow snaps

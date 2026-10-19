@@ -1,3 +1,4 @@
+// @ts-check
 // The acting kit (rig-v4): one shared module so every shot can give the gators a face to act with. A pure function of t.
 // Director, 2026-10-17: "our gator itself is not very emotional. We need more emotion for our gator, even just some
 // simple face changes."

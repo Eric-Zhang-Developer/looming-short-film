@@ -1,3 +1,4 @@
+// @ts-check
 // s09b · The door (docs/shots/s09b.md, v4 + the director's 2026-10-18 block; climax-a2). The poster image.
 // Restaged for Q17: there is no night-light. The light is his own nightstand lamp, clicked on in s09a and left on. His
 // door is at the hall's NEAR end, so lamp → doorway → blob → hall → the front door on the end wall lie on one line, and

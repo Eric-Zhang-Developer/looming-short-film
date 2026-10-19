@@ -1,3 +1,4 @@
+// @ts-check
 // s02 · The ink drop is born (docs/shots/s02.md, G4). v2 on the frozen kits, and the home desk unit re-staged at real
 // scale (brief v2-home-a: the director's "massive table"). The desk, chair, lamp and laptop are home_kit art at the
 // scale table's sizes (evidence/asset-home-kit/scale_table.md: 1 real m = 0.055 film m against the 0.096 m gator); the

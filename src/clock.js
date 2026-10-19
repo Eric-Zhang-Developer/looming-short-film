@@ -1,3 +1,4 @@
+// @ts-check
 // The film's one wall clock (docs/shots/README.md §13; brief climax-a1). The painted clock_kit: a face (kraft rim at
 // home, navy rim in the exam room), the hour and minute hands, the amber pin; a thin second hand drawn in code on the
 // paper material in Night Navy. Every hand is its own paper plane in front of the face, so a low light gives each a

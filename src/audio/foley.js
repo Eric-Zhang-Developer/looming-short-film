@@ -1,3 +1,4 @@
+// @ts-check
 // Named foley from doc 05's table. One-shots: (seed) => mono Float32Array at 48 kHz.
 // Beds and sized one-shots take a length: (seed, dur), dur in seconds; omit it for the sound's default length.
 // Each sound's output peak is its intended loudness relative to the others at cue gain 1.

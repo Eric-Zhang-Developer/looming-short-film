@@ -1,3 +1,4 @@
+// @ts-check
 // Seeded randomness, ported bit-identically from 1776's src/rng.ts. The only source of randomness in the film.
 // hash(n): stateless, for per-frame/per-object lookups (the common case in a pure renderFrame(t)).
 export function hash(n) {

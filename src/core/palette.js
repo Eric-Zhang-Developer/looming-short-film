@@ -1,3 +1,4 @@
+// @ts-check
 // Doc 03 palette. The only place hex codes live; everything else reads PALETTE.
 export const PALETTE = Object.freeze({
   navy: '#1E2440',   // paper: night navy (walls, sky, shadowed stock)

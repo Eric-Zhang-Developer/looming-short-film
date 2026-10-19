@@ -1,3 +1,4 @@
+// @ts-check
 // Post chain (doc 04 §Camera and post): Render -> Bokeh (miniature DOF) -> sRGB output -> per-act LUT -> grain + vignette.
 // No bloom. Everything is a pure function of the frame: grain is hashed from (pixel, frame), never a clock.
 import * as THREE from 'three';

@@ -1,3 +1,4 @@
+// @ts-check
 // Paper material: Lambert from the front, light through the sheet from behind, a glowing torn rim when backlit
 // (doc 04 · paperMaterial, contract in docs/contracts.md).
 //

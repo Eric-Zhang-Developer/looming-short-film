@@ -1,3 +1,4 @@
+// @ts-check
 // s16 · Practice (docs/shots/s16.md, v4). 16 s on the v4 timeline: five solves from 2.5× (Q16), no neighbor wake, no
 // laptop, no stand. Picks up on s15's last frame: s11's desk set (marstonDesk) and, mirrored at x' = 0.350 − x, a second
 // one for the neighbor (the Drinks gator from s13), who is working under their own lit pendant from the first frame.

@@ -1,3 +1,4 @@
+// @ts-check
 // s18 · Crossed off; the ink goes home; the next date (docs/shots/s18.md, G4). v2 on s02's real-scale home desk, at
 // night, the lamp on. Setups (README §8): W 0–3 (s02's wide), I 3–7 (s02's calendar insert), I2 7–11.5 (the sheet),
 // W 11.5–17. He crosses the exam off the calendar (examCrossedOff 2.0) and the blob shrinks to a dot; the dot climbs

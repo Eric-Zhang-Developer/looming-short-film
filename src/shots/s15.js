@@ -1,3 +1,4 @@
+// @ts-check
 // s15 · The name (docs/shots/s15.md, v4). 8 s, Camera B′ locked, with one close-up. No sensor (the light has been on
 // since s10), no phone light (it's face-down since s11), no laptop. He picks up the pen, uncaps it (penUncap 1.5),
 // hesitates, writes his name at the top of the practice sheet (nameWritten 4.5), and the blob flinches. He looks at it;

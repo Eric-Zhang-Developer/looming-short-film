@@ -1,3 +1,4 @@
+// @ts-check
 // s00 · The notification (docs/shots/s00.md, G4). Cold open: a phone face-up on the real-scale home desk (s02.js's
 // unit), pre-dawn dark. It buzzes (notifyBuzz 0.5), the screen wakes to one banner, props_kit's painted card
 // "Calc 2 Exam · Fri" with its red badge, buzzes again at 2.0, and dims as it times out (3.5) for the cut to s01.

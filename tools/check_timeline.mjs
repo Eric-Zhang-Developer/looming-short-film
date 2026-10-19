@@ -1,3 +1,4 @@
+// @ts-check
 // node tools/check_timeline.mjs [--file=path/to/timeline.js]
 // Fails on gaps, overlaps, total outside TARGET ±5 s, duplicate beat names, beats outside their shot.
 // TARGET is the director's runtime: 3:15, inside his 3:10–3:20 (G4, 2026-10-15; was 180).

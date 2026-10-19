@@ -1,3 +1,4 @@
+// @ts-check
 // s06 · The lamp beat (docs/shots/s06.md, G4). v2 on the real-scale home desk (s02.js's unit), at night.
 // He's gaming; the laptop screen throws the 1.25× blob's shadow 4.06× up the wall (S = screenZ / (screenZ − z_B)).
 // He pulls the lamp's chain (lampClickHome 0.5): light from above shrinks the shadow to a small pool and shows the

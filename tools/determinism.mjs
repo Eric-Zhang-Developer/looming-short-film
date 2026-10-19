@@ -1,3 +1,4 @@
+// @ts-check
 // node tools/determinism.mjs --page=<html> --t=0.5,4
 // Renders each t, renders other times in between, renders it again, then loads a fresh page and renders it a third time.
 // All hashes of a given t must match. Exits 1 on any mismatch.

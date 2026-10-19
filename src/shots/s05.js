@@ -1,3 +1,4 @@
+// @ts-check
 // s05 · Game night: a roommate walks through it (docs/shots/s05.md, G4). v2: the living room dressed from the frozen
 // home_kit (planked floor, rug, door, poster, window, floor lamp) with the couch and coffee table at real height (their
 // apt_furniture_sheet isn't frozen: still proxies). The Student on a floor cushion at frame right games on his laptop

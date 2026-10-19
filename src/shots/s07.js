@@ -1,3 +1,4 @@
+// @ts-check
 // s07 · Bed rot (docs/shots/s07.md, v4; README §1 2.5× peak, director 2026-10-18). The bedroom at night: he lies on his
 // back in bed, the phone glowing under his chin, thumb scrolling. The Exam sits on the blanket over his knees, and the
 // phone, low and close beneath it, throws its shadow over the ceiling. He glances at the clock (1:45), looks back at the

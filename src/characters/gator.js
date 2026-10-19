@@ -1,3 +1,4 @@
+// @ts-check
 // The Student's rig, and the helpers every character file builds with (contract: docs/contracts.md §characters).
 // Pieces come from assets.load(): cut frozen art where it exists (gator_sheet, face_sheet), proxies elsewhere.
 // Geometry is s15's desk unit (docs/shots/README.md §2): shoulder = hip + (0.013, 0.030), near arm 0.032 to the

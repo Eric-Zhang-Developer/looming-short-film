@@ -1,3 +1,4 @@
+// @ts-check
 // Easing and keyframes, ported from the KnightHacks src/core.js with the beat/BPM coupling dropped.
 export const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
 export const lerp = (a, b, x) => a + (b - a) * x;

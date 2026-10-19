@@ -1,3 +1,4 @@
+// @ts-check
 // Shared by render.mjs and tools/determinism.mjs: local HTTP server (ES modules don't load from file://),
 // headless Chrome via puppeteer-core, and in-page frame grabbing. Every grab happens in the same task as
 // renderFrame(t), so it works whether or not the page uses preserveDrawingBuffer.
