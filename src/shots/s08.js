@@ -6,12 +6,14 @@
 //   C2 2–4   his face, the painted `numb` head lying on the pillow; on the 3.0 tick his head rolls back toward the clock
 //   CC 4–5   the red circle on the calendar (circleGlance): his look, carried by the cut (brief: the painted pupils don't move)
 //   C2 5–7   his face again, now the painted `dread` head (the swap is hidden by the cut), breathing faster; a sweat drop at 6.5
-//   C3 7–10  s07's camera: him small in bed, frozen, the rig's own `dread` face; the blob blinks at 8.5
+//   C3 7–10  v7-bed: s07's H, head-on at 3 a.m.: the phone on and cold (cyan, no reel colours now), the clock behind him
+//            at 3:00, his `dread` face with the sweat, holding still. The blob is a silhouette from behind, so v4's blink
+//            at 8.5 (its eyes) can't read: dropped, not moved. Only his breath moves.
 // Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
 import { onTwos } from '../core/ease.js';
 import { act } from '../characters/acting.js';
-import { bedroom, closeHeads, ROOM, CAM, LOOK, LIE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT } from './s07.js';
+import { bedroom, closeHeads, headOn, ROOM, LIE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT, H_CAM, H_FOCUS } from './s07.js';
 
 const ID = 's08', DEG = Math.PI / 180;
 export const BLOB_R = { start: 0.030 };                       // 2.5× all shot (README §1, Q16)
@@ -44,6 +46,7 @@ function breathPhase(T) {
 export async function build(ctx) {
   const { camera, post } = ctx;
   const R = await bedroom(ctx, ID), { T: tl, rig, exam, spot, fill, spill, clock } = R;
+  const Hs = await headOn(ctx, ID);
   const H = await closeHeads(ctx, tl, rig, ['numb', 'dread']);
   // The sweat drop (6.5): one drawn tissue drop at his temple on the dread head, sliding 1.5 mm down by 7.0.
   const drop = tl.paper('sweat', { path: [[0.5, 0.02], [0.8, 0.5], [0.85, 0.75], [0.5, 0.98], [0.15, 0.75], [0.2, 0.5]], color: '#' + new THREE.Color(ctx.PALETTE.cream).lerp(new THREE.Color(ctx.PALETTE.phone), 0.35).getHexString(), weight: 'vellum', size: [0.0024, 0.0034], res: 256 });
@@ -61,16 +64,16 @@ export async function build(ctx) {
     ...R, heads: H,
     update(t) {
       const T = onTwos(t), S = setupAt(t);
-      tl.boil(t); clock.boil(t); rig.boil(t, 10);
-      clock.set(3, 0, t);                                       // 3:00:00 at 0.0, ticking on every whole second
+      tl.boil(t); clock.boil(t); rig.boil(t, 10); Hs.T.boil(t); Hs.clock.boil(t); Hs.rig.boil(t, 10);
+      clock.set(3, 0, t); Hs.clock.set(3, 0, t);                // 3:00:00 at 0.0, ticking on every whole second
 
       // ---- camera (cuts on the ticks 2, 4, 5, 7) ----
-      const cam = S === 'C1' ? C1 : S === 'C2' ? C2 : S === 'CC' ? CC : { pos: CAM.toArray(), look: LOOK.toArray() };
+      const cam = S === 'C1' ? C1 : S === 'C2' ? C2 : S === 'CC' ? CC : H_CAM;
       camera.position.set(...cam.pos); camera.lookAt(...cam.look);
       if (S === 'C1') fx.set({ focus: focusOf(C1.pos, C1.look, ROOM.CLOCK), aperture: 0.002 });
       else if (S === 'C2') fx.set({ focus: focusOf(C2.pos, C2.look, [0.16, 0.07, 0.31]), aperture: 0.03 });
       else if (S === 'CC') fx.set({ focus: focusOf(CC.pos, CC.look, [0, 0, 0]) * 0.8, aperture: 0.01 });
-      else fx.set({ focus: focusOf(CAM.toArray(), LOOK.toArray(), [0.145, 0.062, 0.31]), aperture: 0.012 });
+      else fx.set({ focus: H_FOCUS, aperture: 0.02 });
 
       // ---- him: frozen; his thumb has stopped. On the 3.0 tick his head rolls back toward the clock (anticipation 1°
       // forward at 2.917), and stays there; breathing quickens from 5.0 ----
@@ -92,12 +95,16 @@ export async function build(ctx) {
         drop.position.set(...DROP_AT).addScaledVector(down, 0.0015 * k);
       }
 
-      // ---- the Exam: 2.5× on his knees; follows his look to the circle at 4.0 and back at 5.0; blinks at 8.5 ----
+      // ---- the Exam: 2.5× on his knees; follows his look to the circle at 4.0 and back at 5.0 (C3's blink: dropped, v7-bed) ----
       let eyes = 'open', look = -1;
       if (T >= 4 - 1e-6 && T < 5 - 1e-6) eyes = 'side';
-      if (at2(T, 8.5, 8.58)) eyes = 'closed';
       R.placeBlob(BLOB_R.start);
       exam.update(t, { wobble: 0.8, eyes, look, key: spot });
+
+      // ---- C3, H: frozen in dread (the worried eyes carry the sweat), hands still on the phone; only his breath moves ----
+      Hs.rig.pose({ body: 0, arm_l: -112 * DEG, arm_r: 112 * DEG });
+      act(Hs.rig, t, [[0, 'dread']], { slump: 0, tilt: 0, tail: 0, breath: 3, depth: 0.008, blink: false });
+      Hs.set(t, { r: BLOB_R.start, colour: Hs.hues[0], wobble: 0.8, level: DIM });
 
       // ---- light: s07's end state; the spill lifted only in the clock insert ----
       spot.intensity = DIM * SPOT;
