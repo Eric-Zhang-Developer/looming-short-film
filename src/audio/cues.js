@@ -10,7 +10,6 @@
 // beat is still hung on beats and moves when they move. Sources: doc 05's v4 table and docs/shots/sNN.md §Sound (the v4 cut, 3:15).
 // The music stem (score.js) is not placed here.
 import { beat, DURATION } from '../timeline.js';
-import { X } from '../shots/s09c.js';
 
 const at = ([b, o = 0]) => beat(b) + o;
 const bed = (sound, stem, from, to, gain, extra) => ({ beat: from[0], offset: from[1] ?? 0, dur: at(to) - at(from), sound, stem, gain, ...extra });
@@ -32,26 +31,19 @@ const dB = (x) => 10 ** (x / 20);
 const ticks = (sound, b, offsets, gain) => offsets.map((o) => ({ beat: b, offset: o, sound, gain, stem: AMB }));
 const range = (a, z) => Array.from({ length: z - a + 1 }, (_, k) => a + k);
 
-// snd-v4: footsteps follow the picture. s09c's feet are phased on distance walked (one contact per STRIDE of its exported
-// x(t)), drawn on 2s, so a step sounds on the first 12 fps drawing at or past each 0.024 m. The side-steps around the blob
-// and the back-view walk after the turn are timed, as in s09c.js.
-// ponytail: DECIDE (blobBlocks + 7/6) and TURN (18.0) mirror s09c.js, which doesn't export them; import them if it ever does.
-const STRIDE = 0.024, S09C = beat('walkStart'), lb = (b) => beat(b) - S09C;
+// walk-redo: footsteps follow the picture. s09c's gait is timed: a contact every STEP (0.25 s) on the global pulse grid
+// from 84.0, up to the block, then from stepAround (a contact) to the turn. The side-steps around the blob and the
+// back-view walk after the turn are timed as before, as in s09c.js.
+// ponytail: STEP, DECIDE (blobBlocks + 7/6) and TURN (18.0) mirror s09c.js, which doesn't export them; import them if it ever does.
+const STEP = 0.25, S09C = beat('walkStart'), lb = (b) => beat(b) - S09C;
 const DECIDE = lb('blobBlocks') + 7 / 6, TURN = 18.0, twos = (t) => Math.ceil(t * 12 - 1e-6) / 12;
 function walkSteps() {
   const out = [];
-  const byDistance = (t0, t1, x0) => {
-    let k = 0;
-    for (let n = Math.ceil(t0 * 12) + 1; n / 12 < t1 - 1e-9; n++) {
-      const kk = Math.floor((X(n / 12) - x0) / STRIDE + 1e-9);
-      if (kk > k) { out.push(n / 12); k = kk; }
-    }
-  };
-  out.push(0);                                                   // the shot opens on a contact drawing
-  byDistance(0, lb('blobBlocks'), X(0));
+  const timed = (t0, t1) => { for (let t = t0; t < t1 - 1e-9; t += STEP) out.push(t); };
+  timed(0, lb('blobBlocks'));
   for (let m = 1; m <= 3; m++) out.push(twos(DECIDE + m * (lb('stepAround') - DECIDE) / 3));   // the third lands on stepAround
-  byDistance(lb('stepAround'), TURN, X(lb('stepAround')));
-  for (let t = TURN + 0.25; t < 20 - 1e-9; t += 0.25) out.push(t);
+  timed(lb('stepAround') + STEP, TURN);
+  timed(TURN + STEP, 20);
   return out;
 }
 export const WALK_STEPS = walkSteps();
