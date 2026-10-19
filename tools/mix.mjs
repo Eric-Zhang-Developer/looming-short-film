@@ -4,7 +4,7 @@
 // out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav normalized to -16 LUFS / -4 dBTP (snd-g4's brief)
 // with ffmpeg loudnorm (two-pass, linear; the full mix throws if loudnorm falls back to dynamic, or if the result
 // misses -16 ±1 LUFS or goes over -4 dBTP), then prints the mix's measured LUFS and true peak (ebur128).
-import { mkdirSync } from 'node:fs';
+import { existsSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { beat, DURATION } from '../src/timeline.js';
@@ -41,10 +41,25 @@ if (!(b > a)) throw new Error(`bad --range: ${arg}`);
 const n = Math.round((b - a) * SR);
 const stems = { music: new Float32Array(n), foley: new Float32Array(n), ambience: new Float32Array(n) };
 
+// v7, third-party audio (s07's reels, the laptop's CS2; cues.js): a window of a clip, decoded mono at SR through a phone speaker's band,
+// levelled to RMS 1 (the cue's gain sets the level) with 5 ms edges so the hard cuts don't click. The clips are
+// gitignored: without one, its cue stays silent and the mix says so.
+const CLIP_DIR = fileURLToPath(new URL('../assets/raw/reels/', import.meta.url));
+function clip(file, inSec, dur) {
+  const path = `${CLIP_DIR}${file}.mp3`;
+  if (!existsSync(path)) { console.warn(`clip ${file}.mp3 missing from assets/raw/reels/: its cue is silent`); return new Float32Array(0); }
+  const raw = execFileSync('ffmpeg', ['-v', 'error', '-ss', `${inSec}`, '-t', `${dur}`, '-i', path,
+    '-af', 'highpass=f=350,lowpass=f=4500', '-ac', '1', '-ar', `${SR}`, '-f', 'f32le', '-'], { maxBuffer: 1 << 28 });
+  const x = new Float32Array(raw.buffer, raw.byteOffset, raw.length >> 2).slice();
+  const rms = Math.sqrt(x.reduce((s, v) => s + v * v, 0) / x.length) || 1, edge = Math.round(0.005 * SR);
+  return x.map((v, i) => (v / rms) * Math.min(1, i / edge, (x.length - 1 - i) / edge));
+}
+
 for (const c of CUES) {                          // mixInto clips to the range, so cues outside it add nothing
   const at = beat(c.beat) + (c.offset ?? 0);
   const dur = c.dur ?? (c.until ? beat(c.until) - at : undefined);
-  mixInto(stems[c.stem ?? 'foley'], FOLEY[c.sound](c.seed ?? seedOf(c.sound), dur), at - a, c.gain);
+  const src = c.sound === 'clip' ? clip(c.file, c.in, dur) : FOLEY[c.sound](c.seed ?? seedOf(c.sound), dur);
+  mixInto(stems[c.stem ?? 'foley'], src, at - a, c.gain);
 }
 
 mixInto(stems.music, renderScore(b), -a);       // score is rendered from 0 so its notes ring into the range

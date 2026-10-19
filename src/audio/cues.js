@@ -22,8 +22,15 @@ const END = ['tagPenUncap', DURATION - beat('tagPenUncap')];        // 3:15
 // same in score.js), which is also what keeps the three clicks identical in mix.wav. A lamp click is 0.3 s.
 const ON = (b) => [b, 0.3];
 // snd-foley-2's sounds, in one place so a level pass touches one table.
-const GAIN = { jarClink: 0.4, cartonSlosh: 0.5, tvBloops: 0.4, winJingle: 0.3, roommateStep: 0.4, rodSnap: 0.2, cardTap: 0.4 };
 const dB = (x) => 10 ** (x / 20);
+const GAIN = { jarClink: 0.4, cartonSlosh: 0.5, tvBloops: 0.4, winJingle: 0.3, roommateStep: 0.4, rodSnap: 0.2, cardTap: 0.4, cs2: dB(-30) };
+// v7, s07's reels: [file in assets/raw/reels/, in-point in the clip (s), from, to (s07 local s)]. Third-party audio: the
+// clips are gitignored and never committed; without them tools/mix.mjs leaves these cues silent and says so. The in-points
+// are each clip's first onset (by waveform; nobody has listened yet), so retime them here by ear. Director: four reels,
+// 2-4 s each; two before the reminder, two after. The cuts are the flicks; when the picture is reworked, its flicks
+// follow this table. (Deoy-54x6aJ, the fifth clip given, is unused: the quietest and flattest of the five.)
+export const REELS = /** @type {[string, number, number, number][]} */ ([
+  ['DIR3LipSfp6', 0.15, 0.5, 3.25], ['DbSRzwjx3hR', 0, 3.25, 6.25], ['DMbt-octmy6', 0, 7.75, 10.0], ['Ddrfu6TxBq-', 0, 10.0, 12.0]]);
 
 // snd-v4: the clock. One cue per tick, each on a whole second of global time (the beats it hangs on are whole seconds, or
 // offsets that land on one), so the tick and the walk's pulse share one grid. Every tick is clockTick's one buffer; the
@@ -145,11 +152,15 @@ export const CUES = [
   { beat: 'lampOn', sound: 'lampClick', gain: 0.6 },
   // The blob's gulps (doc 05): a soft inkDrip swallow at -18 dB under the score's two notes, one per gulp (three in v4).
   ...[1, 2, 3].map((k) => ({ beat: `gulp${k}`, sound: 'inkDrip', gain: 0.126, seed: 20 + k })),
-  // s07, new: the thumb's scroll ticks, -22 dB, seeded per flick: every 0.75 s from bedRot + 0.5 to + 5.75, paused for the
-  // clock glance, again from + 7.0 to + 11.5 (climax-a1 as built: the last flick is 59.5). No clock tick under s07, though
-  // its second hand moves from 48.0: the tick's first close appearance is s08's, on the frame the music goes out.
-  ...[...range(0, 7).map((k) => 0.5 + 0.75 * k), ...range(0, 6).map((k) => 7 + 0.75 * k)]
-    .map((o, k) => ({ beat: 'bedRot', offset: o, sound: 'scrollTick', gain: dB(-22), seed: 1 + k })),
+  // s07: the thumb's scroll ticks, -22 dB, seeded per flick. v7: one per reel, on its cut (REELS), where the picture's
+  // flicks are too (was every 0.75 s). No clock tick under s07, though its second hand moves from 48.0: the tick's first
+  // close appearance is s08's, on the frame the music goes out.
+  ...REELS.map(([, , o], k) => ({ beat: 'bedRot', offset: o, sound: 'scrollTick', gain: dB(-22), seed: 1 + k })),
+  // v7: the doom scroll. Real Reels audio (the director's clips) out of the phone, each cut hard by the next flick, so
+  // it plays as scrolling. Quiet for the 7-hours reminder (6.25-7.75: the chime, the swipe, the gulp), then
+  // straight back to the feed, and cut dead by s08's hard cut to the lone tick at 60.0. tools/mix.mjs decodes them
+  // through a phone-speaker band and levels each window to one RMS.
+  ...REELS.map(([file, inSec, from, to]) => ({ beat: 'bedRot', offset: from, dur: to - from, sound: 'clip', file, in: inSec, gain: dB(-24) })),
   // s08, new: his breath, nasal, -24 dB, phased to the picture as built (climax-a1): in at 65.67, out at 67.25, in at 68.75
   // (doc 05's 20/min, a cycle of 3.08 s), to the choice's slow in-breath at 71.75.
   bed('breathNasal', 'foley', ['clockThree', 5.67], ['breathIn', 0.25], dB(-24)),
@@ -256,13 +267,14 @@ export const CUES = [
   bed('tvBloops', 'foley', ['gameNight', 6], ['lampClickHome', -0.5], GAIN.tvBloops, { seed: 2 }),
   { beat: 'gameNight', offset: 5, sound: 'winJingle', gain: GAIN.winJingle },
   ...Array.from({ length: 10 }, (_, k) => ({ beat: 'gameNight', offset: 3.33 + k / 3, sound: 'roommateStep', gain: GAIN.roommateStep, seed: 1 + (k % 2) })),
-  // ───────── snd-g4: the laptop game's blips, on his key taps, never on a gulp's frame ─────────
-  // gameBlip's seed sets its note and register (foley.js): 0xx home, 1xx higher (s05, under the TV).
-  // s03: the two-note boot on laptopUp (C then G), then the taps (none on gulp1).
-  ...[[0, 0], [0.1, 9]].map(([o, seed]) => ({ beat: 'laptopUp', offset: o, sound: 'gameBlip', gain: 0.126, seed })),
-  ...[1.33, 1.67, 2.17, 2.5, 3.0, 3.67, 4.17, 4.67].map((o, k) => ({ beat: 'laptopUp', offset: o, sound: 'gameBlip', gain: 0.1, seed: k + 1 })),
-  // s05: every 0.5 s from 0.33, quieter and an octave higher, under the TV's bloops.
-  ...Array.from({ length: 14 }, (_, k) => ({ beat: 'gameNight', offset: 0.33 + 0.5 * k, sound: 'gameBlip', gain: 0.063, seed: 101 + k })),
-  // s06: the taps resume half a second after gulp2 (he is back at the keys from 4.0; the gulp's frame stays clear).
-  ...Array.from({ length: 7 }, (_, k) => ({ beat: 'gulp2', offset: 0.5 + 0.5 * k, sound: 'gameBlip', gain: 0.08, seed: 11 + k })),
+  // ───────── v7: the laptop game is real CS2 (the director's clip), replacing snd-g4's synthesized blips ─────────
+  // Out of the laptop's speakers (the same device band as the reels), under the score. [in-point (s), beat, from, to]:
+  // s03 from just after the lid opens, aligned so the clip's first burst (1.4 s in) is him playing, its quiet stretch
+  // carries the reminder (gulp1 - 1.25) and the swipe, and its long spray (3.45 s in) lands 0.2 s after gulp1: back to
+  // the game. s05 plays the clip's second half under the TV's bloops (its last bursts, 10-12 s in, from 4.5 s, as he
+  // snorts at the screen). s06 resumes half a second after gulp2, where his taps did.
+  // The last number is extra dB: s05's groove and s06's run 6 dB hotter than s03's, and at one gain the game sat 12-15 dB
+  // under them (measured on the music and foley stems), lost; +6 puts it as far under them as it sits under s03's.
+  ...(/** @type {[number, string, number, number, number][]} */ ([[0, 'laptopUp', 0.25, 6.0, 0], [5.75, 'gameNight', 0.33, 6.58, 6], [0, 'gulp2', 0.5, 4.0, 6]]))
+    .map(([inSec, b, from, to, up]) => ({ beat: b, offset: from, dur: to - from, sound: 'clip', file: 'cs2', in: inSec, gain: GAIN.cs2 * dB(up) })),
 ];

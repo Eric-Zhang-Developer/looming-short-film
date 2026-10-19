@@ -19,6 +19,7 @@ import { makeClock } from '../clock.js';
 import { tools } from './s02.js';
 import { reminderInsert } from './s03.js';
 import { COUNTDOWN } from '../props/canvas.js';
+import { REELS } from '../audio/cues.js';
 
 const DEG = Math.PI / 180;
 const F = (s) => Math.round(s * 12) / 12;                    // spec times are 2s drawings
@@ -278,8 +279,8 @@ export async function closeHeads(ctx, T, rig, names = ['numb', 'dread', 'resolve
 // The key's level and the face fill (s08 and s09a keep them while the phone is on); the moon panes' glow.
 export const SPOT = 0.9, SPOT_ANGLE = 1.05, FACE_FILL = 0.05, SPILL = 0.40, MOON_PANES = 0.10, FACE_LIGHT = 0.0035;
 
-// The thumb flicks: 0.50, then every 0.75 s, pausing for the glance (6.00–6.75) and picking up at 7.00.
-const FLICKS = [...Array.from({ length: 8 }, (_, i) => 0.5 + 0.75 * i), ...Array.from({ length: 7 }, (_, i) => 7.0 + 0.75 * i)].map(F);
+// The thumb flicks (v7): one per reel, on the sound's cuts (cues.js REELS), so each flick changes what the phone plays.
+const FLICKS = REELS.map(([, , from]) => F(from));
 
 const ID = 's07';
 // The cut in (fix-bedroom, cold-v4: "his face is under the covers, so I can't tell whether he's on his phone"): his
