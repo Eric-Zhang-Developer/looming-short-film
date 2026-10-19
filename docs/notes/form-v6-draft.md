@@ -51,7 +51,7 @@ The way the film treats procrastination follows Sirois and Pychyl's research on 
 ## Resourcefulness
 We don't animate the shadow growing. We move the light. The shadow's size is the light's distance to the wall divided by its distance to the blob, so a physics student can check the metaphor.
 
-I worked like a director with an AI crew. Claude ran builder agents in parallel, each owning a batch of shots in its own copy of the code, and nothing merged without rendered frames as proof. My job was the judgment calls. I picked the look and the gator from 52 painted tries, and I watched each cut and sent it back with notes.
+I worked like a director with an AI crew. Claude ran builder agents in parallel, each owning a batch of shots in its own copy of the code, and nothing merged without rendered frames as proof. My job was the judgment calls. I picked the look and the gator from more than 50 painted tries, and I watched each cut and sent it back with notes.
 
 Those notes changed the film. Research turned up no desk lamps at Marston, which broke the first climax. After v3 I cut the janitor, the window blinds and the motion-sensor lights and made the walk to the library the climax. On the last night I watched the master at 9:34 p.m. and the walk looked wrong. We redid it, re-rendered only those 21 seconds, and had the fixed master by 10:03.
 
