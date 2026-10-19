@@ -30,7 +30,6 @@ const XT = [[B.walkStart, -0.120], [B.lamp1, 0.000], [B.lamp2, 0.238], [B.lamp3,
   [DECIDE, 0.590], [B.stepAround, 0.690], [B.lamp4, 0.825], [B.lamp5, 0.975], [18.0, 1.305]];
 export const X = (t) => kf(t, XT, lin);
 const WALK_Z = 0.10, AROUND_Z = 0.13, HEEL = [-0.045, 0.015];   // blob contact from his root: behind him, camera side
-const STRIDE = 0.024;                                   // rig-legs: the side walk's foot spacing at scale 1
 const TURN = 18.0, END = [1.36, -0.115];                // the turn into depth, and where he is at the cut
 const BLOCK = [0.650, 0.104];                           // the block: in his path, a hair in front of his plane
 
@@ -60,6 +59,17 @@ const CU = [B.blobBlocks + 1 / 3, DECIDE + 0.5], CU_I = 0.007;
 // At the block the wide slides 8.5 cm ahead, so lamp 4, beyond the blob, is in frame with the shadow it throws back at him.
 const BLOCK_PAN = [[9.0, 0], [B.blobBlocks, 0.085], [B.stepAround + 0.5, 0.085], [B.lamp4, 0]];
 const HOP = 0.5, HOP_H = 0.003;
+// walk-redo: the gait is timed, not phased on distance: a contact every STEP from PULSE0 (global 84.0), so every other
+// footfall lands on the 120 bpm pulse. His legs are short (hip 0.015 m), so at x(t)'s 0.06–0.11 m/s that means four
+// steps a second; each step's leg spread is scaled to the distance x(t) covers in it, so the planted foot barely skates.
+const PULSE0 = B.lamp1, STEP = 0.25, SPREAD0 = 0.024;   // SPREAD0: the side set's contact spacing (poses.js)
+const SWING = 14 * D, SWAY = 8 * D;                     // extra arm swing and tail sway on top of the poses' ±15° / ±6°
+// walk-redo: the blob trails a further GAP behind HEEL, so it reads as its own shape beside him. LAMP_X (exported) still
+// comes from HEEL alone; on a lamp beat the blob is GAP short of the lamp, which still lights it nearly from overhead.
+const GAP = 0.035;
+// walk-redo: his own light. The lamps sit behind him, so he was lit by their torn-edge rim and the through-light alone
+// (muddy hoodie, white fringe). The paper lights itself at SELF (its painted colour, so cream stays cream), no edge catch.
+const SELF = 0.45, THROUGH = 0.1;
 
 // A lamppost from marston_ext_kit, globe centre at the light point. Returns its glowing material.
 /**
@@ -225,10 +235,17 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const CUES = [[0, 'dread'], [B.blobBlocks, 'flinch'], [B.blobBlocks + 7 / 12, 'dread'], [DECIDE, 'resolve']];
   const camX = (t) => {                                   // the blob's x + 0.02, smoothed: a 1 s box average of x(t). Before
     let s = 0; for (let i = -5; i <= 5; i++) s += X(Math.min(t, TURN) + i * 0.1);   // lamp 1 it sits 3 cm further back, so the
-    return s / 11 + HEEL[0] + 0.02 - 0.03 * (1 - ease(t / B.lamp1))                // long shadow behind them is in frame
+    return s / 11 + HEEL[0] - GAP / 2 + 0.02 - 0.03 * (1 - ease(t / B.lamp1))                // long shadow behind them is in frame
       + kf(t, BLOCK_PAN, ease);
   };
   const bc = new THREE.Vector3();
+  // every frame, after the rigs' boil / face / mouth-bar swaps (each replaces a map); act() adds the mouth bar late
+  const selfLit = (g) => g.traverse((o) => {
+    const m = /** @type {any} */ (o).material, u = m?.userData?.paper;
+    if (!u) return;
+    m.emissive.setScalar(1); m.emissiveMap = m.map; m.emissiveIntensity = SELF;
+    u.uEdgeCatch.value = 0; u.uTranslucency.value = THROUGH;
+  });
 
   function update(t) {
     const T = onTwos(t);
@@ -242,35 +259,41 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     const close = t >= CU[0] && t < CU[1];
     if (!turned) {
       side.boil(t, 10);
-      let hip;
-      if (T < B.blobBlocks) {                             // the walk: the feet's phase is the distance walked, so no foot skates
-        const u = 12 * (X(T) - X(0)) / STRIDE, w = walk(u, { set: 'side', step: 12 });
-        side.blend(P, w.keys, u); hip = w.hip;
+      const walking = T < B.blobBlocks || T >= B.stepAround;
+      // after the side-steps the cycle picks up on the b foot, where they ended (stepAround is a b contact at t0 + STEP)
+      const t0 = T < B.blobBlocks ? PULSE0 : PULSE0 + STEP;
+      if (walking) {
+        const w = walk(T, { set: 'side', step: STEP, t0 });
+        side.blend(P, w.keys, T);
+        const j = side.joints, b = j.body.rotation.z;
+        const k = clamp((X(T + STEP / 2) - X(T - STEP / 2)) / SPREAD0, 0.7, 1.2);   // ponytail: linear in angle, close enough
+        for (const leg of [j.leg_r, j.leg_l]) leg.rotation.z = k * (b + leg.rotation.z) - b;
       } else if (T < DECIDE) {                            // the stop drawing, a recoil lean, then still
         side.blend({ stand: STAND, recoil: RECOIL }, [[B.blobBlocks, 'stand'], [B.blobBlocks + 1 / 12, 'recoil'], [B.blobBlocks + 0.5, 'stand']], T);
-        hip = hipHeight(STAND);
-      } else if (T < B.stepAround) {                      // three side-steps, toward the camera and past it
+      } else {                                            // three side-steps, toward the camera and past it
         const step = (B.stepAround - DECIDE) / 3, w = walk(T, { set: 'side', step, t0: DECIDE });
-        side.blend(P, w.keys, T); hip = w.hip;
-      } else {                                            // on, faster; phase picks up on the b foot where the side-steps ended
-        const u = 12 * (1 + (X(T) - X(B.stepAround)) / STRIDE), w = walk(u, { set: 'side', step: 12 });
-        side.blend(P, w.keys, u); hip = w.hip;
+        side.blend(P, w.keys, T);
       }
-      const z = kf(T, [[DECIDE, WALK_Z], [B.stepAround, AROUND_Z], [B.stepAround + 0.5, WALK_Z]], ease);
-      root = [X(T), hip, z];
-      side.group.position.set(...root);
       // Acting: 36/min to the decision, 40/min after; head down 8° under dread. fix-walk: hunched and tail drooped until
       // he decides (cold-v4 read the upright plod as "out for a walk with his pet"), upright and tail level after.
       const breath = T < DECIDE ? 60 / 36 : 60 / 40;
       const f = act(side, t, CUES, { breath, slump: T < DECIDE ? 0.6 : 0, tail: T < DECIDE ? -16 : 0 });
+      if (walking) {                                      // arms swing against the legs, the tail sways with the hips
+        const c = Math.cos(Math.PI * (T - t0) / STEP), j = side.joints;
+        j.arm_r.rotation.z += SWING * c; j.arm_l.rotation.z -= SWING * c; j.tail.rotation.z += SWAY * c;
+      }
+      // the root's height from the final legs (after act's lean), so the lower foot is on the paving: the step's bob
+      const j = side.joints, hip = hipHeight({ body: j.body.rotation.z, leg_r: j.leg_r.rotation.z, leg_l: j.leg_l.rotation.z });
+      const z = kf(T, [[DECIDE, WALK_Z], [B.stepAround, AROUND_Z], [B.stepAround + 0.5, WALK_Z]], ease);
+      root = [X(T), hip, z];
+      side.group.position.set(...root);
       const head = kf(T, [[0, -10], [B.blobBlocks, -10], [B.blobBlocks + 1 / 12, 0], [DECIDE, -2], [B.lamp4, -2], [B.lamp4 + 1 / 3, 0],
         [B.marstonSeen, 0], [B.marstonSeen + 1 / 3, 4]], ease);
       side.joints.head.rotation.z += head * D;
       if (T >= B.marstonSeen) side.joints.tail.rotation.z += 5 * D;
-      // eyes: follow the blob's hop past him; glance down at it as he goes round; a little wider at Marston
-      if (T >= 9.5 && T < B.blobBlocks) side.face({ eyes: 'side', mouth: f.mouth });
-      if (T >= DECIDE + 1 / 3 && T < DECIDE + 7 / 12) side.face({ eyes: 'side', mouth: f.mouth });
-      if (T >= B.marstonSeen && f.eyes === 'open') side.face({ eyes: 'gasp', mouth: f.mouth });
+      // walk-redo: one head for the whole wide: the open eye and its blinks. The worried / gasp / side takes read at this
+      // size as a different, bug-eyed head (director's note); the fear is the close-up's, and the hunch's here.
+      side.face({ eyes: f.eyes === 'closed' ? 'closed' : 'open', mouth: f.mouth });
       sweat.visible = T >= 6.0 && T < 7.0;
       sweat.position.set(-0.0018, 0.0254 - 0.001 * clamp((T - 6.0) / 0.5), 0.003);
       fill.position.set(root[0] + 0.035, 0.07, root[2] + 0.03);
@@ -300,12 +323,12 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     // ---------- the Exam, on 2s: one hop per pulse at his heels; the block; the hop after him
     const ph = ((T + 1e-6) % HOP) / HOP, landing = ph < 1 / 6;
     let bx, by = 0, bz, sq = landing ? 0.2 : 0, mirror = false, eyes = 'open', look = 1;
-    const heel = (tt) => [X(tt) + HEEL[0], WALK_Z + HEEL[1]];
+    const heel = (tt) => [X(tt) + HEEL[0] - GAP, WALK_Z + HEEL[1]];
     if (T < 9.5) { [bx, bz] = heel(T); by = HOP_H * Math.sin(Math.PI * ph); }
     else if (T < B.blobBlocks) {                          // one big hop past him on the camera side: crouch, two drawings up
       const [x0, z0] = heel(9.5);
       if (T < 9.5 + 1 / 12) { [bx, bz] = [x0, z0]; sq = 0.25; }
-      else if (T < 9.75) { bx = x0 + 0.06; by = 0.022; bz = 0.125; sq = -0.2; }
+      else if (T < 9.75) { bx = X(9.5) + HEEL[0] + 0.06; by = 0.022; bz = 0.125; sq = -0.2; }
       else { bx = BLOCK[0] - 0.02; by = 0.014; bz = 0.115; sq = -0.15; }
       eyes = 'open';
     } else if (T < B.stepAround + 0.5) {                  // planted square in his path, turned to face him
@@ -316,7 +339,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       bx = BLOCK[0] + (hx - BLOCK[0]) * k; bz = BLOCK[1] + (hz - BLOCK[1]) * k; by = 0.010 * Math.sin(Math.PI * k);
       sq = k < 1 / 6 ? -0.1 : 0; eyes = 'gasp';
     } else if (T < TURN) { [bx, bz] = heel(T); by = HOP_H * Math.sin(Math.PI * ph); }
-    else { bx = root[0] - 0.045; bz = root[2] + 0.02; by = HOP_H * Math.sin(Math.PI * ph); }   // beside and a step behind him
+    else { bx = root[0] - 0.045 - GAP; bz = root[2] + 0.02; by = HOP_H * Math.sin(Math.PI * ph); }   // beside and a step behind him
     if (LAMP_BEATS.some((b) => Math.abs(T - B[b]) < 1e-3)) sq = 0.3;   // the light presses it down on each puddle beat
     if (T >= B.marstonSeen && T < TURN) { eyes = 'side'; look = 1; }
     exam.mesh.position.set(bx, by, bz);
@@ -340,6 +363,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     warm.target.position.set(root[0], 0.04, root[2]); warm.target.updateMatrixWorld();
     winMats.forEach((m) => { m.emissiveIntensity = 0.75; });
     exam.update(t, { squash: sq, wobble: 1, eyes, look, key });
+    selfLit(side.group); selfLit(back.group);            // last: after every boil, face and mouth-bar swap this frame
 
     // ---------- camera, on 1s: lateral track at his x + 0.06, the block's push-in in z, locked from the turn
     const cx = camX(t), cz = kf(t, CAM_Z, ease);
