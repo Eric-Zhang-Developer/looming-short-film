@@ -1,0 +1,2 @@
+s03 local 2.00         r 0.0120  L (0.0074, 0.0125, 0.0208)  zB 0.0150  S 3.600  units 3.600  projected width 3.600 u  centre (0.0887, 0.0108)
+s03 local 5.00         r 0.0180  L (0.0074, 0.0125, 0.0208)  zB 0.0150  S 3.600  units 5.400  projected width 5.400 u  centre (0.0887, 0.0324)

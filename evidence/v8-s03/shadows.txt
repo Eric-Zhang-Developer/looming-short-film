@@ -1,0 +1,15 @@
+v8-s03 · the blob's wall shadow in s03, v7 against v8.
+Measured from the live shot by evidence/v8-s03/shadows.ts (v7-laptop's method, evidence/v7-laptop/shadows.mjs, ported to the
+compiled build/): s03 is built as film.ts builds it, updated to the time, and its key light and Exam are read back.
+units = S · r / 0.012 with S = z_L / (z_L − z_B) (README §1); "width" projects the blob card's body circle from the key's
+world position onto the wall (z 0), in units of the 1× blob's diameter (0.024).
+v7 = s03.ts and canvas.ts as on wave/3-assets c57d12b (checked out over this branch for the run); v8 = this branch.
+Raw lines: shadows_v7.txt, shadows_v8.txt.
+
+                    v7 (gulp at 4.5)              v8 (gulp at 5.5)
+before the gulp     local 2.00  width 3.600 u     local 3.00  width 3.600 u   +0.00%   (and 5.42, the swallow's drawing: 3.600)
+after the gulp      local 5.00  width 5.400 u     local 5.50  width 5.400 u   +0.00%   (and 8.00: 5.400)
+
+Light L (0.0074, 0.0125, 0.0208), blob z 0.0150, S 3.600 in both; the shadow's centre (0.0887, 0.0108) before and
+(0.0887, 0.0324) after in both. Limit ±5%: met exactly. The swell lands on the gulp frame, 5.50 (one drawing after
+5.42 it is still 3.6), so the shadow grows on the alt-tab's cut.

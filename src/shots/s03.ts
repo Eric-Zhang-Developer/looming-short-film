@@ -3,6 +3,10 @@
 // the screen centre, aimed screen → blob → wall), so the blob's shadow climbs the wall at 3× (S = screenZ / (screenZ −
 // B.z) = 0.0225 / 0.0075) the moment the screen wakes, and swells to 3.75 units on gulp 1 (4.5), the first meter step.
 // Characters on 2s, light on 1s, boil 10/s.
+// v8 (docs/notes/v8-beats.md, the flinch; 10 s): the lid opens on the practice problem (canvas.ts's practicePage), not the
+// game. An insert holds it 1.5–5.0 to read; the countdown banner drops over it at 4.0; the wide comes back on his flinch at
+// 5.0 (pen up, then down); on gulp1 (5.5) the game snaps over the problem on a hard cut (the alt-tab) and the AK sprays.
+// The light, the blob's sizes and so every shadow number are v7's; only their times moved (the gulp 4.5 → 5.5).
 import * as THREE from 'three';
 import { phoneLight, dawnLight, ambient, aim } from '../lights.ts';
 import { kf, ease } from '../core/ease.ts';
@@ -12,8 +16,8 @@ import { createBlob } from '../blob.ts';
 import { makeGator } from '../characters/gator.ts';
 import { specPose } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
-import { DESK, B, LAPTOP, tools, homeDesk, seatReach, firing } from './s02.ts';
-import { banner, todoScreen, COUNTDOWN } from '../props/canvas.ts';
+import { DESK, B, LAPTOP, tools, homeDesk, seatReach } from './s02.ts';
+import { banner, todoScreen, practicePage, COUNTDOWN } from '../props/canvas.ts';
 import type { Pose } from '../puppet.ts';
 import type { SpecOpts } from '../characters/poses.ts';
 import type { ShotCtx } from '../film.ts';
@@ -76,6 +80,10 @@ export function reminderInsert({ PALETTE }: Pick<ShotCtx, 'PALETTE'>, { body, ki
     plane(1.7, 2.6, roundCard(1.7, 2.6, 0.2, '#16182A'), [0, 0.47 - 1.3]);
     plane(1.6, 2.5, screen ?? solid('#2A3A66'), [0, 0.42 - 1.25]);
     rest = [0, 0.37, 1.5];
+  } else if (kind === 'page') {   // v8-s03: the whole laptop screen, centred and filling the frame's height (the practice problem)
+    plane(1.62, 1.06, roundCard(1.62, 1.06, 0.03, '#202231'), [0, 0]);
+    plane(1.52, 0.95, screen ?? solid('#2A3A66'), [0, 0]);
+    rest = [0.4, 0.44, 0.7];
   } else {
     plane(3.34, 2.14, roundCard(3.34, 2.14, 0.06, '#202231'), [0.86 - 1.6, 0.44 - 1.0 + 0.04]);
     plane(3.2, 2.0, screen ?? solid('#2A3A66'), [0.86 - 1.6, 0.44 - 1.0]);
@@ -118,7 +126,7 @@ const BLOB_R = { start: 0.012, gulp1: 0.018 };            // METER.birth → MET
 // v3-readability: the light now sits at the *open* screen's centre (v3 lit from the closed lid's, S ≈ 2.5 in practice),
 // so the shadow is the 4.33× the v3 note asked for; pulled back again so the gulp's 5.4 units stay in frame.
 const CAM: CamKey = { pos: [0.068, 0.088, 0.47], look: [0.068, 0.056, 0.012] };
-const FOCUS: Key<number>[] = [[2.0, 0.455], [3.0, 0.47]];                 // blob → wall over 2–3, eased, on 1s
+const FOCUS: Key<number>[] = [[6.0, 0.455], [7.0, 0.47]];                 // blob → wall over 6–7 (v8: after the gulp, with its glance up), eased, on 1s
 // v4: the gulp is now 1 → 1.5×, so at v3's S 4.33 the swollen shadow (6.5 units) ran out of the top and right of frame. The light is re-solved to keep
 // v3's 5.4 units after the gulp, which fit: S = 5.4 · 0.012 / 0.018 = 3.6, so SCREEN_Z = S · B.z / (S − 1) = 0.0208. Before the gulp it is 3.6 units.
 const SCREEN_Z = 3.6 * B[2] / (3.6 - 1);
@@ -135,7 +143,13 @@ const F = (n: number) => n / 12, fr = (t: number) => Math.floor(t * 12 + 1e-6);
 const LID = [[5, 0], [6, 15], [7, 30], [8, 45], [9, 60], [10, 75], [11, 92], [12, 110]];   // [drawing, degrees]
 const lidAt = (f: number) => LID.reduce((d, [n, deg]) => (f >= n ? deg : d), 0);
 const wakeK = (deg: number) => (deg < 15 ? 0 : 0.3 + 0.7 * (deg - 15) / 95);   // 0.3 on the crack, 1 open
-const TAPS = [2.33, 2.67, 3.17, 3.5, 4.0, 4.67, 5.17, 5.67, 6.17, 6.67].map((s) => Math.round(s * 12));   // v4: the shot runs to 7.0; he keeps gaming
+// v8: the AK in the mix (cues.ts): its spray (clip 8.7–10.6 s) from gulp1 for 2 s, then its single taps from clip 0.25 s.
+// The taps' onsets (clip 0.36, 1.69, 2.64 s, by envelope, assets/raw/reels/cs2_ak.mp3) land at local 7.61, 8.94, 9.89: the
+// nearest 2s drawings carry the muzzle flash and his key tap. During the spray the muzzle flashes on every 2s drawing.
+const SPRAY = [66, 89], TAPS = [92, 108, 118];
+const firingAt = (f: number) => (f >= SPRAY[0] && f < SPRAY[1] && f % 2 === 0) || TAPS.includes(f);
+const PROBLEM = [1.5, 5.0];                                 // the insert on the practice problem (problemShown → the flinch)
+const GULP = 66;                                            // gulp1, 5.5: the alt-tab
 
 export async function build(ctx: ShotCtx) {
   const { scene, camera, PALETTE, post } = ctx;
@@ -160,8 +174,16 @@ export async function build(ctx: ShotCtx) {
   const seat = (o: SpecOpts) => specPose({ leg: 60, farLeg: 54, far: -40, ...o });
   const at = (p: THREE.Vector3, range: [number, number], o: SpecOpts = {}) => { const r = seatReach(cam, p, range); return seat({ lean: r.lean, arm: r.arm, ...o }); };
   // [drawing, pose, shoulder drop (m)]. 0–0.17 anticipation, 0.17–0.33 the shrug, 0.42 back, 0.50 hand on the lid's
-  // front edge, 0.67 / 0.83 the lid at 30° / 60°, 1.00 hands on the keys (laptopUp), 2.00 settled into the hunch.
+  // front edge, 0.67 / 0.83 the lid at 30° / 60°, 1.00 the lid open (laptopUp). v8: 1.17 the hand on the pen, 1.33 the pen
+  // up and the lean in to read (held through the insert, leaning further); 5.0 the flinch jerks him upright, pen still up;
+  // 5.17 the pen drops (pen down); 5.5 the hand on the keys (the alt-tab), 6.5 settled into v7's hunch.
+  const penAt = new THREE.Vector3(DESK.pen[0] + 0.003, 0.001, DESK.pen[1]);
   const P: Record<string, Pose> = {
+    grab: at(penAt, [0, 30], { head: -12 }),
+    penUp: seat({ lean: 20, arm: 38, head: -6 }),
+    penIn: seat({ lean: 24, arm: 40, head: -8 }),
+    startle: seat({ lean: 4, arm: 58, far: -20, head: 8 }),
+    recoil: seat({ lean: 8, arm: 5, head: 2 }),
     slump: seat({ lean: 10, arm: 35, head: -8 }),
     antic: seat({ lean: 10, arm: 35, head: -11 }),
     shrug: seat({ lean: 8, arm: 55, far: -20, head: 6 }),
@@ -171,8 +193,13 @@ export async function build(ctx: ShotCtx) {
   };
   P.tap = { ...P.hunch, arm_r: P.hunch.arm_r + 2 * DEG };
   for (const [, deg] of LID) P['lid' + deg] = at(lidEdge(deg), [6, 30], { head: -8 - 2 * ((deg < 30) as unknown as number) });   // true counts as 1
-  const KEYS = [[0, 'slump'], [F(1), 'antic'], [F(3), 'shrug'], [F(4), 'back'], ...LID.slice(0, -1).map(([n, deg]) => [F(n), 'lid' + deg]),
-    [F(12), 'keys'], [F(24), 'hunch'], ...TAPS.flatMap((n) => [[F(n - 1), 'hunch'], [F(n), 'tap'], [F(n + 1), 'hunch']]), [7, 'hunch']];
+  const KEYS = [[0, 'slump'], [F(1), 'antic'], [F(3), 'shrug'], [F(4), 'back'], ...LID.map(([n, deg]) => [F(n), 'lid' + deg]),
+    [F(14), 'grab'], [F(16), 'penUp'], [F(58), 'penIn'], [F(60), 'startle'], [F(62), 'recoil'], [F(64), 'recoil'],
+    [F(GULP), 'keys'], [F(78), 'hunch'], ...TAPS.flatMap((n) => [[F(n - 1), 'hunch'], [F(n), 'tap'], [F(n + 1), 'hunch']]), [10, 'hunch']];
+  // The pen (mirrored so its nib points +x, origin at the nib, as s18's): on the page's front edge, in his hand 1.17–5.17.
+  const pen = T.cut(set.props, 'pen', [0.0075, null], 'pen', { anchor: [1, 0.5], flip: true });
+  const penRest = [DESK.pen[0] + 0.0075, 0.0006, DESK.pen[1]] as const;
+  const hp = new THREE.Vector3();
 
   // ---- the Exam at B ----
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
@@ -200,12 +227,11 @@ export async function build(ctx: ShotCtx) {
   const ambI = amb.intensity;
   scene.add(spot, spot.target, fill, sun.light, sun.light.target, amb);
   const halo = screenHalo(PALETTE); scene.add(halo);
-  // v6-canvas-b: gulp1's cause. Mid-game the Canvas reminder pops top-right on his screen: an insert of the laptop's
-  // screen 3.25–4.5 (the banner in at 3.25, read to 4.25, flicked off to the right 4.25–4.42, his trackpad swipe), cut
-  // back to the wide on the gulp (4.5), so the swipe lands on it.
-  const ins = reminderInsert(ctx, { body: COUNTDOWN.s03, kind: 'laptop', screen: set.glow.material.map, dir: [1, 0] });
+  // v8: the screen is the practice problem until the alt-tab. An insert of the whole screen 1.5–5.0 (PROBLEM); the
+  // countdown banner drops into the page itself at 4.0 (so the wide's screen has it too at 5.0); on gulp1 the game.
+  const page = practicePage({ body: COUNTDOWN.s03 }), game = set.glow.material.map;
+  const ins = reminderInsert(ctx, { body: COUNTDOWN.s03, kind: 'page', screen: page.texture });
   scene.add(ins.group);
-  const INS = [3.25, 4.5];
 
   const C = new THREE.Vector3(), hit = new THREE.Vector3();
   return {
@@ -221,10 +247,15 @@ export async function build(ctx: ShotCtx) {
       gator.group.position.y = DESK.hip[1] + (f >= 2 && f < 4 ? -0.0015 : 0);
       // v4 acting: guilt (the look at the blob), then numb for the game. slump 0: his hands are on the lid and keys, so the pose
       // owns the lean. The spec's own eye and mouth beats (the shrug's shut eyes, the small smile) go over the preset's face.
-      act(gator, t, [[0, 'guilt'], [0.67, 'numb']], { slump: 0, breath: 6, blink: false });
-      const eyes = f < 2 ? 'side' : f < 5 ? 'closed' : 'tired';
-      const mouth = f < 24 ? 'line' : f >= 42 && f < 46 ? 'smile' : 'neutral';
-      gator.face({ eyes, mouth });
+      // v8: guilt, then open-eyed on the problem (neutral), the flinch on 5.0, numb for the game once the spray settles.
+      const took = act(gator, t, [[0, 'guilt'], [0.67, 'neutral'], [5.0, 'flinch'], [6.0, 'numb']], { slump: 0, breath: 6, blink: false });
+      gator.face({ eyes: f < 2 ? 'side' : f < 5 ? 'closed' : took.eyes, mouth: took.mouth });
+      gator.group.updateMatrixWorld(true);
+      gator.hand!.getWorldPosition(hp);
+      if (f >= 14 && f < 62) {
+        const a = (f < 16 ? 15 : 50) * DEG;   // nib up and forward once it's lifted
+        pen.g.rotation.set(0, 0, a); pen.g.position.set(hp.x + 0.003 * Math.cos(a), hp.y + 0.003 * Math.sin(a), DESK.hip[2] + 0.0128);
+      } else { pen.g.rotation.set(-Math.PI / 2, 0, -0.1); pen.g.position.set(...penRest); }
 
       // The laptop: the hand on the lid at 0.42, the lift over 0.5–0.92, open on laptopUp (1.00). The screen glows from the
       // crack and the light rides it (see LID); the window and ambient give way as it brightens.
@@ -233,20 +264,25 @@ export async function build(ctx: ShotCtx) {
       set.screenCentre(L);
       set.glow.visible = on;
       set.glow.material.color.setScalar(f >= 12 ? 1 : 0.35 + 0.5 * k);   // full game on laptopUp
-      set.game.fire(firing(t, 1.25, 0));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.ts: from laptopUp + 0.25, in 0)
+      // v8: the problem until gulp1, then the game on a hard cut (the alt-tab), the muzzle on the AK (firingAt).
+      page.set(f < 48 ? 0 : f < 50 ? 0.5 : 1);   // the banner arrives at 4.0: a full second to read before the flinch
+      set.glow.material.map = f >= GULP ? game : page.texture;
+      set.game.fire(firingAt(f));
       sun.light.intensity = sunI * (SUN_SCALE_OFF + (SUN_SCALE - SUN_SCALE_OFF) * k);   // before the wake the window is the room; after it the screen is
       amb.intensity = ambI * (AMB_K_OFF + (AMB_K - AMB_K_OFF) * k);
 
-      // The Exam: open on him; side toward the screen at 1.08; up-right at its shadow at 3.0; back to him at 4.33.
-      // Gulp 1 (4.5): squash 0.3 eyes closed on 4.417, snap to 1.25× stretched on 4.5, settled by 4.75.
+      // The Exam: open on him; side toward the screen at 1.08; back on him for the flinch (5.0). Gulp 1 (5.5, v8; v7 4.5):
+      // squash 0.3 eyes closed on 5.417, snap to 1.5× stretched on 5.5, settled by 5.75. Then v7's glance up-right at its
+      // own shadow (7.0–8.5, after the gulp now: it leads the eye to the rule), back on him, one held blink at 9.25.
       let eyesB = 'open', look = 1, squash = 0;
-      if (f >= 13 && f < 52) { eyesB = 'side'; look = f < 36 ? -1 : 1; }
-      if (f === 53 || f === 78) { squash = f === 53 ? 0.3 : 0; eyesB = 'closed'; }   // 4.417 the swallow; 6.5 the held blink (v4)
-      const grown = f >= 54;
-      if (f >= 54 && f < 57) squash = -0.2 * Math.exp(-6 * (F(f) - 4.5)) * Math.cos(18 * (F(f) - 4.5));   // settles by 4.75
+      if (f >= 13 && f < 60) { eyesB = 'side'; look = -1; }
+      if (f >= 84 && f < 102) eyesB = 'side';
+      if (f === GULP - 1 || f === 111) { squash = f === GULP - 1 ? 0.3 : 0; eyesB = 'closed'; }
+      const grown = f >= GULP, tg = F(f) - F(GULP);
+      if (grown && f < GULP + 3) squash = -0.2 * Math.exp(-6 * tg) * Math.cos(18 * tg);   // settles by 5.75
       const r = grown ? BLOB_R.gulp1 : BLOB_R.start;
       exam.mesh.scale.setScalar(r / BLOB_R.start);
-      exam.update(t, { squash, wobble: f >= 54 && f < 66 ? 0.8 : 1, eyes: eyesB, look, key: on ? spot : sun.light });
+      exam.update(t, { squash, wobble: grown && f < GULP + 12 ? 0.8 : 1, eyes: eyesB, look, key: on ? spot : sun.light });
 
       // Key on 1s: 0 before 1.00, full from that frame, ±5% flicker per drawing. Aimed screen → blob centre → wall.
       const flick = 1 + FLICK * (2 * hash2(1303, f) - 1);
@@ -265,9 +301,9 @@ export async function build(ctx: ShotCtx) {
       spot.target.position.copy(hit);
       spot.target.updateMatrixWorld();
 
-      const insert = t >= INS[0] - 1e-6 && t < INS[1] - 1e-6;
+      const insert = t >= PROBLEM[0] - 1e-6 && t < PROBLEM[1] - 1e-6;
       fx.set(insert ? { focus: 0.06, aperture: 0.002 } : { focus: kf(t, FOCUS, ease), aperture: 0.01 });
-      ins.update(camera, { on: insert, arrive: f < 40 ? 0.5 : 1, swipe: f === 51 ? 0.35 : f === 52 ? 0.75 : f >= 53 ? 1 : 0 });
+      ins.update(camera, { on: insert, arrive: 0 });   // the banner is drawn in the page (page.set), not on the insert's own card
     },
   };
 }

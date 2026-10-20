@@ -43,8 +43,8 @@ Only the shots marked Δ change in content or length. Every other shot keeps its
 |---|---|
 | 0.0–1.0 | As now: the guilt glance at the blob and the circle |
 | 1.0 `laptopUp` | The lid opens on **the practice problem**: a Canvas page, "Practice Exam · Problem 1", **∫ x·eˣ dx** |
-| 1.5 `problemShown`–4.5 | Insert on the screen, held to read. He leans in, pen up |
-| 4.5 | The Canvas banner drops in over the problem: `Calc 2 Exam · Starts in 24 hours` (v6's banner, now over the work instead of the game) |
+| 1.5 `problemShown`–5.0 | Insert on the screen, held to read (the banner over it from 4.0). He leans in, pen up |
+| 4.0 | The Canvas banner drops in over the problem: `Calc 2 Exam · Starts in 24 hours` (v6's banner, now over the work instead of the game) |
 | 5.0 | His face: the flinch (eyes wide, pen down) |
 | **5.5 `gulp1`** | **Alt-tab:** the game snaps over the problem on a hard cut, and **the AK's spray starts on that frame** (the sound gag). The blob gulps |
 | 5.5–10.0 | As v7 from the gaming on: the shadow climbs the wall (the rule, first time), the key taps, the hold. The old banner swipe is gone; the alt-tab replaces it |

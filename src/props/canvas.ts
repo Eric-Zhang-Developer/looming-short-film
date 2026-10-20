@@ -183,5 +183,54 @@ function list(g: CanvasRenderingContext2D, H: number, marker: number, clock: str
   });
 }
 
+// v8-s03: the practice problem on the laptop (the work he opens before he flinches). A Canvas quiz page, light mode, in
+// the banner's look: the dark global nav with the app glyph, the header, one question card with ∫ x·eˣ dx set large and
+// an empty answer box. The answer (xeˣ − eˣ + C) is s16's; it is never drawn here. 640 × 400 pt (the laptop glow's
+// 1.6 aspect), drawn at 3 px/pt so it holds up as a full-frame insert at 1080p.
+//   const p = practicePage()          → { texture, canvas, set }
+//   p.set(arrive)                     the countdown banner (COUNTDOWN.s03) dropped in top-right: 0 none, 0..1 sliding
+//                                     down into place, 1 resting. Redraws only when arrive changes.
+const PW = 640, PH = 400, PS = 3;
+export function practicePage({ body = COUNTDOWN.s03 }: { body?: string } = {}) {
+  const canvas = Object.assign(document.createElement('canvas'), { width: PW * PS, height: PH * PS }), g = canvas.getContext('2d')!;
+  const texture = textureOf(canvas);
+  const MATH = '"Times New Roman", Times, serif';
+  const math = (s: string, x: number, y: number, pt: number) => { g.font = `italic 400 ${pt}px ${MATH}`; g.fillStyle = C.ink; g.textAlign = 'left'; g.fillText(s, x, y); return x + g.measureText(s).width; };
+  let last = -1;
+  const set = (arrive = 0) => {
+    if (arrive === last) return;
+    last = arrive;
+    g.setTransform(PS, 0, 0, PS, 0, 0);
+    g.fillStyle = C.bg; g.fillRect(0, 0, PW, PH);
+    // The global nav: dark column, the glyph, four icon dots.
+    g.fillStyle = C.ink; g.fillRect(0, 0, 58, PH);
+    glyph(g, 11, 12, 36);
+    g.fillStyle = '#56636D'; for (let i = 0; i < 4; i++) { g.beginPath(); g.arc(29, 82 + i * 46, 9, 0, 7); g.fill(); }
+    // Header: the course line and the title.
+    g.fillStyle = C.head; g.fillRect(58, 0, PW - 58, 66);
+    g.fillStyle = C.line; g.fillRect(58, 66, PW - 58, 1);
+    text(g, 'MAC2312', 84, 26, 11, C.grey, 500);
+    text(g, 'Practice Exam · Problem 1', 84, 52, 20, C.ink, 700);
+    // The question card.
+    g.strokeStyle = C.line; g.lineWidth = 1.5; rrect(g, 84, 92, 520, 268, 8); g.stroke();
+    g.fillStyle = C.head; rrect(g, 85, 93, 518, 34, 7); g.fill();
+    g.fillStyle = C.orange; g.fillRect(85, 126, 518, 2);
+    text(g, 'Evaluate.', 104, 116, 14, C.grey, 600);
+    // ∫ x·eˣ dx, real typesetting proportions: a tall integral sign, the exponent raised and smaller.
+    g.font = `400 112px ${MATH}`; g.fillStyle = C.ink; g.textAlign = 'left'; g.fillText('∫', 192, 248);
+    let x = math('x·e', 250, 236, 64);
+    x = math('x', x + 2, 204, 38);
+    math(' dx', x + 4, 236, 64);
+    // The empty answer box with its cursor bar, and the orange submit button (no label).
+    g.strokeStyle = '#C9CED3'; g.lineWidth = 1.5; rrect(g, 104, 288, 300, 40, 6); g.stroke();
+    g.fillStyle = C.ink; g.fillRect(114, 298, 1.5, 20);
+    g.fillStyle = C.orange; rrect(g, 476, 288, 108, 40, 6); g.fill();
+    if (arrive > 0) { const k = arrive * arrive * (3 - 2 * arrive); g.save(); g.globalAlpha = k; drawBanner(g, PW - BW - 14, 14 - 40 * (1 - k), 'Calc 2 Exam', body, true); g.restore(); }
+    texture.needsUpdate = true;
+  };
+  set(0);
+  return { texture, canvas, set };
+}
+
 /** A point on the screen in UI points → [u, v] in 0..1 of the texture (v from the bottom, as three's uv). */
 export const uiPoint = (scr: { H: number }, x: number, y: number): number[] => [x / W, 1 - y / scr.H];

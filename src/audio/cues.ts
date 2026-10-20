@@ -179,14 +179,15 @@ export const CUES: Cue[] = [
   { beat: 'backpackGrab', offset: 0.75, sound: 'footstepSoft', gain: dB(-20), seed: 5 },
   { beat: 'backpackGrab', offset: 1, sound: 'inkDrip', gain: 0.2, seed: 39 },
   // v6-canvas-b: the Canvas reminder, four times, one chime: two high gameBlip notes 80 ms apart, the same pair each time
-  // (the same notification every time; phoneBuzz stays s00's two). On arrival: s03 23.5 (v8: over the practice problem, 1.0 s before the alt-tab), s06 43.21 (the
+  // (the same notification every time; phoneBuzz stays s00's two). On arrival: s03 23.0 (v8: over the practice problem, 1.5 s before the alt-tab), s06 43.21 (the
   // phone on the desk lights with the lamp-off at 43.0; the chime waits out the click's 0.17 s window so the three clicks
   // stay identical), s07 54.25, s09a 70.0 (on the tick). Each swipe is a soft thumbFlick as the banner starts to go,
   // 0.25 s before its gulp, clear of the gulp's frame.
-  ...([['gulp1', -1.0], ['lampOffHome', 0.21], ['gulp3', -1.25], ['phoneFaceDown', -0.5]] as [string, number][]).flatMap(([b, o]) => [
+  ...([['gulp1', -1.5], ['lampOffHome', 0.21], ['gulp3', -1.25], ['phoneFaceDown', -0.5]] as [string, number][]).flatMap(([b, o]) => [
     { beat: b, offset: o, sound: 'gameBlip', gain: 0.1, seed: 105 },
     { beat: b, offset: o + 0.08, sound: 'gameBlip', gain: 0.1, seed: 107 }]),
-  ...['gulp1', 'gulp2', 'gulp3'].map((b, k) => ({ beat: b, offset: -0.25, sound: 'thumbFlick', gain: dB(-24), seed: 40 + k })),
+  // v8: s03 has no swipe (the alt-tab is a cut, and the AK's spray is its sound), so gulp1 keeps no flick.
+  ...['gulp2', 'gulp3'].map((b, k) => ({ beat: b, offset: -0.25, sound: 'thumbFlick', gain: dB(-24), seed: 41 + k })),
   // s09b, new: the latch and hinge on doorOpen (the hall swells under it, above); the blob lands on the threshold at 78.167;
   // one quick breath on the shadow; the swallow in C5, 79.667; his first footsteps, on the runner.
   { beat: 'doorOpen', sound: 'doorLatch', gain: 0.6 },
