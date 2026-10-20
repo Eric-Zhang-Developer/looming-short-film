@@ -1,9 +1,8 @@
-// @ts-check
 // WAV writer: 32-bit float PCM (format 3), 48 kHz. Channels are mono Float32Arrays of equal length.
 import { writeFileSync } from 'node:fs';
-import { SR } from './synth.js';
+import { SR } from './synth.ts';
 
-export function writeWav(path, channels) {
+export function writeWav(path: string, channels: Float32Array[]) {
   const nc = channels.length, n = channels[0].length, bytes = n * nc * 4;
   const b = Buffer.alloc(44 + bytes);
   b.write('RIFF', 0); b.writeUInt32LE(36 + bytes, 4); b.write('WAVE', 8);

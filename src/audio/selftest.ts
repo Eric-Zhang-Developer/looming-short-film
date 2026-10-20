@@ -1,35 +1,35 @@
-// @ts-check
-// node src/audio/selftest.js — run after a full `node tools/mix.mjs`. Exits non-zero on the first failure.
+// node src/audio/selftest.ts — run after a full `node tools/mix.mjs`. Exits non-zero on the first failure.
 // Checks every cue and score beat resolves, the three lamp clicks are sample-identical in the foley stem and within ±1 LSB in mix.wav,
 // the clock is one buffer, a bed cue with dur/until fills its span, and voices and every foley sound are deterministic and finite.
 // Writes solo WAVs to out/audio/solo/ for spectrograms.
 import assert from 'node:assert/strict';
 import { readFileSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { SR, feltPiano, musicBox, pad, subSwell } from './synth.js';
-import { FOLEY } from './foley.js';
-import { CUES } from './cues.js';
-import { SCORE } from './score.js';
-import { writeWav } from './wav.js';
+import { SR, feltPiano, musicBox, pad, subSwell } from './synth.ts';
+import { FOLEY } from './foley.ts';
+import { CUES } from './cues.ts';
+import type { Cue } from './cues.ts';
+import { SCORE } from './score.ts';
+import { writeWav } from './wav.ts';
 import { beat, DURATION } from '../timeline.ts';
 import { seedOf } from '../core/rng.ts';
 
 const out = fileURLToPath(new URL('../../out/audio', import.meta.url));
-const ok = (name, fn) => { fn(); console.log(`ok  ${name}`); };
+const ok = (name: string, fn: () => void) => { fn(); console.log(`ok  ${name}`); };
 
 // The off click is followed by the spring-back's rustle at +0.17 s (s06.md), so the lamp clicks are compared over their first
 // 0.17 s; what the buffer does after that is the tink's tail, which must stay under 1% of the click's peak (asserted below).
 const CLICK_CMP = 0.17;
 const CLICK_BEATS = ['lampClickHome', 'lampOffHome', 'lampOn'];
-const cuesOf = (sound) => CUES.filter((c) => c.sound === sound);
+const cuesOf = (sound: string) => CUES.filter((c) => c.sound === sound);
 const stemL = () => {
   const b = readFileSync(`${out}/stems/foley.wav`);
   const L = new Float32Array((b.length - 44) / 8).map((_, i) => b.readFloatLE(44 + i * 8)); // left channel
   assert.equal(L.length, DURATION * SR, `run the full ${DURATION} s mix first`);
   return L;
 };
-const sliceAt = (L, c, n) => { const i0 = Math.round((beat(c.beat) + (c.offset ?? 0)) * SR); return L.slice(i0 - 4800, i0 + n + 4800); };
-const peakOf = (x) => x.reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+const sliceAt = (L: Float32Array, c: Cue, n: number) => { const i0 = Math.round((beat(c.beat) + (c.offset ?? 0)) * SR); return L.slice(i0 - 4800, i0 + n + 4800); };
+const peakOf = (x: Float32Array) => x.reduce((m, v) => Math.max(m, Math.abs(v)), 0);
 
 ok('every cue and score event hangs on a beat the v4 timeline has', () => {
   for (const c of [...CUES, ...SCORE]) beat(c.beat);
@@ -67,11 +67,11 @@ for (const sound of ['penUncap', 'phoneBuzz']) ok(`the two ${sound}s are one see
 });
 ok('every bed cue with a length sounds at both ends of its own span', () => {
   // Checks each cue's own span, not the whole stem, so several beds can share a stem.
-  const stems = {}, read = (st) => (stems[st] ??= readFileSync(`${out}/stems/${st}.wav`));
-  const live = (b, t0, t1) => { for (let i = Math.floor(t0 * SR); i < t1 * SR; i++) if (b.readFloatLE(44 + i * 8) !== 0) return true; return false; };
+  const stems: Record<string, Buffer> = {}, read = (st: string) => (stems[st] ??= readFileSync(`${out}/stems/${st}.wav`));
+  const live = (b: Buffer, t0: number, t1: number) => { for (let i = Math.floor(t0 * SR); i < t1 * SR; i++) if (b.readFloatLE(44 + i * 8) !== 0) return true; return false; };
   const beds = CUES.filter((c) => (c.until || c.dur) && c.stem === 'ambience');  // beds live on ambience; one-shot foley with a dur may fade
   for (const c of beds) {
-    const b = read(c.stem ?? 'foley'), at = beat(c.beat) + (c.offset ?? 0), end = c.dur ? at + c.dur : beat(c.until);
+    const b = read(c.stem ?? 'foley'), at = beat(c.beat) + (c.offset ?? 0), end = c.dur ? at + c.dur : beat(c.until!);
     assert.ok(live(b, at, at + 0.05) && live(b, end - 0.05, end), `${c.sound} @ ${c.beat}: silent at an end of ${at}–${end} s`);
   }
   console.log(`    ${beds.length} bed cues sound at both ends of their spans`);
@@ -85,10 +85,10 @@ ok('every foley sound renders, deterministic and finite', () => {
   for (const [k, f] of Object.entries(FOLEY)) { const x = f(7), y = f(7); assert.deepEqual(x, y, k); assert.ok(x.every(Number.isFinite) && x.some((v) => v !== 0), k); }
 });
 
-for (const [sound, n, label] of /** @type {[string, number, string][]} */ ([['lampClick', Math.round(CLICK_CMP * SR), 'lamp clicks']])) {
+for (const [sound, n, label] of ([['lampClick', Math.round(CLICK_CMP * SR), 'lamp clicks']] as [string, number, string][])) {
   ok(`the three ${label} are identical within ±1 LSB in out/audio/mix.wav (over the first ${(n / SR).toFixed(2)} s)`, () => {
     const b = readFileSync(`${out}/mix.wav`), d = b.indexOf('data') + 8;              // 16-bit stereo, 48 kHz
-    const L = (i) => b.readInt16LE(d + i * 4);
+    const L = (i: number) => b.readInt16LE(d + i * 4);
     assert.equal((b.length - d) / 4, DURATION * SR, `run the full ${DURATION} s mix first`);
     const cs = cuesOf(sound), at = cs.map((c) => Math.round((beat(c.beat) + (c.offset ?? 0)) * SR));
     let peak = 0;
@@ -101,7 +101,7 @@ for (const [sound, n, label] of /** @type {[string, number, string][]} */ ([['la
 }
 
 mkdirSync(`${out}/solo`, { recursive: true });
-const pad0 = (x) => { const y = new Float32Array(x.length + SR / 10); y.set(x, SR / 20); return y; };
+const pad0 = (x: Float32Array) => { const y = new Float32Array(x.length + SR / 10); y.set(x, SR / 20); return y; };
 const click = pad0(FOLEY.lampClick(seedOf('lampClick'))), piano = pad0(feltPiano(60, { vel: 0.7, dur: 1.5 }));
 writeWav(`${out}/solo/lampclick.wav`, [click]);
 writeWav(`${out}/solo/clocktick.wav`, [pad0(FOLEY.clockTick())]);

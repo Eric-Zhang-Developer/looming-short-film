@@ -21,7 +21,7 @@ import { makeClock } from '../clock.js';
 import { tools } from './s02.js';
 import { reminderInsert } from './s03.js';
 import { COUNTDOWN } from '../props/canvas.js';
-import { REELS } from '../audio/cues.js';
+import { REELS } from '../audio/cues.ts';
 
 const DEG = Math.PI / 180;
 const F = (s) => Math.round(s * 12) / 12;                    // spec times are 2s drawings

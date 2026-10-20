@@ -1,12 +1,22 @@
-// @ts-check
 // The film's score (doc 05 §Leitmotifs, §Structure by section): a flat list of note events plus one renderer.
 // Every event is { beat, at, voice, midi, ... }: a beat name from src/timeline.js plus an offset in seconds,
 // never a global time, so retiming a shot moves its music. `motif` tags which leitmotif a note belongs to.
 // Voices are doc 05's four, from synth.js: felt piano, music box, warm pad, sub swell; plus v4's pulse, built from the
 // clock's tick (foley.js). An event may carry until: '<beat>' to stop dead on that beat. Mono, 48 kHz.
 import { beat, S13_DESKS } from '../timeline.ts';
-import { SR, feltPiano, musicBox, pad, subSwell, mixInto } from './synth.js';
-import { FOLEY } from './foley.js';
+import { SR, feltPiano, musicBox, pad, subSwell, mixInto } from './synth.ts';
+import type { PadOpts, SubOpts } from './synth.ts';
+import { FOLEY } from './foley.ts';
+
+// One flat shape for every voice; which fields count depends on the voice (renderScore). midi is a note or a chord
+// (piano, box, pad) or null (sub, pulse).
+type Voice = 'piano' | 'box' | 'pad' | 'sub' | 'pulse';
+export type ScoreEvent = {
+  beat: string, at: number, voice: Voice, midi: number | number[] | null,
+  vel?: number, dur?: number, gain?: number, motif?: string, until?: string,
+  attack?: number, release?: number, hz?: number, bend?: PadOpts['bend'], open?: PadOpts['open'], vib?: number, vibTo?: string,
+};
+type EvOpts = Omit<ScoreEvent, 'beat' | 'at' | 'voice' | 'midi'>;
 
 // ───────── leitmotifs: [midi, offset s]. Fixed intervals and rhythm, so every return is the same shape ─────────
 // The Exam: four music-box notes rising then falling, each a few cents out of tune (kept from snd-engine's bed).
@@ -18,18 +28,18 @@ const THEME = [60, 64, 69, 67, 64, 65, 62];
 const HARM = [[36, 43, 52], [40, 48], [41, 48, 57], [40, 48, 55], [45, 52], [38, 45, 53], [43, 50, 55, 60]];
 const G7 = [43, 50, 53, 59];
 
-const ev = (beatName, at, voice, midi, o = {}) => ({ beat: beatName, at, voice, midi, ...o });
-const exam = (beatName, at, o) => EXAM.map(([m, dt]) => ev(beatName, at + dt, 'box', m, { motif: 'exam', ...o }));
+const ev = (beatName: string, at: number, voice: Voice, midi: ScoreEvent['midi'], o: EvOpts = {}): ScoreEvent => ({ beat: beatName, at, voice, midi, ...o });
+const exam = (beatName: string, at: number, o: EvOpts) => EXAM.map(([m, dt]) => ev(beatName, at + dt, 'box', m, { motif: 'exam', ...o }));
 // The gulp (doc 05): the motif's first two notes (its rising third), k semitones down for gulp k, the second 0.275 s later
 // (half the motif's spacing, a swallow) and 4k cents flatter (the drift growing); velocity 0.30 rising to 0.42 over v4's three.
-const gulp = (k) => [[0, 0, 0.5], [1, 0.275, 0.8]].map(([j, at, dur]) =>
+const gulp = (k: number) => [[0, 0, 0.5], [1, 0.275, 0.8]].map(([j, at, dur]) =>
   ev(`gulp${k}`, at, 'box', EXAM[j][0] - k - (j ? 0.04 * k : 0), { vel: (24 + 6 * k) / 100, dur, motif: 'gulp' }));
 // The shrink answer (doc 05 v4): the same two notes falling (second note first), 0.25 s after the solve's theme note, at
 // about -6 dB under it. Five solves from the 2.5x peak: #1 -2 (one above the deepest gulp), #2 0 (birth size at birth
 // pitch), #3 +1, #4 +2, #5 +3; then the test +4 and the cross-off +5.
-const SHRINKS = [['problemOneSolved', -2], ['problemSolved2', 0], ['problemSolved3', 1], ['problemSolved4', 2],
+const SHRINKS: [string, number][] = [['problemOneSolved', -2], ['problemSolved2', 0], ['problemSolved3', 1], ['problemSolved4', 2],
   ['problemSolved5', 3], ['testSolved', 4], ['examCrossedOff', 5]];
-const shrink = ([b, k]) => [[1, 0.25, 0.5], [0, 0.525, 0.9]].map(([j, at, dur]) =>
+const shrink = ([b, k]: [string, number]) => [[1, 0.25, 0.5], [0, 0.525, 0.9]].map(([j, at, dur]) =>
   ev(b, at, 'box', EXAM[j][0] + k, { vel: 0.25, dur, motif: 'shrink' }));
 
 // ───────── the avoidance groove ─────────
@@ -38,32 +48,30 @@ const shrink = ([b, k]) => [[1, 0.25, 0.5], [0, 0.525, 0.9]].map(([j, at, dur]) 
 // so each dodge's last bar is cut to its first half (a 2/4 bar) and the next dodge still lands on a downbeat. The groove
 // ends at bedRot, where s07 thins it to one dyad.
 const BAR = 2, BAR0 = -0.5;
-/** @type {[string, number][]} */
-const DODGES = [['fridge', -8], ['gameNight', -4], ['lampClickHome', 0], ['bedRot', 4]];
-const dodge = (n) => DODGES.findLast(([, k]) => n >= k);
-/** @returns {[string, number]} */
-const bar = (n, sec = 0) => { // → [beat, offset] of second `sec` in bar n
-  const [b, n0] = dodge(n);
+const DODGES: [string, number][] = [['fridge', -8], ['gameNight', -4], ['lampClickHome', 0], ['bedRot', 4]];
+const dodge = (n: number) => DODGES.findLast(([, k]) => n >= k);
+const bar = (n: number, sec = 0): [string, number] => { // → [beat, offset] of second `sec` in bar n
+  const [b, n0] = dodge(n)!;
   return [b, (b === 'lampClickHome' ? BAR0 : 0) + (n - n0) * BAR + sec];
 };
-const barLen = (n) => n === 0 ? 0.5 : Math.min(BAR, (([b, o]) => beat(b) + o)(bar(n + 1)) - (([b, o]) => beat(b) + o)(bar(n)));
+const barLen = (n: number) => n === 0 ? 0.5 : Math.min(BAR, (([b, o]) => beat(b) + o)(bar(n + 1)) - (([b, o]) => beat(b) + o)(bar(n)));
 const CHORDS = [ // I vi IV V, one per bar; every dodge starts on I
   { oom: [48, 43], walk: [48, 52, 55, 57], stab: [64, 67, 72], mel: [[0, 67], [2, 64], [3, 67], [5, 72], [6, 67]] },
   { oom: [45, 40], walk: [45, 48, 52, 54], stab: [64, 69, 72], mel: [[0, 69], [2, 64], [3, 69], [5, 72], [6, 71]] },
   { oom: [41, 48], walk: [41, 45, 48, 50], stab: [65, 69, 72], mel: [[0, 69], [2, 65], [3, 69], [5, 72], [6, 74]] },
   { oom: [43, 50], walk: [43, 47, 50, 53], stab: [62, 67, 71], mel: [[0, 71], [2, 74], [3, 71], [4, 67], [6, 65]] },
 ];
-const swing = (slot) => Math.floor(slot / 2) * 0.5 + (slot % 2) * 0.3; // eighths, swung 60:40
+const swing = (slot: number) => Math.floor(slot / 2) * 0.5 + (slot % 2) * 0.3; // eighths, swung 60:40
 
 // Layers, one per dodge: 1 the fridge's oom-pah bass, 2 game night's stabs, 3 after the lamp's off click (v4's last dodge
 // before bed) the bouncy tune over a walking bass, from gulp2's downbeat. s06 plays from 0.0 and cuts dead on the click
 // (the gate does the cutting) and sits out the off click (bar 1, stop-time).
 function groove() {
-  const out = [];
+  const out: ScoreEvent[] = [];
   for (let n = -8; n < 4; n++) {
     if (n === 1) continue;
-    const c = CHORDS[(n - dodge(n)[1]) % 4], end = barLen(n);
-    const p = (sec, midi, vel, dur) => sec < end && out.push(ev(...bar(n, sec), 'piano', midi, { vel, dur, motif: 'groove' }));
+    const c = CHORDS[(n - dodge(n)![1]) % 4], end = barLen(n);
+    const p = (sec: number, midi: number | number[], vel: number, dur: number) => sec < end && out.push(ev(...bar(n, sec), 'piano', midi, { vel, dur, motif: 'groove' }));
     if (n < 2) { p(0, c.oom[0], 0.55, 0.22); p(1, c.oom[1], 0.5, 0.22); }      // 1: oom-pah bass
     else c.walk.forEach((m, k) => p(k * 0.5, m, 0.55, 0.3));                     // 3: walking bass under the tune
     if (n >= -4) for (const s of n < 2 ? [2, 6] : [1, 3, 5, 7]) p(swing(s), c.stab, 0.33, 0.12);  // 2: stabs
@@ -76,7 +84,7 @@ function groove() {
 // Everything on the pulse's grid (every global half-second from lamp1). Every event carries until: 'lightFlood', so on
 // that frame it stops dead and only the held chord is left. The climb (+4 dB, marstonSeen → doorPush) is a gain ramp on the
 // stem in renderScore, so it lifts every layer at once.
-const W = (b, at, voice, midi, o = {}) => ev(b, at, voice, midi, { until: 'lightFlood', ...o });
+const W = (b: string, at: number, voice: Voice, midi: ScoreEvent['midi'], o: EvOpts = {}) => ev(b, at, voice, midi, { until: 'lightFlood', ...o });
 const PULSE_N = Math.round((beat('lightFlood') - beat('lamp1')) / 0.5);   // 39 beats, 84.0 … 103.0
 // Layer 2, the Exam motif rising: three-note cells built from its opening leaps (up a third, up a fourth), each cell
 // starting a step higher (C, D, E), the opposite of the gulps' falling pair; one note per two pulses from lamp2, landing
@@ -118,11 +126,11 @@ const WALK = [
 // theme in major, C E A G, a theme note and its chord on the first phone of each pair, a chord tone above on the second;
 // so the E7 opens onto C instead of resolving to A minor. The last two phones land on the home chord and its top note,
 // and a pad holds that C into s15, where the theme goes on at nameWritten.
-const S13_WAKE = { d2: [45, 52, 60], d4: [41, 48, 57, 64], d15: [40, 47, 56, 62], d1: 64, d11: 68, d5: 71, d12: 74, d14: 76, d7: 80, d9: 83 };
-const S13_DOWN = { d7: [THEME[0], HARM[0]], d9: [67], d2: [THEME[1], HARM[1]], d12: [72], d4: [THEME[2], HARM[2]], d14: [72],
+const S13_WAKE: Record<string, number | number[]> = { d2: [45, 52, 60], d4: [41, 48, 57, 64], d15: [40, 47, 56, 62], d1: 64, d11: 68, d5: 71, d12: 74, d14: 76, d7: 80, d9: 83 };
+const S13_DOWN: Record<string, [number, number[]?]> = { d7: [THEME[0], HARM[0]], d9: [67], d2: [THEME[1], HARM[1]], d12: [72], d4: [THEME[2], HARM[2]], d14: [72],
   d1: [THEME[3], HARM[3]], d11: [76], d5: [72, [36, 43, 52, 60, 67]], d15: [76] };
-const FEATURED = { revealSleeper: 2.2, revealDrinks: 2.2, revealFreshman: beat('phonesDown') - beat('revealFreshman') };   // chord lengths
-const s13Keys = (o) => Object.keys(o).sort().join();
+const FEATURED: Record<string, number> = { revealSleeper: 2.2, revealDrinks: 2.2, revealFreshman: beat('phonesDown') - beat('revealFreshman') };   // chord lengths
+const s13Keys = (o: object) => Object.keys(o).sort().join();
 if (s13Keys(S13_WAKE) !== s13Keys(S13_DESKS) || s13Keys(S13_DOWN) !== s13Keys(S13_DESKS)) throw new Error('score: every s13 desk needs a wake note and a down note');
 const S13 = [
   ev('headLift', 0, 'sub', null, { hz: 45, dur: beat('phonesDown') - beat('headLift'), attack: 3, gain: 0.15, until: 'phonesDown', motif: 'swell' }),
@@ -137,7 +145,7 @@ const S13 = [
   ev('homeChord', 0, 'pad', [48, 55, 64, 72], { dur: 4, attack: 0.8, release: 2.5, gain: 0.3, motif: 'chord' }),
 ];
 
-export const SCORE = [
+export const SCORE: ScoreEvent[] = [
   // 0:00–0:19 Birth. A dawn pad drains away as the ink drop forms; the Exam motif enters on the music box.
   ev('inkDropForms', -10, 'pad', [48, 55, 64, 74], { dur: 8, attack: 3, release: 3, gain: 0.5 }),
   ...exam('inkDropForms', 0.3, { vel: 0.55, dur: 1.4 }),
@@ -180,7 +188,7 @@ export const SCORE = [
   // before the desk: its first two notes on felt piano, softer than the desk's statement, one per strip light, over a low
   // C-major pad that carries him to the desk, where the phrase is stated in full.
   ev('underLight1', 0, 'pad', [36, 48, 55, 64], { dur: beat('deskSit') - beat('underLight1'), attack: 2, release: 1.5, gain: 0.2 }),
-  ...[['underLight1', 0, 2.4], ['underLight2', 1, 2]].flatMap(([b, k, dur]) => [
+  ...([['underLight1', 0, 2.4], ['underLight2', 1, 2]] as [string, number, number][]).flatMap(([b, k, dur]) => [
     ev(b, 0, 'piano', THEME[k], { vel: 0.24, dur, motif: 'theme' }),
     ev(b, 0, 'piano', HARM[k], { vel: 0.19, dur }),
   ]),
@@ -199,7 +207,7 @@ export const SCORE = [
   // phrase completes on #5 (F, then D half a beat later) and is released by s17's first frame.
   ev('nameWritten', 0, 'piano', THEME[0], { vel: 0.5, dur: 6.5, motif: 'theme' }),
   ev('problemOneSolved', 0, 'piano', THEME[1], { vel: 0.5, dur: 3, motif: 'theme' }),
-  ...[['problemSolved2', 0, 1], ['problemSolved3', 0, 0.8], ['problemSolved4', 0, 0.8], ['problemSolved5', 0, 0.4], ['problemSolved5', 0.5, 0.25]].flatMap(([b, at, dur], k) => [
+  ...([['problemSolved2', 0, 1], ['problemSolved3', 0, 0.8], ['problemSolved4', 0, 0.8], ['problemSolved5', 0, 0.4], ['problemSolved5', 0.5, 0.25]] as [string, number, number][]).flatMap(([b, at, dur], k) => [
     ev(b, at, 'piano', THEME[k + 2], { vel: 0.48, dur, motif: 'theme' }),
     ev(b, at, 'piano', HARM[k + 2], { vel: 0.35, dur }),
   ]),
@@ -249,11 +257,10 @@ const LEVEL = 0.5;
 // Notes and their room tails ring through it (the groove's bar −1 stabs reach the home click; s09a's held note runs
 // under the nightstand lamp's click), so the gate fades the stem out over 40 ms before the click and back in 20 ms after
 // the window. Beat-relative, like the notes. [beat, window]: a lamp click is 0.3 s, the off click's 0.17 s (the spring-back follows it).
-/** @type {[string, number][]} */
-const CLICKS = [['lampClickHome', 0.3], ['lampOffHome', 0.17], ['lampOn', 0.3]];
+const CLICKS: [string, number][] = [['lampClickHome', 0.3], ['lampOffHome', 0.17], ['lampOn', 0.3]];
 const FADE_OUT = 0.04, FADE_IN = 0.02;
-function gateClicks(out) {
-  const at = (s) => Math.round(s * SR);
+function gateClicks(out: Float32Array) {
+  const at = (s: number) => Math.round(s * SR);
   for (const [b, len] of CLICKS) {
     const t = beat(b), a = at(t - FADE_OUT), z = at(t), y = at(t + len), e = at(t + len + FADE_IN);
     for (let i = a; i < e && i < out.length; i++) out[i] *= i < z ? 1 - (i - a) / (z - a) : i < y ? 0 : (i - y) / (e - y);
@@ -262,13 +269,13 @@ function gateClicks(out) {
 // The climb (doc 05 v4): every layer +4 dB, linear in dB, marstonSeen → doorPush, held to lightFlood, where the walk's
 // events have all stopped (until), so the held chord is untouched.
 const CLIMB_DB = 4;
-function climb(out) {
+function climb(out: Float32Array) {
   const t0 = beat('marstonSeen'), t1 = beat('doorPush'), t2 = beat('lightFlood');
   for (let i = Math.round(t0 * SR); i < Math.round(t2 * SR) && i < out.length; i++)
     out[i] *= 10 ** (CLIMB_DB * Math.min(1, (i / SR - t0) / (t1 - t0)) / 20);
 }
 // until: the event stops dead on that beat's frame (a 5 ms fade, so no click), tails and all. Returns a copy.
-function cut(buf, sec) {
+function cut(buf: Float32Array, sec: number) {
   const n = Math.max(0, Math.min(buf.length, Math.round(sec * SR))), f = Math.min(n, Math.round(0.005 * SR)), o = buf.slice(0, n);
   for (let i = 0; i < f; i++) o[n - 1 - i] *= i / f;
   return o;
@@ -276,22 +283,23 @@ function cut(buf, sec) {
 
 // Renders SCORE over [0, durSec) of film time as a mono Float32Array. Notes are cached, so the groove's
 // repeats cost one synthesis each.
-export function renderScore(durSec) {
-  const out = new Float32Array(Math.round(durSec * SR)), cache = new Map();
-  const note = (voice, m, vel, dur, vib, vibUntil) => {
+export function renderScore(durSec: number) {
+  const out = new Float32Array(Math.round(durSec * SR)), cache = new Map<string, Float32Array>();
+  const note = (voice: Voice, m: number, vel: number | undefined, dur: number | undefined, vib: number, vibUntil: number) => {
     const k = `${voice}|${m}|${vel}|${dur}|${vib}|${vibUntil}`;
     if (!cache.has(k)) cache.set(k, voice === 'piano' ? feltPiano(m, { vel, dur }) : musicBox(m, { vel, dur, vib, vibUntil }));
-    return cache.get(k);
+    return cache.get(k)!;
   };
   const pulse = FOLEY.pulse();
   for (const e of SCORE) {
     const t = beat(e.beat) + e.at, g = LEVEL * (e.gain ?? 1);
     if (t >= durSec) continue;
-    const put = (buf) => mixInto(out, e.until ? cut(buf, beat(e.until) - t) : buf, t, g);
-    if (e.voice === 'pad') put(pad(e.midi, e));
-    else if (e.voice === 'sub') put(subSwell(e));
+    const put = (buf: Float32Array) => mixInto(out, e.until ? cut(buf, beat(e.until) - t) : buf, t, g);
+    // The voice fixes the shape (ev's callers): a pad has a chord and a dur, a sub a dur, a piano or box note a midi.
+    if (e.voice === 'pad') put(pad(e.midi as number[], e as PadOpts));
+    else if (e.voice === 'sub') put(subSwell(e as SubOpts));
     else if (e.voice === 'pulse') put(pulse);
-    else for (const m of [e.midi].flat()) put(note(e.voice, m, e.vel, e.dur, e.vib ?? 0, e.vibTo ? beat(e.vibTo) - t : Infinity));
+    else for (const m of [e.midi as number | number[]].flat()) put(note(e.voice, m, e.vel, e.dur, e.vib ?? 0, e.vibTo ? beat(e.vibTo) - t : Infinity));
   }
   climb(out);
   gateClicks(out);

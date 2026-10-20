@@ -1,4 +1,3 @@
-// @ts-check
 // Cue sheet: sounds placed by beat name (src/timeline.js), never by raw time. Moving a beat moves its sound.
 // stem: 'foley' (default) | 'ambience' | 'music'. seed: defaults to seedOf(sound) in tools/mix.mjs,
 // so the two lamp clicks share one seed and are sample-identical (doc 05).
@@ -11,42 +10,46 @@
 // The music stem (score.js) is not placed here.
 import { beat, DURATION, S13_DESKS } from '../timeline.ts';
 
-const at = ([b, o = 0]) => beat(b) + o;
-const bed = (sound, stem, from, to, gain, extra) => ({ beat: from[0], offset: from[1] ?? 0, dur: at(to) - at(from), sound, stem, gain, ...extra });
+type Point = [string, number?];
+type Stem = 'foley' | 'ambience' | 'music';
+export type Cue = { beat: string, offset?: number, sound: string, stem?: Stem, gain: number, seed?: number, dur?: number, until?: string, file?: string, in?: number };
+
+const at = ([b, o = 0]: Point) => beat(b) + o;
+const bed = (sound: string, stem: Stem, from: Point, to: Point, gain: number, extra?: { seed: number }): Cue => ({ beat: from[0], offset: from[1] ?? 0, dur: at(to) - at(from), sound, stem, gain, ...extra });
 const AMB = 'ambience';
-const START = ['notifyBuzz', -beat('notifyBuzz')];                // 0:00. s00's only beat
-const S01 = ['notifyBuzz', 4 - beat('notifyBuzz')];                // 0:04, s01 has no beat of its own
-const S18 = ['examCrossedOff', -2];                                 // 2:55, s18 @ 0
-const END = ['tagPenUncap', DURATION - beat('tagPenUncap')];        // 3:15
+const START: Point = ['notifyBuzz', -beat('notifyBuzz')];                // 0:00. s00's only beat
+const S01: Point = ['notifyBuzz', 4 - beat('notifyBuzz')];                // 0:04, s01 has no beat of its own
+const S18: Point = ['examCrossedOff', -2];                                 // 2:55, s18 @ 0
+const END: Point = ['tagPenUncap', DURATION - beat('tagPenUncap')];        // 3:15
 // Doc 05: every lamp click is dry and exposed. Beds stop on it and come back after its window (the music stem does the
 // same in score.js), which is also what keeps the three clicks identical in mix.wav. A lamp click is 0.3 s.
-const ON = (b) => [b, 0.3];
+const ON = (b: string): Point => [b, 0.3];
 // snd-foley-2's sounds, in one place so a level pass touches one table.
-const dB = (x) => 10 ** (x / 20);
+const dB = (x: number) => 10 ** (x / 20);
 const GAIN = { jarClink: 0.4, cartonSlosh: 0.5, tvBloops: 0.4, winJingle: 0.3, roommateStep: 0.4, rodSnap: 0.2, cardTap: 0.4, cs2: dB(-30) };
 // v7, s07's reels: [file in assets/raw/reels/, in-point in the clip (s), from, to (s07 local s)]. Third-party audio: the
 // clips are gitignored and never committed; without them tools/mix.mjs leaves these cues silent and says so. The in-points
 // are each clip's first onset (by waveform; nobody has listened yet), so retime them here by ear. Director: four reels,
 // 2-4 s each; two before the reminder, two after. The cuts are the flicks; when the picture is reworked, its flicks
 // follow this table. (Deoy-54x6aJ, the fifth clip given, is unused: the quietest and flattest of the five.)
-export const REELS = /** @type {[string, number, number, number][]} */ ([
-  ['DIR3LipSfp6', 0.15, 0.5, 3.25], ['DbSRzwjx3hR', 0, 3.25, 6.25], ['DMbt-octmy6', 0, 7.75, 10.0], ['Ddrfu6TxBq-', 0, 10.0, 12.0]]);
+export const REELS = ([
+  ['DIR3LipSfp6', 0.15, 0.5, 3.25], ['DbSRzwjx3hR', 0, 3.25, 6.25], ['DMbt-octmy6', 0, 7.75, 10.0], ['Ddrfu6TxBq-', 0, 10.0, 12.0]] as [string, number, number, number][]);
 
 // snd-v4: the clock. One cue per tick, each on a whole second of global time (the beats it hangs on are whole seconds, or
 // offsets that land on one), so the tick and the walk's pulse share one grid. Every tick is clockTick's one buffer; the
 // variants only filter it for distance (foley.js).
-const ticks = (sound, b, offsets, gain) => offsets.map((o) => ({ beat: b, offset: o, sound, gain, stem: AMB }));
-const range = (a, z) => Array.from({ length: z - a + 1 }, (_, k) => a + k);
+const ticks = (sound: string, b: string, offsets: number[], gain: number): Cue[] => offsets.map((o) => ({ beat: b, offset: o, sound, gain, stem: AMB }));
+const range = (a: number, z: number) => Array.from({ length: z - a + 1 }, (_, k) => a + k);
 
 // walk-redo: footsteps follow the picture. s09c's gait is timed: a contact every STEP (0.25 s) on the global pulse grid
 // from 84.0, up to the block, then from stepAround (a contact) to the turn. The side-steps around the blob and the
 // back-view walk after the turn are timed as before, as in s09c.js.
 // ponytail: STEP, DECIDE (blobBlocks + 7/6) and TURN (18.0) mirror s09c.js, which doesn't export them; import them if it ever does.
-const STEP = 0.25, S09C = beat('walkStart'), lb = (b) => beat(b) - S09C;
-const DECIDE = lb('blobBlocks') + 7 / 6, TURN = 18.0, twos = (t) => Math.ceil(t * 12 - 1e-6) / 12;
+const STEP = 0.25, S09C = beat('walkStart'), lb = (b: string) => beat(b) - S09C;
+const DECIDE = lb('blobBlocks') + 7 / 6, TURN = 18.0, twos = (t: number) => Math.ceil(t * 12 - 1e-6) / 12;
 function walkSteps() {
-  const out = [];
-  const timed = (t0, t1) => { for (let t = t0; t < t1 - 1e-9; t += STEP) out.push(t); };
+  const out: number[] = [];
+  const timed = (t0: number, t1: number) => { for (let t = t0; t < t1 - 1e-9; t += STEP) out.push(t); };
   timed(0, lb('blobBlocks'));
   for (let m = 1; m <= 3; m++) out.push(twos(DECIDE + m * (lb('stepAround') - DECIDE) / 3));   // the third lands on stepAround
   timed(lb('stepAround') + STEP, TURN);
@@ -55,7 +58,7 @@ function walkSteps() {
 }
 export const WALK_STEPS = walkSteps();
 
-export const CUES = [
+export const CUES: Cue[] = [
   // ───────── ambience beds ─────────
   // Paper boil: throughout, very low (doc 05), broken only at the three lamp clicks (the off click's window is 0.17 s: the rustle follows it).
   bed('paperBoil', AMB, START, ['lampClickHome'], 1),
@@ -180,7 +183,7 @@ export const CUES = [
   // phone on the desk lights with the lamp-off at 43.0; the chime waits out the click's 0.17 s window so the three clicks
   // stay identical), s07 54.25, s09a 70.0 (on the tick). Each swipe is a soft thumbFlick as the banner starts to go,
   // 0.25 s before its gulp, clear of the gulp's frame.
-  ...(/** @type {[string, number][]} */ ([['gulp1', -1.25], ['lampOffHome', 0.21], ['gulp3', -1.25], ['phoneFaceDown', -0.5]])).flatMap(([b, o]) => [
+  ...([['gulp1', -1.25], ['lampOffHome', 0.21], ['gulp3', -1.25], ['phoneFaceDown', -0.5]] as [string, number][]).flatMap(([b, o]) => [
     { beat: b, offset: o, sound: 'gameBlip', gain: 0.1, seed: 105 },
     { beat: b, offset: o + 0.08, sound: 'gameBlip', gain: 0.1, seed: 107 }]),
   ...['gulp1', 'gulp2', 'gulp3'].map((b, k) => ({ beat: b, offset: -0.25, sound: 'thumbFlick', gain: dB(-24), seed: 40 + k })),
@@ -284,6 +287,6 @@ export const CUES = [
   // snorts at the screen). s06 resumes half a second after gulp2, where his taps did.
   // The last number is extra dB: s05's groove and s06's run 6 dB hotter than s03's, and at one gain the game sat 12-15 dB
   // under them (measured on the music and foley stems), lost; +6 puts it as far under them as it sits under s03's.
-  ...(/** @type {[number, string, number, number, number][]} */ ([[0, 'laptopUp', 0.25, 6.0, 0], [5.75, 'gameNight', 0.33, 6.58, 6], [0, 'gulp2', 0.5, 4.0, 6]]))
+  ...([[0, 'laptopUp', 0.25, 6.0, 0], [5.75, 'gameNight', 0.33, 6.58, 6], [0, 'gulp2', 0.5, 4.0, 6]] as [number, string, number, number, number][])
     .map(([inSec, b, from, to, up]) => ({ beat: b, offset: from, dur: to - from, sound: 'clip', file: 'cs2', in: inSec, gain: GAIN.cs2 * dB(up) })),
 ];

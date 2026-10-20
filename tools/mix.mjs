@@ -9,11 +9,11 @@ import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { beat, DURATION } from '../src/timeline.ts';
 import { seedOf } from '../src/core/rng.ts';
-import { SR, mixInto } from '../src/audio/synth.js';
-import { renderScore } from '../src/audio/score.js';
-import { FOLEY } from '../src/audio/foley.js';
-import { CUES } from '../src/audio/cues.js';
-import { writeWav } from '../src/audio/wav.js';
+import { SR, mixInto } from '../src/audio/synth.ts';
+import { renderScore } from '../src/audio/score.ts';
+import { FOLEY } from '../src/audio/foley.ts';
+import { CUES } from '../src/audio/cues.ts';
+import { writeWav } from '../src/audio/wav.ts';
 
 // Music bus: fixed makeup gain into a sample-peak limiter (no RNG, no state beyond its 2 ms attack / 80 ms
 // release). It lifts the score so the premix peak-to-loudness ratio fits linear loudnorm, while the music

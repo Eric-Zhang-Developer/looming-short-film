@@ -1,4 +1,3 @@
-// @ts-check
 // Offline voices and DSP (doc 05, contracts §src/audio). Plain Node, mono Float32Array at 48 kHz.
 // Ideas ported from 1776's audio.ts (oscillator + envelope voices, polyBLEP saw, biquads); code is new.
 // Deterministic: noise comes only from src/core/rng.js, seeded per call.
@@ -6,18 +5,18 @@ import { mulberry32, seedOf } from '../core/rng.ts';
 
 export const SR = 48000;
 const TAU = Math.PI * 2;
-const mtof = (m) => 440 * 2 ** ((m - 69) / 12);
-const len = (sec) => Math.max(1, Math.ceil(sec * SR));
+const mtof = (m: number) => 440 * 2 ** ((m - 69) / 12);
+const len = (sec: number) => Math.max(1, Math.ceil(sec * SR));
 
 // ───────── primitives ─────────
-export function noise(seed, dur) {
+export function noise(seed: number, dur: number) {
   const r = mulberry32(seed), out = new Float32Array(len(dur));
   for (let i = 0; i < out.length; i++) out[i] = r() * 2 - 1;
   return out;
 }
 
 // RBJ biquad, returns a new buffer. type: 'lp' | 'hp' | 'bp' (bp has 0 dB peak).
-function biquad(x, type, f0, Q = 0.707) {
+function biquad(x: Float32Array, type: 'lp' | 'hp' | 'bp', f0: number, Q = 0.707) {
   const w = TAU * Math.min(f0, SR * 0.45) / SR, cs = Math.cos(w), al = Math.sin(w) / (2 * Q);
   const [b0, b1, b2] = type === 'lp' ? [(1 - cs) / 2, 1 - cs, (1 - cs) / 2]
     : type === 'hp' ? [(1 + cs) / 2, -(1 + cs), (1 + cs) / 2] : [al, 0, -al];
@@ -29,12 +28,12 @@ function biquad(x, type, f0, Q = 0.707) {
   }
   return out;
 }
-export const lowpass = (buf, hz) => biquad(buf, 'lp', hz);
-export const highpass = (buf, hz) => biquad(buf, 'hp', hz);
-export const bandpass = (buf, hz, Q = 1) => biquad(buf, 'bp', hz, Q);
+export const lowpass = (buf: Float32Array, hz: number) => biquad(buf, 'lp', hz);
+export const highpass = (buf: Float32Array, hz: number) => biquad(buf, 'hp', hz);
+export const bandpass = (buf: Float32Array, hz: number, Q = 1) => biquad(buf, 'bp', hz, Q);
 
 // Linear ADSR over the whole buffer, in place: release occupies the last r seconds.
-export function env(buf, { a = 0.005, d = 0.1, s = 1, r = 0.05 } = {}) {
+export function env(buf: Float32Array, { a = 0.005, d = 0.1, s = 1, r = 0.05 }: { a?: number, d?: number, s?: number, r?: number } = {}) {
   const T = buf.length / SR;
   for (let i = 0; i < buf.length; i++) {
     const t = i / SR;
@@ -46,7 +45,7 @@ export function env(buf, { a = 0.005, d = 0.1, s = 1, r = 0.05 } = {}) {
 }
 
 // Adds src into dest starting at atSec (may be negative or run past the end; the overlap is mixed).
-export function mixInto(dest, src, atSec, gain = 1) {
+export function mixInto(dest: Float32Array, src: Float32Array, atSec: number, gain = 1) {
   const i0 = Math.round(atSec * SR);
   for (let i = Math.max(0, -i0); i < src.length && i0 + i < dest.length; i++) dest[i0 + i] += src[i] * gain;
   return dest;
@@ -54,7 +53,7 @@ export function mixInto(dest, src, atSec, gain = 1) {
 
 // Small Schroeder room: 4 parallel combs into 2 allpasses (prime-ish delays, ~1.2 s tail at fb 0.78).
 // ponytail: mono plate-ish room, swap for a stereo FDN if the piano needs width.
-function room(x, wet = 0.2, fb = 0.78, tail = 1.2) {
+function room(x: Float32Array, wet = 0.2, fb = 0.78, tail = 1.2) {
   const n = x.length + len(tail), out = new Float32Array(n), acc = new Float32Array(n);
   for (const D of [1557, 1617, 1491, 1422].map((d) => Math.round(d * SR / 44100))) {
     const buf = new Float32Array(D); let p = 0, lp = 0;
@@ -73,7 +72,7 @@ function room(x, wet = 0.2, fb = 0.78, tail = 1.2) {
   return out;
 }
 
-function sawBlep(phase, dt) {           // polyBLEP-corrected saw, phase in [0,1)
+function sawBlep(phase: number, dt: number) {           // polyBLEP-corrected saw, phase in [0,1)
   let v = 2 * phase - 1;
   if (phase < dt) { const t = phase / dt; v -= t + t - t * t - 1; }
   else if (phase > 1 - dt) { const t = (phase - 1) / dt; v -= t * t + t + t + 1; }
@@ -84,10 +83,10 @@ function sawBlep(phase, dt) {           // polyBLEP-corrected saw, phase in [0,1
 // Felt piano: 8 stiff-string partials (f_n = n f √(1+B n²)), upper partials decay faster,
 // a felt-hammer thump of low-passed noise, a 2-pole low-pass whose cutoff opens with velocity and
 // closes as the note decays, then a short room. Output runs dur + damper release + reverb tail.
-export function feltPiano(midi, { vel = 0.7, dur = 1.5 } = {}) {
+export function feltPiano(midi: number, { vel = 0.7, dur = 1.5 }: { vel?: number, dur?: number } = {}) {
   const f = mtof(midi), B = 0.0004, rel = 0.25, n = len(dur + rel), x = new Float32Array(n);
   const tau0 = 2.2 * 2 ** (-(midi - 60) / 24);   // lower notes ring longer
-  const parts = [];
+  const parts: { w: number, a: number, tau: number }[] = [];
   for (let k = 1; k <= 8; k++) {
     const fk = k * f * Math.sqrt(1 + B * k * k);
     if (fk < SR * 0.45) parts.push({ w: TAU * fk / SR, a: (1 / k ** 1.4) * (k === 1 ? 1 : 0.8), tau: tau0 / (1 + 0.7 * (k - 1)) });
@@ -117,7 +116,7 @@ export function feltPiano(midi, { vel = 0.7, dur = 1.5 } = {}) {
 // Music box: a sine plus a bright inharmonic partial (×4.2) that dies in ~60 ms. Fractional midi = detune.
 // Optional vibrato: vib cents at vibHz, stopping dead at vibUntil seconds (the pitch then holds where it is). vib 0 = none,
 // and then the samples are exactly the vibrato-less ones.
-export function musicBox(midi, { vel = 0.6, dur = 1.2, vib = 0, vibHz = 7, vibUntil = Infinity } = {}) {
+export function musicBox(midi: number, { vel = 0.6, dur = 1.2, vib = 0, vibHz = 7, vibUntil = Infinity }: { vel?: number, dur?: number, vib?: number, vibHz?: number, vibUntil?: number } = {}) {
   const f = mtof(midi), out = new Float32Array(len(dur)), w1 = TAU * f / SR, w2 = TAU * f * 4.2 / SR, d = 2 ** (vib / 1200) - 1;
   for (let i = 0; i < out.length; i++) {
     const t = i / SR, fade = Math.min(1, (dur - t) / 0.02);
@@ -132,14 +131,11 @@ export function musicBox(midi, { vel = 0.6, dur = 1.2, vib = 0, vibHz = 7, vibUn
 // Length = dur + release. snd-v4, both optional (without them the samples are exactly as before):
 // bend { voice, at: [[t, semitones], ...] } glides one voice (index into midis) along a piecewise-linear pitch curve;
 // open { from, to, hz } raises the low-pass ceiling by hz between from and to (seconds from the note's start).
-/**
- * @param {number[]} midis
- * @param {{ dur: number, attack?: number, release?: number, bend?: { voice: number, at: number[][] }, open?: { from: number, to: number, hz: number } }} opts
- */
-export function pad(midis, { dur, attack = 1.5, release = 2, bend, open } = /** @type {any} */ ({})) {  // dur has no default: pass it
+export type PadOpts = { dur: number, attack?: number, release?: number, bend?: { voice: number, at: number[][] }, open?: { from: number, to: number, hz: number } };
+export function pad(midis: number[], { dur, attack = 1.5, release = 2, bend, open }: PadOpts = {} as PadOpts) {  // dur has no default: pass it
   const n = len(dur + release), out = new Float32Array(n), dets = [-8, 0, 8];
   const oscs = midis.flatMap((m, v) => dets.map((c, j) => ({ v, dt: mtof(m) * 2 ** (c / 1200) / SR, ph: (j * 0.318) % 1 })));
-  const curve = (k, t) => { if (t <= k[0][0]) return k[0][1]; for (let i = 1; i < k.length; i++) if (t <= k[i][0]) { const [t0, a] = k[i - 1], [t1, b] = k[i]; return a + (b - a) * (t - t0) / (t1 - t0); } return k[k.length - 1][1]; };
+  const curve = (k: number[][], t: number) => { if (t <= k[0][0]) return k[0][1]; for (let i = 1; i < k.length; i++) if (t <= k[i][0]) { const [t0, a] = k[i - 1], [t1, b] = k[i]; return a + (b - a) * (t - t0) / (t1 - t0); } return k[k.length - 1][1]; };
   let y1 = 0, y2 = 0;
   for (let i = 0; i < n; i++) {
     const t = i / SR, r = bend ? 2 ** (curve(bend.at, t) / 12) : 1;
@@ -156,7 +152,8 @@ export function pad(midis, { dur, attack = 1.5, release = 2, bend, open } = /** 
 }
 
 // Sub swell: a 40–60 Hz sine with a slow (smoothstep) attack, 0.5 s release at the end.
-export function subSwell({ hz = 50, dur, attack = dur / 2 }) {
+export type SubOpts = { hz?: number, dur: number, attack?: number };
+export function subSwell({ hz = 50, dur, attack = dur / 2 }: SubOpts) {
   const out = new Float32Array(len(dur)), w = TAU * hz / SR, r = Math.min(0.5, dur / 4);
   for (let i = 0; i < out.length; i++) {
     const t = i / SR, a = Math.min(1, t / attack), e = a * a * (3 - 2 * a) * Math.min(1, (dur - t) / r);

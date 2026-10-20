@@ -1,18 +1,17 @@
-// @ts-check
 // Named foley from doc 05's table. One-shots: (seed) => mono Float32Array at 48 kHz.
 // Beds and sized one-shots take a length: (seed, dur), dur in seconds; omit it for the sound's default length.
 // Each sound's output peak is its intended loudness relative to the others at cue gain 1.
 // The same seed always gives the same samples, so a cue repeated with one seed is sample-identical.
 import { mulberry32 } from '../core/rng.ts';
-import { SR, noise, lowpass, highpass, bandpass, mixInto, subSwell } from './synth.js';
+import { SR, noise, lowpass, highpass, bandpass, mixInto, subSwell } from './synth.ts';
 
 const TAU = Math.PI * 2;
-const gen = (sec, fn) => { const o = new Float32Array(Math.ceil(sec * SR)); for (let i = 0; i < o.length; i++) o[i] = fn(i / SR, i); return o; };
-const decay = (buf, tau, a = 0.0005) => { for (let i = 0; i < buf.length; i++) { const t = i / SR; buf[i] *= Math.min(1, t / a) * Math.exp(-t / tau); } return buf; };
-const scale = (buf, g) => { for (let i = 0; i < buf.length; i++) buf[i] *= g; return buf; };
-const norm = (buf, peak) => { let m = 0; for (const v of buf) m = Math.max(m, Math.abs(v)); return m ? scale(buf, peak / m) : buf; };
+const gen = (sec: number, fn: (t: number, i: number) => number) => { const o = new Float32Array(Math.ceil(sec * SR)); for (let i = 0; i < o.length; i++) o[i] = fn(i / SR, i); return o; };
+const decay = (buf: Float32Array, tau: number, a = 0.0005) => { for (let i = 0; i < buf.length; i++) { const t = i / SR; buf[i] *= Math.min(1, t / a) * Math.exp(-t / tau); } return buf; };
+const scale = (buf: Float32Array, g: number) => { for (let i = 0; i < buf.length; i++) buf[i] *= g; return buf; };
+const norm = (buf: Float32Array, peak: number) => { let m = 0; for (const v of buf) m = Math.max(m, Math.abs(v)); return m ? scale(buf, peak / m) : buf; };
 // Linear fade-out of f seconds and fade-in of fi seconds, in place, so no sound starts or ends on a hard edge.
-const fade = (buf, f = 0.02, fi = f) => {
+const fade = (buf: Float32Array, f = 0.02, fi = f) => {
   const n = Math.min(buf.length / 2, f * SR), m = Math.min(buf.length / 2, fi * SR);
   for (let i = 0; i < n; i++) buf[buf.length - 1 - i] *= i / n;
   for (let i = 0; i < m; i++) buf[i] *= i / m;
@@ -23,14 +22,14 @@ const fade = (buf, f = 0.02, fi = f) => {
 // a smaller settle tick 11 ms later, then the bulb's filament "tink" as it heats, ~45 ms in, very quiet.
 function lampClick(seed = 1) {
   const out = new Float32Array(Math.ceil(0.3 * SR));
-  const snap = (at, g, s) => {
+  const snap = (at: number, g: number, s: number) => {
     mixInto(out, decay(bandpass(noise(s, 0.02), 3800, 0.9), 0.0016), at, g);
     mixInto(out, gen(0.04, (t) => Math.sin(TAU * 1750 * t) * Math.exp(-t / 0.004)), at, g * 0.45);
     mixInto(out, gen(0.04, (t) => Math.sin(TAU * 820 * t) * Math.exp(-t / 0.006)), at, g * 0.3);
   };
   snap(0, 1, seed);
   snap(0.011, 0.35, seed + 1);
-  const tink = (t) => Math.sin(TAU * 6150 * t) + 0.5 * Math.sin(TAU * 9230 * t) + 0.3 * Math.sin(TAU * 12370 * t);
+  const tink = (t: number) => Math.sin(TAU * 6150 * t) + 0.5 * Math.sin(TAU * 9230 * t) + 0.3 * Math.sin(TAU * 12370 * t);
   mixInto(out, gen(0.2, (t) => tink(t) * Math.min(1, t / 0.002, (0.2 - t) / 0.02) * Math.exp(-t / 0.025)), 0.045, 0.05);
   return scale(out, 0.9);
 }
@@ -41,7 +40,7 @@ function lampClick(seed = 1) {
 // (cues.js: fluorescentHum at 0.15 / this cue's 0.8), so it hands over to the bed at +0.65. Both wakes use the one seed.
 function sensorWake(seed = 1) {
   const out = new Float32Array(Math.ceil(0.65 * SR));
-  const snap = (at, g, s) => {
+  const snap = (at: number, g: number, s: number) => {
     mixInto(out, decay(bandpass(noise(s, 0.02), 2400, 0.9), 0.0018), at, g);
     mixInto(out, gen(0.05, (t) => Math.sin(TAU * 1100 * t) * Math.exp(-t / 0.005)), at, g * 0.45);
     mixInto(out, gen(0.05, (t) => Math.sin(TAU * 520 * t) * Math.exp(-t / 0.008)), at, g * 0.3);
@@ -121,7 +120,7 @@ function penScratch(seed = 1, dur = 3) {
   return norm(fade(scratch(seed, dur, speed), 0.01), 0.4);
 }
 // The pen's sound for a given speed curve (0..1 per sample, length ceil(dur * SR)), unnormalized.
-function scratch(seed, dur, speed) {
+function scratch(seed: number, dur: number, speed: Float32Array) {
   const n = speed.length, lo = bandpass(noise(seed, dur), 2200, 0.8), hi = bandpass(noise(seed + 1, dur), 5500, 0.9);
   const rt = mulberry32(seed + 2), ticks = new Float32Array(n);
   for (let i = 0; i < n; i++) if (rt() < speed[i] * 250 / SR) ticks[i] = (rt() < 0.5 ? -1 : 1) * (0.5 + rt());
@@ -173,7 +172,7 @@ function fridgeHum(seed = 1, dur = 4) {
 // 2.4–3.4 kHz body mode, and a quieter release tick 30–60 ms later.
 function controllerClick(seed = 1) {
   const r = mulberry32(seed), out = new Float32Array(Math.ceil(0.9 * SR)), count = 4 + Math.floor(r() * 4);
-  const press = (at, g, s, f) => {
+  const press = (at: number, g: number, s: number, f: number) => {
     mixInto(out, decay(bandpass(noise(s, 0.01), 3000, 0.8), 0.0012), at, g);
     mixInto(out, gen(0.03, (t) => Math.sin(TAU * f * t) * Math.exp(-t / 0.003)), at, g * 0.5);
   };
@@ -288,7 +287,7 @@ function nightHum(seed = 1, dur = 4) {
 // (seed, dur) => bed (default 10 s, s12). The shadow's breathing in Quiet 1: a 45 Hz sine and a breath of noise below
 // 250 Hz, following the blob's breath (s12: period 5 s, peaks at 1.25 and 6.25 s), then holding its 6.0 s level.
 function shadowBreath(seed = 1, dur = 10) {
-  const air = lowpass(lowpass(noise(seed, dur), 250), 250), breath = (t) => 0.5 + 0.5 * Math.cos(TAU * (Math.min(t, 6) - 1.25) / 5);
+  const air = lowpass(lowpass(noise(seed, dur), 250), 250), breath = (t: number) => 0.5 + 0.5 * Math.cos(TAU * (Math.min(t, 6) - 1.25) / 5);
   const out = gen(dur, (t, i) => breath(t) * (Math.sin(TAU * 45 * t) + 2 * air[i]));
   return norm(fade(out, 0.3), 0.5);
 }
@@ -297,9 +296,9 @@ function shadowBreath(seed = 1, dur = 10) {
 // ───────── snd-foley-2: the shot specs' sounds doc 05 doesn't list ─────────
 
 // TV speaker: nothing below 300 Hz or above 4.5 kHz.
-const tv = (buf) => lowpass(lowpass(highpass(buf, 300), 4500), 4500);
+const tv = (buf: Float32Array) => lowpass(lowpass(highpass(buf, 300), 4500), 4500);
 // A few odd harmonics of f: a soft 8-bit square, no aliasing.
-const square = (ph) => Math.sin(ph) + Math.sin(3 * ph) / 3 + Math.sin(5 * ph) / 5 + Math.sin(7 * ph) / 7;
+const square = (ph: number) => Math.sin(ph) + Math.sin(3 * ph) / 3 + Math.sin(5 * ph) / 5 + Math.sin(7 * ph) / 7;
 
 // (seed) => one-shot, 0.06 s. s03's thumb flick on the phone glass: a tiny bright tick and a whisper of skin.
 function thumbFlick(seed = 1) {
@@ -321,7 +320,7 @@ function scrollTick(seed = 1) {
 // (×1, 2.32, 3.86, 5.1, higher ones dying faster) with a small impact tick, then a lighter second touch 25–45 ms later.
 function jarClink(seed = 1) {
   const r = mulberry32(seed), out = new Float32Array(Math.ceil(0.5 * SR)), f0 = 1900 + 700 * r();
-  const hit = (at, g, s) => {
+  const hit = (at: number, g: number, s: number) => {
     const parts = [[1, 1, 0.22], [2.32, 0.6, 0.12], [3.86, 0.4, 0.07], [5.1, 0.25, 0.04]];
     mixInto(out, gen(0.4, (t) => parts.reduce((v, [m, a, tau]) => v + a * Math.sin(TAU * f0 * m * t) * Math.exp(-t / tau), 0) * Math.min(1, t / 0.0004, (0.4 - t) / 0.15)), at, g);   // tapered, so the ring never stops on a step
     mixInto(out, decay(highpass(noise(s, 0.01), 4000), 0.0008), at, g * 0.5);
@@ -373,8 +372,8 @@ function roommateStep(seed = 1) {
 // (seed) => one-shot, 0.9 s. s05's TV "win": an 8-bit C-major arpeggio up (C6 E6 G6, 70 ms each), then C7 + E7 held
 // 0.45 s with a 7 Hz vibrato, through the TV speaker. A game sound, not score. Seed unused.
 function winJingle(seed = 1) {
-  const out = new Float32Array(Math.ceil(0.9 * SR)), hz = (m) => 440 * 2 ** ((m - 69) / 12);
-  const note = (m, at, len, vib) => {
+  const out = new Float32Array(Math.ceil(0.9 * SR)), hz = (m: number) => 440 * 2 ** ((m - 69) / 12);
+  const note = (m: number, at: number, len: number, vib: number) => {
     let ph = 0;
     mixInto(out, gen(len, (u) => { ph += TAU * hz(m) * (1 + vib * 0.012 * Math.sin(TAU * 7 * u)) / SR; return square(ph) * Math.min(1, u / 0.003, (len - u) / 0.02); }), at, 0.5);
   };
@@ -397,7 +396,7 @@ function ladderCreak(seed = 1) {
 // (1150, 3170, 6200 Hz), and a small rattle 18 ms later.
 function rodSnap(seed = 1) {
   const out = new Float32Array(Math.ceil(0.5 * SR));
-  const hit = (at, g, s) => {
+  const hit = (at: number, g: number, s: number) => {
     mixInto(out, decay(bandpass(noise(s, 0.015), 3000, 0.9), 0.001), at, g);
     mixInto(out, gen(0.45, (t) => (Math.sin(TAU * 1150 * t) * Math.exp(-t / 0.15) + 0.6 * Math.sin(TAU * 3170 * t) * Math.exp(-t / 0.08) + 0.3 * Math.sin(TAU * 6200 * t) * Math.exp(-t / 0.04)) * Math.min(1, t / 0.0005, (0.45 - t) / 0.15)), at, g * 0.35);
   };
@@ -419,7 +418,7 @@ function curtainSwish(seed = 1, dur = 0.67) {
 // dull tap (noise under 2.5 kHz) and a lighter settle tap 30 ms later.
 function cardTap(seed = 1) {
   const out = new Float32Array(Math.ceil(0.2 * SR));
-  const tap = (at, g, s) => {
+  const tap = (at: number, g: number, s: number) => {
     mixInto(out, gen(0.1, (t) => Math.sin(TAU * 180 * t) * Math.min(1, t / 0.001) * Math.exp(-t / 0.025)), at, g * 0.6);
     mixInto(out, decay(lowpass(noise(s, 0.03), 2500), 0.004), at, g);
   };
@@ -487,7 +486,7 @@ function blindRattle(seed = 1) {
   const cloth = bandpass(noise(seed, BLIND_CLACK), 900, 0.7);
   for (let i = 0; i < cloth.length; i++) cloth[i] *= 0.25 * Math.sin(Math.PI * i / cloth.length);
   mixInto(out, cloth, 0);
-  const clack = (at, g, s) => {
+  const clack = (at: number, g: number, s: number) => {
     mixInto(out, decay(lowpass(noise(s, 0.03), 1800), 0.006), at, g);
     mixInto(out, gen(0.12, (u) => (Math.sin(TAU * 420 * u) * Math.exp(-u / 0.015) + 0.5 * Math.sin(TAU * 1150 * u) * Math.exp(-u / 0.008)) * Math.min(1, u / 0.0005)), at, g * 0.7);
   };
@@ -512,7 +511,7 @@ function penTap(seed = 1) {
 }
 
 // A far-away version of a sound for the exam room: darker, with two slap echoes off the walls.
-const far = (buf, hz = 2500) => { const o = lowpass(buf, hz); mixInto(o, o.slice(), 0.07, 0.3); mixInto(o, o.slice(), 0.16, 0.15); return o; };
+const far = (buf: Float32Array, hz = 2500) => { const o = lowpass(buf, hz); mixInto(o, o.slice(), 0.07, 0.3); mixInto(o, o.slice(), 0.16, 0.15); return o; };
 
 // (seed, dur) => bed. s17b's exam room: a large quiet room's air (darker and wider than roomTone), a distant page turn
 // every 1.5-3.5 s, and now and then a far pen. The wall clock and the cough are their own sounds (clockTick, cough), so
@@ -534,7 +533,7 @@ function examHush(seed = 1, dur = 4) {
 const TICK_SEED = 0x71c4;
 function clockTick() {
   const out = new Float32Array(Math.ceil(0.12 * SR));
-  const tick = (at, g, k, s) => {
+  const tick = (at: number, g: number, k: number, s: number) => {
     mixInto(out, decay(bandpass(noise(s, 0.01), 3200 * k, 1.4), 0.0006), at, g);
     for (const [f, tau, a] of [[420, 0.010, 0.35], [1150, 0.006, 0.6], [2650, 0.003, 0.4]])
       mixInto(out, gen(0.05, (t) => Math.sin(TAU * f * k * t) * Math.exp(-t / tau)), at, g * a);
@@ -546,7 +545,7 @@ function clockTick() {
 }
 // Distance is filtering, never a different tick: s08 C2 a little further; the room through his door (s08 C3, s09a, s09b);
 // the exam room's reverb (s17b: far()'s two slaps plus a short darkening tail).
-const roomy = (b, sec) => { const o = new Float32Array(Math.ceil(sec * SR)); o.set(b); return o; };
+const roomy = (b: Float32Array, sec: number) => { const o = new Float32Array(Math.ceil(sec * SR)); o.set(b); return o; };
 const clockTickMid = () => lowpass(clockTick(), 4000);
 const clockTickFar = () => { const o = far(roomy(clockTick(), 0.3), 2200); mixInto(o, lowpass(o.slice(), 1500), 0.03, 0.4); return o; };
 const clockTickExam = () => {
@@ -570,7 +569,7 @@ function pulse() {
 // (450, 1400, 2600 Hz), a sharp onset each, the second smaller, 0.18 s apart; then far().
 function cough(seed = 1) {
   const out = new Float32Array(Math.ceil(0.6 * SR));
-  const burst = (at, g, s, len) => {
+  const burst = (at: number, g: number, s: number, len: number) => {
     const x = noise(s, len), y = bandpass(x, 450, 3);
     mixInto(y, bandpass(x, 1400, 4), 0, 0.6);
     mixInto(y, bandpass(x, 2600, 5), 0, 0.3);
@@ -587,7 +586,7 @@ function cough(seed = 1) {
 // body) and a soft stop.
 function paperSlide(seed = 1) {
   const r = mulberry32(seed), d = 0.5, n = Math.ceil(d * SR), out = new Float32Array(n), skid = 0.42;
-  const speed = (t) => t < skid ? Math.sin(Math.PI / 2 * t / skid) : Math.max(0, 1 - (t - skid) / 0.06);
+  const speed = (t: number) => t < skid ? Math.sin(Math.PI / 2 * t / skid) : Math.max(0, 1 - (t - skid) / 0.06);
   const lo = bandpass(noise(seed, d), 1400, 0.6), hi = bandpass(noise(seed + 1, d), 3000, 0.8);
   for (let i = 0; i < n; i++) { const v = speed(i / SR); out[i] = v * ((1 - v) * lo[i] + v * hi[i]); }
   const chatter = new Float32Array(n);
@@ -622,7 +621,7 @@ function inkSoak(seed = 1) {
 // The squeak is a stick-slip whistle (a 1.6-2.8 kHz tone with jittered pitch and a little 2nd harmonic) over felt noise.
 function markerScratch(seed = 1, dur = 2) {
   const r = mulberry32(seed), n = Math.ceil(dur * SR), env = new Float32Array(n), pitch = new Float32Array(n).fill(2000);
-  const stroke = (t0, len, f0, f1, round) => {
+  const stroke = (t0: number, len: number, f0: number, f1: number, round: boolean) => {
     const i0 = Math.round(t0 * SR), m = Math.round(len * SR);
     for (let i = 0; i < m && i0 + i < n; i++) {
       const p = i / m;
@@ -652,12 +651,12 @@ function markerScratch(seed = 1, dur = 2) {
 // ───────── snd-v4: the climax's sounds (doc 05 v4, marked "new"). Same toolkit, same habit: one physical joke each ─────────
 
 // A sin^p swell of `len` seconds at t0, added into env.
-const swell = (env, t0, len, g, p = 2) => { const i0 = Math.round(t0 * SR), m = Math.round(len * SR); for (let i = 0; i < m && i0 + i < env.length; i++) env[i0 + i] += g * Math.sin(Math.PI * i / m) ** p; };
+const swell = (env: Float32Array, t0: number, len: number, g: number, p = 2) => { const i0 = Math.round(t0 * SR), m = Math.round(len * SR); for (let i = 0; i < m && i0 + i < env.length; i++) env[i0 + i] += g * Math.sin(Math.PI * i / m) ** p; };
 
 // (seed, dur) => breathing at a fixed rate: each cycle an inhale (brighter air, 1.8 + 3.6 kHz) then an exhale (darker,
 // 0.9 + 1.7 kHz), each a swell, levels seeded per breath. nasal: through the nose, narrower, a 2.8 kHz resonance, and
 // the joke: every third in-breath catches a faint nose whistle that slides up.
-function breaths(seed, dur, { period, tin, tout, nasal = false }) {
+function breaths(seed: number, dur: number, { period, tin, tout, nasal = false }: { period: number, tin: number, tout: number, nasal?: boolean }) {
   const r = mulberry32(seed), n = Math.ceil(dur * SR), eIn = new Float32Array(n), eOut = new Float32Array(n), whistle = new Float32Array(n);
   const ni = noise(seed, dur), no = noise(seed + 1, dur);
   const inA = bandpass(ni, nasal ? 2800 : 1800, nasal ? 4 : 0.9), inB = bandpass(ni, 3600, 1.2);
@@ -715,7 +714,7 @@ function backpackGrab(seed = 1) {
 // through two body bands. The joke: the creak's pitch rises 180 → 420 Hz, like the door asking.
 function doorLatch(seed = 1) {
   const out = new Float32Array(Math.ceil(1.1 * SR));
-  const clk = (at, g, s) => {
+  const clk = (at: number, g: number, s: number) => {
     mixInto(out, decay(bandpass(noise(s, 0.01), 3000, 1), 0.001), at, g);
     mixInto(out, gen(0.06, (t) => (Math.sin(TAU * 2200 * t) + 0.5 * Math.sin(TAU * 3900 * t)) * Math.exp(-t / 0.008)), at, g * 0.4);
   };
@@ -796,8 +795,7 @@ function doorPush(seed = 1) {
   return norm(fade(out, 0.05, 0), 0.6);
 }
 
-/** @type {Record<string, (seed?: number, dur?: number) => Float32Array>} */
-export const FOLEY = {
+export const FOLEY: Record<string, (seed?: number, dur?: number) => Float32Array> = {
   lampClick, sensorWake, penUncap, inkDrip, paperRustle, fluorescentHum,
   penScratch, phoneHum, inkRoll, shadowGrowth, fridgeHum, controllerClick, drill,
   fluorescentFlicker, mopOnTile, paperBoil, dawnBirds, roomTone, nightHum, shadowBreath,
