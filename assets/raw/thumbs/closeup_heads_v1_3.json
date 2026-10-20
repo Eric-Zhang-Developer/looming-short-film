@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/closeup_heads_v1_3.png",
+  "prompt_file": "assets/prompts/closeup_heads.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/closeup_heads.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/gator_hero.png",
+      "sha256": "bf02530ba4a6214ea701dc2c6c72c4ff2917f26cb36a13dccefce54b6e20f8fb"
+    },
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a14cf6-7df0-75a2-a0e9-bdf39c5cf0d3",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a14cf6-7df0-75a2-a0e9-bdf39c5cf0d3/exec-f4536f3f-5a05-4497-b252-fad039d9182f.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-BIDxKH",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 244973,
+    "cached_input_tokens": 216448,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2802,
+    "reasoning_output_tokens": 108
+  },
+  "timestamp_start_utc": "2026-10-18T03:03:04Z",
+  "timestamp_end_utc": "2026-10-18T03:05:50Z",
+  "output_sha256": "139d4d233eca77bdfae0c5b8b018833474c437e0867e80d31467431fec390e66",
+  "width": 1536,
+  "height": 1024,
+  "pixel_format": "rgb24",
+  "thumbnail": "assets/raw/thumbs/closeup_heads_v1_3.jpg",
+  "screening": "Survives, ranked 2nd of 3. Six heads, six islands, all moods read, strongest brows. Closest snout (snout/W +2..+3% on five of six) and nearest green on G (143 vs 141, but R and B 15 lower, so more saturated). Flaws: eyes 12-15% bigger than the hero relative to head width, bump 2.6-2.8x, the relief head is painted 7% smaller than the other five, its breath puff floats a few px off the snout tip, sheet width spread 7.5%."
+}

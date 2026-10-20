@@ -1,0 +1,8 @@
+tLocal 1: blob z 0.190  blob 2.68 x 2.48 cm  shadow 11.6 x 10.4 cm  x -0.212..-0.096 y 0.076..0.180  center (-0.154, 0.128)
+  scale: width 4.31x  height 4.18x  (target 4.2 ± 0.4: PASS on width)
+tLocal 3.5: blob z 0.200  blob 2.70 x 2.50 cm  shadow 13.7 x 12.7 cm  x -0.267..-0.130 y 0.084..0.211  center (-0.199, 0.148)
+  scale: width 5.08x  height 5.07x  (target 5 ± 0.5: PASS on width)
+tLocal 7.5: blob z 0.210  blob 2.69 x 2.44 cm  shadow 17.0 x 15.8 cm  x -0.363..-0.193 y 0.095..0.254  center (-0.278, 0.175)
+  scale: width 6.31x  height 6.48x  (target 6.25 ± 0.6: PASS on width)
+  upper-cabinet band y 0.09..0.22: shadow covers y 0.095..0.220 → OVERLAPS
+Student wall shadow at 5.0: 0 px change when every Student part stops casting

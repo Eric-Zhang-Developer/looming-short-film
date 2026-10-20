@@ -1,0 +1,8 @@
+# node evidence/v7-fridge/measure.mjs, run by the v7-fridge builder on 533095b (copied from its hand-back by the
+# orchestrator; the builder handed back before writing this file).
+t 1.00 open 1: key 0.3  blob z 0.173  blob 4.06 cm wide  shadow 11.2 x 9.7 cm  scale 2.76x  units 4.14
+t 2.00 shut (away): key 0  no wall shadow (0 px)
+t 3.25 open 2: key 0.3  blob z 0.184  shadow 12.8 x 10.2 cm  scale 3.17x  units 4.76
+t 4.25 shut: key 0  no wall shadow (0 px)
+t 6.00 open 3: key 0.3  blob z 0.197  shadow 14.9 x 10.7 cm  scale 3.59x  units 5.39
+shadow width by open: open 1 11.2 cm → open 2 12.8 cm → open 3 14.9 cm  GROWING

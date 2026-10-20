@@ -1,0 +1,7 @@
+src/audio/cues.js unresolved: nextSemester, sensorWakeFreshman, phoneUp, scrollStart, curtainsDone, blobYawn, curtainsStart
+src/audio/score.js unresolved: curtainsStart, scrollStart, sensorWakeFreshman
+src/audio/selftest.js unresolved: lampClick, sensorWake
+src/audio/foley.js unresolved: none
+tools/mix.mjs unresolved: none
+cues.js import fails: unknown beat: nextSemester
+score.js imports ok

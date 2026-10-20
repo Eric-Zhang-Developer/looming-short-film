@@ -1,0 +1,4 @@
+t=26.5  9eb2e75bf5101fc0 9eb2e75bf5101fc0 9eb2e75bf5101fc0  PASS
+t=28.25  f0121db35c71d7cf f0121db35c71d7cf f0121db35c71d7cf  PASS
+t=31.5  4f3c2dbcd9e12bc3 4f3c2dbcd9e12bc3 4f3c2dbcd9e12bc3  PASS
+determinism: PASS

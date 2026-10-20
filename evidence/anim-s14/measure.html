@@ -1,0 +1,54 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s14 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s14 measurement rig: builds src/shots/s14.js on its own stage (no post, so pixels are the lit scene) and reads
+  // back pixels at projected world points. Used by measure.mjs.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build, FOCUS } from '/src/shots/s14.js';
+  import { kf } from '/src/core/ease.js';
+  import { UNIT } from '/src/shots/s15.js';
+  window.UNIT = UNIT;
+  window.focusAt = (t) => kf(t, FOCUS);
+
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: () => ({ set() {} }) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 5 });
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  let px = null;
+  const project = (p) => { const v = new THREE.Vector3(...p).project(camera); return [(v.x + 1) / 2 * W, (1 - v.y) / 2 * H]; };
+  const lum = ([x, y]) => { x = Math.round(x); y = Math.round(y); if (x < 0 || y < 0 || x >= W || y >= H) return NaN;
+    const i = ((H - 1 - y) * W + x) * 4; return (0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2]) / 255; };
+  window.frame = (t) => { stage.renderFrame(t); px = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    return shot.probe(); };
+  window.project = project;
+  window.lumAvg = (w, r) => { const [cx, cy] = project(w); let s = 0, n = 0;
+    for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) { const l = lum([cx + x, cy + y]); if (!isNaN(l)) { s += l; n++; } } return s / n; };
+  // luminance along a world segment a→b, n samples: [[s, world, px, lum]]
+  window.scan = (a, b, n) => Array.from({ length: n + 1 }, (_, i) => {
+    const w = a.map((v, j) => v + (b[j] - v) * i / n); return [i / n, w, project(w), lum(project(w))]; });
+  window.lumAt = (w) => lum(project(w));
+  // Shadow of the blob alone: luminance with the blob hidden minus with it, at a world point (same t, same everything else).
+  const blobs = []; scene.traverse((o) => { if (o.name === 'blob') blobs.push(o); });   // [tiny, hero] in add order
+  window.blobCount = blobs.length;
+  let pxNo = null;
+  window.frameBoth = (t, i = 1) => { const p = window.frame(t); const keep = px; const blobMesh = blobs[i]; blobMesh.visible = false; stage.renderFrame(t);
+    pxNo = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, pxNo); blobMesh.visible = true; px = keep; return p; };
+  const lumOf = (buf, [x, y]) => { x = Math.round(x); y = Math.round(y); if (x < 0 || y < 0 || x >= W || y >= H) return NaN;
+    const i = ((H - 1 - y) * W + x) * 4; return (0.2126 * buf[i] + 0.7152 * buf[i + 1] + 0.0722 * buf[i + 2]) / 255; };
+  window.scanBoth = (a, b, n) => Array.from({ length: n + 1 }, (_, i) => {
+    const w = a.map((v, j) => v + (b[j] - v) * i / n), q = project(w); return [w[0], lumOf(px, q), lumOf(pxNo, q)]; });
+  const aisle = []; scene.traverse((o) => { if (o.name === 'custodian' || o.name === 'cart' || o.name === 'blob' && o !== blobs[1]) aisle.push(o); });
+  const phone = (() => { let l = null; scene.traverse((o) => { if (o.isSpotLight && Math.abs(o.angle - 0.9) < 1e-9) l = o; }); return l; })();
+  const aisleFill = (() => { let l = null; scene.traverse((o) => { if (o.isSpotLight && Math.abs(o.angle - 0.7) < 1e-9) l = o; }); return l; })();
+  window.setFill = (k) => { aisleFill.intensity = k; };
+  window.setAisle = (v) => aisle.forEach((o) => { o.visible = v; });   // custodian, cart, tiny blob
+  window.setPhone = (k) => { phone.intensity = k; };
+  window.cam = () => ({ pos: camera.position.toArray(), quat: camera.quaternion.toArray() });
+</script>

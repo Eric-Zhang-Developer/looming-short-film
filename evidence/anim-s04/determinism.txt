@@ -1,0 +1,5 @@
+t=21.5  748aa79b6fa6a7ba 748aa79b6fa6a7ba 748aa79b6fa6a7ba  PASS
+t=25  569c90fcfa0395b2 569c90fcfa0395b2 569c90fcfa0395b2  PASS
+t=10  4407c6bd89b1cd04 4407c6bd89b1cd04 4407c6bd89b1cd04  PASS
+t=21.5  748aa79b6fa6a7ba 748aa79b6fa6a7ba 748aa79b6fa6a7ba  PASS
+determinism: PASS

@@ -1,0 +1,26 @@
+# at 4827451, tree 2369b9d (tsc, typeonly, check_timeline, acting and mix all re-run there after the commit, same results). The runs were at fb42861, the same tree before a commit message was reworded.
+$ npx tsc -v
+Version 7.0.2
+
+$ npx tsc --noEmit; echo exit $?
+exit 0
+
+$ npx tsc --listFilesOnly | grep -vc node_modules   # files in the program: 58 .js/.mjs + src/globals.d.ts
+59
+
+$ python3 evidence/ts-check/typeonly.py wave/3-assets
+58 files checked, 0 non-type changes
+
+$ node tools/check_timeline.mjs | tail -1   # full output byte-identical to the base checkout (3012a96), cmp
+ok (21 shots, 70 beats, 195.0s)
+
+$ node src/characters/acting.js   # byte-identical to the base checkout, cmp
+acting: ok 1.67 4.92 8.42
+
+$ node tools/mix.mjs && shasum -a 256 out/audio/mix.wav
+range 0:195 s  premix -18.44 LUFS, -7.15 dBTP  →  loudnorm linear
+mix.wav  integrated -15.9 LUFS  true peak -4.7 dBTP (ebur128)  /  -15.92 LUFS, -5.03 dBTP (loudnorm pass 2)  target -16 ±1 LUFS, ≤ -4 dBTP
+ccff87a2e3c41e2563fdb0dc331deabfd3dd0ed6583f9d7d4140dfc8e66ecbd9  /Users/ericzhang/code/media/looming-ts-check/out/audio/mix.wav
+ccff87a2e3c41e2563fdb0dc331deabfd3dd0ed6583f9d7d4140dfc8e66ecbd9  out/audio/mix.wav
+
+expected (the submitted master's mix, main checkout out/audio/mix.wav): ccff87a2e3c41e2563fdb0dc331deabfd3dd0ed6583f9d7d4140dfc8e66ecbd9

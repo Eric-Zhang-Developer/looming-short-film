@@ -1,0 +1,546 @@
+# snd-v4 cue sheet: 292 cues + 251 score events (groove notes and the 78 pulse hits included), sorted by start time
+# time      mark  stem     sound (cue gain) / voice:motif notes (→|beat = stops dead there)   beat+offset
+ 0:00.00        ambience paperBoil (40.5 s) 0 dB            notifyBuzz-0.5
+ 0:00.00        ambience roomTone (4 s) -8 dB               notifyBuzz-0.5
+ 0:00.50        foley    phoneBuzz -3 dB                    notifyBuzz
+ 0:02.00        foley    phoneBuzz -3 dB                    notifyBuzz+1.5
+ 0:04.00        ambience roomTone (16 s) 0 dB               notifyBuzz+3.5
+ 0:04.00        music    pad 48/55/64/74                    inkDropForms-10
+ 0:09.00  NEW   ambience clockTick -30 dB                   calendarZoom-1.5
+ 0:10.00  NEW   ambience clockTick -30 dB                   calendarZoom-0.5
+ 0:14.00        foley    inkDrip -9 dB                      inkDropForms
+ 0:14.30        music    box:exam 72.14                     inkDropForms+0.3
+ 0:14.85        music    box:exam 75.9                      inkDropForms+0.85
+ 0:15.00        foley    inkDrip -10 dB                     inkDropForms+1
+ 0:15.40        music    box:exam 81.18                     inkDropForms+1.4
+ 0:15.95        music    box:exam 74.88                     inkDropForms+1.95
+ 0:16.42        foley    inkDrip -3 dB                      inkDropForms+2.42
+ 0:17.00  NEW   ambience clockTick -30 dB                   inkDropForms+3
+ 0:18.00  NEW   ambience clockTick -30 dB                   inkDropForms+4
+ 0:18.04        foley    inkDrip -10 dB                     inkDropForms+4.04
+ 0:18.83        foley    inkDrip -10 dB                     inkDropForms+4.83
+ 0:20.00        ambience roomTone (6 s) -3 dB               laptopUp
+ 0:20.00        ambience phoneHum (20.5 s) -10 dB           laptopUp
+ 0:20.00        foley    paperRustle -8 dB                  laptopUp
+ 0:20.00        foley    gameBlip -18 dB                    laptopUp
+ 0:20.00        music    sub 42 Hz                          laptopUp
+ 0:20.10        foley    gameBlip -18 dB                    laptopUp+0.1
+ 0:21.33        foley    gameBlip -20 dB                    laptopUp+1.33
+ 0:21.67        foley    gameBlip -20 dB                    laptopUp+1.67
+ 0:22.17        foley    gameBlip -20 dB                    laptopUp+2.17
+ 0:22.50        foley    gameBlip -20 dB                    laptopUp+2.5
+ 0:23.00        foley    gameBlip -20 dB                    laptopUp+3
+ 0:23.50        foley    inkDrip -18 dB                     gulp1
+ 0:23.50        music    box:gulp 71.14                     gulp1
+ 0:23.67        foley    gameBlip -20 dB                    laptopUp+3.67
+ 0:23.77        music    box:gulp 74.86                     gulp1+0.275
+ 0:24.17        foley    gameBlip -20 dB                    laptopUp+4.17
+ 0:24.67        foley    gameBlip -20 dB                    laptopUp+4.67
+ 0:26.00        ambience fridgeHum (7 s) -8 dB              fridge
+ 0:26.00        foley    paperRustle -6 dB                  fridge
+ 0:26.00        music    piano:groove 48                    fridge
+ 0:26.00        music    sub 44 Hz                          fridge
+ 0:26.83        foley    jarClink -8 dB                     fridge+0.83
+ 0:27.00        music    piano:groove 43                    fridge+1
+ 0:28.00        music    piano:groove 45                    fridge+2
+ 0:28.17        foley    jarClink -8 dB                     fridge+2.17
+ 0:28.33        foley    paperRustle -10 dB                 fridge+2.33
+ 0:29.00        music    piano:groove 40                    fridge+3
+ 0:29.33        foley    jarClink -8 dB                     fridge+3.33
+ 0:29.50        foley    cartonSlosh -6 dB                  fridge+3.5
+ 0:29.67        foley    cartonSlosh -6 dB                  fridge+3.67
+ 0:29.83        foley    cartonSlosh -6 dB                  fridge+3.83
+ 0:30.00        music    piano:groove 41                    fridge+4
+ 0:31.00        music    piano:groove 48                    fridge+5
+ 0:31.33        foley    paperRustle -10 dB                 fridge+5.33
+ 0:32.00        music    piano:groove 43                    fridge+6
+ 0:33.00        foley    paperRustle -6 dB                  gameNight
+ 0:33.00        foley    tvBloops (4.9 s) -8 dB             gameNight
+ 0:33.00        music    piano:groove 48                    gameNight
+ 0:33.00        music    sub 47 Hz                          gameNight
+ 0:33.30        foley    controllerClick -9 dB              gameNight+0.3
+ 0:33.33        foley    gameBlip -24 dB                    gameNight+0.33
+ 0:33.50        music    piano:groove 64/67/72              gameNight+0.5
+ 0:33.83        foley    gameBlip -24 dB                    gameNight+0.83
+ 0:34.00        music    piano:groove 43                    gameNight+1
+ 0:34.33        foley    gameBlip -24 dB                    gameNight+1.33
+ 0:34.50        music    piano:groove 64/67/72              gameNight+1.5
+ 0:34.83        foley    gameBlip -24 dB                    gameNight+1.83
+ 0:34.90        foley    controllerClick -9 dB              gameNight+1.9
+ 0:35.00        music    piano:groove 45                    gameNight+2
+ 0:35.33        foley    gameBlip -24 dB                    gameNight+2.33
+ 0:35.50        music    piano:groove 64/69/72              gameNight+2.5
+ 0:35.83        foley    gameBlip -24 dB                    gameNight+2.83
+ 0:36.00        music    piano:groove 40                    gameNight+3
+ 0:36.30        foley    controllerClick -9 dB              gameNight+3.3
+ 0:36.33        foley    roommateStep -8 dB                 gameNight+3.33
+ 0:36.33        foley    gameBlip -24 dB                    gameNight+3.33
+ 0:36.50        music    piano:groove 64/69/72              gameNight+3.5
+ 0:36.66        foley    roommateStep -8 dB                 gameNight+3.663
+ 0:36.83        foley    gameBlip -24 dB                    gameNight+3.83
+ 0:37.00        foley    roommateStep -8 dB                 gameNight+3.997
+ 0:37.00        music    piano:groove 41                    gameNight+4
+ 0:37.33        foley    roommateStep -8 dB                 gameNight+4.33
+ 0:37.33        foley    gameBlip -24 dB                    gameNight+4.33
+ 0:37.50        music    piano:groove 65/69/72              gameNight+4.5
+ 0:37.66        foley    roommateStep -8 dB                 gameNight+4.663
+ 0:37.83        foley    gameBlip -24 dB                    gameNight+4.83
+ 0:38.00        foley    roommateStep -8 dB                 gameNight+4.997
+ 0:38.00        foley    winJingle -10 dB                   gameNight+5
+ 0:38.00        music    piano:groove 48                    gameNight+5
+ 0:38.33        foley    roommateStep -8 dB                 gameNight+5.33
+ 0:38.33        foley    gameBlip -24 dB                    gameNight+5.33
+ 0:38.40        foley    controllerClick -9 dB              gameNight+5.4
+ 0:38.50        music    piano:groove 65/69/72              gameNight+5.5
+ 0:38.66        foley    roommateStep -8 dB                 gameNight+5.663
+ 0:38.83        foley    gameBlip -24 dB                    gameNight+5.83
+ 0:39.00        foley    roommateStep -8 dB                 gameNight+5.997
+ 0:39.00        foley    controllerClick -9 dB              gameNight+6
+ 0:39.00        foley    tvBloops (1 s) -8 dB               gameNight+6
+ 0:39.00        music    piano:groove 43                    gameNight+6
+ 0:39.33        foley    roommateStep -8 dB                 gameNight+6.33
+ 0:39.33        foley    gameBlip -24 dB                    gameNight+6.33
+ 0:39.50        music    piano:groove 62/67/71              gameNight+6.5
+ 0:39.83        foley    gameBlip -24 dB                    gameNight+6.83
+ 0:40.00        music    piano:groove 48                    lampClickHome-0.5
+ 0:40.50        foley    lampClick -4 dB                    lampClickHome
+ 0:40.80        ambience paperBoil (2.2 s) 0 dB             lampClickHome+0.3
+ 0:40.85        music    box:exam 72.14                     lampClickHome+0.35
+ 0:41.40        music    box:exam 75.9                      lampClickHome+0.9
+ 0:41.95        music    box:exam 81.18                     lampClickHome+1.45
+ 0:42.50        music    box:exam 74.88                     lampClickHome+2
+ 0:43.00        foley    lampClick -4 dB                    lampOffHome
+ 0:43.17        ambience paperBoil (30.83 s) 0 dB           lampOffHome+0.17
+ 0:43.17        ambience phoneHum (16.83 s) -10 dB          lampOffHome+0.17
+ 0:43.17        foley    paperRustle -8 dB                  lampOffHome+0.17
+ 0:43.17        music    sub 50 Hz                          lampOffHome+0.17
+ 0:44.00        foley    inkDrip -18 dB                     gulp2
+ 0:44.00        music    box:gulp 70.14                     gulp2
+ 0:44.00        music    piano:groove 41                    lampClickHome+3.5
+ 0:44.00        music    piano:groove 69                    lampClickHome+3.5
+ 0:44.27        music    box:gulp 73.82                     gulp2+0.275
+ 0:44.30        music    piano:groove 65/69/72              lampClickHome+3.8
+ 0:44.50        foley    gameBlip -22 dB                    gulp2+0.5
+ 0:44.50        music    piano:groove 45                    lampClickHome+4
+ 0:44.50        music    piano:groove 65                    lampClickHome+4
+ 0:44.80        music    piano:groove 65/69/72              lampClickHome+4.3
+ 0:44.80        music    piano:groove 69                    lampClickHome+4.3
+ 0:45.00        foley    gameBlip -22 dB                    gulp2+1
+ 0:45.00        music    piano:groove 48                    lampClickHome+4.5
+ 0:45.30        music    piano:groove 65/69/72              lampClickHome+4.8
+ 0:45.30        music    piano:groove 72                    lampClickHome+4.8
+ 0:45.50        foley    gameBlip -22 dB                    gulp2+1.5
+ 0:45.50        music    piano:groove 50                    lampClickHome+5
+ 0:45.50        music    piano:groove 74                    lampClickHome+5
+ 0:45.80        music    piano:groove 65/69/72              lampClickHome+5.3
+ 0:46.00        foley    gameBlip -22 dB                    gulp2+2
+ 0:46.00        music    piano:groove 43                    lampClickHome+5.5
+ 0:46.00        music    piano:groove 71                    lampClickHome+5.5
+ 0:46.30        music    piano:groove 62/67/71              lampClickHome+5.8
+ 0:46.50        foley    gameBlip -22 dB                    gulp2+2.5
+ 0:46.50        music    piano:groove 47                    lampClickHome+6
+ 0:46.50        music    piano:groove 74                    lampClickHome+6
+ 0:46.80        music    piano:groove 62/67/71              lampClickHome+6.3
+ 0:46.80        music    piano:groove 71                    lampClickHome+6.3
+ 0:47.00        foley    gameBlip -22 dB                    gulp2+3
+ 0:47.00        music    piano:groove 50                    lampClickHome+6.5
+ 0:47.00        music    piano:groove 67                    lampClickHome+6.5
+ 0:47.30        music    piano:groove 62/67/71              lampClickHome+6.8
+ 0:47.50        foley    gameBlip -22 dB                    gulp2+3.5
+ 0:47.50        music    piano:groove 53                    lampClickHome+7
+ 0:47.50        music    piano:groove 65                    lampClickHome+7
+ 0:47.80        music    piano:groove 62/67/71              lampClickHome+7.3
+ 0:48.00  NEW   ambience nightHum (12 s) -2 dB              bedRot
+ 0:48.00  NEW   music    piano:thin 47.85/51.85 →|clockThree bedRot
+ 0:48.50  NEW   foley    scrollTick -22 dB                  bedRot+0.5
+ 0:49.25  NEW   foley    scrollTick -22 dB                  bedRot+1.25
+ 0:50.00  NEW   foley    scrollTick -22 dB                  bedRot+2
+ 0:50.75  NEW   foley    scrollTick -22 dB                  bedRot+2.75
+ 0:51.50  NEW   foley    scrollTick -22 dB                  bedRot+3.5
+ 0:52.25  NEW   foley    scrollTick -22 dB                  bedRot+4.25
+ 0:53.00  NEW   foley    scrollTick -22 dB                  bedRot+5
+ 0:53.75  NEW   foley    scrollTick -22 dB                  bedRot+5.75
+ 0:55.00  NEW   foley    scrollTick -22 dB                  bedRot+7
+ 0:55.50        foley    paperRustle -9 dB                  gulp3
+ 0:55.50        foley    inkDrip -18 dB                     gulp3
+ 0:55.50        music    box:gulp 69.14                     gulp3
+ 0:55.50  NEW   music    sub 56 Hz →|clockThree             gulp3
+ 0:55.75  NEW   foley    scrollTick -22 dB                  bedRot+7.75
+ 0:55.77        music    box:gulp 72.78                     gulp3+0.275
+ 0:56.50  NEW   foley    scrollTick -22 dB                  bedRot+8.5
+ 0:57.25  NEW   foley    scrollTick -22 dB                  bedRot+9.25
+ 0:58.00  NEW   foley    scrollTick -22 dB                  bedRot+10
+ 0:58.75  NEW   foley    scrollTick -22 dB                  bedRot+10.75
+ 0:59.50  NEW   foley    scrollTick -22 dB                  bedRot+11.5
+ 1:00.00  NEW   ambience nightHum (14 s) -6 dB              clockThree
+ 1:00.00  NEW   ambience clockTick -12 dB                   clockThree
+ 1:01.00  NEW   ambience clockTick -12 dB                   clockThree+1
+ 1:02.00  NEW   ambience clockTickMid -12 dB                clockThree+2
+ 1:03.00  NEW   ambience clockTickMid -12 dB                clockThree+3
+ 1:04.00  NEW   ambience clockTickMid -12 dB                clockThree+4
+ 1:05.00  NEW   ambience clockTickMid -12 dB                clockThree+5
+ 1:05.67  NEW   foley    breathNasal (6.08 s) -24 dB        clockThree+5.67
+ 1:06.00  NEW   ambience clockTickMid -12 dB                clockThree+6
+ 1:07.00  NEW   ambience clockTickFar -14 dB                clockThree+7
+ 1:08.00  NEW   ambience clockTickFar -14 dB                clockThree+8
+ 1:09.00  NEW   ambience clockTickFar -14 dB                clockThree+9
+ 1:10.00  NEW   ambience clockTickMid -16 dB                phoneFaceDown-0.5
+ 1:10.50  NEW   foley    cardTap -8 dB                      phoneFaceDown
+ 1:11.00  NEW   ambience clockTickMid -16 dB                phoneFaceDown+0.5
+ 1:11.50  NEW   music    piano:held 36                      breathIn
+ 1:11.50  NEW   music    pad:held 48/55                     breathIn
+ 1:11.75  NEW   foley    breathSlow -20 dB                  breathIn+0.25
+ 1:12.00  NEW   ambience clockTickMid -20 dB                breathIn+0.5
+ 1:13.00  NEW   ambience clockTickMid -20 dB                breathIn+1.5
+ 1:13.50  NEW   foley    paperRustle (0.35 s) -10 dB        sitUp
+ 1:14.00  NEW   foley    lampClick -4 dB                    lampOn
+ 1:14.30  NEW   ambience paperBoil (120.7 s) 0 dB           lampOn+0.3
+ 1:14.30  NEW   ambience nightHum (2.7 s) -6 dB             lampOn+0.3
+ 1:15.00  NEW   ambience clockTickMid -20 dB                breathIn+3.5
+ 1:15.00  NEW   foley    backpackGrab -4 dB                 backpackGrab
+ 1:15.75  NEW   foley    footstepSoft -20 dB                backpackGrab+0.75
+ 1:16.00  NEW   ambience clockTickFar -16 dB                doorOpen-1
+ 1:16.00  NEW   foley    inkDrip -14 dB                     backpackGrab+1
+ 1:17.00  NEW   ambience hallHum (5 s) 0 dB                 doorOpen
+ 1:17.00  NEW   ambience clockTickFar -16 dB                doorOpen
+ 1:17.00  NEW   foley    doorLatch -4 dB                    doorOpen
+ 1:18.00  NEW   ambience clockTickFar -16 dB                doorOpen+1
+ 1:18.17  NEW   foley    inkDrip -10 dB                     doorOpen+1.167
+ 1:18.50  NEW   foley    paperRustle -9 dB                  shadowAhead
+ 1:18.50  NEW   foley    breathCatch -22 dB                 shadowAhead
+ 1:18.50  NEW   music    sub 48 Hz                          shadowAhead
+ 1:19.00  NEW   ambience clockTickFar -16 dB                doorOpen+2
+ 1:19.67  NEW   foley    swallow -24 dB                     doorOpen+2.667
+ 1:20.00  NEW   ambience clockTickFar -16 dB                doorOpen+3
+ 1:20.50  NEW   foley    footstepSoft -20 dB                stepIntoShadow
+ 1:21.00  NEW   ambience clockTickFar -16 dB                doorOpen+4
+ 1:21.00  NEW   foley    footstepSoft -20 dB                stepIntoShadow+0.5
+ 1:22.00  NEW   ambience nightAir (21.5 s) 0 dB             walkStart
+ 1:22.00  NEW   ambience clockTickMid -16 dB                walkStart
+ 1:22.00  NEW   foley    footstep -20 dB                    walkStart
+ 1:22.00  NEW   foley    breathFast (11.167 s) -22 dB       walkStart
+ 1:22.42  NEW   foley    footstep -20 dB                    walkStart+0.417
+ 1:22.83  NEW   foley    footstep -20 dB                    walkStart+0.833
+ 1:23.00  NEW   ambience clockTickMid -16 dB                walkStart+1
+ 1:23.25  NEW   foley    footstep -20 dB                    walkStart+1.25
+ 1:23.67  NEW   foley    footstep -20 dB                    walkStart+1.667
+ 1:24.00  NEW   foley    footstep -20 dB                    walkStart+2
+ 1:24.00  NEW   music    pulse  →|lightFlood                lamp1
+ 1:24.18  NEW   music    pulse  →|lightFlood                lamp1+0.18
+ 1:24.42  NEW   foley    footstep -20 dB                    walkStart+2.417
+ 1:24.50  NEW   music    pulse  →|lightFlood                lamp1+0.5
+ 1:24.68  NEW   music    pulse  →|lightFlood                lamp1+0.68
+ 1:24.75  NEW   foley    footstep -20 dB                    walkStart+2.75
+ 1:25.00  NEW   music    pulse  →|lightFlood                lamp1+1
+ 1:25.08  NEW   foley    footstep -20 dB                    walkStart+3.083
+ 1:25.18  NEW   music    pulse  →|lightFlood                lamp1+1.18
+ 1:25.42  NEW   foley    footstep -20 dB                    walkStart+3.417
+ 1:25.50  NEW   music    pulse  →|lightFlood                lamp1+1.5
+ 1:25.68  NEW   music    pulse  →|lightFlood                lamp1+1.68
+ 1:25.83  NEW   foley    footstep -20 dB                    walkStart+3.833
+ 1:26.00  NEW   music    pulse  →|lightFlood                lamp1+2
+ 1:26.17  NEW   foley    footstep -20 dB                    walkStart+4.167
+ 1:26.18  NEW   music    pulse  →|lightFlood                lamp1+2.18
+ 1:26.50  NEW   foley    footstep -20 dB                    walkStart+4.5
+ 1:26.50  NEW   music    pulse  →|lightFlood                lamp1+2.5
+ 1:26.68  NEW   music    pulse  →|lightFlood                lamp1+2.68
+ 1:26.83  NEW   foley    footstep -20 dB                    walkStart+4.833
+ 1:27.00  NEW   music    pulse  →|lightFlood                lamp1+3
+ 1:27.18  NEW   music    pulse  →|lightFlood                lamp1+3.18
+ 1:27.25  NEW   foley    footstep -20 dB                    walkStart+5.25
+ 1:27.50  NEW   music    pulse  →|lightFlood                lamp1+3.5
+ 1:27.50  NEW   music    piano:rise 60 →|lightFlood         lamp2
+ 1:27.58  NEW   foley    footstep -20 dB                    walkStart+5.583
+ 1:27.68  NEW   music    pulse  →|lightFlood                lamp1+3.68
+ 1:27.83  NEW   foley    footstep -20 dB                    walkStart+5.833
+ 1:28.00  NEW   music    pulse  →|lightFlood                lamp1+4
+ 1:28.17  NEW   foley    footstep -20 dB                    walkStart+6.167
+ 1:28.18  NEW   music    pulse  →|lightFlood                lamp1+4.18
+ 1:28.50  NEW   foley    footstep -20 dB                    walkStart+6.5
+ 1:28.50  NEW   music    pulse  →|lightFlood                lamp1+4.5
+ 1:28.50  NEW   music    piano:rise 64 →|lightFlood         lamp2+1
+ 1:28.68  NEW   music    pulse  →|lightFlood                lamp1+4.68
+ 1:28.75  NEW   foley    footstep -20 dB                    walkStart+6.75
+ 1:29.00  NEW   music    pulse  →|lightFlood                lamp1+5
+ 1:29.08  NEW   foley    footstep -20 dB                    walkStart+7.083
+ 1:29.18  NEW   music    pulse  →|lightFlood                lamp1+5.18
+ 1:29.33  NEW   foley    footstep -20 dB                    walkStart+7.333
+ 1:29.50  NEW   music    pulse  →|lightFlood                lamp1+5.5
+ 1:29.50  NEW   music    piano:rise 69 →|lightFlood         lamp2+2
+ 1:29.67  NEW   foley    footstep -20 dB                    walkStart+7.667
+ 1:29.68  NEW   music    pulse  →|lightFlood                lamp1+5.68
+ 1:30.00  NEW   foley    footstep -20 dB                    walkStart+8
+ 1:30.00  NEW   music    pulse  →|lightFlood                lamp1+6
+ 1:30.18  NEW   music    pulse  →|lightFlood                lamp1+6.18
+ 1:30.25  NEW   foley    footstep -20 dB                    walkStart+8.25
+ 1:30.50  NEW   music    pulse  →|lightFlood                lamp1+6.5
+ 1:30.50  NEW   music    piano:rise 62 →|lightFlood         lamp2+3
+ 1:30.50  NEW   music    pad:swell 48/52/55/55/60 →|lightFlood lamp3
+ 1:30.58  NEW   foley    footstep -20 dB                    walkStart+8.583
+ 1:30.68  NEW   music    pulse  →|lightFlood                lamp1+6.68
+ 1:30.83  NEW   foley    footstep -20 dB                    walkStart+8.833
+ 1:31.00  NEW   music    pulse  →|lightFlood                lamp1+7
+ 1:31.17  NEW   foley    footstep -20 dB                    walkStart+9.167
+ 1:31.18  NEW   music    pulse  →|lightFlood                lamp1+7.18
+ 1:31.50  NEW   foley    footstep -20 dB                    walkStart+9.5
+ 1:31.50  NEW   music    pulse  →|lightFlood                lamp1+7.5
+ 1:31.50  NEW   music    piano:rise 67 →|lightFlood         lamp2+4
+ 1:31.68  NEW   music    pulse  →|lightFlood                lamp1+7.68
+ 1:31.83  NEW   foley    footstep -20 dB                    walkStart+9.833
+ 1:32.00  NEW   foley    inkDrip -10 dB                     blobBlocks
+ 1:32.00  NEW   music    pulse  →|lightFlood                lamp1+8
+ 1:32.18  NEW   music    pulse  →|lightFlood                lamp1+8.18
+ 1:32.50  NEW   music    pulse  →|lightFlood                lamp1+8.5
+ 1:32.50  NEW   music    piano:rise 71 →|lightFlood         lamp2+5
+ 1:32.68  NEW   music    pulse  →|lightFlood                lamp1+8.68
+ 1:33.00  NEW   music    pulse  →|lightFlood                lamp1+9
+ 1:33.17  NEW   foley    breathFaster (9.833 s) -22 dB      blobBlocks+1.167
+ 1:33.18  NEW   music    pulse  →|lightFlood                lamp1+9.18
+ 1:33.50  NEW   foley    footstep -20 dB                    walkStart+11.5
+ 1:33.50  NEW   music    pulse  →|lightFlood                lamp1+9.5
+ 1:33.50  NEW   music    piano:rise 64 →|lightFlood         lamp2+6
+ 1:33.68  NEW   music    pulse  →|lightFlood                lamp1+9.68
+ 1:33.75  NEW   foley    footstep -20 dB                    walkStart+11.75
+ 1:34.00  NEW   foley    footstep -20 dB                    walkStart+12
+ 1:34.00  NEW   music    pulse  →|lightFlood                lamp1+10
+ 1:34.18  NEW   music    pulse  →|lightFlood                lamp1+10.18
+ 1:34.33  NEW   foley    footstep -20 dB                    walkStart+12.333
+ 1:34.50  NEW   music    pulse  →|lightFlood                lamp1+10.5
+ 1:34.50  NEW   music    piano:rise 69 →|lightFlood         lamp2+7
+ 1:34.58  NEW   foley    footstep -20 dB                    walkStart+12.583
+ 1:34.68  NEW   music    pulse  →|lightFlood                lamp1+10.68
+ 1:34.83  NEW   foley    footstep -20 dB                    walkStart+12.833
+ 1:35.00  NEW   music    pulse  →|lightFlood                lamp1+11
+ 1:35.08  NEW   foley    footstep -20 dB                    walkStart+13.083
+ 1:35.18  NEW   music    pulse  →|lightFlood                lamp1+11.18
+ 1:35.33  NEW   foley    footstep -20 dB                    walkStart+13.333
+ 1:35.50  NEW   music    pulse  →|lightFlood                lamp1+11.5
+ 1:35.50  NEW   music    piano:rise 72 →|lightFlood         lamp2+8
+ 1:35.50  NEW   music    box:exam-rising 72 →|lightFlood    lamp4
+ 1:35.67  NEW   foley    footstep -20 dB                    walkStart+13.667
+ 1:35.68  NEW   music    pulse  →|lightFlood                lamp1+11.68
+ 1:35.83  NEW   foley    footstep -20 dB                    walkStart+13.833
+ 1:36.00  NEW   music    pulse  →|lightFlood                lamp1+12
+ 1:36.00  NEW   music    box:exam-rising 76 →|lightFlood    lamp4+0.5
+ 1:36.08  NEW   foley    footstep -20 dB                    walkStart+14.083
+ 1:36.18  NEW   music    pulse  →|lightFlood                lamp1+12.18
+ 1:36.33  NEW   foley    footstep -20 dB                    walkStart+14.333
+ 1:36.50  NEW   music    pulse  →|lightFlood                lamp1+12.5
+ 1:36.50  NEW   music    piano:rise 74 →|lightFlood         lamp2+9
+ 1:36.58  NEW   foley    footstep -20 dB                    walkStart+14.583
+ 1:36.68  NEW   music    pulse  →|lightFlood                lamp1+12.68
+ 1:36.83  NEW   foley    footstep -20 dB                    walkStart+14.833
+ 1:37.00  NEW   music    pulse  →|lightFlood                lamp1+13
+ 1:37.00  NEW   music    sub:swell 45 Hz →|lightFlood       lamp5
+ 1:37.08  NEW   foley    footstep -20 dB                    walkStart+15.083
+ 1:37.18  NEW   music    pulse  →|lightFlood                lamp1+13.18
+ 1:37.25  NEW   foley    footstep -20 dB                    walkStart+15.25
+ 1:37.50  NEW   foley    footstep -20 dB                    walkStart+15.5
+ 1:37.50  NEW   music    pulse  →|lightFlood                lamp1+13.5
+ 1:37.50  NEW   music    piano:rise 76 →|lightFlood         lamp2+10
+ 1:37.50  NEW   music    box:exam-rising 74 →|lightFlood    lamp4+2
+ 1:37.68  NEW   music    pulse  →|lightFlood                lamp1+13.68
+ 1:37.75  NEW   foley    footstep -20 dB                    walkStart+15.75
+ 1:37.92  NEW   foley    footstep -20 dB                    walkStart+15.917
+ 1:38.00  NEW   music    pulse  →|lightFlood                lamp1+14
+ 1:38.00  NEW   music    piano:rise 69/81 →|lightFlood      marstonSeen
+ 1:38.00  NEW   music    pad:swell 43/50/55/59/62 →|lightFlood marstonSeen
+ 1:38.00  NEW   music    box:exam-rising 77 →|lightFlood    lamp4+2.5
+ 1:38.17  NEW   foley    footstep -20 dB                    walkStart+16.167
+ 1:38.18  NEW   music    pulse  →|lightFlood                lamp1+14.18
+ 1:38.42  NEW   foley    footstep -20 dB                    walkStart+16.417
+ 1:38.50  NEW   music    pulse  →|lightFlood                lamp1+14.5
+ 1:38.58  NEW   foley    footstep -20 dB                    walkStart+16.583
+ 1:38.68  NEW   music    pulse  →|lightFlood                lamp1+14.68
+ 1:38.83  NEW   foley    footstep -20 dB                    walkStart+16.833
+ 1:39.00  NEW   foley    footstep -20 dB                    walkStart+17
+ 1:39.00  NEW   music    pulse  →|lightFlood                lamp1+15
+ 1:39.00  NEW   music    piano:rise 69/81 →|lightFlood      marstonSeen+1
+ 1:39.18  NEW   music    pulse  →|lightFlood                lamp1+15.18
+ 1:39.25  NEW   foley    footstep -20 dB                    walkStart+17.25
+ 1:39.50  NEW   foley    footstep -20 dB                    walkStart+17.5
+ 1:39.50  NEW   music    pulse  →|lightFlood                lamp1+15.5
+ 1:39.50  NEW   music    box:exam-rising 76 →|lightFlood    lamp4+4
+ 1:39.67  NEW   foley    footstep -20 dB                    walkStart+17.667
+ 1:39.68  NEW   music    pulse  →|lightFlood                lamp1+15.68
+ 1:39.92  NEW   foley    footstep -20 dB                    walkStart+17.917
+ 1:40.00  NEW   music    pulse  →|lightFlood                lamp1+16
+ 1:40.00  NEW   music    piano:rise 69/81 →|lightFlood      marstonSeen+2
+ 1:40.00  NEW   music    box:exam-rising 79 →|lightFlood    lamp4+4.5
+ 1:40.18  NEW   music    pulse  →|lightFlood                lamp1+16.18
+ 1:40.25  NEW   foley    footstep -20 dB                    walkStart+18.25
+ 1:40.50  NEW   foley    footstep -20 dB                    walkStart+18.5
+ 1:40.50  NEW   music    pulse  →|lightFlood                lamp1+16.5
+ 1:40.68  NEW   music    pulse  →|lightFlood                lamp1+16.68
+ 1:40.75  NEW   foley    footstep -20 dB                    walkStart+18.75
+ 1:41.00  NEW   foley    footstep -20 dB                    walkStart+19
+ 1:41.00  NEW   music    pulse  →|lightFlood                lamp1+17
+ 1:41.00  NEW   music    piano:rise 69/81 →|lightFlood      marstonSeen+3
+ 1:41.18  NEW   music    pulse  →|lightFlood                lamp1+17.18
+ 1:41.25  NEW   foley    footstep -20 dB                    walkStart+19.25
+ 1:41.50  NEW   foley    footstep -20 dB                    walkStart+19.5
+ 1:41.50  NEW   music    pulse  →|lightFlood                lamp1+17.5
+ 1:41.50  NEW   music    box:exam-rising 77 →|lightFlood    lamp4+6
+ 1:41.68  NEW   music    pulse  →|lightFlood                lamp1+17.68
+ 1:41.75  NEW   foley    footstep -20 dB                    walkStart+19.75
+ 1:42.00  NEW   foley    footstep -20 dB                    doorPush-1
+ 1:42.00  NEW   music    pulse  →|lightFlood                lamp1+18
+ 1:42.00  NEW   music    piano:rise 69/81 →|lightFlood      marstonSeen+4
+ 1:42.00  NEW   music    box:exam-rising 81 →|lightFlood    lamp4+6.5
+ 1:42.18  NEW   music    pulse  →|lightFlood                lamp1+18.18
+ 1:42.25  NEW   foley    footstep -20 dB                    doorPush-0.75
+ 1:42.50  NEW   music    pulse  →|lightFlood                lamp1+18.5
+ 1:42.68  NEW   music    pulse  →|lightFlood                lamp1+18.68
+ 1:43.00  NEW   foley    doorPush -2 dB                     doorPush
+ 1:43.00  NEW   music    pulse  →|lightFlood                lamp1+19
+ 1:43.00  NEW   music    piano:peak 31/43/50/55/59/62 →|lightFlood doorPush
+ 1:43.18  NEW   music    pulse  →|lightFlood                lamp1+19.18
+ 1:43.25  NEW   foley    footstepSoft -20 dB                doorPush+0.25
+ 1:43.50  NEW   ambience roomTone (42.5 s) -6 dB            lightFlood
+ 1:43.50  NEW   ambience fluorescentHum (54.5 s) -24 dB     lightFlood
+ 1:43.50  NEW   music    piano:chord 36/43/52/60/67/76      lightFlood
+ 1:43.50  NEW   music    pad:chord 48/55/64/72              lightFlood
+ 1:44.50  NEW   music    box:exam 72.14                     blobBlinks
+ 1:47.00  NEW   foley    exhale -6 dB                       exhale
+ 1:50.50  NEW   music    piano:theme 60                     deskSit
+ 1:50.50  NEW   music    piano 36/43/52                     deskSit
+ 1:50.75  NEW   foley    footstepSoft -12 dB                deskSit+0.25
+ 1:52.50  NEW   foley    cardTap -14 dB                     deskSit+2
+ 1:52.50  NEW   music    piano:theme 64                     deskSit+2
+ 1:52.50  NEW   music    piano 40/48                        deskSit+2
+ 1:53.00  NEW   foley    inkDrip -20 dB                     blobClimbs
+ 1:53.50  NEW   foley    inkDrip -20 dB                     blobClimbs+0.5
+ 1:53.83  NEW   foley    inkDrip -20 dB                     blobClimbs+0.83
+ 1:54.50  NEW   music    piano:theme 69                     deskSit+4
+ 1:54.50  NEW   music    piano 41/48/57                     deskSit+4
+ 1:55.00  NEW   music    box:exam 72.14                     blobSettles
+ 1:56.50  NEW   music    piano:theme 67                     deskSit+6
+ 1:56.50  NEW   music    piano 40/48/55                     deskSit+6
+ 1:57.50        foley    paperRustle (0.6 s) -12 dB         headLift
+ 1:58.50        music    piano 41/48/57/64                  revealDrinks
+ 1:59.75        music    piano 40/48/55/64                  revealFreshman
+ 2:03.50        foley    penUncap -3 dB                     penUncap
+ 2:04.33        foley    penScratch (2.167 s) -6 dB         penUncap+0.833
+ 2:06.50        foley    inkDrip -18 dB                     nameWritten
+ 2:06.50        music    piano:theme 60                     nameWritten
+ 2:10.50        foley    penScratch (3.6 s) -4 dB           crossOut-4.1
+ 2:14.35        foley    penTap -6 dB                       crossOut-0.25
+ 2:14.60        foley    penStroke (0.15 s) -2 dB           crossOut
+ 2:14.80        foley    penScratch (1.3 s) -4 dB           crossOut+0.2
+ 2:16.17        foley    penStroke (0.12 s) -5 dB           problemOneSolved-0.33
+ 2:16.33        foley    penStroke (0.12 s) -5 dB           problemOneSolved-0.17
+ 2:16.50        foley    inkDrip -18 dB                     problemOneSolved
+ 2:16.50        music    piano:theme 64                     problemOneSolved
+ 2:16.75        music    box:shrink 73.9                    problemOneSolved+0.25
+ 2:17.03        music    box:shrink 70.14                   problemOneSolved+0.525
+ 2:19.50        foley    penStroke (0.35 s) -6 dB           problemSolved2-2
+ 2:20.00        foley    penStroke (0.35 s) -6 dB           problemSolved2-1.5
+ 2:20.50        foley    penStroke (0.35 s) -6 dB           problemSolved2-1
+ 2:21.50        foley    inkDrip -18 dB                     problemSolved2
+ 2:21.50        music    piano:theme 69                     problemSolved2
+ 2:21.50        music    piano 41/48/57                     problemSolved2
+ 2:21.75        music    box:shrink 75.9                    problemSolved2+0.25
+ 2:21.90        foley    penScratch (1 s) -10 dB            problemSolved3-1.1
+ 2:22.03        music    box:shrink 72.14                   problemSolved2+0.525
+ 2:23.00        foley    inkDrip -18 dB                     problemSolved3
+ 2:23.00        music    piano:theme 67                     problemSolved3
+ 2:23.00        music    piano 40/48/55                     problemSolved3
+ 2:23.25        music    box:shrink 76.9                    problemSolved3+0.25
+ 2:23.30        foley    penScratch (0.6 s) -10 dB          problemSolved4-0.7
+ 2:23.53        music    box:shrink 73.14                   problemSolved3+0.525
+ 2:24.00        foley    inkDrip -18 dB                     problemSolved4
+ 2:24.00        music    piano:theme 64                     problemSolved4
+ 2:24.00        music    piano 45/52                        problemSolved4
+ 2:24.25        music    box:shrink 77.9                    problemSolved4+0.25
+ 2:24.30        foley    penScratch (0.6 s) -10 dB          problemSolved5-0.7
+ 2:24.53        music    box:shrink 74.14                   problemSolved4+0.525
+ 2:25.00        foley    inkDrip -18 dB                     problemSolved5
+ 2:25.00        music    piano:theme 65                     problemSolved5
+ 2:25.00        music    piano 38/45/53                     problemSolved5
+ 2:25.25        music    box:shrink 78.9                    problemSolved5+0.25
+ 2:25.50        music    piano:theme 62                     problemSolved5+0.5
+ 2:25.50        music    piano 43/50/55/60                  problemSolved5+0.5
+ 2:25.53        music    box:shrink 75.14                   problemSolved5+0.525
+ 2:26.00        ambience roomTone (12 s) 0 dB               quiet2Start
+ 2:29.00        ambience dawnBirds (3.5 s) -6 dB            dawnBird1
+ 2:33.00        ambience dawnBirds (3.5 s) -6 dB            dawnBird2
+ 2:36.00        ambience dawnBirds (3.5 s) -6 dB            dawnBird3
+ 2:38.00        ambience examHush (4.05 s) 0 dB             examRoom
+ 2:38.00  NEW   ambience clockTickExam -18 dB               examRoom
+ 2:39.00  NEW   ambience clockTickExam -26 dB               examRoom+1
+ 2:39.60        foley    cough -6 dB                        examRoom+1.6
+ 2:40.00  NEW   ambience clockTickExam -26 dB               examRoom+2
+ 2:41.00  NEW   ambience clockTickExam -26 dB               examRoom+3
+ 2:42.00        ambience examHush (1.05 s) -6 dB            testRecognise
+ 2:42.00  NEW   ambience clockTickExam -26 dB               examRoom+4
+ 2:43.00        ambience examHush (5.55 s) 0 dB             testRecognise+1
+ 2:43.00  NEW   ambience clockTickExam -26 dB               examRoom+5
+ 2:43.50        music    piano:theme 60                     testSmile
+ 2:44.00  NEW   ambience clockTickExam -26 dB               examRoom+6
+ 2:44.50        foley    penScratch (2.9 s) -8 dB           testSolved-3
+ 2:45.00  NEW   ambience clockTickExam -26 dB               examRoom+7
+ 2:46.00  NEW   ambience clockTickExam -26 dB               examRoom+8
+ 2:47.00  NEW   ambience clockTickExam -26 dB               examRoom+9
+ 2:47.50        foley    inkDrip -18 dB                     testSolved
+ 2:47.50        music    piano:theme 64                     testSolved
+ 2:47.50        music    piano 40/48                        testSolved
+ 2:47.75        music    box:shrink 79.9                    testSolved+0.25
+ 2:48.03        music    box:shrink 76.14                   testSolved+0.525
+ 2:48.50        ambience examHush (6.5 s) -12 dB            gradeSlide
+ 2:48.50        foley    paperSlide -3 dB                   gradeSlide
+ 2:49.33        foley    paperRustle (0.5 s) -8 dB          gradeSlide+0.83
+ 2:50.00        music    box:exam-resolved 72               gradeReveal
+ 2:50.00        music    piano:theme 60                     gradeReveal
+ 2:50.00        music    piano 36/43/52                     gradeReveal
+ 2:51.00        music    box:exam-resolved 76               gradeReveal+1
+ 2:51.00        music    piano:theme 64                     gradeReveal+1
+ 2:51.00        music    piano 40/48                        gradeReveal+1
+ 2:51.50        foley    cardTap -14 dB                     gradeReveal+1.5
+ 2:52.00        music    box:exam-resolved 81               gradeReveal+2
+ 2:52.00        music    piano:theme 69                     gradeReveal+2
+ 2:52.00        music    piano 41/48/57                     gradeReveal+2
+ 2:52.00  NEW   music    piano:theme 72                     gradeGrin
+ 2:53.00        music    box:exam-resolved 79               gradeReveal+3
+ 2:53.00        music    piano:theme 67                     gradeReveal+3
+ 2:53.00        music    piano 40/48/55                     gradeReveal+3
+ 2:53.00  NEW   music    piano:theme 71                     gradeGrin+1
+ 2:54.00        music    piano:theme 64                     gradeReveal+4
+ 2:54.00        music    piano 45/52                        gradeReveal+4
+ 2:54.00  NEW   music    piano:theme 67                     gradeGrin+2
+ 2:55.00        ambience roomTone (20 s) 0 dB               examCrossedOff-2
+ 2:55.00  NEW   ambience clockTick -30 dB                   examCrossedOff-2
+ 2:55.00        music    piano:theme 65                     gradeReveal+5
+ 2:55.00        music    piano 38/45/53                     gradeReveal+5
+ 2:55.00  NEW   music    piano:theme 69                     gradeGrin+3
+ 2:56.00  NEW   ambience clockTick -30 dB                   examCrossedOff-1
+ 2:56.00        music    piano:theme 62                     gradeReveal+6
+ 2:56.00        music    piano 43/50/53/59                  gradeReveal+6
+ 2:56.00  NEW   music    piano:theme 65                     gradeGrin+4
+ 2:56.50        foley    penStroke (0.18 s) -4 dB           examCrossedOff-0.5
+ 2:56.80        foley    penStroke (0.2 s) -4 dB            examCrossedOff-0.2
+ 2:57.00  NEW   ambience clockTick -30 dB                   examCrossedOff
+ 2:57.00        foley    inkDrip -18 dB                     examCrossedOff
+ 2:57.25        music    box:shrink 80.9                    examCrossedOff+0.25
+ 2:57.53        music    box:shrink 77.14                   examCrossedOff+0.525
+ 2:58.50        foley    inkDrip -14 dB                     blobAbsorbed-2
+ 2:59.00        foley    inkDrip -14 dB                     blobAbsorbed-1.5
+ 2:59.00        music    piano:theme 60                     blobAbsorbed-1.5
+ 2:59.00        music    piano 36/43/52/55                  blobAbsorbed-1.5
+ 2:59.00        music    pad 48/55/64/72                    blobAbsorbed-1.5
+ 3:00.50        foley    inkSoak -4 dB                      blobAbsorbed
+ 3:00.50        music    box:exam 74.88                     blobAbsorbed
+ 3:02.00  NEW   ambience clockTick -30 dB                   examCrossedOff+5
+ 3:02.50  NEW   foley    exhale -20 dB                      lampSitBack
+ 3:03.00  NEW   ambience clockTick -30 dB                   examCrossedOff+6
+ 3:04.00  NEW   ambience clockTick -30 dB                   examCrossedOff+7
+ 3:05.50        foley    markerScratch (2 s) -6 dB          newDate-2
+ 3:09.30        music    box:reprise 72.14                  dropQuivers+0.3
+ 3:09.85        music    box:reprise 75.9                   dropQuivers+0.85
+ 3:10.00  NEW   ambience clockTick -30 dB                   examCrossedOff+13
+ 3:11.00  NEW   ambience clockTick -30 dB                   examCrossedOff+14
+ 3:11.50        foley    penUncap -3 dB                     tagPenUncap
+ 3:12.00  NEW   ambience clockTick -30 dB                   examCrossedOff+15
+ 3:12.00        music    piano:theme 60                     tagPenUncap+0.5
+ 3:13.00  NEW   ambience clockTick -30 dB                   examCrossedOff+16
+ 3:14.00  NEW   ambience clockTick -30 dB                   examCrossedOff+17
+# 293 NEW rows

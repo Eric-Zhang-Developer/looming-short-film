@@ -1,0 +1,18 @@
+# mix.wav (16-bit, after loudnorm), dBFS. "over" = tick peak / floor RMS between ticks.
+s08 C1 clockTick         60.0  peak  -10.6  floor  -37.5  over  26.9 dB   | >500 Hz: peak  -11.4  floor  -43.3  over  31.9 dB
+s08 C1 clockTick         61.0  peak  -10.1  floor  -36.6  over  26.5 dB   | >500 Hz: peak  -11.4  floor  -41.5  over  30.1 dB
+s08 C2 clockTickMid      62.0  peak  -11.0  floor  -37.1  over  26.1 dB   | >500 Hz: peak  -11.4  floor  -43.5  over  32.1 dB
+s08 C2 clockTickMid      63.0  peak  -10.9  floor  -37.0  over  26.2 dB   | >500 Hz: peak  -11.9  floor  -42.4  over  30.5 dB
+s08 C2 clockTickMid      64.0  peak  -10.8  floor  -37.1  over  26.2 dB   | >500 Hz: peak  -11.5  floor  -43.1  over  31.6 dB
+s08 C2 clockTickMid      65.0  peak  -10.3  floor  -37.8  over  27.5 dB   | >500 Hz: peak  -11.9  floor  -42.9  over  30.9 dB
+s08 C2 clockTickMid      66.0  peak  -11.2  floor  -35.3  over  24.2 dB   | >500 Hz: peak  -12.0  floor  -38.2  over  26.2 dB
+s08 C3 clockTickFar      67.0  peak  -13.7  floor  -36.0  over  22.3 dB   | >500 Hz: peak  -15.3  floor  -40.4  over  25.1 dB
+s08 C3 clockTickFar      68.0  peak  -12.7  floor  -36.9  over  24.2 dB   | >500 Hz: peak  -15.5  floor  -42.9  over  27.5 dB
+s08 C3 clockTickFar      69.0  peak  -13.6  floor  -35.8  over  22.2 dB   | >500 Hz: peak  -15.5  floor  -39.1  over  23.6 dB
+s02 W, -30 dB             9.0  peak  -15.0  floor  -25.6  over  10.7 dB   | >500 Hz: peak  -19.4  floor  -32.7  over  13.3 dB
+s02 W, -30 dB            17.0  peak  -16.9  floor  -34.1  over  17.2 dB   | >500 Hz: peak  -20.0  floor  -41.6  over  21.6 dB
+s18 W, -30 dB           176.0  peak   -5.0  floor  -14.3  over   9.3 dB   | >500 Hz: peak  -16.4  floor  -24.3  over   7.9 dB
+s17b exam room          158.0  peak  -16.6  floor  -33.7  over  17.1 dB   | >500 Hz: peak  -18.1  floor  -39.9  over  21.8 dB
+s17b exam room          160.0  peak  -22.2  floor  -33.6  over  11.4 dB   | >500 Hz: peak  -24.3  floor  -40.2  over  15.9 dB
+lamp click (s06 on)      40.5  peak   -5.0  floor  -22.9  over  17.8 dB   | >500 Hz: peak   -5.6  floor  -27.7  over  22.1 dB
+# a -30 dB tick's own peak in mix.wav:  -28.4 dBFS (buffer peak 0.9 x cue gain x loudnorm's +2.52 dB); the s02/s18/s17b rows' peaks are other sounds.

@@ -1,0 +1,44 @@
+{
+ "clock_kit_face_home": [
+  43,
+  100,
+  505,
+  502
+ ],
+ "clock_kit_tab": [
+  385,
+  711,
+  165,
+  201
+ ],
+ "clock_kit_face_exam": [
+  560,
+  101,
+  504,
+  501
+ ],
+ "clock_kit_minute_spare": [
+  804,
+  673,
+  67,
+  269
+ ],
+ "clock_kit_hour": [
+  1117,
+  326,
+  67,
+  212
+ ],
+ "clock_kit_minute": [
+  1265,
+  249,
+  66,
+  294
+ ],
+ "clock_kit_pin": [
+  1403,
+  380,
+  88,
+  89
+ ]
+}

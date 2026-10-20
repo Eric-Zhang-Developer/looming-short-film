@@ -1,0 +1,14 @@
+fix-walk · s09c between-lamp shadow, measured at sheet size (400 px cells of evidence/fix-walk/fix_76-110.jpg)
+Method: cell cropped with ffmpeg to gray; path band = rows (y > 120) whose 80th-percentile luma > 110; lit = 90th
+percentile luma of the band; shadow = band pixels with luma <= 50% of lit; length = 1st..99th percentile x of the mask.
+Blob width read off a 20 px grid of the same cell (by eye, +-4 px).
+
+82.0 (local 0.0, blob 0.12 before lamp 1, shadow behind)  lit 128  shadow mean 21 = 17% of lit  shadow x 5..228 = 223 px
+     blob ~167..235 = 68 px  ->  3.3x  (the mask reaches the frame's left edge: a lower bound)
+98.0 (local 16.0, blob 0.11 past lamp 5, shadow ahead)   lit 126  shadow mean 22 = 17% of lit  shadow x 147..388 = 241 px
+     blob ~132..220 = 88 px  ->  2.7x  (mask ends 12 px from the right edge)
+
+Probe (evidence/climax-a2/probe.mjs, world metres, keep z 0.03..0.26) at an earlier build of this branch (LAMP_Z 0.045,
+LAMP_H 0.095, the 18 deg camera, before the final 11 deg camera): len/w 2.81 at 3.75, 2.67 at 6.75, lit/dark 3.06 and 3.44;
+lamp beats 1.41-1.45x. The shadow ran off the frame edge there too. The final build's probe run timed out on page load
+(machine load average 260-400 from other jobs) and was not repeated.

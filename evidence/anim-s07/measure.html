@@ -1,0 +1,105 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s07 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s07 measurement rig. Builds src/shots/s07.js on its own stage, with the real post (graded pixels, for
+  // luminance) unless ?raw, which skips post for the shadow diff.
+  //   scale(t): smoke-paper method as anim-s03: the blob's colorWrite off, rendered casting and not casting with the
+  //     moon's shadow off; changed pixels back-projected onto z 0, counting only rays that land on the wall face
+  //     (0 < y < 0.30). Width over the blob's own back-projected width, and the width itself against the spec's 0.48 m.
+  //   luma(t, boxes): mean Rec.709 luma (sRGB bytes / 255) over the whole frame and over named world-point boxes.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { createPost } from '/src/post.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build } from '/src/shots/s07.js';
+
+  const raw = new URLSearchParams(location.search).has('raw');
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: raw ? () => ({ set() {} }) : (o) => createPost(stage, o) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 10 });
+  const { exam, moon, gator } = shot.parts;
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  const cv = renderer.domElement;
+  const pixels = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d'); g.drawImage(cv, 0, 0); return g.getImageData(0, 0, W, H).data; };
+  const grabPx = () => { renderer.render(scene, camera); const p = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, p); return p; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+  const onPlane = (x, y, z) => { ndc.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1); ray.setFromCamera(ndc, camera); return ray.ray.intersectPlane(new THREE.Plane(new THREE.Vector3(0, 0, 1), -z), hit); };
+  function box(mask, z, keep = () => true) {
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, n = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!mask[y * W + x]) continue;
+      const h = onPlane(x, y, z); if (!keep(h)) continue; n++;
+      x0 = Math.min(x0, h.x); x1 = Math.max(x1, h.x); y0 = Math.min(y0, h.y); y1 = Math.max(y1, h.y);
+    }
+    return { x0, x1, y0, y1, w: x1 - x0, h: y1 - y0, n };
+  }
+  window.scale = (t) => {
+    stage.renderFrame(t);
+    const mat = exam.mesh.material, stain = exam.stain.visible;
+    moon.light.castShadow = false; exam.stain.visible = false;
+    mat.colorWrite = false; mat.depthWrite = false;
+    exam.mesh.castShadow = true; const a = grabPx();
+    exam.mesh.castShadow = false; const b = grabPx();
+    mat.colorWrite = true; mat.depthWrite = true;
+    exam.mesh.visible = false; const c = grabPx(); exam.mesh.visible = true; const d = grabPx(); exam.mesh.castShadow = true;
+    moon.light.castShadow = true; exam.stain.visible = stain;
+    const sm = new Uint8Array(W * H), bm = new Uint8Array(W * H);
+    for (let i = 0; i < W * H; i++) {
+      const da = Math.abs(a[i * 4] - b[i * 4]) + Math.abs(a[i * 4 + 1] - b[i * 4 + 1]) + Math.abs(a[i * 4 + 2] - b[i * 4 + 2]);
+      const db = Math.abs(c[i * 4] - d[i * 4]) + Math.abs(c[i * 4 + 1] - d[i * 4 + 1]) + Math.abs(c[i * 4 + 2] - d[i * 4 + 2]);
+      sm[i] = da > 12 ? 1 : 0; bm[i] = db > 12 ? 1 : 0;
+    }
+    const s = box(sm, 0, (h) => h.y > 0.0005 && h.y < 0.2995), bl = box(bm, exam.mesh.position.z);
+    return { t, shadow: s, blob: bl, scale: s.w / bl.w };
+  };
+  // Screen px of a world point (y down, canvas space).
+  const px = (v) => { const p = v.clone().project(camera); return [Math.round((p.x + 1) / 2 * W), Math.round((1 - p.y) / 2 * H)]; };
+  const luma = (d, i) => (0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2]) / 255;
+  function mean(d, [cx, cy], r) {
+    let s = 0, n = 0;
+    for (let y = cy - r; y <= cy + r; y++) for (let x = cx - r; x <= cx + r; x++) {
+      if (x < 0 || y < 0 || x >= W || y >= H) continue; s += luma(d, (y * W + x) * 4); n++;
+    }
+    return n ? s / n : NaN;
+  }
+  // The moon patch's centre on the floor: the window centre carried along the light direction to y 0.
+  const patchCentre = () => {
+    const dir = moon.light.target.position.clone().sub(moon.light.position).normalize(), w = new THREE.Vector3(-0.15, 0.18, 0);
+    return w.addScaledVector(dir, -w.y / dir.y);
+  };
+  window.luma = (t, points = {}) => {
+    stage.renderFrame(t);
+    const d = pixels();
+    let s = 0, mx = 0;
+    for (let i = 0; i < d.length; i += 4) { const l = luma(d, i); s += l; mx = Math.max(mx, l); }
+    const out = { t, frame: s / (W * H), max: mx };
+    const eye = new THREE.Vector3(); gator.meshes.eyes.getWorldPosition(eye);
+    const all = { face: [eye, 4], patch: [patchCentre(), 6], ...points };
+    for (const [k, [p, r]] of Object.entries(all)) { const q = px(new THREE.Vector3().copy(p)); out[k] = { px: q, mean: mean(d, q, r) }; }
+    return out;
+  };
+  // The window's seams (on the wall, mean luma over each strip) and the floor under the window (p95 luma over a
+  // grid of floor points covering every station's moon patch, x −0.45…−0.10, z 0.15…0.45).
+  window.seams = (t) => {
+    stage.renderFrame(t);
+    const d = pixels();
+    const strip = (x0, x1) => {
+      const [a, b] = px(new THREE.Vector3(x0, 0.235, 0)), [c, e] = px(new THREE.Vector3(x1, 0.125, 0));
+      let s = 0, n = 0;
+      for (let y = b; y <= e; y++) for (let x = a; x <= Math.max(a, c - 1); x++) { s += luma(d, (y * W + x) * 4); n++; }
+      return s / n;
+    };
+    const fl = [];
+    for (let x = -0.45; x <= -0.10; x += 0.005) for (let z = 0.15; z <= 0.45; z += 0.005) fl.push(mean(d, px(new THREE.Vector3(x, 0, z)), 1));
+    fl.sort((a, b) => a - b);
+    return { t, left: strip(-0.200, -0.197), centre: strip(-0.1505, -0.1495), right: strip(-0.103, -0.100), panel: strip(-0.18, -0.17),
+      floorP95: fl[Math.floor(0.95 * fl.length)], floorMed: fl[fl.length >> 1] };
+  };
+  window.V = THREE.Vector3;
+  window.shot = shot;
+</script>

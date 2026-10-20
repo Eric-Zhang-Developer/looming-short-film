@@ -1,0 +1,15 @@
+$ node tools/check_timeline.mjs | tail -1
+ok (21 shots, 58 beats, 195.0s)
+$ node tools/determinism.mjs --t=165,167,175,186,193.4  (first run FAILED at 186: the drop shadow decal stayed visible from a later frame; fixed in s18, rerun below)
+t=165  bfc80ec09e5fb2ad bfc80ec09e5fb2ad bfc80ec09e5fb2ad  PASS
+t=167  4e947dab85bf789b 4e947dab85bf789b 4e947dab85bf789b  PASS
+t=175  c8ba329d6600afe4 c8ba329d6600afe4 c8ba329d6600afe4  PASS
+t=186  1f79a799ab71222a 1f79a799ab71222a 1f79a799ab71222a  PASS
+t=193.4  5eadb48b2683a339 5eadb48b2683a339 5eadb48b2683a339  PASS
+determinism: PASS
+$ grep for system-font names in the three shots
+(none)
+$ node tools/determinism.mjs --t=172.4,177.9  (frames with the bundled hand on the page)
+t=172.4  216cdb6862351132 216cdb6862351132 216cdb6862351132  PASS
+t=177.9  1527cc6016749ddf 1527cc6016749ddf 1527cc6016749ddf  PASS
+determinism: PASS

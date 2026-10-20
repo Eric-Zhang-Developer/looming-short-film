@@ -1,0 +1,17 @@
+{
+  // Emit only: src/ → build/, which index.html loads. Type checking is tsconfig.json's (npm run typecheck).
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "nodenext",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "removeComments": false,
+    "skipLibCheck": true,
+    "noCheck": true,
+    "rootDir": "src",
+    "outDir": "build"
+  },
+  "include": ["src/**/*.ts"]
+}

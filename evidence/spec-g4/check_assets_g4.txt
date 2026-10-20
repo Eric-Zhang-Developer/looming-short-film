@@ -1,0 +1,39 @@
+F gator_sheet                s02 s03 s04 s05 s06 s07 s08 s09 s10 s11 s12 s14 s15 s16 s17 s17b s17c s18
+F face_sheet                 s02 s03 s04 s05 s06 s07 s08 s09 s10 s11 s12 s13 s14 s15 s16 s17 s17b s18
+F roommates_sheet            s05
+F custodian_sheet            s14
+F skyline_sheet              s01
+F apt_exterior               s01
+F foliage_sheet              s01 s09
+F apt_furniture_sheet        s05
+F marston_ext                s09
+F marston_stacks             s10
+F marston_furniture_sheet    s11 s12 s14 s15 s16 s17
+F desk_lamp                  s02 s03 s06 s18
+F calendar                   s02 s03 s06 s18
+F study_props_sheet          s00 s02 s03 s06 s09 s10 s11 s12 s14 s15 s16 s17 s17b s18
+F apt_props_sheet            s05 s07 s08
+F top_props_sheet            s13
+F crowd_sheet                s16 s17
+F top_figures_sheet          s13
+F home_kit                   s00 s02 s03 s05 s06 s07 s08 s18
+F kitchen_kit                s04
+F props_kit                  s00 s16 s17 s17b s17c s18
+F exam_room_kit              s17b s17c
+P apt_wall                   s00 s02 s03 s04 s05 s06 s07 s08 s18
+P apt_floor                  s04 s05 s07 s08
+P apt_ceiling                s04 s07 s08
+P apt_window                 s01 s04 s05 s07 s08
+P dawn_sky                   s01
+P night_sky                  s09
+P plaza_ground               s09
+P marston_doors              s09
+P marston_wall               s10
+P ceiling_header             s10 s14
+P marston_floor              s10 s11 s12 s13 s14 s15 s16 s17
+P marston_window_wall        s11 s12 s14 s15 s16 s17
+P window_tissue              s11 s12 s14 s15 s16 s17 s17b
+P sensor_trough              s11 s14 s16 s17
+
+frozen in shots: 22; + style_tile = 23 (cap 35); procedural: 14; shots checked: 21
+PASS

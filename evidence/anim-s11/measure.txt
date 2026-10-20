@@ -1,0 +1,15 @@
+pool t 2.0 (fluorescent, on the desk top y 0): x -1.22..1.26 cm, z 8.88..9.54 cm (242 px); blob -1.25..1.40 cm; scale 0.94x (spec 1.0x, <= 1.2x); centre x 0.02 cm vs blob x 0
+wall t 3.65: x -1.71..11.43 cm, y -3.06..9.12 cm (267993 px); blob 2.74 cm wide; scale 4.80x, spec 4.77x (0.6%); centre (4.86, 3.03) cm
+wall t 4: x -1.55..13.27 cm, y -3.41..9.71 cm (333235 px); blob 2.80 cm wide; scale 5.29x; centre (5.86, 3.15) cm
+wall t 4.4: x -1.18..15.14 cm, y -3.40..10.91 cm (406749 px); blob 2.77 cm wide; scale 5.89x, spec 5.9x (-0.1%); centre (6.98, 3.75) cm
+wall t 5.5: x -0.81..15.22 cm, y -3.40..10.84 cm (421625 px); blob 2.69 cm wide; scale 5.96x, spec 5.9x (1.0%); centre (7.21, 3.72) cm
+camera t 0: pos (0.02000, 0.03300, 0.66800) rot (0, 0, 0)
+camera t 1: pos (0.02000, 0.03300, 0.66800) rot (0, 0, 0)
+camera t 2: pos (0.02000, 0.03300, 0.66800) rot (0, 0, 0)
+camera t 2.6: pos (0.02000, 0.03300, 0.66800) rot (0, 0, 0)
+camera t 3: pos (0.02000, 0.03300, 0.66647) rot (0, 0, 0)
+camera t 4: pos (0.02000, 0.03300, 0.65324) rot (0, 0, 0)
+camera t 5: pos (0.02000, 0.03300, 0.63635) rot (0, 0, 0)
+camera t 5.99: pos (0.02000, 0.03300, 0.62800) rot (0, 0, 0)
+luma t 2 (no post): face 39.1, lit desk top right of the blob 47, ratio 83%
+luma t 5.5 (no post): face 33.6, phone-lit wall outside the shadow 48.4, ratio 69%

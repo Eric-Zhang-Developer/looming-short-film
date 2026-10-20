@@ -1,0 +1,5 @@
+t=0.5  d2e1f4051a0b053d d2e1f4051a0b053d d2e1f4051a0b053d  PASS
+t=4  215bbfe5794f369e 215bbfe5794f369e 215bbfe5794f369e  PASS
+t=10  1daa87afa00bc4d6 1daa87afa00bc4d6 1daa87afa00bc4d6  PASS
+t=0.5  d2e1f4051a0b053d d2e1f4051a0b053d d2e1f4051a0b053d  PASS
+determinism: PASS

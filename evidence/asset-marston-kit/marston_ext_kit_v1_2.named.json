@@ -1,0 +1,86 @@
+{
+ "marston_ext_kit_facade_block": [
+  24,
+  124,
+  696,
+  216
+ ],
+ "marston_ext_kit_stepped_bay": [
+  748,
+  116,
+  355,
+  224
+ ],
+ "marston_ext_kit_breezeway_frame": [
+  1136,
+  100,
+  328,
+  244
+ ],
+ "marston_ext_kit_century_tower": [
+  1528,
+  13,
+  96,
+  351
+ ],
+ "marston_ext_kit_night_view": [
+  28,
+  376,
+  460,
+  220
+ ],
+ "marston_ext_kit_oak_canopy": [
+  524,
+  416,
+  628,
+  164
+ ],
+ "marston_ext_kit_lit_window_strip": [
+  1184,
+  440,
+  468,
+  99
+ ],
+ "marston_ext_kit_brick_strip": [
+  28,
+  648,
+  540,
+  88
+ ],
+ "marston_ext_kit_band_strip": [
+  584,
+  660,
+  532,
+  60
+ ],
+ "marston_ext_kit_planter_hex": [
+  1148,
+  600,
+  244,
+  144
+ ],
+ "marston_ext_kit_sculpture_yellow": [
+  1448,
+  561,
+  188,
+  183
+ ],
+ "marston_ext_kit_lantern_post": [
+  540,
+  764,
+  48,
+  160
+ ],
+ "marston_ext_kit_lantern_cluster": [
+  752,
+  776,
+  148,
+  132
+ ],
+ "marston_ext_kit_lamppost_black": [
+  1084,
+  748,
+  44,
+  176
+ ]
+}

@@ -1,0 +1,23 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>rig-legs · sizes</title>
+<!-- Evidence page, not film. window.measure(asset, piece): loads the piece, tears it with makePaper at sizes[piece] and
+     returns the opaque box of the torn alpha in meters, next to the PIECES size. -->
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+<script type="module">
+  import * as assets from '/src/assets.js';
+  import { makePaper } from '/src/paper.js';
+  window.measure = async (name, piece) => {
+    const a = await assets.load(name), size = a.sizes[piece];
+    const sheet = makePaper({ art: a.pieces[piece], size, key: `sizes-${name}-${piece}`, res: 1024 });
+    const img = sheet.alphaMap.image, W = img.width, H = img.height;
+    let d = img.data;
+    if (!d) { const g = Object.assign(document.createElement('canvas'), { width: W, height: H }).getContext('2d'); g.drawImage(img, 0, 0); d = g.getImageData(0, 0, W, H).data; }
+    const step = d.length / (W * H);  // 1 (one channel) or 4 (RGBA)
+    let x0 = W, x1 = -1, y0 = H, y1 = -1;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (d[(y * W + x) * step] >= 128) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    return { proxy: a.proxy, bitmap: [a.pieces[piece].width, a.pieces[piece].height], size, pieces: assets.PIECES[name][piece].slice(0, 2),
+      drawn: [(x1 + 1 - x0) / W * sheet.size[0], (y1 + 1 - y0) / H * sheet.size[1]] };
+  };
+  window.renderFrame = () => {};  // openPage waits for it; this page draws nothing
+</script>

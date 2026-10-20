@@ -1,0 +1,8 @@
+$ node evidence/rig-legs/height.mjs
+gator stand            sole -29.62 mm  top  50.18 mm  height  79.80 mm  PASS (8 cm ±0.3 mm)
+gator walk_side_pass   sole -29.52 mm  top  49.78 mm  height  79.30 mm
+gator walk_side_a      sole -27.07 mm  top  49.78 mm  height  76.85 mm
+front stand_front      sole  -0.07 mm  top  79.88 mm  height  79.95 mm
+back stand_back        sole  -0.27 mm  top  80.18 mm  height  80.45 mm
+freshman stand         sole -25.12 mm  top  42.63 mm  height  67.75 mm
+height: PASS

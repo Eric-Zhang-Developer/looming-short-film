@@ -1,0 +1,21 @@
+$ ffmpeg -i out/audio/mix.wav -af ebur128=peak=true -f null -
+[Parsed_ebur128_0 @ 0xaad024900] Summary:
+
+  Integrated loudness:
+    I:         -15.9 LUFS
+    Threshold: -27.2 LUFS
+
+  Loudness range:
+    LRA:        16.3 LU
+    Threshold: -37.2 LUFS
+    LRA low:   -28.6 LUFS
+    LRA high:  -12.3 LUFS
+
+  True peak:
+    Peak:       -4.7 dBFS
+
+$ ffprobe out/audio/mix.wav
+sample_rate=48000
+channels=2
+bits_per_sample=16
+duration=195.000000

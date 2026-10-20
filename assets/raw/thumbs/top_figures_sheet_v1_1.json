@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/top_figures_sheet_v1_1.png",
+  "prompt_file": "assets/prompts/top_figures_sheet.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/top_figures_sheet.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a142fa-788c-7ee0-b535-cec29bad3a88",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a142fa-788c-7ee0-b535-cec29bad3a88/exec-0f32c09a-080b-4d97-bb3a-9339176c9cb1.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-K9QMYi",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 109409,
+    "cached_input_tokens": 91520,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1527,
+    "reasoning_output_tokens": 42
+  },
+  "timestamp_start_utc": "2026-10-16T04:31:13Z",
+  "timestamp_end_utc": "2026-10-16T04:32:38Z",
+  "output_sha256": "ef8f0855d5410fee550a549f75ab9ad6ce5333a1078c90667df8bdf4bc1c0f52",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/top_figures_sheet_v1_1.jpg",
+  "screening": "Best. Alpha, 11 islands. Hero head has a clear snout and eye bumps, cream hoodie, navy backpack with amber zip, scalloped tail, two cream-sleeved arms with green mittens (one island, as asked); six distinct muted seated students. Some padded boxes touch (gap 0 px), islands still separate. Hero body 1.16 vs 0.75 asked."
+}

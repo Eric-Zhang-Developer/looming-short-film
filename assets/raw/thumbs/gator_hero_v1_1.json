@@ -1,0 +1,53 @@
+{
+  "output": "assets/raw/gator_hero_v1_1.png",
+  "prompt_file": "assets/prompts/gator_hero.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/gator_hero.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/raw/gator_sheet_v1_1.png",
+      "sha256": "63e3566cfda3aeb7f18f8da7ef4d018213d90c3319a78a0dd55a7911469f4b95"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a140a8-9df4-77b3-8055-813715adaea6",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a140a8-9df4-77b3-8055-813715adaea6/exec-a9b1e17c-0fa6-41bf-9e2f-38e01040431f.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-o1B9IL",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 224905,
+    "cached_input_tokens": 201088,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1588,
+    "reasoning_output_tokens": 97
+  },
+  "timestamp_start_utc": "2026-10-15T17:42:33Z",
+  "timestamp_end_utc": "2026-10-15T17:45:15Z",
+  "output_sha256": "bf02530ba4a6214ea701dc2c6c72c4ff2917f26cb36a13dccefce54b6e20f8fb",
+  "width": 1536,
+  "height": 1024,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/gator_hero_v1_1.jpg",
+  "screening": {
+    "verdict": "survivor, rank 1 of 2 (hero)",
+    "reasons": [
+      "same pose and design as v1_1 turn_side, shape for shape; mean green #678553 vs v1_1 #668850",
+      "figure height 973 of 1024 px = 95.0% of the canvas (>= 70%)",
+      "torn rim: the clearest of the round, a pale torn rim ~4-6 px on every cut edge and on the overlapping pieces, closest to the style tile wall",
+      "frame margin 23 px (top and bottom): nothing touches, but under the 40 px the spec target asks",
+      "cut.mjs --auto: 1 island",
+      "no baked light/shadow, real alpha, no text, on palette"
+    ]
+  }
+}

@@ -1,0 +1,55 @@
+# islands · cut.mjs --auto --pad=0, one block per variant (scratch --out dir, exit 0 for all). Expected: heads 6, clock 7.
+# heads: 6 heads (the relief breath puff sits inside the relief head's island at cut's 4 px grid). clock: 2 faces, 2 hands + 1 spare hand, pin, tab.
+
+## closeup_heads_v1_1
+no alpha in closeup_heads_v1_1: keyed #FF00FF (tol 80), 1211319 px cleared, 15426 edge px soft-keyed and despilled
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: evidence/asset-v4-kit/closeup_heads_v1_1.boxes.json
+closeup_heads_v1_1_1: [93, 586, 407, 243] -> <scratch>/cut_h1/closeup_heads_v1_1_1.png
+closeup_heads_v1_1_2: [96, 179, 370, 244] -> <scratch>/cut_h1/closeup_heads_v1_1_2.png
+closeup_heads_v1_1_3: [593, 584, 362, 244] -> <scratch>/cut_h1/closeup_heads_v1_1_3.png
+closeup_heads_v1_1_4: [596, 179, 361, 244] -> <scratch>/cut_h1/closeup_heads_v1_1_4.png
+closeup_heads_v1_1_5: [1087, 584, 367, 244] -> <scratch>/cut_h1/closeup_heads_v1_1_5.png
+closeup_heads_v1_1_6: [1091, 178, 361, 245] -> <scratch>/cut_h1/closeup_heads_v1_1_6.png
+## closeup_heads_v1_2
+no alpha in closeup_heads_v1_2: keyed #FF00FF (tol 80), 1018912 px cleared, 18836 edge px soft-keyed and despilled
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: evidence/asset-v4-kit/closeup_heads_v1_2.boxes.json
+closeup_heads_v1_2_1: [46, 569, 486, 307] -> <scratch>/cut_h2/closeup_heads_v1_2_1.png
+closeup_heads_v1_2_2: [49, 145, 449, 309] -> <scratch>/cut_h2/closeup_heads_v1_2_2.png
+closeup_heads_v1_2_3: [564, 145, 441, 309] -> <scratch>/cut_h2/closeup_heads_v1_2_3.png
+closeup_heads_v1_2_4: [568, 565, 438, 311] -> <scratch>/cut_h2/closeup_heads_v1_2_4.png
+closeup_heads_v1_2_5: [1054, 145, 438, 309] -> <scratch>/cut_h2/closeup_heads_v1_2_5.png
+closeup_heads_v1_2_6: [1057, 565, 436, 311] -> <scratch>/cut_h2/closeup_heads_v1_2_6.png
+## closeup_heads_v1_3
+no alpha in closeup_heads_v1_3: keyed #FF00FF (tol 80), 1227615 px cleared, 14971 edge px soft-keyed and despilled
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: evidence/asset-v4-kit/closeup_heads_v1_3.boxes.json
+closeup_heads_v1_3_1: [85, 619, 383, 240] -> <scratch>/cut_h3/closeup_heads_v1_3_1.png
+closeup_heads_v1_3_2: [86, 166, 354, 242] -> <scratch>/cut_h3/closeup_heads_v1_3_2.png
+closeup_heads_v1_3_3: [596, 166, 354, 243] -> <scratch>/cut_h3/closeup_heads_v1_3_3.png
+closeup_heads_v1_3_4: [598, 619, 348, 240] -> <scratch>/cut_h3/closeup_heads_v1_3_4.png
+closeup_heads_v1_3_5: [1099, 166, 354, 243] -> <scratch>/cut_h3/closeup_heads_v1_3_5.png
+closeup_heads_v1_3_6: [1100, 618, 350, 241] -> <scratch>/cut_h3/closeup_heads_v1_3_6.png
+## clock_kit_v1_1
+no alpha in clock_kit_v1_1: keyed #00FF00 (tol 80), 1138211 px cleared, 14436 edge px soft-keyed and despilled
+7 alpha island(s): 7 kept, 0 dropped under 500 px
+boxes for review: evidence/asset-v4-kit/clock_kit_v1_1.boxes.json
+clock_kit_v1_1_1: [59, 94, 485, 480] -> <scratch>/cut_c1/clock_kit_v1_1_1.png
+clock_kit_v1_1_2: [222, 710, 173, 214] -> <scratch>/cut_c1/clock_kit_v1_1_2.png
+clock_kit_v1_1_3: [528, 640, 50, 317] -> <scratch>/cut_c1/clock_kit_v1_1_3.png
+clock_kit_v1_1_4: [580, 95, 479, 480] -> <scratch>/cut_c1/clock_kit_v1_1_4.png
+clock_kit_v1_1_5: [1121, 273, 53, 240] -> <scratch>/cut_c1/clock_kit_v1_1_5.png
+clock_kit_v1_1_6: [1270, 192, 50, 321] -> <scratch>/cut_c1/clock_kit_v1_1_6.png
+clock_kit_v1_1_7: [1396, 394, 86, 87] -> <scratch>/cut_c1/clock_kit_v1_1_7.png
+## clock_kit_v1_2
+no alpha in clock_kit_v1_2: keyed #00FF00 (tol 80), 1120277 px cleared, 14207 edge px soft-keyed and despilled
+7 alpha island(s): 7 kept, 0 dropped under 500 px
+boxes for review: evidence/asset-v4-kit/clock_kit_v1_2.boxes.json
+clock_kit_v1_2_1: [47, 104, 497, 494] -> <scratch>/cut_c2/clock_kit_v1_2_1.png
+clock_kit_v1_2_2: [389, 715, 157, 193] -> <scratch>/cut_c2/clock_kit_v1_2_2.png
+clock_kit_v1_2_3: [564, 105, 496, 493] -> <scratch>/cut_c2/clock_kit_v1_2_3.png
+clock_kit_v1_2_4: [808, 677, 59, 261] -> <scratch>/cut_c2/clock_kit_v1_2_4.png
+clock_kit_v1_2_5: [1121, 330, 59, 204] -> <scratch>/cut_c2/clock_kit_v1_2_5.png
+clock_kit_v1_2_6: [1269, 253, 58, 286] -> <scratch>/cut_c2/clock_kit_v1_2_6.png
+clock_kit_v1_2_7: [1407, 384, 80, 81] -> <scratch>/cut_c2/clock_kit_v1_2_7.png

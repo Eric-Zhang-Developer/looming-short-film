@@ -1,0 +1,86 @@
+{
+  "gator_sheet_turn_side": [
+    40,
+    72,
+    472,
+    432
+  ],
+  "gator_sheet_body": [
+    68,
+    512,
+    224,
+    244
+  ],
+  "gator_sheet_arm_l": [
+    108,
+    780,
+    240,
+    112
+  ],
+  "gator_sheet_head": [
+    364,
+    532,
+    220,
+    192
+  ],
+  "gator_sheet_arm_r": [
+    456,
+    780,
+    244,
+    112
+  ],
+  "gator_sheet_turn_front": [
+    572,
+    76,
+    240,
+    428
+  ],
+  "gator_sheet_snout": [
+    648,
+    588,
+    308,
+    120
+  ],
+  "gator_sheet_leg_l": [
+    840,
+    756,
+    152,
+    140
+  ],
+  "gator_sheet_turn_back": [
+    908,
+    76,
+    284,
+    432
+  ],
+  "gator_sheet_jaw": [
+    1008,
+    592,
+    280,
+    120
+  ],
+  "gator_sheet_leg_r": [
+    1084,
+    756,
+    152,
+    140
+  ],
+  "gator_sheet_turn_head34": [
+    1296,
+    128,
+    288,
+    256
+  ],
+  "gator_sheet_tail": [
+    1320,
+    564,
+    308,
+    148
+  ],
+  "gator_sheet_pocket": [
+    1328,
+    768,
+    248,
+    128
+  ]
+}

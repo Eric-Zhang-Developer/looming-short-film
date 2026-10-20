@@ -1,0 +1,15 @@
+range 0:180 s  premix -17.15 LUFS, -4.79 dBTP  →  loudnorm linear
+mix.wav  integrated -13.9 LUFS  true peak -1.6 dBTP (ebur128)  /  -13.92 LUFS, -1.66 dBTP (loudnorm pass 2)  target -14 LUFS, ≤ -1 dBTP
+3e68e01e5d593e2da876e9a9875027bc28d6516bbfa7f0da3955795b84f69056  /Users/ericzhang/.worktrees/looming/snd-foley-2/out/audio/mix.wav
+    lampClickHome@36.5s, lampClickMarston@100.5s, lampClickFreshman@164s; 24000 samples each (±0.1 s), peak 0.5645
+ok  three lamp clicks are sample-identical in out/audio/stems/foley.wav
+    36 bed cues sound at both ends of their spans
+ok  every bed cue with a length sounds at both ends of its own span
+ok  voices and foley are deterministic and finite
+ok  every foley sound renders, deterministic and finite
+    max diff vs lampClickMarston [0,0,0] LSB over 14400 samples each, peak 26582 LSB
+ok  three lamp clicks are identical within ±1 LSB in out/audio/mix.wav (over the click's own samples)
+wrote /Users/ericzhang/.worktrees/looming/snd-foley-2/out/audio/solo/{lampclick,piano_c4}.wav (19200, 146400 samples)
+354c6b88b268a04f26bbcf8cfd0d2c858c3d16d0f2cd42eba51d3430a3251eb1  out/audio/stems/music.wav
+456852c3f560c7fb35b7e4d71b2ee2317f7fe4633a6cb6cd5b39b7a82aacafc1  out/audio/stems/foley.wav
+7fccc00b3fbd2ad2a5a389c42490b16699fbdf6e890552386a4c2469a1bf25ff  out/audio/stems/ambience.wav

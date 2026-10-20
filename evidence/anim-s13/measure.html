@@ -1,0 +1,65 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s13 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s13 measurement rig: builds src/shots/s13.js on its own stage (no post) and measures, from pixels, each desk's
+  // shadow decal against its blob. Each is rendered alone on white; every pixel is back-projected onto its own plane
+  // and measured along the decal's axes (width across, length along). Holes = enclosed non-ink regions of the decal.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build } from '/src/shots/s13.js';
+
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: () => ({ set() {} }) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 7 });
+
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  function mask(obj) {
+    const vis = new Map(); scene.traverse((o) => { vis.set(o, o.visible); });
+    scene.children.forEach((o) => { o.visible = !!o.isLight; });   // three hides only visible === false
+    obj.visible = true; for (let p = obj.parent; p; p = p.parent) p.visible = true;
+    const bg = scene.background; scene.background = new THREE.Color(1, 1, 1);
+    renderer.render(scene, camera);
+    const px = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, px);
+    scene.background = bg; vis.forEach((v, o) => { o.visible = v; });
+    const m = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) m[i] = px[i * 4] < 128 ? 1 : 0;
+    return m;
+  }
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+  function extent(m, z, rot) {
+    const plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -z), c = Math.cos(rot), s = Math.sin(rot);
+    let a0 = 1e9, a1 = -1e9, b0 = 1e9, b1 = -1e9, n = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!m[y * W + x]) continue; n++;
+      ndc.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1); ray.setFromCamera(ndc, camera); ray.ray.intersectPlane(plane, hit);
+      const across = hit.x * c + hit.y * s, along = -hit.x * s + hit.y * c;   // decal local x and y
+      a0 = Math.min(a0, across); a1 = Math.max(a1, across); b0 = Math.min(b0, along); b1 = Math.max(b1, along);
+    }
+    return { w: a1 - a0, l: b1 - b0, n };
+  }
+  function holes(m) {   // enclosed background components (> 20 px) in the mask
+    const seen = new Uint8Array(W * H), stack = []; let count = 0;
+    const fill = (i0) => { let size = 0, edge = false; stack.push(i0); seen[i0] = 1;
+      while (stack.length) { const i = stack.pop(), x = i % W, y = (i / W) | 0; size++;
+        if (x === 0 || y === 0 || x === W - 1 || y === H - 1) edge = true;
+        for (const j of [i - 1, i + 1, i - W, i + W]) if (j >= 0 && j < W * H && !seen[j] && !m[j] && Math.abs((j % W) - x) <= 1) { seen[j] = 1; stack.push(j); } }
+      return { size, edge }; };
+    for (let i = 0; i < W * H; i++) if (!m[i] && !seen[i]) { const r = fill(i); if (!r.edge && r.size > 20) count++; }
+    return count;
+  }
+  window.cast = () => shot.cast;
+  window.measure = (t) => {
+    stage.renderFrame(t);
+    return shot.rigs.map((g) => {
+      if (!g.decal.visible) return { key: g.key, who: g.who, target: g.S, decal: null };
+      const dm = mask(g.decal), d = extent(dm, g.decal.position.z, g.decal.rotation.z);
+      const b = extent(mask(g.blob.mesh), g.blob.mesh.position.z, g.decal.rotation.z);
+      return { key: g.key, who: g.who, target: g.S, growing: t < g.wake + 0.5, decalW: d.w, decalL: d.l, blobW: b.w, scale: d.w / b.w, lw: d.l / d.w, holes: holes(dm) };
+    });
+  };
+</script>

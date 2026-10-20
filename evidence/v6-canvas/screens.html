@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>lab · canvas screens</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+<script type="module">
+  // Evidence page for src/props/canvas.js (node render.mjs --page=evidence/v6-canvas/screens.html --sheet=0,1,2 --cols=1 --w=860 --out=evidence/v6-canvas/screens.jpg): the screens flat at 400 px wide. t 0: the list, the list + the s00 banner;
+  // t 1: a swipe half-way (s07), the open half-way (s09a); t 2: the four countdown banners.
+  import { todoScreen, banner, COUNTDOWN } from '../../src/props/canvas.js';
+  const out = Object.assign(document.createElement('canvas'), { width: 860, height: 900 }), g = out.getContext('2d');
+  document.body.append(out);
+  const scr = todoScreen(), put = (c, x, y) => g.drawImage(c, x, y, 400, 400 * c.height / c.width);
+  window.renderFrame = (t) => {
+    g.fillStyle = '#556'; g.fillRect(0, 0, 860, 900);
+    const views = [[{ marker: 1 }, { banner: banner({ body: COUNTDOWN.s00 }), marker: 1 }],
+      [{ banner: banner({ body: COUNTDOWN.s07 }), swipe: 0.5, clock: '1:45' }, { banner: banner({ body: COUNTDOWN.s09a }), open: 0.6, clock: '3:00' }]][t];
+    if (views) views.forEach((o, i) => { scr.set(t, o); put(scr.canvas, 20 + i * 420, 10); });
+    else ['s03', 's06', 's07', 's09a'].forEach((k, i) => put(banner({ body: COUNTDOWN[k] }).canvas, 20, 20 + i * 110));
+  };
+</script>

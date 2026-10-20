@@ -1,0 +1,7 @@
+swap free 1028M at start
+t=50  f402ad1122b0a18d f402ad1122b0a18d f402ad1122b0a18d  PASS
+t=55.75  5f4b9aa3058b2c99 5f4b9aa3058b2c99 5f4b9aa3058b2c99  PASS
+t=58.084  84f93a773d2e912e 84f93a773d2e912e 84f93a773d2e912e  PASS
+t=66  9d26b2cb95abf5bc 9d26b2cb95abf5bc 9d26b2cb95abf5bc  PASS
+t=68  1a8171e0b0ac008d 1a8171e0b0ac008d 1a8171e0b0ac008d  PASS
+determinism: PASS

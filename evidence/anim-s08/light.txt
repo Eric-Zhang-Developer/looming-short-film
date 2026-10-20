@@ -1,0 +1,5 @@
+tLocal 0: wall max 124.8 p99.9 120.0 | seam max right 62.7 left 72.6 centre 59.1 (mean 30.8 / 32.6 / 20.0) | right/wall 0.50x, vs p99.9 0.52x | max at 1185,677 | face 70.9 vs lit patch 101.1 = 70 %
+tLocal 1: wall max 125.1 p99.9 120.3 | seam max right 66.0 left 74.5 centre 49.2 (mean 42.6 / 34.5 / 25.6) | right/wall 0.53x, vs p99.9 0.55x | max at 1129,767 | face 71.1 vs lit patch 101.6 = 70 %
+tLocal 3: wall max 126.1 p99.9 120.7 | seam max right 153.5 left 118.6 centre 142.1 (mean 114.9 / 44.3 / 57.8) | right/wall 1.22x, vs p99.9 1.27x | max at 1129,772 | face 73.1 vs lit patch 102.3 = 71 %
+tLocal 5: wall max 126.5 p99.9 121.6 | seam max right 227.1 left 166.4 centre 234.2 (mean 199.9 / 65.0 / 92.8) | right/wall 1.80x, vs p99.9 1.87x | max at 1138,722 | face 71.7 vs lit patch 103.0 = 70 %
+tLocal 5.99: wall max 126.7 p99.9 121.7 | seam max right 238.9 left 201.7 centre 237.5 (mean 231.1 / 61.8 / 104.7) | right/wall 1.89x, vs p99.9 1.96x | max at 1206,640 | face 71.8 vs lit patch 103.2 = 70 %

@@ -1,0 +1,135 @@
+diff -r base_out/shots/s15.js new_out/shots/s15.js
+19,23c19,23
+<     camA: ({ pos: [-0.010, 0.118, 0.392], look: [-0.010, 0.0385, 0.080] }),
+<     camB: ({ pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] }),
+<     focus: ([-0.024, 0.020, 0.086]), aperture: 0.02, maxblur: 0.01,
+<     fill: ([-0.046, 0.040, 0.114]),
+<     tube: ([0, 0.127, 0.040]),
+---
+>     camA: { pos: [-0.010, 0.118, 0.392], look: [-0.010, 0.0385, 0.080] },
+>     camB: { pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] },
+>     focus: [-0.024, 0.020, 0.086], aperture: 0.02, maxblur: 0.01,
+>     fill: [-0.046, 0.040, 0.114],
+>     tube: [0, 0.127, 0.040],
+30,33c30,33
+< export const PHONE = ([-0.010, 0.0015, 0.114]), PHONE_L = [-0.010, 0.004, 0.114];
+< export const CAM_A2 = ({ pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] });
+< export const CAM_B2 = ({ pos: [-0.010, 0.112, 0.358], look: [-0.010, 0.020, 0.084] });
+< export const PAGE = ([-0.0205, 0.0003, 0.095]);
+---
+> export const PHONE = [-0.010, 0.0015, 0.114], PHONE_L = [-0.010, 0.004, 0.114];
+> export const CAM_A2 = { pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] };
+> export const CAM_B2 = { pos: [-0.010, 0.112, 0.358], look: [-0.010, 0.020, 0.084] };
+> export const PAGE = [-0.0205, 0.0003, 0.095];
+35c35
+< const CAM_CU = ({ pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] });
+---
+> const CAM_CU = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };
+69c69
+< const X = (['x', 1]);
+---
+> const X = ['x', 1];
+356c356
+<             r.blend(P, (BODY), tc + 1e-6);
+---
+>             r.blend(P, BODY, tc + 1e-6);
+diff -r base_out/shots/s16.js new_out/shots/s16.js
+27,28c27,28
+< const CAM_D = ({ pos: [0.168, 0.230, 1.010], look: [0.168, 0.040, 0.080], focus: [0.168, 0.020, 0.086] });
+< const CAM_P = ({ pos: [-0.0205, 0.0753, 0.0934], look: [-0.0205, 0.0003, 0.0934] });
+---
+> const CAM_D = { pos: [0.168, 0.230, 1.010], look: [0.168, 0.040, 0.080], focus: [0.168, 0.020, 0.086] };
+> const CAM_P = { pos: [-0.0205, 0.0753, 0.0934], look: [-0.0205, 0.0003, 0.0934] };
+34c34
+< const N = { hip: [0.425, -0.012], blob: [0.350, OTHER_R.neighbor, 0.098], phone: ([0.360, 0.0015, 0.114]) };
+---
+> const N = { hip: [0.425, -0.012], blob: [0.350, OTHER_R.neighbor, 0.098], phone: [0.360, 0.0015, 0.114] };
+36c36
+< const INSERT_TINT = ([0.62, 0.85, 0.9]);
+---
+> const INSERT_TINT = [0.62, 0.85, 0.9];
+58c58
+< const NPOPS = ([[0, 'crowd_write'], ...Array.from({ length: 14 }, (_, i) => [9 + 0.5 * i, i % 2 ? 'crowd_write' : 'n_write2'])]);
+---
+> const NPOPS = [[0, 'crowd_write'], ...Array.from({ length: 14 }, (_, i) => [9 + 0.5 * i, i % 2 ? 'crowd_write' : 'n_write2'])];
+221c221
+<         (ia.children[0]).material.color.setRGB(...INSERT_TINT);
+---
+>         ia.children[0].material.color.setRGB(...INSERT_TINT);
+diff -r base_out/shots/s17b.js new_out/shots/s17b.js
+15c15
+< const CLOCK = { at: ([0.12, 0.10, 0.0008]), d: 0.014, reads: ([9, 0]), s0: 12 };
+---
+> const CLOCK = { at: [0.12, 0.10, 0.0008], d: 0.014, reads: [9, 0], s0: 12 };
+17c17
+< const CAM_K = ({ pos: [0.12, 0.10, kZ(KFILL[0])], look: [0.12, 0.10, 0.0008] });
+---
+> const CAM_K = { pos: [0.12, 0.10, kZ(KFILL[0])], look: [0.12, 0.10, 0.0008] };
+24c24
+< const CAM_HERO = ({ pos: [0.0, 0.115, 0.42], look: [0.004, 0.05, 0.093] });
+---
+> const CAM_HERO = { pos: [0.0, 0.115, 0.42], look: [0.004, 0.05, 0.093] };
+66,68c66,68
+< export const CAM_P = ({ pos: [-0.012, 0.0814, 0.1221], look: [-0.012, 0.0003, 0.0965] });
+< const CAM_T1 = ({ pos: [0.0, 0.29, 0.70], look: [0.0, 0.045, 0.125] });
+< const CAM_T3 = ({ pos: [-0.015, 0.055, 0.400], look: [-0.015, 0.018, 0.086] });
+---
+> export const CAM_P = { pos: [-0.012, 0.0814, 0.1221], look: [-0.012, 0.0003, 0.0965] };
+> const CAM_T1 = { pos: [0.0, 0.29, 0.70], look: [0.0, 0.045, 0.125] };
+> const CAM_T3 = { pos: [-0.015, 0.055, 0.400], look: [-0.015, 0.018, 0.086] };
+70c70
+< const HIP = ([-0.054, -0.0134, 0.074]);
+---
+> const HIP = [-0.054, -0.0134, 0.074];
+198c198
+<             const m = (pane.children[0]).material;
+---
+>             const m = pane.children[0].material;
+217c217
+<     const figures = ([]), bobbers = [], blobs1 = [];
+---
+>     const figures = [], bobbers = [], blobs1 = [];
+241,242c241,242
+<             (fig).pose = seat({ lean: hero ? 12 : 8 + 8 * rng(), arm: -26, head: hero ? -8 : -4 - 8 * rng() });
+<             (fig).eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';
+---
+>             fig.pose = seat({ lean: hero ? 12 : 8 + 8 * rng(), arm: -26, head: hero ? -8 : -4 - 8 * rng() });
+>             fig.eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';
+359,360c359,360
+<                 camera.position.set(...(CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k))));
+<                 camera.lookAt(look.set(...(CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k)))));
+---
+>                 camera.position.set(...CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k)));
+>                 camera.lookAt(look.set(...CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k))));
+diff -r base_out/shots/s17c.js new_out/shots/s17c.js
+19,21c19,21
+< const CU_AT = ([0.6, 0, 0]);
+< const CU_HIP = ([-0.054, -0.0134, 0.074]);
+< const CAM_CU = ({ pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] });
+---
+> const CU_AT = [0.6, 0, 0];
+> const CU_HIP = [-0.054, -0.0134, 0.074];
+> const CAM_CU = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };
+diff -r base_out/shots/s18.js new_out/shots/s18.js
+22c22
+< const LAMP_AT = ([DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005]), LAMP_AIM = ([0.036, 0.020, 0.0035]);
+---
+> const LAMP_AT = [DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005], LAMP_AIM = [0.036, 0.020, 0.0035];
+42c42
+< const CLOCK = { at: ([C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z]), h: 4, m: 10 };
+---
+> const CLOCK = { at: [C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z], h: 4, m: 10 };
+73c73
+<     const penRest = ([DESK.pen[0] + 0.0075, 0.0006, DESK.pen[1]]);
+---
+>     const penRest = [DESK.pen[0] + 0.0075, 0.0006, DESK.pen[1]];
+150c150
+<             const hip = (DESK.hip.map((v, i) => lerp(v, STAND[i], REACH_UP))), at = artToWorld(...NEW_CELL);
+---
+>             const hip = DESK.hip.map((v, i) => lerp(v, STAND[i], REACH_UP)), at = artToWorld(...NEW_CELL);
+308,309c308,309
+<             camera.position.set(...(cam.pos.map((v, i) => lerp(v, PUSH.pos[i], push))));
+<             camera.lookAt(look.set(...(cam.look.map((v, i) => lerp(v, PUSH.look[i], push)))));
+---
+>             camera.position.set(...cam.pos.map((v, i) => lerp(v, PUSH.pos[i], push)));
+>             camera.lookAt(look.set(...cam.look.map((v, i) => lerp(v, PUSH.look[i], push))));

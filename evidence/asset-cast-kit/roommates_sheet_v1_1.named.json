@@ -1,0 +1,38 @@
+{
+ "roommates_sheet_tall_body": [
+  43,
+  94,
+  254,
+  389
+ ],
+ "roommates_sheet_tall_head": [
+  317,
+  103,
+  457,
+  355
+ ],
+ "roommates_sheet_tall_leg_l": [
+  794,
+  120,
+  124,
+  346
+ ],
+ "roommates_sheet_tall_leg_r": [
+  976,
+  120,
+  126,
+  346
+ ],
+ "roommates_sheet_tall_tail": [
+  1110,
+  222,
+  385,
+  189
+ ],
+ "roommates_sheet_round": [
+  573,
+  505,
+  405,
+  473
+ ]
+}

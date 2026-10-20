@@ -23,11 +23,11 @@ codex exec -C "$RUN" -s workspace-write --json \
 
 - `-i` attaches reference images (the approved style tile and any approved character sheets).
 - The prompt file is piped on stdin, so long prompts are versioned files, not shell strings.
-- **Run Codex in an empty scratch folder (`$RUN`), not the repo root.** Codex reads `AGENTS.md` and the docs it finds in its workspace. In wave 1 that cost about 190k input tokens for a single image, and it means Codex might try to follow rules written for Claude's subagents. `gen.mjs` makes a fresh temp folder per call, and Claude copies the output into `assets/raw/`.
+- **Run Codex in an empty scratch folder (`$RUN`), not the repo root.** Codex reads `AGENTS.md` and the docs it finds in its workspace. In wave 1 that cost about 190k input tokens for a single image, and it means Codex might try to follow rules written for Claude's subagents. `gen.ts` makes a fresh temp folder per call, and Claude copies the output into `assets/raw/`.
 - `-s workspace-write` lets Codex copy its output into that folder. Its image skill saves to `~/.codex/generated_images/` first, then copies into the workspace.
 - The `image_gen` call doesn't appear in `--json` events, so the model name and image cost aren't reported. The sidecar records `"model": "unknown (Codex image_gen)"` and the token usage from `turn.completed`.
 - **Resolution:** wave 1's 5-piece sheet came back at 1983×793, about 400 px per piece. That's fine for distant props, but anything that fills a lot of the frame needs **one piece per image** at the largest size.
-- `tools/gen.mjs` wraps the call:
+- `tools/gen.ts` wraps the call:
   - runs it N times for variants
   - finds each new file
   - writes a sidecar `.json` (prompt file, reference hashes, model, timestamp, output sha256)
@@ -84,7 +84,7 @@ Once frozen, an asset can be used as a reference. Rejected outputs are never use
 
 1. **Spec.** Claude adds the asset to `assets/specs.json`: name, purpose, shots, target resolution, key color, parts list, acceptance checklist.
 2. **Prompt.** Claude writes `assets/prompts/<name>.v1.md` from the five blocks.
-3. **Generate.** `gen.mjs` makes 3–4 variants into `assets/raw/`.
+3. **Generate.** `gen.ts` makes 3–4 variants into `assets/raw/`.
 4. **Screen.** Claude views every variant and rejects any that fails the checklist:
    - baked-in light or shadow
    - background not flat
@@ -96,7 +96,7 @@ Once frozen, an asset can be used as a reference. Rejected outputs are never use
 5. **Pick.** The director sees a contact sheet of the survivors and picks one, or gives notes. Notes become the next prompt version.
 6. **Cap.** At most **8 generations per asset**. If it still fails, rethink the spec instead of re-rolling.
 7. **Freeze.** The pick is copied to `assets/frozen/` and added to `manifest.json`. It's never edited after that. A change means a new version.
-8. **Cut.** `tools/cut.mjs` keys the background, splits parts by bounding boxes, and writes RGB plus mask to `assets/cut/`.
+8. **Cut.** `tools/cut.ts` keys the background, splits parts by bounding boxes, and writes RGB plus mask to `assets/cut/`.
 9. **Approve in context.** Claude renders it lit, in its real shot. The director signs off there. A painting that works flat can still fail under the lamp.
 
 ## Generation order
@@ -123,7 +123,7 @@ assets/raw/thumbs/           # every output as a ≤1024 px JPEG + its sidecar .
 assets/frozen/               # director picks, never edited
 assets/generated/manifest.json
 assets/cut/                  # keyed parts + masks
-tools/gen.mjs  tools/cut.mjs
+tools/gen.ts  tools/cut.ts
 ```
 
 ## Transparency deliverables

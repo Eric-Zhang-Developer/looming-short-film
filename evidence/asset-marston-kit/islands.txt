@@ -1,0 +1,32 @@
+== marston_kit_v1_1
+alpha in marston_kit_v1_1: 476300 px at alpha 250-254 clamped to 255
+18 alpha island(s): 18 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-marston-kit/evidence/asset-marston-kit/marston_kit_v1_1.boxes.json
+== marston_kit_v1_2
+alpha in marston_kit_v1_2: 452173 px at alpha 250-254 clamped to 255
+18 alpha island(s): 18 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-marston-kit/evidence/asset-marston-kit/marston_kit_v1_2.boxes.json
+== marston_kit_v1_3
+alpha in marston_kit_v1_3: 481378 px at alpha 250-254 clamped to 255
+18 alpha island(s): 18 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-marston-kit/evidence/asset-marston-kit/marston_kit_v1_3.boxes.json
+== marston_ext_kit_v1_1
+alpha in marston_ext_kit_v1_1: 510222 px at alpha 250-254 clamped to 255
+14 alpha island(s): 14 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-marston-kit/evidence/asset-marston-kit/marston_ext_kit_v1_1.boxes.json
+== marston_ext_kit_v1_2
+alpha in marston_ext_kit_v1_2: 423772 px at alpha 250-254 clamped to 255
+14 alpha island(s): 14 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-marston-kit/evidence/asset-marston-kit/marston_ext_kit_v1_2.boxes.json
+== marston_ext_kit_v1_3
+alpha in marston_ext_kit_v1_3: 435403 px at alpha 250-254 clamped to 255
+14 alpha island(s): 14 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-marston-kit/evidence/asset-marston-kit/marston_ext_kit_v1_3.boxes.json
+== marston_kit_v2_1
+alpha in marston_kit_v2_1: 441181 px at alpha 250-254 clamped to 255
+18 alpha island(s): 18 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-marston-kit/evidence/asset-marston-kit/marston_kit_v2_1.boxes.json
+== marston_kit_v2_2
+alpha in marston_kit_v2_2: 422807 px at alpha 250-254 clamped to 255
+18 alpha island(s): 18 kept, 0 dropped under 500 px
+boxes for review: /Users/ericzhang/.worktrees/looming/asset-marston-kit/evidence/asset-marston-kit/marston_kit_v2_2.boxes.json

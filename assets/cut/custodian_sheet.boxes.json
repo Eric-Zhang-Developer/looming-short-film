@@ -1,0 +1,62 @@
+{
+ "custodian_sheet_custodian_body": [
+  52,
+  120,
+  256,
+  324
+ ],
+ "custodian_sheet_custodian_head": [
+  324,
+  196,
+  268,
+  208
+ ],
+ "custodian_sheet_custodian_cap": [
+  612,
+  233,
+  268,
+  123
+ ],
+ "custodian_sheet_custodian_arm_l": [
+  908,
+  256,
+  279,
+  112
+ ],
+ "custodian_sheet_custodian_arm_r": [
+  1216,
+  256,
+  296,
+  120
+ ],
+ "custodian_sheet_custodian_tail": [
+  1536,
+  264,
+  188,
+  104
+ ],
+ "custodian_sheet_cart_frame": [
+  72,
+  528,
+  360,
+  276
+ ],
+ "custodian_sheet_cart_tray": [
+  496,
+  672,
+  744,
+  84
+ ],
+ "custodian_sheet_cart_bucket": [
+  1292,
+  580,
+  252,
+  220
+ ],
+ "custodian_sheet_mop": [
+  1600,
+  416,
+  120,
+  400
+ ]
+}

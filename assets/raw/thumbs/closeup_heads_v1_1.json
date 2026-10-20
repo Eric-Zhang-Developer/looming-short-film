@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/closeup_heads_v1_1.png",
+  "prompt_file": "assets/prompts/closeup_heads.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/closeup_heads.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/gator_hero.png",
+      "sha256": "bf02530ba4a6214ea701dc2c6c72c4ff2917f26cb36a13dccefce54b6e20f8fb"
+    },
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a14cf2-2c24-78a2-a946-820c4402f380",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a14cf2-2c24-78a2-a946-820c4402f380/exec-1e908e6d-595b-4425-b2be-d03b3d631bf4.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-HdmydS",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 387882,
+    "cached_input_tokens": 361472,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2877,
+    "reasoning_output_tokens": 99
+  },
+  "timestamp_start_utc": "2026-10-18T02:58:20Z",
+  "timestamp_end_utc": "2026-10-18T03:00:55Z",
+  "output_sha256": "e2fc3ae982c41d3f84760ec43ca065632ccf0c8efdbe04c1086255792c3dc427",
+  "width": 1536,
+  "height": 1024,
+  "pixel_format": "rgb24",
+  "thumbnail": "assets/raw/thumbs/closeup_heads_v1_1.jpg",
+  "screening": "Survives, ranked 3rd of 3. Six heads, six islands, all moods read; sheet width spread 3.4% (the tightest of the three). Not the pick: pale pinkish rim from the magenta key on every piece, brightest green (sample rgb 101,153,75 vs hero 111,141,90), snout/W +4..+10%, bump 2.3-2.6x, brows are thick square bars heavier than the hero line weight."
+}

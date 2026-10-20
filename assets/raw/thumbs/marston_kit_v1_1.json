@@ -1,0 +1,47 @@
+{
+  "output": "assets/raw/marston_kit_v1_1.png",
+  "prompt_file": "assets/prompts/marston_kit.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/marston_kit.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    },
+    {
+      "file": "assets/frozen/home_kit.png",
+      "sha256": "afac7d678669486fe3300b96c70f3b9eb0db1ea7f1f99f11920047779226e718"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a142a1-813c-71c3-9297-906b924528cb",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a142a1-813c-71c3-9297-906b924528cb/exec-418be49c-cd24-4e1e-8e0d-29ab2522fc5c.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-w0708q",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 128666,
+    "cached_input_tokens": 105728,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2123,
+    "reasoning_output_tokens": 22
+  },
+  "timestamp_start_utc": "2026-10-16T02:54:02Z",
+  "timestamp_end_utc": "2026-10-16T02:55:54Z",
+  "output_sha256": "74343884c025eb4aae27d06ce0ab71303a0118dea331c1c29872ef6c79091491",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/marston_kit_v1_1.jpg",
+  "screening": "pass: 18 flat islands, key/alpha clean, no text, no baked light. Weak: chair side and three-quarter have a plain oval mesh back (the Y shows only from behind, thin); cubicle front desk is a bit stubby. Ring lit/unlit read as one object in two states."
+}

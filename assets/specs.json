@@ -5,12 +5,547 @@
     "refs": [
       "reference-videos/frames/torn_paper_ref.jpg"
     ],
-    "prompt": "assets/prompts/style_tile.v2.md",
+    "prompt": "assets/prompts/style_tile.v3.md",
     "variants": 4,
+    "cap": 12,
     "target": "largest landscape size available, 6 separate pieces (wall, desk edge, calendar, lamp, laptop, gator)",
     "key": {
       "name": "magenta",
       "hex": "#FF00FF"
     }
+  },
+  {
+    "name": "gator_sheet",
+    "purpose": "The Student, the film's hero gator: a turnaround plus separated cutout parts that drop straight onto the side rig in src/characters/gator.js. Gate G2. Carries G1's approved design (style tile v3_4, the graphic picture-book gator) and Q9 (short stubby legs).",
+    "shots": "s02-s12, s14-s18 (close-ups in s06, s15, s18 H)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/raw/gator_sheet_v1_1.png"
+    ],
+    "prompt": "assets/prompts/gator_sheet.v2.md",
+    "variants": 2,
+    "cap": 8,
+    "target": "largest landscape size available, one sheet with nothing else on it: 4 turnaround pieces (top row) and 10 rig parts (middle and bottom rows), one shared scale, every bounding box >= 40 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "parts": {
+      "turn_side": {
+        "rig": "s12 whole-figure piece (no face slots)",
+        "face": "painted: eye, smile line, tooth tips, nostril dot",
+        "orientation": "full figure facing +x, standing, arms down, legs ~20% of standing height"
+      },
+      "turn_front": {
+        "rig": "makeGator facing 'front': body, pivot [0.5, 1] (feet)",
+        "face": "blank: eyes and mouth are face_sheet swaps",
+        "orientation": "full figure facing camera, painted without arms (the rig adds arm_l/arm_r); snout foreshortened as a broad rounded muzzle with two nostril bumps and tooth tips at the jaw line; no cream face or throat patch"
+      },
+      "turn_back": {
+        "rig": "makeGator facing 'back': body, pivot [0.5, 1] (feet)",
+        "face": "none (back view)",
+        "orientation": "full figure from behind, arms down, tail toward camera"
+      },
+      "turn_head34": {
+        "rig": "side rig head34, pivot [0.4, 0.75], swaps head+snout+jaw (s14)",
+        "face": "both eyes painted, partly visible (v2 brief: \"both eyes partly visible\"); no mouth beyond the jaw seam and tooth tips",
+        "orientation": "head and snout turned about 45 degrees toward +x, snout angling away into depth"
+      },
+      "body": {
+        "rig": "body (root), pivot [0.45, 0.95] = hip",
+        "orientation": "hoodie torso facing +x, hood rolled down at the back of the neck, green hips below the hem; no head, arms, legs, tail or pocket"
+      },
+      "head": {
+        "rig": "head, pivot [0.3, 0.75] = neck",
+        "face": "blank: eyes and mouth are face_sheet swaps",
+        "orientation": "cranium facing +x with the semicircle eye bump on top, no snout, no jaw"
+      },
+      "snout": {
+        "rig": "snout (upper jaw), parent head, pivot [0.1, 0.5]",
+        "orientation": "pointing +x, root left, blunt rounded tip right, one tiny nostril dot near the tip"
+      },
+      "jaw": {
+        "rig": "jaw (lower jaw), parent head, pivot [0.1, 0.3]",
+        "orientation": "pointing +x, root left; cream underside; 3-4 tiny cream triangle tooth tips along its top edge"
+      },
+      "arm_l": {
+        "rig": "arm_l (far), reach 0.032, z -0.004",
+        "orientation": "horizontal, shoulder end left, rounded green mitten hand right"
+      },
+      "arm_r": {
+        "rig": "arm_r (near), reach 0.032, z 0.012",
+        "orientation": "horizontal, shoulder end left, rounded green mitten hand right"
+      },
+      "leg_l": {
+        "rig": "leg_l (far), pivot [0.31, 0.08] = hip, z -0.003",
+        "orientation": "vertical, hip end up and cut flat (no lighter cylinder top), foot pointing +x; short and stubby"
+      },
+      "leg_r": {
+        "rig": "leg_r (near), pivot [0.31, 0.08] = hip, z -0.001",
+        "orientation": "vertical, hip end up and cut flat (no lighter cylinder top), foot pointing +x; short and stubby"
+      },
+      "tail": {
+        "rig": "tail, pivot [0.92, 0.5] = root, z -0.002",
+        "orientation": "pointing -x, root right; cream underside, darker green rounded scallops along the top edge"
+      },
+      "pocket": {
+        "rig": "pocket, pivot [0.5, 0], z 0.003, tissue weight",
+        "orientation": "cream hoodie kangaroo pocket, a soft rounded rectangle"
+      }
+    },
+    "proportions": "legs about 20% of standing height, as in v3_4 (the rig's legs are 37%; the sheet sets the truth and the rig is refit to it)",
+    "acceptance": [
+      "keeps v3_4's design: flat geometric shapes, strong simple silhouette, blunt long snout with a few tiny cream triangle tooth tips, semicircle eye bump, scalloped tail, cream hoodie, stubby legs, friendly read",
+      "torn paper, not felt: flat colour, a visible pale torn fibre rim of 2-6 px on every piece (as the style tile wall and desk), fine paper grain, no fuzz or pile",
+      "no baked-in light or shadow; background alpha or flat magenta",
+      "every bounding box >= 40 px from every other piece and from the frame edge, measured",
+      "no text or artifacts; on palette (gator green, cream, a black pupil on turn_side only)",
+      "head and turn_front painted without eye or mouth; turn_head34 shows both eyes partly; turn_side fully featured",
+      "cut.mjs --auto gives one island per piece (14)",
+      "turn_front reads as a gator: broad foreshortened muzzle, two nostril bumps, tooth tips at the jaw line, no cream mask",
+      "turn_head34 is a real 3/4 head (about 45 degrees, snout angling away)",
+      "keeps v1_1 side view, colours and proportions exactly",
+      "leg tops cut flat"
+    ],
+    "refs_note": "v2: v1_1 is the approved base (G2 round 1, director: \"sounds good ok we can continue\"); doc 08 lets an approved pick be a reference for its own revision. It lives only in assets/raw/ (gitignored), so gen.mjs refuses where it is missing."
+  },
+  {
+    "name": "gator_hero",
+    "purpose": "The Student, large, for the close-ups in s06, s15 and s18 H: the side view of gator_sheet (v1_1 base) repainted alone at the largest size (doc 08: one piece per image for frame-filling use). Same pose and design as the sheet side view, fully featured face.",
+    "shots": "s06, s15, s18 H (close-ups)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/raw/gator_sheet_v1_1.png"
+    ],
+    "refs_note": "v1_1 is the approved gator_sheet base (G2 round 1); it lives only in assets/raw/ (gitignored).",
+    "prompt": "assets/prompts/gator_hero.v1.md",
+    "variants": 2,
+    "cap": 4,
+    "target": "largest landscape size available, one full side-view figure alone, figure height >= 70% of the canvas height (prompt asks ~85%), >= 40 px margin to every frame edge",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "parts": {
+      "hero_side": {
+        "rig": "whole-figure close-up piece (no face slots), same as gator_sheet turn_side",
+        "face": "painted: eye, smile line, tooth tips, nostril dot",
+        "orientation": "full figure facing +x, standing, arms down, legs ~20% of standing height"
+      }
+    },
+    "acceptance": [
+      "same pose and design as gator_sheet v1_1 turn_side",
+      "figure height >= 70% of the canvas height, measured",
+      "torn paper: visible pale torn fibre rim on every cut edge, no fuzz or pile",
+      "no baked-in light or shadow; background alpha or flat magenta",
+      "nothing touching the frame edge; no text or artifacts; on palette",
+      "cut.mjs --auto gives one island"
+    ]
+  },
+  {
+    "name": "face_sheet",
+    "purpose": "Every eye and mouth swap from doc 03 Face set, at one size and line weight, so the swaps drop onto the frozen gator head (gator_sheet v2_1) with no in-betweens. Shared, scaled, by the roommates and the Freshman; must read from above in s13.",
+    "shots": "s02-s18",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/face_sheet.v1.md",
+    "variants": 3,
+    "cap": 8,
+    "target": "landscape at the frozen gator_sheet pixel scale (1672 x 941): open eye disc 59 px (measured on gator_sheet turn_side: 59 x 60 px at centre (298.5, 130), pupil 37 x 38 px at (309.5, 131)); 11 pieces in three rows, >= 80 px apart",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "parts": {
+      "eyes_open": {
+        "rig": "eyes slot, take open (side rig head, at [0.010, 0.010])",
+        "face": "cream disc 59 px, pupil 37 px toward +x, one highlight dot"
+      },
+      "eyes_closed": {
+        "rig": "eyes slot, take closed (side rig head, at [0.010, 0.010])",
+        "face": "content: a dark green upward arc, no disc"
+      },
+      "eyes_tired": {
+        "rig": "eyes slot, take tired (side rig head, at [0.010, 0.010])",
+        "face": "open eye with a green lid over the top half"
+      },
+      "eyes_gasp": {
+        "rig": "eyes slot, take gasp (side rig head, at [0.010, 0.010])",
+        "face": "disc ~65 px, small ~20 px pupil"
+      },
+      "eyes_worried": {
+        "rig": "eyes slot, take worried (side rig head, at [0.010, 0.010])",
+        "face": "pupil down and back, slanted lid sliver, two cream sweat drops touching the disc"
+      },
+      "eyes_side": {
+        "rig": "eyes slot, take side (side rig head, at [0.010, 0.010])",
+        "face": "pupil at the -x (back) edge"
+      },
+      "eyes_front_open": {
+        "rig": "not consumed yet: the front rig (facing front) shares the side eyes slot; needs a char-rigs change",
+        "face": "two 59 px discs ~95 px apart, pupils centred, looking at camera"
+      },
+      "mouth_neutral": {
+        "rig": "mouth slot, take neutral (side rig head, at [0.022, -0.002])",
+        "face": "near-straight dark green line ~60 px, 7 px thick"
+      },
+      "mouth_smile": {
+        "rig": "mouth slot, take smile",
+        "face": "the frozen smile line, ~70 px, curving up toward +x"
+      },
+      "mouth_o": {
+        "rig": "mouth slot, take o",
+        "face": "dark green oval ~22 px, slightly taller than wide"
+      },
+      "mouth_line": {
+        "rig": "mouth slot, take line",
+        "face": "straight flat line ~40 px"
+      }
+    },
+    "acceptance": [
+      "10 pieces (6 side eyes, 4 mouths) plus the front open pair",
+      "open eye disc within 5% of the frozen head eye (59.5 px), measured",
+      "every piece at the same line weight and scale (one stroke thickness, one disc size except gasp)",
+      "keeps the approved look: one big round eye, small highlight, simple smile line, friendly read",
+      "no baked-in light or shadow; background alpha or flat magenta",
+      "parts not touching; no text or artifacts; on palette (cream, black pupils, gator green lids, one dark green line colour)",
+      "cut.mjs --auto islands accounted for against pieces"
+    ]
+  },
+  {
+    "name": "home_kit",
+    "purpose": "Student bedroom parts kit that reads as a room: furniture at real proportion to the gator (G4: 'massive table', 'doesn't look like a room'). One sheet of 21 separate flat pieces; painter task asset-home-kit.",
+    "shots": "s02-s08 (home set)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/home_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size available, 21 separate pieces in four rows, every bounding box >= 60 px from every other and from the frame edge; aspect ratios per piece as prompted, sheet scale is not shared (film sizes come from the scale table in done/asset-home-kit.md)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "every piece is a separate island (cut.mjs --auto gives 21 islands, a piece that has parts such as laptop screen vs base counts as separate islands)",
+      "flat orthographic elevation, no perspective or 3D top faces",
+      "torn paper look and palette of the style tile, no baked light or shadow",
+      "no text anywhere, no gator, no scene",
+      "window_glass, laptop_screen, blind_up/blind_down are separate pieces",
+      "each piece reads as what it is at small size"
+    ]
+  },
+  {
+    "name": "kitchen_kit",
+    "purpose": "Apartment kitchen parts kit that reads as a kitchen (G4: 'doesn't really look like a kitchen', 'furniture is weird'). One sheet of 16 separate flat pieces, fridge door separate so it opens; painter task asset-home-kit.",
+    "shots": "s02-s08 (kitchen, s05)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/kitchen_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size available, 16 separate pieces in three rows, every bounding box >= 60 px from every other and from the frame edge; aspect ratios per piece as prompted",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "every piece is a separate island (cut.mjs --auto gives 16 intended)",
+      "fridge body and fridge door are separate pieces",
+      "flat orthographic elevation, torn paper look, palette of the style tile",
+      "no text, no gator, no scene, no baked light or shadow",
+      "each appliance reads as what it is at small size"
+    ]
+  },
+  {
+    "name": "marston_kit",
+    "purpose": "Marston upper-floor interior parts kit recognisable to a UF student (director's photos): cubicles, desk rows, round table, Y-back mesh chairs, ring/strip/recessed lights, coffered ceiling, column, carpet, shelf bay, exit sign, ribbon window. Painter task asset-marston-kit.",
+    "shots": "s10-s17 (Marston interior)",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png",
+      "assets/frozen/home_kit.png"
+    ],
+    "prompt": "assets/prompts/marston_kit.v2.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size available, 18 separate pieces in 4 rows, every piece a separate alpha island with clear space around it; aspect per piece as prompted; the director's interior photos are described in text, not attached",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "every piece a separate island (cut.mjs --auto gives 18)",
+      "chairs show the Y-shaped mesh back in side, three-quarter and rear views",
+      "ring light lit and unlit read as one object in two states",
+      "flat elevation, torn paper look, palette of the style tile, no baked light or shadow, no text, no gator",
+      "ribbon window panes empty (key shows through)"
+    ]
+  },
+  {
+    "name": "marston_ext_kit",
+    "purpose": "Marston exterior parts kit: brick block with bronze bands, stepped bays, breezeway with Century Tower, lit ribbon windows, yellow lanterns, plus the night window view. Painter task asset-marston-kit.",
+    "shots": "s09, s11-s17 window view",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png",
+      "assets/frozen/home_kit.png"
+    ],
+    "prompt": "assets/prompts/marston_ext_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size available, 14 separate pieces in 4 rows, every piece a separate alpha island with clear space around it; aspect per piece as prompted; the director's interior photos are described in text, not attached",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "every piece a separate island (cut.mjs --auto gives 14)",
+      "facade window openings and breezeway opening empty",
+      "tower reads as Century Tower, no numerals, no text",
+      "flat elevation, torn paper look, palette, no baked light, no text, no gator"
+    ]
+  },
+  {
+    "name": "props_kit",
+    "purpose": "G4 story props: wall calendar, phone, notification card, practice sheets, test and graded pages, red marks, pen, backpack, ink drop. Lettering and math painted, hand-lettered, and screened for exactness; painter task asset-props-kit.",
+    "shots": "s00, s02, s15, s16, s17b, s17c, s18",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png",
+      "assets/frozen/home_kit.png"
+    ],
+    "prompt": "assets/prompts/props_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size, 17 separate pieces in three rows, every bounding box >= 60 px from every other and the frame edge; lettered pieces drawn as large as possible",
+    "key": {
+      "name": "green",
+      "hex": "#00FF00"
+    },
+    "acceptance": [
+      "every piece a separate island (cut.mjs --auto gives 17; the red circle and X are single strokes)",
+      "every lettered or math piece transcribed from the image in text_check.md and exactly right, else the variant is rejected",
+      "only the listed pieces carry letters or digits; calendar grid cells are scribbles",
+      "red only on the badge, circle, X, checks and the 94",
+      "flat elevation or plan view, torn paper look, palette, no baked light, no gator"
+    ]
+  },
+  {
+    "name": "exam_room_kit",
+    "purpose": "G4 exam room parts: exam desk with attached chair, wall clock, board, proctor silhouette, door, wall and floor strips; painter task asset-props-kit.",
+    "shots": "s17b, s17c",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png",
+      "assets/frozen/home_kit.png"
+    ],
+    "prompt": "assets/prompts/exam_room_kit.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "largest landscape size, 7 separate pieces in three rows, every bounding box >= 60 px from every other and the frame edge",
+    "key": {
+      "name": "green",
+      "hex": "#00FF00"
+    },
+    "acceptance": [
+      "every piece a separate island (cut.mjs --auto gives 7)",
+      "clock has tick marks only, board has scribbles only, no text anywhere",
+      "door slit and clock are clean; proctor reads as a standing adult gator silhouette",
+      "flat elevation, torn paper look, palette, no baked light, no red, no green, no gator student"
+    ]
+  },
+  {
+    "name": "roommates_sheet",
+    "purpose": "s05 roommates: a tall heron and a round bear cub, muted, blank faces (face sheet swaps); painter task asset-cast-kit (drop-in for the placeholder sheet of the same name in src/assets.js)",
+    "shots": "s05",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/roommates_sheet.v1.md",
+    "variants": 2,
+    "cap": 3,
+    "target": "largest landscape size, 6 separate pieces in two rows, every bounding box >= 60 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "one island per piece (cut.mjs --auto)",
+      "every piece named in src/assets.js PIECES present, aspect ratios near PIECES",
+      "same felt-paper/torn-rim style as gator_sheet, muted, no baked light, no text",
+      "different animal from the hero where the brief says so",
+      "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
+    ]
+  },
+  {
+    "name": "custodian_sheet",
+    "purpose": "s14 custodian: an old tortoise in a work shirt and cap with painted face, plus cart frame, tray, bucket and mop; painter task asset-cast-kit (drop-in for the placeholder sheet of the same name in src/assets.js)",
+    "shots": "s14",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/custodian_sheet.v1.md",
+    "variants": 2,
+    "cap": 3,
+    "target": "largest landscape size, 10 separate pieces in two rows, every bounding box >= 60 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "one island per piece (cut.mjs --auto)",
+      "every piece named in src/assets.js PIECES present, aspect ratios near PIECES",
+      "same felt-paper/torn-rim style as gator_sheet, muted, no baked light, no text",
+      "different animal from the hero where the brief says so",
+      "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
+    ]
+  },
+  {
+    "name": "crowd_sheet",
+    "purpose": "s16/s17 Marston neighbours: the tired neighbour and the sleeper, painted faces, seated side view; painter task asset-cast-kit (drop-in for the placeholder sheet of the same name in src/assets.js)",
+    "shots": "s16, s17",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/crowd_sheet.v1.md",
+    "variants": 2,
+    "cap": 3,
+    "target": "largest landscape size, 6 separate pieces in two rows, every bounding box >= 60 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "one island per piece (cut.mjs --auto)",
+      "every piece named in src/assets.js PIECES present, aspect ratios near PIECES",
+      "same felt-paper/torn-rim style as gator_sheet, muted, no baked light, no text",
+      "different animal from the hero where the brief says so",
+      "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
+    ]
+  },
+  {
+    "name": "top_figures_sheet",
+    "purpose": "s13 top-down figures: the hero in five parts and six varied seated students; painter task asset-cast-kit (drop-in for the placeholder sheet of the same name in src/assets.js)",
+    "shots": "s13",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/gator_sheet.png"
+    ],
+    "prompt": "assets/prompts/top_figures_sheet.v1.md",
+    "variants": 2,
+    "cap": 3,
+    "target": "largest landscape size, 11 separate pieces in two rows, every bounding box >= 60 px from every other and from the frame edge (prompt asks 60)",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "acceptance": [
+      "one island per piece (cut.mjs --auto)",
+      "every piece named in src/assets.js PIECES present, aspect ratios near PIECES",
+      "same felt-paper/torn-rim style as gator_sheet, muted, no baked light, no text",
+      "different animal from the hero where the brief says so",
+      "heads blank (no eyes/mouth) for roommates and hero_head; painted faces for custodian and crowd"
+    ]
+  },
+  {
+    "name": "closeup_heads",
+    "purpose": "v4 close-up heads: six whole-head replacement drawings of the hero (side view) that the climax close-ups swap in, so the gator's emotion is painted, not just eyes and mouth swapped. Same head as gator_hero in shape, line weight, felt texture and palette; only the face acts.",
+    "shots": "s08, s09a, s09b, s10, s15, s17c (close-ups)",
+    "refs": [
+      "assets/frozen/gator_hero.png",
+      "assets/frozen/style_tile.png"
+    ],
+    "prompt": "assets/prompts/closeup_heads.v1.md",
+    "variants": 3,
+    "cap": 6,
+    "target": "landscape sheet (~1536x1024), 6 heads in a 3x2 grid, each head ~400 px wide (~55% of the hero's pixel scale), all six the same size, >= 70 px between heads and from the frame edge",
+    "key": {
+      "name": "magenta",
+      "hex": "#FF00FF"
+    },
+    "parts": {
+      "closeup_heads_numb": {
+        "face": "half-lidded green lid, low flat brow, slack sagging mouth line"
+      },
+      "closeup_heads_dread": {
+        "face": "worried eye, brow up and in (snout end high), sweat drop(s) on the head, tight wavy mouth"
+      },
+      "closeup_heads_resolve": {
+        "face": "level open eye, flat low brow, firm straight mouth, jaw set"
+      },
+      "closeup_heads_relief": {
+        "face": "closed arch eye, lifted brow, faint smile, parted mouth, a breath puff touching the snout tip"
+      },
+      "closeup_heads_surprised_smile": {
+        "face": "wide eye, high arch brow, small smile with two tooth tips"
+      },
+      "closeup_heads_pride": {
+        "face": "big grin with 4-5 tooth tips, bright eye with two highlights, cheek-corner dash"
+      }
+    },
+    "acceptance": [
+      "six separate islands in the 3x2 order numb, dread, resolve, relief, surprised, pride (cut.mjs --auto gives 6)",
+      "same gator as gator_hero: head outline, eye bump, snout, jaw, nostril, torn rim, palette (judged beside the hero)",
+      "head size within 5% of the hero's after one uniform scale, and the six within 5% of each other (measured)",
+      "each mood reads at phone size",
+      "no hoodie, no baked light or shadow, no text; background alpha or flat magenta"
+    ]
+  },
+  {
+    "name": "clock_kit",
+    "purpose": "v4 wall clock: the film's pulse. A tick-mark-only analog clock face (home: kraft rim; exam room: navy rim), separate hour and minute hands and a centre pin so the film can set any time. Paper style matches the calendar.",
+    "shots": "s02, s07, s08, s17b, s18",
+    "refs": [
+      "assets/frozen/style_tile.png",
+      "assets/frozen/props_kit.png",
+      "assets/frozen/exam_room_kit.png"
+    ],
+    "prompt": "assets/prompts/clock_kit.v1.md",
+    "variants": 2,
+    "cap": 4,
+    "target": "landscape sheet, 7 pieces in two rows, faces ~45% of the canvas height, every piece >= 60 px from every other and from the frame edge",
+    "key": {
+      "name": "green",
+      "hex": "#00FF00"
+    },
+    "parts": {
+      "clock_kit_face_home": {
+        "face": "cream face, navy ticks (12/3/6/9 longer), kraft rim, no numbers, no hands"
+      },
+      "clock_kit_face_exam": {
+        "face": "same face, navy rim"
+      },
+      "clock_kit_hour": {
+        "face": "short wide navy hand pointing up"
+      },
+      "clock_kit_minute": {
+        "face": "longer navy hand pointing up"
+      },
+      "clock_kit_pin": {
+        "face": "small amber centre disc"
+      },
+      "clock_kit_tab": {
+        "face": "small kraft hanging tab"
+      },
+      "clock_kit_minute_spare": {
+        "face": "spare minute hand"
+      }
+    },
+    "acceptance": [
+      "7 separate islands (cut.mjs --auto)",
+      "no numerals or letters on the faces",
+      "paper style matches the calendar; no baked light or shadow; no glass shine",
+      "the two faces are the same size, differing only in rim colour"
+    ]
   }
 ]

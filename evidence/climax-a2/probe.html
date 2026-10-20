@@ -1,0 +1,58 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>climax-a2 shadow probe</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // One shot built the way film.js builds it, so the probe can reach its parts (exam, camera). ?shot=s09c, local t.
+  // probe(t, plane) renders three passes: as is; the blob invisible to the camera but still casting; and not casting.
+  // shadow = pixels darker in pass 2 than pass 3, blob = pixels that differ between 1 and 2. Each mask pixel is
+  // unprojected onto `plane` (shadow) or the blob's own z plane (blob), so extents come back in metres.
+  import * as THREE from 'three';
+  import { createStage } from '/src/core/stage.js';
+  import { createPost } from '/src/post.js';
+  import * as assets from '/src/assets.js';
+  import { PALETTE } from '/src/core/palette.js';
+  const id = new URLSearchParams(location.search).get('shot');
+  const stage = createStage(), { renderer } = stage;
+  const scene = new THREE.Scene(), camera = stage.camera.clone(), fns = [];
+  let draw = () => renderer.render(scene, camera);
+  const sstage = { renderer, scene, camera, onFrame: (fn) => fns.push(fn), setRender: (fn) => { draw = fn; } };
+  const shot = await (await import(`/src/shots/${id}.js`)).build({ stage: sstage, scene, camera, renderer, assets, PALETTE, post: (o) => createPost(sstage, o) });
+  const frame = (t) => { shot.update(t); for (const f of fns) f(t); draw(); };
+  window.renderFrame = async (t) => frame(t);
+  window.LOOMING = { fps: 24, duration: 30, ready: Promise.resolve() };
+
+  const W = 1920, H = 1080, c2 = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c2.getContext('2d', { willReadFrequently: true });
+  const grabLuma = () => { g.drawImage(renderer.domElement, 0, 0); const d = g.getImageData(0, 0, W, H).data, L = new Float32Array(W * H);
+    for (let i = 0; i < W * H; i++) L[i] = 0.2126 * d[4 * i] + 0.7152 * d[4 * i + 1] + 0.0722 * d[4 * i + 2]; return L; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+  const onPlane = (x, y, pl) => { ndc.set((x + 0.5) / W * 2 - 1, 1 - (y + 0.5) / H * 2); ray.setFromCamera(ndc, camera); return ray.ray.intersectPlane(pl, hit) ? hit.clone() : null; };
+  // plane: { n: [nx, ny, nz], d } (n·p + d = 0); keep: { x: [lo, hi], y, z } keeps only hits inside the receiver
+  window.probe = async (t, { n, d, keep, thr = 10, rel = 0.2 } = {}) => {
+    const { exam } = shot.parts, mat = exam.mesh.material;
+    frame(t); const A = grabLuma();
+    mat.colorWrite = false; mat.depthWrite = false; frame(t); const Bp = grabLuma();
+    exam.mesh.castShadow = false; frame(t); const Cp = grabLuma();
+    mat.colorWrite = true; mat.depthWrite = true; exam.mesh.castShadow = true;
+    const pl = new THREE.Plane(new THREE.Vector3(...n), d);
+    const bz = exam.mesh.getWorldPosition(new THREE.Vector3()).z, bpl = new THREE.Plane(new THREE.Vector3(0, 0, 1), -bz);
+    const S = { xs: [], ys: [], zs: [], n: 0, dark: 0, lit: 0, recv: 0 }, Bl = { xs: [], ys: [], px: [Infinity, -Infinity, Infinity, -Infinity] };
+    for (let y = 0; y < H; y += 2) for (let x = 0; x < W; x += 2) {
+      const i = y * W + x;
+      if (Math.abs(A[i] - Bp[i]) > thr) { const p = onPlane(x, y, bpl); if (p) { Bl.xs.push(p.x); Bl.ys.push(p.y); }
+        Bl.px = [Math.min(Bl.px[0], x), Math.max(Bl.px[1], x), Math.min(Bl.px[2], y), Math.max(Bl.px[3], y)]; }
+      const p = onPlane(x, y, pl); if (!p) continue;
+      if (keep && ['x', 'y', 'z'].some((k) => keep[k] && (p[k] < keep[k][0] || p[k] > keep[k][1]))) continue;
+      S.recv++;                                              // pixels whose ray meets the receiver inside keep
+      if (Cp[i] - Bp[i] > Math.max(thr, rel * Cp[i])) {
+        S.xs.push(p.x); S.ys.push(p.y); S.zs.push(p.z); S.n++; S.dark += Bp[i]; S.lit += Cp[i];
+      }
+    }
+    // robust extents: 1st and 99th percentiles, so a few noisy pixels don't set the length
+    const q = (a, f) => { if (!a.length) return NaN; const s = [...a].sort((u, v) => u - v); return s[Math.min(s.length - 1, Math.floor(f * s.length))]; };
+    const ext = (a) => [q(a, 0.01), q(a, 0.99)];
+    return { t, blob: { x: ext(Bl.xs), y: ext(Bl.ys), w: q(Bl.xs, 0.99) - q(Bl.xs, 0.01), px: Bl.px },
+      shadow: { x: ext(S.xs), y: ext(S.ys), z: ext(S.zs), px: S.n * 4, cover: S.n / Math.max(1, S.recv), contrast: S.n ? S.lit / Math.max(1, S.dark) : NaN } };
+  };
+</script>

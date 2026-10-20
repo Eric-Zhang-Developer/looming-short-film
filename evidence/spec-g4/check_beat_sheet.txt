@@ -1,0 +1,23 @@
+s00   timeline   0 s   doc 02   0 s
+s01   timeline   4 s   doc 02   4 s
+s02   timeline  10 s   doc 02  10 s
+s03   timeline  20 s   doc 02  20 s
+s04   timeline  26 s   doc 02  26 s
+s05   timeline  34 s   doc 02  34 s
+s06   timeline  42 s   doc 02  42 s
+s07   timeline  50 s   doc 02  50 s
+s08   timeline  62 s   doc 02  62 s
+s09   timeline  68 s   doc 02  68 s
+s10   timeline  74 s   doc 02  74 s
+s11   timeline  80 s   doc 02  80 s
+s12   timeline  86 s   doc 02  86 s
+s13   timeline  96 s   doc 02  96 s
+s14   timeline 103 s   doc 02 103 s
+s15   timeline 108 s   doc 02 108 s
+s16   timeline 122 s   doc 02 122 s
+s17   timeline 146 s   doc 02 146 s
+s17b  timeline 164 s   doc 02 164 s
+s17c  timeline 173 s   doc 02 173 s
+s18   timeline 178 s   doc 02 178 s
+end 195 s; doc 02 ends "3:15 Black": true
+PASS: 21 shots, doc 02 and the timeline agree

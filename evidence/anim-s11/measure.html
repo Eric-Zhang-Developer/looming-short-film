@@ -1,0 +1,62 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>s11 measure</title>
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // anim-s11 measurement rig (the s03/s10 method). Builds src/shots/s11.js on its own stage without post, keeps only the
+  // receiver and the blob, and renders the frame with the blob invisible to the camera (colorWrite off), once casting
+  // and once not. Changed pixels are back-projected onto the receiver plane: the window wall (z 0) for the phone's
+  // shadow, the desk top (y 0) for the fluorescent pool. Scale = shadow x-width / blob x-width (blob mask back-projected
+  // onto its own plane). Also logs the camera and the mean luma of a few screen boxes (no post).
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import * as assets from '/src/assets.js';
+  import { build } from '/src/shots/s11.js';
+
+  const stage = createStage(), { renderer, scene, camera } = stage;
+  const shot = await build({ stage, scene, camera, renderer, assets, PALETTE, post: () => ({ set() {} }) });
+  stage.onFrame((t) => shot.update(t));
+  exposeForRender(stage, { duration: 6 });
+  const { exam, wall, panes, deskTop } = shot.parts;
+  const gl = renderer.getContext(), W = gl.drawingBufferWidth, H = gl.drawingBufferHeight;
+  const grabPx = () => { renderer.render(scene, camera); const p = new Uint8Array(W * H * 4); gl.readPixels(0, 0, W, H, gl.RGBA, gl.UNSIGNED_BYTE, p); return p; };
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hit = new THREE.Vector3();
+  const onPlane = (x, y, plane) => { ndc.set((x + 0.5) / W * 2 - 1, (y + 0.5) / H * 2 - 1); ray.setFromCamera(ndc, camera); return ray.ray.intersectPlane(plane, hit); };
+  const Z = (z) => new THREE.Plane(new THREE.Vector3(0, 0, 1), -z), Y0 = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+  function box(mask, plane, keep = () => true) {
+    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9, z0 = 1e9, z1 = -1e9, n = 0;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      if (!mask[y * W + x]) continue;
+      const h = onPlane(x, y, plane); if (!h || !keep(h)) continue; n++;
+      x0 = Math.min(x0, h.x); x1 = Math.max(x1, h.x); y0 = Math.min(y0, h.y); y1 = Math.max(y1, h.y); z0 = Math.min(z0, h.z); z1 = Math.max(z1, h.z);
+    }
+    return { x0, x1, y0, y1, z0, z1, w: x1 - x0, n };
+  }
+  const diff = (a, b) => { const m = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) m[i] = Math.abs(a[i*4]-b[i*4]) + Math.abs(a[i*4+1]-b[i*4+1]) + Math.abs(a[i*4+2]-b[i*4+2]) > 6 ? 1 : 0; return m; };
+  window.measure = (t, receiver) => {
+    stage.renderFrame(t);
+    const keepSet = new Set(receiver === 'wall' ? [wall, ...panes, exam.mesh] : [deskTop.children[0], exam.mesh]);
+    const saved = [];
+    scene.traverse((o) => { if (o.isMesh || o.isPoints) { saved.push([o, o.visible]); if (!keepSet.has(o)) o.visible = false; } });
+    const mat = exam.mesh.material;
+    mat.colorWrite = false; mat.depthWrite = false;
+    exam.mesh.castShadow = true; const a = grabPx();
+    exam.mesh.castShadow = false; const b = grabPx();
+    mat.colorWrite = true; mat.depthWrite = true;
+    const c = grabPx(); exam.mesh.visible = false; const d = grabPx(); exam.mesh.visible = true;
+    exam.mesh.castShadow = true;
+    for (const [o, v] of saved) o.visible = v;
+    const shadow = receiver === 'wall' ? box(diff(a, b), Z(0)) : box(diff(a, b), Y0, (h) => Math.abs(h.x) < 0.1 && h.z > 0.03 && h.z < 0.12);
+    const blob = box(diff(c, d), Z(exam.mesh.position.z));
+    return { t, shadow, blob, scale: shadow.w / blob.w, cx: (shadow.x0 + shadow.x1) / 2, cy: (shadow.y0 + shadow.y1) / 2 };
+  };
+  window.cam = (t) => { stage.renderFrame(t); return [camera.position.toArray(), camera.rotation.toArray().slice(0, 3)]; };
+  window.luma = (t, boxes) => {   // boxes in 1920×1080 top-left px
+    stage.renderFrame(t); const p = grabPx();
+    return boxes.map(([x, y, w, h]) => { let s = 0, n = 0;
+      for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) { const i = ((H - 1 - yy) * W + xx) * 4; s += 0.2126 * p[i] + 0.7152 * p[i + 1] + 0.0722 * p[i + 2]; n++; }
+      return +(s / n).toFixed(1); });
+  };
+</script>

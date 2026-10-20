@@ -1,0 +1,38 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>near lab</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+<script type="module">
+  // Scratch lab (default aim near; ?key=win forces a directional as the blob's key, ?key=auto adds it but lets the blob choose): a blob 4.7 cm from a phone spot, aimed at its wall hit with the DEFAULT aim() near.
+  // ?old=1 re-applies the old rule (near = half the light-to-target distance) to show the failure.
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/src/core/stage.js';
+  import { PALETTE } from '/src/core/palette.js';
+  import { phoneLight, ambient, aim } from '/src/lights.js';
+  import { createBlob } from '/src/blob.js';
+
+  const stage = createStage(), { scene, camera } = stage;
+  scene.background = new THREE.Color(PALETTE.navy);
+  const plane = (w, h, c) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshLambertMaterial({ color: PALETTE[c] })); m.receiveShadow = true; scene.add(m); return m; };
+  plane(0.6, 0.3, 'cream').position.set(0, 0.15, 0);
+  const desk = plane(0.6, 0.3, 'kraft'); desk.rotation.x = -Math.PI / 2; desk.position.set(0, 0, 0.15);
+  const blob = createBlob({ radius: 0.012, seed: 1 });
+  blob.mesh.position.set(0, 0.002, 0.06);
+  scene.add(blob.mesh);
+  const spot = phoneLight({ angle: 0.9, penumbra: 0.4, distance: 0.6, intensity: 0.04 });
+  const P = new THREE.Vector3(-0.03, 0.004, 0.095), C = new THREE.Vector3(0, 0.014, 0.06), hit = new THREE.Vector3();
+  spot.position.copy(P);
+  hit.subVectors(C, P).multiplyScalar(-P.z / (C.z - P.z)).add(P);
+  scene.add(spot, spot.target, ambient());
+  aim(spot, hit);
+  if (new URLSearchParams(location.search).has('old')) { spot.shadow.camera.near = (P.distanceTo(hit)) * 0.5; spot.shadow.camera.updateProjectionMatrix(); }
+  window.nearInfo = { near: spot.shadow.camera.near, dBlob: P.distanceTo(C), dHit: P.distanceTo(hit) };
+  camera.position.set(0.02, 0.07, 0.3); camera.lookAt(0.01, 0.05, 0.03);
+  // ?key=win adds a window-coloured directional (stronger by raw intensity than the spot) and forces it as the blob's key.
+  const q = new URLSearchParams(location.search);
+  const win = new THREE.DirectionalLight(PALETTE.lamp, 0.26); win.position.set(0.8, 0.6, 0.6); win.castShadow = false;
+  if (q.has('key')) scene.add(win, win.target);
+  stage.onFrame((t) => blob.update(t, q.get('key') === 'win' ? { key: win } : {}));
+  exposeForRender(stage, { duration: 1 });
+</script>

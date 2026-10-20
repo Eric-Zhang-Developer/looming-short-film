@@ -1,0 +1,128 @@
+{
+ "home_kit_bed_frame": [
+  52,
+  72,
+  372,
+  176
+ ],
+ "home_kit_bed_mattress": [
+  460,
+  144,
+  368,
+  92
+ ],
+ "home_kit_bed_blanket": [
+  848,
+  116,
+  320,
+  136
+ ],
+ "home_kit_bed_pillow": [
+  1200,
+  116,
+  212,
+  128
+ ],
+ "home_kit_door": [
+  1480,
+  20,
+  148,
+  236
+ ],
+ "home_kit_bookshelf": [
+  64,
+  264,
+  168,
+  288
+ ],
+ "home_kit_window_frame": [
+  324,
+  300,
+  236,
+  224
+ ],
+ "home_kit_window_glass": [
+  636,
+  316,
+  180,
+  204
+ ],
+ "home_kit_blind_up": [
+  880,
+  321,
+  360,
+  115
+ ],
+ "home_kit_blind_down": [
+  1332,
+  320,
+  256,
+  224
+ ],
+ "home_kit_desk": [
+  24,
+  580,
+  320,
+  172
+ ],
+ "home_kit_desk_chair": [
+  400,
+  556,
+  168,
+  200
+ ],
+ "home_kit_floor_lamp": [
+  612,
+  544,
+  104,
+  212
+ ],
+ "home_kit_laundry_pile": [
+  764,
+  584,
+  340,
+  176
+ ],
+ "home_kit_poster_a": [
+  1152,
+  548,
+  152,
+  204
+ ],
+ "home_kit_poster_b": [
+  1364,
+  576,
+  276,
+  164
+ ],
+ "home_kit_laptop_screen": [
+  32,
+  768,
+  228,
+  148
+ ],
+ "home_kit_laptop_base": [
+  284,
+  824,
+  276,
+  92
+ ],
+ "home_kit_rug": [
+  592,
+  776,
+  312,
+  144
+ ],
+ "home_kit_wall_strip": [
+  936,
+  796,
+  320,
+  108
+ ],
+ "home_kit_floor_strip": [
+  1296,
+  784,
+  340,
+  128
+ ]
+}

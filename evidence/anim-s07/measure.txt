@@ -1,0 +1,30 @@
+scale tLocal 9: wall shadow x -36.12..18.94 cm (width 55.06 cm, spec 48 ± 5), y 0.06..29.94 cm; blob 2.73 cm wide; scale 20.14x (spec 20 ± 2); width / (2r = 2.4 cm) = 22.94x
+scale tLocal 9.5: wall shadow x -37.86..17.50 cm (width 55.35 cm, spec 48 ± 5), y 0.06..29.94 cm; blob 2.73 cm wide; scale 20.25x (spec 20 ± 2); width / (2r = 2.4 cm) = 23.06x
+
+black (curtainsDone 8.0 → phone 8.5), mean frame luma, graded:
+  8.042: mean 4.7%, brightest px 33.3%
+  8.083: mean 4.7%, brightest px 30.9%
+  8.125: mean 4.7%, brightest px 31.7%
+  8.167: mean 4.7%, brightest px 30.5%
+  8.208: mean 4.7%, brightest px 31.7%
+  8.250: mean 4.7%, brightest px 32.9%
+  8.292: mean 4.7%, brightest px 33.7%
+  8.333: mean 4.7%, brightest px 34.4%
+  8.375: mean 4.7%, brightest px 34.4%
+  8.417: mean 4.7%, brightest px 33.2%
+  8.458: mean 4.7%, brightest px 35.1%
+  worst mean 4.7% (spec < 5%): PASS
+
+moon patch (floor under the window, p95 and median luma) and the seams (mean luma per strip):
+  1.00: floor p95 14.0%, median 5.3%; seams left 27.8%, centre 5.0%, right 19.6%; panel 28.4%
+  7.50: floor p95 7.6%, median 4.9%; seams left 24.4%, centre 6.0%, right 5.0%; panel 6.5%
+  7.96: floor p95 5.7%, median 5.1%; seams left 24.9%, centre 5.8%, right 22.7%; panel 6.8%
+  8.00: floor p95 4.8%, median 4.1%; seams left 7.3%, centre 4.6%, right 6.4%; panel 4.6%
+  8.25: floor p95 4.8%, median 4.1%; seams left 7.3%, centre 4.6%, right 6.4%; panel 4.6%
+
+face vs key-lit receiver (README §10: fill if under ~30%):
+  1.0: face 510,253 9.2%; patch 291,965 12.0%; ratio 77.1%
+  3.0: face 968,253 9.4%; patch 335,965 11.8%; ratio 79.4%
+  5.0: face 725,255 12.3%; patch 379,965 9.0%; ratio 135.9%
+  7.5: face 760,702 16.2%; patch 423,965 7.9%; ratio 203.8%
+  9.5: face 1267,949 13.9%; wall 1690,399 34.1%; ratio 40.7%

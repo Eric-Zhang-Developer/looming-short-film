@@ -1,0 +1,3 @@
+music events sounding in [135, 160): 0 
+last music note before quiet2Start: piano at 132.60 dur 1.2 release - → ends 133.80
+music-stem cues in s17: 0; dawnBirds cues: 3 on dawnBird1, dawnBird2, dawnBird3

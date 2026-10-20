@@ -21,7 +21,7 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 | Doc | What it covers |
 |---|---|
 | [01 Competition](docs/01-competition.md) | Brief, criteria, category, AI framing, submission answers |
-| [02 Story](docs/02-story.md) | Logline, the visual rule, characters, 3:00 beat sheet |
+| [02 Story](docs/02-story.md) | Logline, the visual rule, characters, 3:21 beat sheet |
 | [03 Art Direction](docs/03-art-direction.md) | Paper diorama look, materials, palette, lighting, references |
 | [04 Technical](docs/04-technical.md) | three.js 2.5D architecture, paper generator, render pipeline |
 | [05 Sound](docs/05-sound.md) | Code-synthesized score, foley, mix |
@@ -35,8 +35,8 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 
 | Decision | Choice |
 |---|---|
-| Runtime | 3:00 (about 30 s of it held quiet shots) |
-| Dialogue | None. No legible text anywhere on screen. |
+| Runtime | 3:24 (v7, s13 back to v3's build; 3:21 in v6, 3:15 from G4) |
+| Dialogue | None. A few hand-lettered words on screen where the story needs them (exam, math, grade). |
 | Characters | Paper-cutout gators. The Exam is the only thing made of ink. |
 | Look | Lit paper diorama: torn-paper cutouts on separate depth planes, real light, real shadows |
 | Engine | three.js scene of flat paper planes; frames rendered headless and encoded with ffmpeg |
@@ -51,7 +51,7 @@ Most AI-made films use glow instead of light, and they cut every two seconds. *L
 - Agents: read `AGENTS.md` and your brief in `tasks/` first. The orchestrator also reads `docs/09-orchestration.md` and `NOW.md`.
 - Read `docs/` before writing code. If the code and the spec disagree, fix the spec first, then the code.
 - Every frame is a pure function of time `t`. No wall-clock time, no unseeded randomness.
-- No on-screen words, captions, HUDs or UI. If a beat needs text to read, the beat is wrong.
+- On-screen words are rare and hand-lettered (the exam, the math, the grade; director, 2026-10-15). No captions burned into the film, no HUDs or UI chrome.
 - Every non-trivial decision goes in the process log (see doc 07).
 - Generated images are assets, never render-time calls. Every one is listed in `assets/generated/manifest.json` with its prompt, model, date and hash.
 - `reference-videos/` is gitignored. It holds third-party videos used only for study.

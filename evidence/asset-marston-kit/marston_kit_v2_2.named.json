@@ -1,0 +1,110 @@
+{
+ "marston_kit_cubicle_front": [
+  32,
+  20,
+  360,
+  220
+ ],
+ "marston_kit_cubicle_side": [
+  472,
+  40,
+  280,
+  200
+ ],
+ "marston_kit_desk_row_front": [
+  792,
+  84,
+  636,
+  152
+ ],
+ "marston_kit_round_table": [
+  1456,
+  108,
+  296,
+  132
+ ],
+ "marston_kit_chair_side": [
+  112,
+  280,
+  204,
+  272
+ ],
+ "marston_kit_chair_34": [
+  436,
+  280,
+  216,
+  272
+ ],
+ "marston_kit_chair_back": [
+  752,
+  280,
+  208,
+  272
+ ],
+ "marston_kit_bookshelf_bay": [
+  1128,
+  268,
+  212,
+  288
+ ],
+ "marston_kit_column": [
+  1528,
+  268,
+  80,
+  288
+ ],
+ "marston_kit_ring_light_lit": [
+  32,
+  576,
+  300,
+  120
+ ],
+ "marston_kit_ring_light_unlit": [
+  392,
+  576,
+  304,
+  120
+ ],
+ "marston_kit_strip_light": [
+  744,
+  604,
+  544,
+  76
+ ],
+ "marston_kit_recessed_panel": [
+  1356,
+  576,
+  124,
+  124
+ ],
+ "marston_kit_exit_sign": [
+  1560,
+  600,
+  160,
+  88
+ ],
+ "marston_kit_ceiling_strip": [
+  20,
+  732,
+  464,
+  128
+ ],
+ "marston_kit_carpet_tile": [
+  500,
+  732,
+  308,
+  128
+ ],
+ "marston_kit_ribbon_window": [
+  824,
+  732,
+  508,
+  128
+ ],
+ "marston_kit_wall_strip": [
+  1348,
+  732,
+  408,
+  128
+ ]
+}

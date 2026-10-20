@@ -1,0 +1,9 @@
+Final proof, refactor/typescript at 38952ac (2026-10-20). Baselines were taken from v7 before any conversion.
+$ npm run -s typecheck                → clean (one strict config)
+$ node src/core/selftest.ts           → selftest: all passed
+$ node tools/check_timeline.ts        → ok (22 shots, 77 beats, 204.0s)
+$ node tools/mix.ts                   → 9801f68535b73559936b6c221e7c3b7dd361c1c8c39624ab0331b318896f51d2 (= baseline_audio.txt)
+$ node src/audio/selftest.ts          → exit 0, output (minus "wrote") identical to baseline_selftest.txt
+$ node tools/hashes.ts --check=evidence/ts-refactor/baseline.json → hashes: PASS (240 frames identical)
+No .js/.mjs left outside evidence/ and smoke/ (left by decision). No ts-ignore/ts-expect-error/ts-nocheck.
+`any`: two, each commented: blob.ts traverseVisible callback, acting.ts self-check stub rig.

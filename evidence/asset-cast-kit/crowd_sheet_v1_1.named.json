@@ -1,0 +1,38 @@
+{
+ "crowd_sheet_neighbor_body": [
+  104,
+  28,
+  372,
+  344
+ ],
+ "crowd_sheet_neighbor_head": [
+  664,
+  68,
+  480,
+  320
+ ],
+ "crowd_sheet_neighbor_arm": [
+  1285,
+  128,
+  683,
+  212
+ ],
+ "crowd_sheet_sleeper_body": [
+  104,
+  380,
+  372,
+  360
+ ],
+ "crowd_sheet_sleeper_head": [
+  676,
+  420,
+  472,
+  300
+ ],
+ "crowd_sheet_sleeper_arm": [
+  1284,
+  473,
+  688,
+  207
+ ]
+}

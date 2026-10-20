@@ -1,0 +1,33 @@
+v2-home-b checks (2026-10-15). Commands run from the worktree root.
+
+$ node tools/check_timeline.mjs
+ok (21 shots, 58 beats, 195.0s)
+
+$ node tools/determinism.mjs --t=29.3,38.5,56.5,67      (one time per shot: s04, s05, s07, s08)
+t=29.3  14ae688907bf880e 14ae688907bf880e 14ae688907bf880e  PASS
+t=38.5  59c0e5ea5b08b8ec 59c0e5ea5b08b8ec 59c0e5ea5b08b8ec  PASS
+t=56.5  b23679066e45a21d b23679066e45a21d b23679066e45a21d  PASS
+t=67  6fcb6eb72cc138b2 6fcb6eb72cc138b2 6fcb6eb72cc138b2  PASS
+determinism: PASS
+
+---- s07 light levels ----
+Method: node render.mjs --stills=<t> (1920x1080 PNG, graded), then evidence/v2-home-b/luma.mjs: each world point on the
+wall (z 0) is projected through the shot camera (fov 20) and the mean luma (ffmpeg signalstats YAVG, 0-255) of a
+16x16 px patch there is printed. Loom contrast = 1 - shadow / lit eye hole of the same blob shadow (both screen-lit,
+same distance from the light), on clear wall.
+  camera: cam=-0.04,0.084,0.95 look=-0.04,0.072,0.20
+
+local t   size   eye hole (lit)            shadow beside it          contrast   spec
+ 5.0      1.5x   (-0.024,0.032)  164.1     (-0.024,0.115)  134.2     18.2%      <= 25%
+ 7.0      1.75x  (-0.030,0.050)  158.9     (-0.030,0.125)   84.6     46.8%      40-60%
+ 9.5      2x     (-0.020,0.115)  163.0     (-0.040,0.030)   16.3     90.0%      >= 90%
+
+Wall beside the shadow, (0.22, 0.10):  5.9: 130.5   6.1: 109.3 (-16%)   7.9: 111.1   8.1: 115.7 (+4%)
+  -> the step at blind1 is clear; at blind2 this patch does NOT drop: the screen's level doubles there (0.5 -> 1.0)
+     as the daylight goes, and the patch is inside the screen's cone. See the done note, Gaps.
+
+---- s08 seams ----
+camera: cam=0.05,0.076,0.90 look=0.05,0.068,0.20. Seam patches 3x14 px on the four drawn seams; lit wall 16x16.
+local t   seam A left  A right  B left  B right   screen-lit wall (0.12,0.11) (0.06,0.12)
+ 0.0        11.8        12.3     13.3    13.4          109.2        106.2          -> no visible seam light
+ 5.96      200.9       218.7    222.9   223.6          110.8        108.4          -> seams 1.8-2.0x the lit wall (spec >= 1.5x)

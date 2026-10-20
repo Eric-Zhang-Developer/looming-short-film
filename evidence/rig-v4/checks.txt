@@ -1,0 +1,23 @@
+rig-v4 checks, 2026-10-17 (task/rig-v4)
+
+$ node tools/check_timeline.mjs
+ok (21 shots, 58 beats, 195.0s)
+
+$ node tools/determinism.mjs --t=23,38.5,83,112,185          (s03, s05, s11, s15, s18)
+t=23  82b215e8946214de 82b215e8946214de 82b215e8946214de  PASS
+t=38.5  0c7fd06c8252078d 0c7fd06c8252078d 0c7fd06c8252078d  PASS
+t=83  2707216ba3ddf1ee 2707216ba3ddf1ee 2707216ba3ddf1ee  PASS
+t=112  d74443eee163ee62 d74443eee163ee62 d74443eee163ee62  PASS
+t=185  cf01fffc6642d70a cf01fffc6642d70a cf01fffc6642d70a  PASS
+determinism: PASS
+
+$ node tools/determinism.mjs --page=evidence/rig-v4/sheet.html --t=42.917,44     (act(): an anticipation drawing, a hold)
+t=42.917  d440fea8d18f4b4c d440fea8d18f4b4c d440fea8d18f4b4c  PASS
+t=44  e7337650023f4140 e7337650023f4140 e7337650023f4140  PASS
+determinism: PASS
+
+$ node src/characters/acting.js          (asserts: hold, 1 anticipation drawing, face on t0, pride's two beats,
+acting: ok 1.67 4.92 8.42                 short hold throws, blinks 3-5 s apart and 1 drawing each, opts override)
+
+$ node render.mjs --sheet=23,38.5,83,112,185 --cols=5 --w=384 --out=evidence/rig-v4/shots.jpg
+evidence/rig-v4/shots.jpg  (5 frames)

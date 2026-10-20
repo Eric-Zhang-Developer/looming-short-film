@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/roommates_sheet_v1_1.png",
+  "prompt_file": "assets/prompts/roommates_sheet.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/roommates_sheet.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a142f1-7a0b-7e92-a325-d04354747a6c",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a142f1-7a0b-7e92-a325-d04354747a6c/exec-70008a4b-249c-4631-9a7e-5f63f90a72c2.png",
+  "codex_images_generated": 2,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-alsCkS",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 225188,
+    "cached_input_tokens": 201216,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2151,
+    "reasoning_output_tokens": 78
+  },
+  "timestamp_start_utc": "2026-10-16T04:21:22Z",
+  "timestamp_end_utc": "2026-10-16T04:23:36Z",
+  "output_sha256": "aa323d483ceed5b81a788a5c7e65bf86819488284e56f853ac910880ab7f19d2",
+  "width": 1536,
+  "height": 1024,
+  "pixel_format": "rgb24",
+  "thumbnail": "assets/raw/thumbs/roommates_sheet_v1_1.jpg",
+  "screening": "Kept as runner-up. Flat magenta key (no alpha), 6 islands. Heron body is a wide cone, not lanky; legs fine; tail is a feather fan. Bear is a three-quarter back view, face blank as asked. Gaps to neighbours 8 px incl. padding, below the 60 px asked."
+}

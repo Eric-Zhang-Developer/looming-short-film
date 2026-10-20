@@ -1,0 +1,9 @@
+# v2-payoff checks
+$ node tools/check_timeline.mjs | tail -1
+ok (21 shots, 58 beats, 195.0s)
+$ node tools/determinism.mjs --t=150,167,175,186
+t=150  8cb0eab5ede3ac99 8cb0eab5ede3ac99 8cb0eab5ede3ac99  PASS
+t=167  4e947dab85bf789b 4e947dab85bf789b 4e947dab85bf789b  PASS
+t=175  27ad97e89db85e9d 27ad97e89db85e9d 27ad97e89db85e9d  PASS
+t=186  67b498a1d7a52108 67b498a1d7a52108 67b498a1d7a52108  PASS
+determinism: PASS

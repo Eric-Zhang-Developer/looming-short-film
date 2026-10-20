@@ -1,0 +1,32 @@
+# Eye size, scale and line weight · face_sheet v1 against the frozen gator_sheet (v2_1)
+# Commands: node evidence/asset-face-sheet/measure.mjs <png> <x> <y> eye|dark   (flood fill, alpha >= 128; eye = not green, dark = lum < 90)
+#           node evidence/asset-face-sheet/strokes.mjs <png> <box> [alpha|dark]  (median vertical run over the middle half of a line)
+
+## Frozen head (assets/frozen/gator_sheet.png, turn_side)
+eye disc   59 x 60 px, diameter 59.5, centre (298.5, 130)       measure.mjs ... 275 130 eye
+pupil      37 x 38 px, diameter 37.5, centre (309.5, 131)       pupil/disc 0.63, pupil 11 px forward of the disc centre
+smile line box 70 x 29 px at (323, 178), stroke 6 px (lum < 105), colour about rgb(74,102,61)
+
+## Raw open eye vs the frozen eye: every variant is painted ~2.2-2.5x too large (the prompt asked for 59 px; Codex ignored absolute size)
+variant  open disc   vs 59.5     pupil   pupil/disc   uniform scale k = 59.5 / open
+v1_1     136.0 px    +129 %      78.5    0.58         0.4375
+v1_2     146.5 px    +146 %      83.0    0.57         0.4061
+v1_3     129.5 px    +118 %      74.5    0.58         0.4595
+After the one sheet-wide scale k (what on_head.jpg uses, and what the rig's PIECES sizes do anyway) the open eye is 59.5 px by construction.
+So the real test is whether every piece shares that one scale:
+
+## Every piece against its own sheet's open eye (diameter = disc width)
+variant  side eye      front pair L / R          gasp (asked +10 %)   tired disc width   worried disc width
+v1_1     136.5 (+0.4%)  123.5 / 124.0 (-9.2%)     145 (+6.6%)          147 (+8.1%)         144 (+5.9%)
+v1_2     146.0 (-0.3%)  138.0 / 137.5 (-6.0%)     164 (+12%)           n/a (fill leaks)    n/a (fill leaks)
+# v1_2's lids are pale enough to fail the green test, so the flood runs into them; their disc widths are unmeasured.
+v1_3     127.5 (-1.5%)  127.5 / 127.0 (-1.7%)     144 (+11%)           132 (+1.9%)         130 (+0.4%)
+
+## Line weight: median stroke px, raw -> x k (frozen smile: 6 px)
+variant  closed  neutral  smile  line    spread   at head scale
+v1_1     13      14       13     14      13-14    5.7-6.1 px
+v1_2     19      18       17     20      17-20    6.9-8.1 px (heavier than the head's smile by ~25 %)
+v1_3     14      14       14     14      14       6.4 px
+
+## Mouth widths at head scale (frozen smile is 70 px wide)
+smile    v1_1 93 px, v1_2 91 px, v1_3 101 px: all 30-45 % wider than the painted smile, and a symmetric U where the frozen one curves up toward the snout

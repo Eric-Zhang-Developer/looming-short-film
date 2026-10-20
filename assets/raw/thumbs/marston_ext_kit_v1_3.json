@@ -1,0 +1,47 @@
+{
+  "output": "assets/raw/marston_ext_kit_v1_3.png",
+  "prompt_file": "assets/prompts/marston_ext_kit.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/marston_ext_kit.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    },
+    {
+      "file": "assets/frozen/home_kit.png",
+      "sha256": "afac7d678669486fe3300b96c70f3b9eb0db1ea7f1f99f11920047779226e718"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a142aa-5619-71b2-8b12-e185ead5db45",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a142aa-5619-71b2-8b12-e185ead5db45/exec-9017ae9f-34a5-489c-af92-1a9e93128514.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-X4ymgE",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 133558,
+    "cached_input_tokens": 108800,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1994,
+    "reasoning_output_tokens": 34
+  },
+  "timestamp_start_utc": "2026-10-16T03:03:41Z",
+  "timestamp_end_utc": "2026-10-16T03:05:36Z",
+  "output_sha256": "ba2dc9818c1d2a85b74c369c7f6ca4cb3f8dcfc25669e0d2ef19e35c76f5593c",
+  "width": 1672,
+  "height": 941,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/marston_ext_kit_v1_3.jpg",
+  "screening": "pass: 14 islands, no text, no baked light. Clean openings, stepped bay with real mullioned windows, breezeway with a clean beam, tower with plain clock and arches, planter and sculpture read. Brick is red-brown, not the night-dark terracotta asked for (engine can darken). Facade is 2 window ribbons (3 bands), not the 3 rows of s09."
+}

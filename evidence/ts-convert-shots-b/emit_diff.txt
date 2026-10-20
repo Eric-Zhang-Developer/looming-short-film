@@ -1,0 +1,28 @@
+diff -r old/build/shots/s09c.js new/build/shots/s09c.js
+229c229
+<         const m = (o).material, u = m?.userData?.paper;
+---
+>         const m = o.material, u = m?.userData?.paper;
+376c376
+<         ([[keyA, mix[0]], [keyB, mix[1]]]).forEach(([k, [i, w]]) => {
+---
+>         [[keyA, mix[0]], [keyB, mix[1]]].forEach(([k, [i, w]]) => {
+diff -r old/build/shots/s10b.js new/build/shots/s10b.js
+47c47
+<             (bay.children[0]).material.color.setScalar(0.85 + 0.15 * rnd());
+---
+>             bay.children[0].material.color.setScalar(0.85 + 0.15 * rnd());
+55c55
+<             (c.children[0]).material.color.setScalar(CEILING_K);
+---
+>             c.children[0].material.color.setScalar(CEILING_K);
+diff -r old/build/shots/s11.js new/build/shots/s11.js
+104c104
+<     scene.traverse((o) => { o.castShadow = o.isMesh && o.rotation.x < 0 && Math.abs(o.position.y) < 1e-9 && Math.abs(o.position.z - 0.075) < 1e-9; });
+---
+>     scene.traverse((o) => { o.castShadow = (o.isMesh && o.rotation.x < 0 && Math.abs(o.position.y) < 1e-9 && Math.abs(o.position.z - 0.075) < 1e-9); });
+diff -r old/build/shots/s17.js new/build/shots/s17.js
+115c115
+<     const zones = ([[[0, 0.127, 0.040], [BLOB[0], 0, BLOB[1]]], [[NB, 0.127, 0.040], [NB_BLOB[0], 0, NB_BLOB[1]]]]).map(([at, to]) => {
+---
+>     const zones = [[[0, 0.127, 0.040], [BLOB[0], 0, BLOB[1]]], [[NB, 0.127, 0.040], [NB_BLOB[0], 0, NB_BLOB[1]]]].map(([at, to]) => {

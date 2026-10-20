@@ -1,0 +1,39 @@
+climax-a1 checks (2026-10-18). Commands run from the worktree root. Lumas: ffmpeg signalstats YAVG (0-255) on
+render.mjs --stills PNGs (1920x1080, graded), patches given as w:h:x:y in canvas px. Stills deleted after measuring.
+
+---- s07 ceiling shadow (node evidence/climax-a1/measure.mjs 5,9 → ceiling_shadow.txt) ----
+Method: render local t with the shadow caster on and off; pixels the caster darkens by > 12% are back-projected through
+the camera onto the ceiling plane y = 0.145. fov 20 = what the shot frames; fov 50 = the same camera widened, to see the
+whole shadow.
+ local t  blob r   blob width (2.28 r)   shadow x-span (whole)   ratio   x-span in frame   visible ceiling width   in-frame / visible
+ 5.0      0.024    0.0547                0.280                   5.11    0.237             0.369                   0.64
+ 9.0      0.030    0.0684                0.311                   4.55    0.248             0.365                   0.68
+Depth (z) span of the shadow on the ceiling: 0.168 (5.0) and 0.177 (9.0), 3.1x and 2.6x the blob width.
+Spec s07.md: >= 80% of the visible ceiling width after the gulp. Measured 68%: NOT met (done note, Gaps).
+
+---- s07 face vs the lit ceiling (still at local 9.0, t 57) ----
+snout (16:16:372:492) 75.8 · head dome by the eye (16:16:282:672) 30.6 · lit ceiling beside the shadow (24:24:960:300) 111.3
+shadow on the ceiling (24:24:1300:300) 16.4 · lit wall (24:24:1500:600) 177.6
+face / ceiling surround: snout 68%, dome 28% (spec 30-45%: the snout is over, the dome just under). Ceiling loom contrast
+1 - 16.4/111.3 = 85%.
+
+---- s07 clock size ----
+Ø 0.020 at the wall through s07's camera (pinhole, fov 20, 1080 tall): 68 px across (spec >= 60). Crop: s07_clock_crop.png.
+
+---- s08 / s07 mean luma (whole frame) ----
+s07 local 9.0 (t 57): 68.18     s08 local 8.0 (t 68, C3): 68.17
+s08 C3 is s07's light exactly (s08.md Light), so the two match; the spec's "lowest so far except s09a" is NOT met by a
+margin (done note, Gaps).
+
+---- s09a black (still at local 1.2, t 71.2; at 1.0 itself the blob is mid-blink, as s09a.md's own table has it) ----
+whole frame 12.76 (5.0%, windows and eyes included; spec: under 5% excluding them) · left eye (10:10:757:465) 143.3 ·
+right eye (10:10:890:465) 143.4 · blob body beside them (10:10:820:520) 27.2 · room (10:10:700:420) 38.9
+eyes / surround: 5.3x against the body, 3.7x against the room (spec >= 3x); each eye's crescent is ~60 px wide.
+
+---- s08 second hand (node evidence/climax-a1/ticks.mjs → ticks.txt) ----
+frames 0, 24, 48 (t 0.0, 1.0, 2.0): 1.5, 7.5, 13.5 deg = 0, 6, 12 + the 1.5 deg overshoot; every other frame at rest.
+
+---- timeline, determinism, acting ----
+$ node tools/check_timeline.mjs → ok (21 shots, 70 beats, 195.0s)
+$ node tools/determinism.mjs --t=49,55.5,57,60.5,61,63,64.5,66.8,68,70.4,70.5,71.2,72.2,73.6,74.1,74.5,75.4,75.9 → 18 PASS, determinism: PASS
+$ node src/characters/acting.js → acting: ok

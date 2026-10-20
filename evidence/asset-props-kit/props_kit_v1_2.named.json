@@ -1,0 +1,104 @@
+{
+ "props_kit_practice_1": [
+  60,
+  76,
+  296,
+  400
+ ],
+ "props_kit_practice_2": [
+  380,
+  76,
+  288,
+  400
+ ],
+ "props_kit_test_page": [
+  692,
+  76,
+  288,
+  400
+ ],
+ "props_kit_graded_test": [
+  1008,
+  76,
+  284,
+  400
+ ],
+ "props_kit_blank_page": [
+  1316,
+  76,
+  296,
+  400
+ ],
+ "props_kit_calendar": [
+  60,
+  484,
+  252,
+  284
+ ],
+ "props_kit_calc_exam_square": [
+  364,
+  592,
+  124,
+  120
+ ],
+ "props_kit_red_circle": [
+  540,
+  580,
+  152,
+  140
+ ],
+ "props_kit_notification_card": [
+  736,
+  584,
+  352,
+  112
+ ],
+ "props_kit_red_x": [
+  1132,
+  568,
+  140,
+  140
+ ],
+ "props_kit_strike_line": [
+  1312,
+  608,
+  296,
+  28
+ ],
+ "props_kit_phone_face_up": [
+  52,
+  784,
+  244,
+  120
+ ],
+ "props_kit_phone_face_down": [
+  328,
+  784,
+  228,
+  120
+ ],
+ "props_kit_pen": [
+  592,
+  820,
+  408,
+  56
+ ],
+ "props_kit_pen_cap": [
+  1036,
+  808,
+  204,
+  76
+ ],
+ "props_kit_backpack": [
+  1276,
+  680,
+  208,
+  228
+ ],
+ "props_kit_ink_drop": [
+  1528,
+  756,
+  92,
+  144
+ ]
+}

@@ -1,0 +1,16 @@
+Luma (Rec.709, 0-255) at t=62.0834 (local 2.083), full-res PNG, boxes x,y,w,h. Before = commit bfbffcb, after = 3698536.
+boxes: head 640,690,40,50 | lit window r3c4 890,200,100,60 | lit window r2c1 160,390,100,70 | plaza under him 590,830,120,40 | facade beside head 740,620,60,60 | facade behind him 520,600,40,40
+== before
+640,690,40,50  mean 30.3  p90 33.2
+890,200,100,60  mean 179.1  p90 199.2
+160,390,100,70  mean 166.4  p90 183.2
+590,830,120,40  mean 11.8  p90 14.7
+740,620,60,60  mean 31.1  p90 36.3
+520,600,40,40  mean 30.5  p90 33.8
+== after
+640,690,40,50  mean 66.6  p90 92.2
+890,200,100,60  mean 179.1  p90 199.2
+160,390,100,70  mean 166.4  p90 183.2
+590,830,120,40  mean 11.8  p90 14.7
+740,620,60,60  mean 31.1  p90 36.3
+520,600,40,40  mean 30.5  p90 33.8

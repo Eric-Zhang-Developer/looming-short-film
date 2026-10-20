@@ -1,0 +1,290 @@
+// The film's light rigs and the light rule in numbers (doc 02 · The visual rule, doc 04 · Lights).
+// Every update takes time as an argument. Randomness comes only from src/core/rng.ts.
+// Intensities are physical (candela for spots, lux for directionals) with decay 2, tuned for
+// the stage's NoToneMapping so a lit cream wall lands below white.
+import * as THREE from 'three';
+import { PALETTE } from './core/palette.ts';
+import { clamp } from './core/ease.ts';
+import { hash2, mulberry32, seedOf } from './core/rng.ts';
+
+type Swatch = keyof typeof PALETTE;
+const color = (k: Swatch) => new THREE.Color(PALETTE[k]);
+const mix = (a: Swatch, b: Swatch, x: number) => color(a).lerp(color(b), x);
+
+function shadowed<L extends THREE.SpotLight | THREE.DirectionalLight>(light: L, { mapSize = 2048, radius = 3, bias = -0.0004, normalBias = 0 } = {}): L {
+  light.castShadow = true;
+  light.shadow.mapSize.set(mapSize, mapSize);
+  light.shadow.radius = radius;          // r186 PCFShadowMap is a soft Vogel-disk PCF; radius sets the softness
+  light.shadow.bias = bias;
+  light.shadow.normalBias = normalBias;
+  return light;
+}
+
+// ---------- the rule ----------
+
+// d(light→wall) / d(light→subject), measured along the light→subject line to the plane z = wallZ.
+// Every point of a cutout parallel to the wall lands at this scale, so it is exact, not approximate.
+// > 1 when the subject is between the light and the wall; Infinity when the line never reaches the wall.
+export function shadowScale(lightPos: THREE.Vector3, subjectPos: THREE.Vector3, wallZ: number): number {
+  const dir = subjectPos.clone().sub(lightPos);
+  const k = (wallZ - lightPos.z) / dir.z;          // the line's parameter at the wall (subject is k = 1)
+  if (!(k > 0) || !Number.isFinite(k)) return Infinity;
+  const hit = lightPos.clone().addScaledVector(dir, k);
+  return lightPos.distanceTo(hit) / lightPos.distanceTo(subjectPos);
+}
+
+// The light position that gives `scale`. The ratio along any line equals the ratio of its z spans,
+// so z is solved in closed form: scale·(Lz − Sz) = Lz − wallZ. `height` and `side` are the light's
+// y and x offsets from the subject (m); they move where the shadow lands, never its scale.
+export function placeForScale({ subjectPos, wallZ, scale, height = 0, side = 0 }: { subjectPos: THREE.Vector3, wallZ: number, scale: number, height?: number, side?: number }): THREE.Vector3 {
+  if (!(scale > 1)) throw new RangeError(`placeForScale: scale must be > 1, got ${scale}`);
+  if (!(subjectPos.z > wallZ)) throw new RangeError('placeForScale: subject must be in front of the wall');
+  const z = (scale * subjectPos.z - wallZ) / (scale - 1);
+  return new THREE.Vector3(subjectPos.x + side, subjectPos.y + height, z);
+}
+
+// Points `spot` at `target` (Vector3 or Object3D) and fits its shadow camera to the target's
+// bounding sphere: near just short of it, fov just around it. A caster's shadow subtends the same
+// angle from the light as the caster, so this frustum holds the whole shadow on any receiver.
+// Call it again whenever the light or the target moves.
+// near is tabletop-scale (min(4 mm, d/20)) so a caster just in front of the light is inside the frustum; pass
+// { nearest } (m, the closest caster to the light) to set it explicitly.
+const _box = new THREE.Box3(), _sphere = new THREE.Sphere(), _lp = new THREE.Vector3();
+export function aim(spot: THREE.SpotLight, target: THREE.Vector3 | THREE.Object3D, { nearest }: { nearest?: number } = {}) {
+  if ((target as THREE.Object3D).isObject3D) _box.setFromObject(target as THREE.Object3D).getBoundingSphere(_sphere);
+  else _sphere.set(_lp.copy(target as THREE.Vector3), 0);
+  const c = _sphere.center.clone(), r = _sphere.radius;
+  const t = spot.target;
+  t.position.copy(c);
+  if (t.parent) { t.parent.updateWorldMatrix(true, false); t.parent.worldToLocal(t.position); }
+  t.updateMatrixWorld();
+
+  const d = spot.getWorldPosition(_lp).distanceTo(c);
+  const cam = spot.shadow.camera;
+  cam.near = nearest ?? Math.min(0.004, d / 20);   // a caster 5 cm from a phone is only 1 cm past this
+  cam.far = spot.distance || 10 * (d + r);         // receivers up to ~10× farther (three uses distance when set)
+  spot.shadow.focus = r > 0 ? clamp(1.15 * Math.asin(Math.min(1, r / d)) / spot.angle, 0.05, 1) : 1;
+  cam.updateProjectionMatrix();                    // SpotLightShadow only does this when fov/far change
+}
+
+// ---------- rigs ----------
+
+// Low, close, wide cyan wedge. Shadow on. Place it with placeForScale, then aim it at the subject.
+// penumbra near 1 turns the hard fan on the desk into a soft fall-off.
+export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle = 1.2, distance = 0.6, penumbra = 0.45 }: { color?: THREE.ColorRepresentation, intensity?: number, angle?: number, distance?: number, penumbra?: number } = {}) {
+  return shadowed(new THREE.SpotLight(c, intensity, distance, angle, penumbra, 2), { bias: -0.0004 });
+}
+
+// Overhead amber spot with a vellum cone and drifting dust. update(t) re-fits the cone and dust
+// to the light's current position and target, so move/aim the light first, then update.
+// The cone runs `reach` × the light→target distance, well past the target, so whatever the light lands on
+// (desk, floor) cuts it off by depth where the pool is: the vellum meets its own pool, even when the cone
+// is slanted. With no receiver it softens out over its last 30% instead of ending in a hard disc.
+// look-pass-2: only the cone's far wall is drawn (BackSide, at twice the strength), so anything standing in the
+// light, like the blob in its pool, hides the vellum behind it instead of wearing an amber film. Its sides fade to
+// nothing by view angle, over a width that wanders with the vellum's frost, so they read as light, not mesh lines.
+// Add light, light.target, cone and dust to the scene root (dust is in world space).
+export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.6, penumbra = 0.5, seed = 1, reach = 2.5 }: { color?: THREE.ColorRepresentation, intensity?: number, angle?: number, penumbra?: number, seed?: number, reach?: number } = {}) {
+  const light = shadowed(new THREE.SpotLight(c, intensity, 0, angle, penumbra, 2), { radius: 2, bias: -0.0003 });
+
+  // Unit cone: apex at the origin, opening down −Y, length 1. Scaled to the light→target distance.
+  const geo = new THREE.ConeGeometry(1, 1, 64, 1, true).translate(0, -0.5, 0);
+  const cone = new THREE.Mesh(geo, new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color() }, uStrength: { value: 0.2 }, uReach: { value: reach } },
+    vertexShader: /* glsl */`
+      varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+      void main() {
+        vUv = uv;
+        vec4 mv = modelViewMatrix * vec4(position, 1.0);
+        vN = normalize(normalMatrix * normal); vV = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: /* glsl */`
+      uniform vec3 uColor; uniform float uStrength, uReach;
+      varying vec2 vUv; varying vec3 vN; varying vec3 vV;
+      float h(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+      float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y); }
+      void main() {
+        float along = 1.0 - vUv.y;                                   // 0 at the apex, 1 at the open end
+        float ndv = abs(dot(normalize(vN), normalize(vV)));
+        float rim = 1.0 - ndv;                                       // frosted vellum catches light at its edges
+        float a = along * uReach;                                    // 0 at the apex, 1 at the target
+        float fade = smoothstep(0.0, 0.15, a) * (1.0 - smoothstep(0.7 * uReach, uReach, a));  // full strength to the target and well past it
+        float folds = 0.88 + 0.12 * sin(vUv.x * 6.2831853 * 7.0 + 0.6 * sin(vUv.y * 9.0));  // soft, slightly bent folds
+        float frost = 0.7 + 0.3 * vn(vec2(vUv.x * 60.0, vUv.y * 24.0)) + 0.15 * vn(vec2(vUv.x * 220.0, vUv.y * 90.0)) - 0.075;  // vellum fibre
+        float feather = 0.5 + 0.35 * vn(vec2(vUv.x * 30.0, vUv.y * 14.0)) + 0.2 * vn(vec2(vUv.x * 90.0, vUv.y * 40.0));  // uneven, so no side is a ruled line
+        float edge = (0.45 + 0.55 * rim * rim) * smoothstep(0.0, feather, ndv);   // bright toward the sides, then gone at the silhouette
+        gl_FragColor = vec4(uColor * uStrength * fade * folds * frost * edge, 1.0);
+        #include <colorspace_fragment>
+      }`,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.BackSide,
+  }));
+  cone.castShadow = cone.receiveShadow = false;
+
+  // 20–40 specks, each with a seeded home in the cone and a slow drift that is a pure function of t.
+  const rng = mulberry32(seedOf('lamp-dust', seed));
+  const n = 20 + Math.floor(rng() * 21);
+  const specks = Array.from({ length: n }, () => ({
+    h: 0.3 + 0.6 * rng(), th: rng() * Math.PI * 2, rho: 0.8 * Math.sqrt(rng()),
+    ph: rng() * Math.PI * 2, w: 0.15 + 0.25 * rng(), spin: (rng() < 0.5 ? -1 : 1) * (0.03 + 0.05 * rng()),
+  }));
+  const dotTex = (() => {
+    const cv = Object.assign(document.createElement('canvas'), { width: 32, height: 32 }), g = cv.getContext('2d')!;
+    const grd = g.createRadialGradient(16, 16, 0, 16, 16, 16);
+    grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.4, 'rgba(255,255,255,0.5)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = grd; g.fillRect(0, 0, 32, 32);
+    return new THREE.CanvasTexture(cv);
+  })();
+  const dustGeo = new THREE.BufferGeometry();
+  dustGeo.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(n * 3), 3));
+  dustGeo.setAttribute('color', new THREE.Float32BufferAttribute(new Float32Array(n * 3), 3));
+  const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({
+    size: 0.005, map: dotTex, vertexColors: true, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  }));
+  dust.frustumCulled = false;
+
+  const apex = new THREE.Vector3(), tip = new THREE.Vector3(), axis = new THREE.Vector3();
+  const b1 = new THREE.Vector3(), b2 = new THREE.Vector3(), p = new THREE.Vector3(), down = new THREE.Vector3(0, -1, 0);
+  function update(t: number) {
+    cone.visible = dust.visible = light.visible;
+    light.getWorldPosition(apex); light.target.getWorldPosition(tip);
+    const len = apex.distanceTo(tip) * reach;
+    const rad = Math.tan(light.angle * (1 - 0.5 * light.penumbra));
+    axis.subVectors(tip, apex).normalize();
+    cone.position.copy(apex);
+    cone.quaternion.setFromUnitVectors(down, axis);
+    cone.scale.set(len * rad, len, len * rad);
+    cone.material.uniforms.uColor.value.copy(light.color);
+
+    b1.set(1, 0, 0).applyQuaternion(cone.quaternion); b2.set(0, 0, 1).applyQuaternion(cone.quaternion);
+    const pos = dustGeo.attributes.position, col = dustGeo.attributes.color;
+    specks.forEach((s, i) => {
+      const h = (s.h + 0.04 * Math.sin(s.w * t + s.ph)) * len / reach;   // along the axis, above the target
+      const th = s.th + s.spin * t;
+      const r = s.rho * h * rad * (1 + 0.08 * Math.sin(0.7 * s.w * t + 2 * s.ph));
+      p.copy(apex).addScaledVector(axis, h).addScaledVector(b1, Math.cos(th) * r).addScaledVector(b2, Math.sin(th) * r);
+      pos.setXYZ(i, p.x, p.y, p.z);
+      const glint = 0.35 + 0.65 * Math.pow(0.5 + 0.5 * Math.sin(1.1 * s.w * t * 3 + s.ph * 3), 3);  // catches light as it turns
+      col.setXYZ(i, light.color.r * glint, light.color.g * glint, light.color.b * glint);
+    });
+    pos.needsUpdate = col.needsUpdate = true;
+    dustGeo.computeBoundingSphere();   // three caches it from the first render; the specks move every frame, so refit or pixels depend on frame order
+  }
+  return { light, cone, dust, update };
+}
+
+// ---------- the Marston motion-sensor zone (docs/shots/README.md §3) ----------
+
+// Wake keys: an intensity multiplier on 1s, STEPPED (no easing). [seconds after the wake frame, level]. Three strikes
+// (+0.042, +0.167, +0.292); the third catches and settles at 1. Every wake in the film uses these, so they read as one event.
+// The README's times are these frames of a 24 fps film (1, 2, 4, 5, 7, 9) rounded to ms; the exact fractions keep a frame
+// that lands on a key on that key.
+export const SENSOR_WAKE: [number, number][] = [[0, 0], [1 / 24, 0.9], [2 / 24, 0.1], [4 / 24, 1.0], [5 / 24, 0.2], [7 / 24, 1.15], [9 / 24, 1.0]];
+const EPS = 1e-6;   // t arrives as a difference of floats; a frame that lands on a key or a frame edge must not fall just short
+// s11's death as built: a seeded on/off chatter per 24 fps frame for 0.8 s under a ceiling falling 1 → 0.3, first frame a drop,
+// dead after. Every timeout (s11, s14) uses s11's seed.
+export const SENSOR_SEED = seedOf('s11', 'tableLightDies') % 65536;
+const TIMEOUT = 0.8;
+
+// The zone's level at time t (any clock, as long as wake/timeoutAt are on the same one). Pure: no state, no clocks.
+//   wake      time of the relay clack, or undefined. With a wake, the zone is dark before it.
+//   timeoutAt time the chatter starts, or undefined. Without one the zone never times out.
+// No wake: lit (1) until timeoutAt. Wake and timeout may both be given (s14: woken at 1.0, times out at 4.2).
+export type SensorOpts = { wake?: number, timeoutAt?: number, seed?: number };
+export function sensorLevel(t: number, { wake, timeoutAt, seed = SENSOR_SEED }: SensorOpts = {}): number {
+  if (wake !== undefined) {
+    if (t < wake) return 0;
+    if (t < wake + SENSOR_WAKE.at(-1)![0] - EPS) return SENSOR_WAKE.findLast(([dt]) => t - wake >= dt - EPS)![1];
+  }
+  if (timeoutAt === undefined || t < timeoutAt) return 1;
+  if (t >= timeoutAt + TIMEOUT - EPS) return 0;
+  const ceil = 1 - 0.7 * (t - timeoutAt) / TIMEOUT;
+  return t - timeoutAt < 1 / 24 - EPS || hash2(seed, Math.floor(t * 24 + EPS)) < 0.45 ? 0.08 * ceil : ceil;
+}
+
+// The ceiling fluorescent over a Marston desk unit: a SpotLight at the tube plus the louvred `sensor_trough` that hangs
+// it (cardstock housing, 5 louvres, 2 rods, a vellum tube whose colour follows the level). Add `group`, `light` and
+// `light.target` to the scene. update(t, { wake, timeoutAt }) sets the light and the tube, and returns the level, so a
+// shot can drive the phone's outshone rule from it (≥ 0.5 → phone spot 0.2). Mirrored units: pass `at` and `aimAt`.
+// intensity 0.8 is s15's lamp pool at the blob: LAMP_I 0.16 × (0.136 / 0.060)² (tube→blob over shade→blob distances).
+export function sensorLight({ at = [0, 0.127, 0.040], aimAt = [0, 0, 0.098], intensity = 0.8, angle = 0.8, penumbra = 0.5, seed = SENSOR_SEED }: { at?: Vec3, aimAt?: Vec3, intensity?: number, angle?: number, penumbra?: number, seed?: number } = {}) {
+  const tone = mix('cream', 'gator', 0.15), dull = mix('cream', 'kraft', 0.35).multiplyScalar(0.55);
+  const light = shadowed(new THREE.SpotLight(tone, intensity, 0, angle, penumbra, 2), { radius: 2, bias: -0.0003 });
+  light.position.set(...at);
+  aim(light, new THREE.Vector3(...aimAt));
+
+  const group = new THREE.Group(), card = new THREE.MeshLambertMaterial({ color: color('kraft') });
+  const part = (geo: THREE.BufferGeometry, mat: THREE.Material, x: number, y: number, z: number) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = false; group.add(m); return m; };
+  const L = 0.060, D = 0.016, H = 0.006, T = 0.0006, cy = at[1] + 0.001;   // housing centre y 0.128, bottom 0.125
+  part(new THREE.BoxGeometry(L, T, D), card, 0, cy + H / 2 - T / 2, 0);                                  // top
+  for (const s of [-1, 1]) part(new THREE.BoxGeometry(L, H, T), card, 0, cy, s * (D / 2 - T / 2));       // front and back walls
+  for (const s of [-1, 1]) part(new THREE.BoxGeometry(T, H, D), card, s * (L / 2 - T / 2), cy, 0);       // end caps
+  for (let i = 0; i < 5; i++) part(new THREE.BoxGeometry(T, H * 0.8, D), card, -L / 2 + L * (i + 0.5) / 5, cy - H * 0.1, 0);  // louvres
+  for (const s of [-1, 1]) part(new THREE.CylinderGeometry(0.0004, 0.0004, 0.25, 6), card, s * L * 0.4, cy + H / 2 + 0.125, 0);  // rods to the ceiling
+  const tubeMat = new THREE.MeshBasicMaterial({ color: dull, side: THREE.DoubleSide });
+  const tube = part(new THREE.PlaneGeometry(0.056, 0.004), tubeMat, 0, 0, 0);
+  tube.rotation.x = Math.PI / 2; tube.position.y = at[1] - 0.0005;   // faces down, inside the housing
+  group.position.set(at[0], 0, at[2]);                               // children carry their own y; x/z from `at`
+  light.position.set(...at);
+
+  function update(t: number, opts: SensorOpts = {}) {
+    const level = sensorLevel(t, { seed, ...opts });
+    light.intensity = intensity * level;
+    tubeMat.color.copy(dull).lerp(tone, Math.min(1, level)).multiplyScalar(0.55 + 0.45 * Math.min(1.15, level));
+    return level;
+  }
+  update(0);
+  return { light, group, tube, update, level: (t: number, opts?: SensorOpts) => sensorLevel(t, { seed, ...opts }) };
+}
+
+// Window light, cold night (k = 0) to gold (k = 1): low and blue, then warmer, brighter and a little higher.
+// One large soft shadow. Add light and light.target; move light.target to recentre the set.
+// t is unused for now: the ramp is driven by k so shots can key it to beats.
+export function dawnLight() {
+  const light = shadowed(new THREE.DirectionalLight(), { radius: 5, bias: -0.0005, normalBias: 0.002 });
+  Object.assign(light.shadow.camera, { left: -0.6, right: 0.6, top: 0.6, bottom: -0.6, near: 0.1, far: 4 });
+  const navy = color('navy'), cold = navy.multiplyScalar(1 / Math.max(navy.r, navy.g, navy.b));  // navy's hue as a light
+  const gold = mix('lamp', 'cream', 0.35), dir = new THREE.Vector3();
+  function update(t: number, k: number) {
+    k = clamp(k);
+    light.color.copy(cold).lerp(gold, k);
+    light.intensity = 0.6 + 2.2 * k * k;
+    const el = THREE.MathUtils.lerp(0.12, 0.35, k), az = -0.75;        // from the left, a little in front
+    dir.set(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
+    light.target.updateMatrixWorld();
+    light.position.copy(light.target.position).addScaledVector(dir, 1.5);
+  }
+  update(0, 0);
+  return { light, update };
+}
+
+// Overhead fluorescent tubes: green-white, mostly steady, with rare seeded stutters.
+// doc 04 pairs a RectAreaLight with a DirectionalLight, but r186's RectAreaLight only lights
+// Standard/Physical materials and paper is Lambert, so the DirectionalLight carries both color and shadow.
+export function fluorescent({ flickerSeed = 1, intensity = 2.2 } = {}) {
+  const light = shadowed(new THREE.DirectionalLight(mix('cream', 'gator', 0.3), intensity), { radius: 5, bias: -0.0005, normalBias: 0.002 });
+  Object.assign(light.shadow.camera, { left: -0.6, right: 0.6, top: 0.6, bottom: -0.6, near: 0.1, far: 4 });
+  light.position.set(0.1, 1.5, 0.8);
+  const seed = seedOf('fluorescent', flickerSeed);
+  function update(t: number) { light.intensity = intensity * flicker(seed, t); }
+  return { light, update };
+}
+
+// Flicker multiplier in (0, 1]. Time is cut into 0.7 s windows; about 1 in 8 holds one stutter of
+// 0.08–0.38 s where the tube drops 40–90% and chatters frame to frame. Outside a stutter: a ±1.5% hum.
+const WIN = 0.7;
+export function flicker(seed: number, t: number): number {
+  const w = Math.floor(t / WIN), r = mulberry32((seed + Math.imul(w, 0x9e3779b9)) >>> 0);
+  const hum = 1 - 0.015 * (0.5 + 0.5 * Math.sin(t * 2.1 + seed % 7));
+  if (r() >= 0.125) return hum;
+  const dur = 0.08 + 0.3 * r(), start = w * WIN + r() * (WIN - dur), depth = 0.4 + 0.5 * r();
+  if (t < start || t >= start + dur) return hum;
+  const chatter = hash2(seed % 65536, Math.floor(t * 24)) > 0.35 ? 1 : 0.3;
+  return hum * (1 - depth * chatter);
+}
+
+// Very low fill: night navy from above, a kraft bounce from below. Keeps unlit stock just off black.
+export function ambient() {
+  return new THREE.HemisphereLight(PALETTE.navy, PALETTE.kraft, 0.8);
+}

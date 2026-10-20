@@ -1,0 +1,74 @@
+# cut.mjs --auto on every v3 variant, parts written to a scratch dir outside the repo (<scratch>); tools/cut.mjs sha256 below
+b09c2a5e7d6f17b3355ce5316f9a872131c203adced6533bbdab911334b23461  tools/cut.mjs
+
+$ node tools/cut.mjs --in=assets/raw/style_tile_v3_4.png --auto --out=<scratch>/cut_v3_4 --boxes=<scratch>/cut_v3_4/boxes.json
+alpha in style_tile_v3_4: 387345 px at alpha 250-254 clamped to 255
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cut_v3_4/boxes.json
+style_tile_v3_4_1: cleared 8428 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_4_1: [32, 92, 400, 564] -> <scratch>/cut_v3_4/style_tile_v3_4_1.png
+style_tile_v3_4_2: cleared 2320 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_4_2: [448, 568, 440, 88] -> <scratch>/cut_v3_4/style_tile_v3_4_2.png
+style_tile_v3_4_3: cleared 2863 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_4_3: [904, 392, 248, 256] -> <scratch>/cut_v3_4/style_tile_v3_4_3.png
+style_tile_v3_4_4: cleared 13362 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_4_4: [1168, 276, 280, 380] -> <scratch>/cut_v3_4/style_tile_v3_4_4.png
+style_tile_v3_4_5: cleared 1416 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_4_5: [1340, 556, 276, 96] -> <scratch>/cut_v3_4/style_tile_v3_4_5.png
+style_tile_v3_4_6: cleared 2762 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_4_6: [1613, 296, 399, 364] -> <scratch>/cut_v3_4/style_tile_v3_4_6.png
+exit 0
+
+$ node tools/cut.mjs --in=assets/raw/style_tile_v3_1.png --auto --out=<scratch>/cut_v3_1 --boxes=<scratch>/cut_v3_1/boxes.json
+alpha in style_tile_v3_1: 375007 px at alpha 250-254 clamped to 255
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cut_v3_1/boxes.json
+style_tile_v3_1_1: cleared 3154 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_1_1: [28, 128, 336, 528] -> <scratch>/cut_v3_1/style_tile_v3_1_1.png
+style_tile_v3_1_2: cleared 3111 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_1_2: [368, 548, 464, 108] -> <scratch>/cut_v3_1/style_tile_v3_1_2.png
+style_tile_v3_1_3: cleared 2541 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_1_3: [844, 360, 256, 296] -> <scratch>/cut_v3_1/style_tile_v3_1_3.png
+style_tile_v3_1_4: cleared 12615 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_1_4: [1116, 264, 272, 392] -> <scratch>/cut_v3_1/style_tile_v3_1_4.png
+style_tile_v3_1_5: cleared 1421 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_1_5: [1312, 532, 352, 124] -> <scratch>/cut_v3_1/style_tile_v3_1_5.png
+style_tile_v3_1_6: cleared 3016 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_1_6: [1668, 288, 280, 372] -> <scratch>/cut_v3_1/style_tile_v3_1_6.png
+exit 0
+
+$ node tools/cut.mjs --in=assets/raw/style_tile_v3_2.png --auto --out=<scratch>/cut_v3_2 --boxes=<scratch>/cut_v3_2/boxes.json
+alpha in style_tile_v3_2: 341232 px at alpha 250-254 clamped to 255
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cut_v3_2/boxes.json
+style_tile_v3_2_1: cleared 3744 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_2_1: [24, 184, 332, 440] -> <scratch>/cut_v3_2/style_tile_v3_2_1.png
+style_tile_v3_2_2: cleared 3171 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_2_2: [364, 484, 428, 128] -> <scratch>/cut_v3_2/style_tile_v3_2_2.png
+style_tile_v3_2_3: cleared 4479 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_2_3: [808, 288, 268, 308] -> <scratch>/cut_v3_2/style_tile_v3_2_3.png
+style_tile_v3_2_4: cleared 11708 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_2_4: [1104, 248, 276, 360] -> <scratch>/cut_v3_2/style_tile_v3_2_4.png
+style_tile_v3_2_5: cleared 2531 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_2_5: [1320, 484, 304, 128] -> <scratch>/cut_v3_2/style_tile_v3_2_5.png
+style_tile_v3_2_6: cleared 4255 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_2_6: [1644, 224, 312, 396] -> <scratch>/cut_v3_2/style_tile_v3_2_6.png
+exit 0
+
+$ node tools/cut.mjs --in=assets/raw/style_tile_v3_3.png --auto --out=<scratch>/cut_v3_3 --boxes=<scratch>/cut_v3_3/boxes.json
+alpha in style_tile_v3_3: 372989 px at alpha 250-254 clamped to 255
+6 alpha island(s): 6 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cut_v3_3/boxes.json
+style_tile_v3_3_1: cleared 7253 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_3_1: [24, 116, 392, 532] -> <scratch>/cut_v3_3/style_tile_v3_3_1.png
+style_tile_v3_3_2: cleared 4593 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_3_2: [432, 552, 424, 92] -> <scratch>/cut_v3_3/style_tile_v3_3_2.png
+style_tile_v3_3_3: cleared 3421 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_3_3: [872, 336, 276, 296] -> <scratch>/cut_v3_3/style_tile_v3_3_3.png
+style_tile_v3_3_4: cleared 11474 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_3_4: [1176, 276, 292, 364] -> <scratch>/cut_v3_3/style_tile_v3_3_4.png
+style_tile_v3_3_5: cleared 1846 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_3_5: [1400, 520, 328, 116] -> <scratch>/cut_v3_3/style_tile_v3_3_5.png
+style_tile_v3_3_6: cleared 2581 px (neighbouring islands, alpha<16 dust)
+style_tile_v3_3_6: [1760, 356, 199, 288] -> <scratch>/cut_v3_3/style_tile_v3_3_6.png
+exit 0

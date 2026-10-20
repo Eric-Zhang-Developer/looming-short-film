@@ -1,0 +1,5 @@
+t=62  ff90af5f8dd5f985 ff90af5f8dd5f985 ff90af5f8dd5f985  PASS
+t=65  e3255791a4b03b78 e3255791a4b03b78 e3255791a4b03b78  PASS
+t=70  116f3aaf45c8f8af 116f3aaf45c8f8af 116f3aaf45c8f8af  PASS
+t=62  ff90af5f8dd5f985 ff90af5f8dd5f985 ff90af5f8dd5f985  PASS
+determinism: PASS

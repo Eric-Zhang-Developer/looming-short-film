@@ -1,0 +1,1 @@
+master limiter active on 305003 samples (6.354 s), worst -1.33 dB at 56.722 s; half-second windows: 17, 17.5, 34.5, 35, 36, 36.5, 39, 39.5, 40, 40.5, 53, 53.5, 54, 55.5, 56, 56.5, 57, 77, 77.5, 179.5, 180

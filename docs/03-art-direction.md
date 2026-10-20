@@ -18,7 +18,13 @@ The film's conflict should be visible in its materials before anyone understands
 | **Kraft / textured card** | Desks, floors, bookshelves | Warm brown with a visible fiber texture. |
 | **Tissue** | Curtains, lampshade, window glass | Translucent and glows when backlit. Ragged, uneven edge. |
 | **Vellum** | Light cones, the dawn haze | Mostly transparent, frosted. Catches light along its edges. |
-| **Ink** | **The Exam only** | Glossy liquid black with a wet highlight. Soaks a faint stain into the paper beneath it. Its shadow is the only true black in the film. |
+| **Ink** | **The Exam only** | Matte liquid black with one painted cream highlight (Q7 b). Soaks a faint stain into the paper beneath it. Its shadow is the only true black in the film. |
+
+**Everything is cut paper except the dread** (G4, 2026-10-15). The director on v1's blob: "It's more animated and less paper-cut, which makes it unnatural. I think you should keep it that way." So the contrast is a rule, not an accident:
+- **Paper** is torn, grained, boiled and posed: it moves pose to pose and its edges shimmer.
+- **The Exam** is the one thing that isn't: a smooth outline that never tears or boils, no paper grain, liquid squash, stretch and wobble. It should look a little too alive for the world it's in.
+- **Words and marks are paper, not ink.** The notification, the calendar's lettering and its X, his handwriting and math, the red checks and circles: all are matte lines drawn on the sheet, part of the paper, even where the story says "pen". Nothing but the Exam is wet, glossy or liquid, so the eye never confuses a pen line with the dread.
+- **Where ink meets paper** it stains: under the blob, along its first run (s02), and at the circle where it soaks back in (s18). The stain is the only ink-on-paper mark in the film.
 
 Rules:
 - **Vary the tear by paper weight.** Identical edge noise on every shape reads as a filter, which was the reference video's biggest flaw.
@@ -36,10 +42,11 @@ Separate **paper stocks** (the color of things) from **light colors** (the color
 | Paper | Gator Green (characters) | `#6F8F5E` |
 | Paper | Kraft (desks, floors, shelves) | `#A8835A` |
 | Light | Phone Cyan | `#6FD3E3` |
-| Light | Lamp Amber | `#F0A84A` |
+| Light | Lamp Amber (the home lamp) | `#F0A84A` |
+| Light | Pendant (Marston's desk light; warm) | `lerp(Lamp Amber, Cream, 0.3)` (shots README, v4 at a glance). The dim distant room light stays `lerp(Cream, Gator Green, 0.15)` ≈ `#DEDBC3` (§6) |
 | Ink | Exam Black | `#0A0A0F` |
 
-The dawn rose is **lamp amber mixed into cream through tissue**, not a new color. Red appears exactly once: the circle on the calendar.
+The dawn rose is **lamp amber mixed into cream through tissue**, not a new color. Red appears only on the calendar circles: the first exam, and the new circled date at the end (director, Q4).
 
 ### Color script
 
@@ -47,22 +54,23 @@ The dawn rose is **lamp amber mixed into cream through tissue**, not a new color
 |---|---|---|
 | Act 1 birth | Cool morning plus the first cyan of the phone | Light, curious |
 | Act 2a avoidance | Cyan grows and the room darkens with each dodge; amber flashes once (lamp beat) | Comic, slowly suffocating |
-| Act 2b Marston | Flickering fluorescent green-white, then near-black with a faint cyan | Lonely, heavy |
-| Act 3 first step | Amber takes over the frame from the desk outward | Warm, relieved |
+| Act 2b The bottom | The phone's cyan under the blob's huge ceiling shadow, then near-black at 3 a.m. with only the blob's eyes | Lonely, heavy |
+| Act 3 the walk | The nightstand lamp's amber behind him, then street-lamp pools on a navy path, then Marston's windows glowing warm; at the door the warm light from above floods the frame and takes it back from cyan (Q12 answered warm for v4) | Terrified, then warm and relieved |
 | Quiet 2 dawn | Gold through tissue windows, cold shadows warming | Peaceful |
-| Button | Night navy and one amber pool | Kind |
+| Button | An ordinary afternoon at home with the lamp on: the light from above, chosen now | Kind |
 
-**Desaturate on the low point.** During Quiet 1 the gator drains slightly toward grey, while the shadow stays rich.
+**Desaturate on the low point.** At 3 a.m. (s08) the gator drains slightly toward grey, while the shadow stays rich.
 
 ## Lighting rules
 
-1. **One motivated source per shot.** Every shot names its key light (phone, lamp, fluorescent, window, dawn). Fill comes only from bounce and ambient.
-2. **Light has shape.** Lamp light is a visible vellum cone with a hard pool on the desk and a few dust specks. Phone light is a low wedge. Draw the light as an object.
+1. **One motivated source per shot.** Every shot names its key light (phone, lamp, street lamp, Marston's pendant, window, dawn). Fill comes only from bounce and ambient.
+2. **Light has shape.** Lamp light is a visible vellum cone with a hard pool on the desk and a few dust specks. Phone light is a low wedge. Marston's light is a ring pendant hung over each desk: a warm spot from above with a soft pool and no cone, always lit, and kept in frame where it matters so the audience sees the cause. Draw the light as an object.
 3. **Light falls off.** Brightness on each paper layer is computed from its distance to the source. The phone lights the gator's snout and the room fades to navy.
 4. **Light comes through paper.** Thin stock glows when lit from behind: tissue curtains, the lampshade, the window, a lit torn edge. This is the look's signature.
-5. **Light seeps out from behind layers.** Dawn creeps under the apartment door and between the Marston stacks as a hot thin seam along a paper edge.
-6. **Two temperatures, one story.** When phone and lamp share a room, the direction of the shadow tells you which one is winning.
+5. **Light seeps out from behind layers.** Dawn creeps under the apartment door and along Marston's ribbon windows as a hot thin seam along a paper edge.
+6. **Two temperatures, one story.** When phone and lamp share a room (at home), or a low street lamp and the light from above meet (the walk, Marston's door), the direction and size of the shadow tell you which one is winning.
 7. **No glow without shadow.** Bloom is used sparingly, at the source only. Every glow must also cast a shadow somewhere.
+8. **Marston's light is warm, from above, and stays on.** There are no desk lamps at Marston and no motion sensors (cut in v4: the library's light is the turn). The pendant over each desk is lit before he arrives and nobody ever switches it. The only lights anyone clicks are at home: the desk lamp (s06, clicked on, then off: he refuses it) and his nightstand lamp (s09a, clicked on and left on behind him, the same click). That second lamp is low, so it throws the shadow long down the hall: "I don't have a night light though I have a nightstand lamp" (director, 2026-10-18, Q17). Light held low and close makes the shadow loom, and light from above makes it small, so the walk from the one to the other is the rule and the story at once. Numbers are in `docs/shots/README.md` ("v4 at a glance" and §3).
 
 ## Characters
 
@@ -74,9 +82,11 @@ The dawn rose is **lamp amber mixed into cream through tissue**, not a new color
 - eyes: open, closed/content, half-lid tired, wide/gasp, worried (with sweat dots), side-glance
 - mouth: neutral, small smile, open "o", tight line
 
-**The Exam (ink blob).** A soft round drop, about the size of a coffee mug in its first scene. Two small round eyes in cream, the only light parts of it. It moves like liquid: squash on landing, slow wobble at rest, stretch when it rolls. In lamplight it looks small and nervous. Its shadow is a clean, soft-edged silhouette of the blob, eyes included as holes.
+**The Exam (ink blob).** A soft round drop, about the size of a coffee mug in its first scene. Two small round eyes in cream, the only light parts of it. It moves like liquid: squash on landing, slow wobble at rest, stretch when it rolls. In light from above it looks nervous, and small next to its shadow at any size. Its shadow is a clean, soft-edged silhouette of the blob, eyes included as holes.
 
-**Roommates, Custodian, Freshman.** The same puppet system with different proportions and paper colors: a tall roommate, a round one, an older custodian with a hunch and a cap, a small Freshman with an oversized backpack.
+**Its size is the meter** (doc 02, `docs/shots/README.md` §1). It grows in steps from 1× at birth (2.4 cm across) to 2.5× by Marston (6 cm tall, its eyes level with his at the desk), then shrinks one step per solved problem to 0.42×, small enough for his pocket. Each step is a **gulp**: eyes closed on a squash, a one-drawing snap to the next size with a stretch, a settle, and its eyes back on him. Bigger means heavier and more anxious, never meaner: the eyes stay round cream discs, it never gets a mouth or teeth, and the matte ink, the painted highlight and the stain scale with it unchanged. It never swells slowly. Each size must read against props the audience knows: the calendar circle, the jars and the stool (s04), the coffee table (s05), his head (s06 on).
+
+**Roommates, Freshman.** The same puppet system with different proportions and paper colors: two gator roommates, a tall one and a round one (rig-v4), and a small Freshman with an oversized backpack. (The custodian was cut in v4.)
 
 **Crowds.** Marston extras are simpler cardstock silhouettes with 2–3 parts each. Every one has a different scale, pose and distance from its light. **Never clone a figure.**
 
@@ -111,7 +121,7 @@ Eight code-made films were reviewed (see `reference-videos/`, not in git). None 
 
 ## What reads as "made by AI" (banned)
 
-- On-screen text, captions, HUDs, fake data labels
+- HUDs and fake data labels; any text beyond the few hand-lettered words the story needs (director, 2026-10-15: "use text very sparingly"; doc 07)
 - Cloned crowds
 - Bloom soup and blown-out glow
 - Swirling light ribbons and particle-storm climaxes

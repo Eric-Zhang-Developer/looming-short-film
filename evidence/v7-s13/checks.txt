@@ -1,0 +1,26 @@
+$ node tools/check_timeline.mjs | tail -1
+ok (22 shots, 77 beats, 204.0s)
+
+$ npx tsc --noEmit -p .
+(no output, exit 0)
+
+$ node tools/mix.mjs
+range 0:204 s  premix -18.03 LUFS, -7.15 dBTP  →  loudnorm linear
+mix.wav  integrated -16.0 LUFS  true peak -5.1 dBTP (ebur128)  /  -15.94 LUFS, -5.44 dBTP (loudnorm pass 2)  target -16 ±1 LUFS, ≤ -4 dBTP
+
+$ node src/audio/selftest.js
+ok  every cue and score event hangs on a beat the v4 timeline has
+ok  three lamp clicks (s06 on, s06 off, s09a nightstand) are sample-identical in out/audio/stems/foley.wav
+ok  the clock is one buffer: clockTick ignores its seed, and every tick cue sits on a whole second of global time
+ok  the two penUncaps are one seed and gain, sample-identical in foley.wav
+ok  the two phoneBuzzs are one seed and gain, sample-identical in foley.wav
+ok  every bed cue with a length sounds at both ends of its own span
+ok  voices and foley are deterministic and finite
+ok  every foley sound renders, deterministic and finite
+ok  the three lamp clicks are identical within ±1 LSB in out/audio/mix.wav (over the first 0.17 s)
+exit 0
+
+$ node evidence/v7-s13/timing.mjs > evidence/v7-s13/timing.txt
+exit 0
+20 shadow events, 20 on a note: every one.
+Frames are on the 24 fps grid when frame × 1/24 = global (all events are multiples of 1/8 s).

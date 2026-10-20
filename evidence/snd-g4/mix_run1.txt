@@ -1,0 +1,3 @@
+range 0:195 s  premix -15.78 LUFS, -4.54 dBTP  →  loudnorm linear
+mix.wav  integrated -15.9 LUFS  true peak -4.8 dBTP (ebur128)  /  -15.89 LUFS, -5.19 dBTP (loudnorm pass 2)  target -16 ±1 LUFS, ≤ -4 dBTP
+8c97f32267ea6bc165c1843ef506da3816fedef6e50c2d7c4c3934f23687e144  /Users/ericzhang/.worktrees/looming/snd-g4/out/audio/mix.wav

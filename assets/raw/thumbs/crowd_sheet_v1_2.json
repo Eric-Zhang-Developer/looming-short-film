@@ -1,0 +1,43 @@
+{
+  "output": "assets/raw/crowd_sheet_v1_2.png",
+  "prompt_file": "assets/prompts/crowd_sheet.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/crowd_sheet.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    },
+    {
+      "file": "assets/frozen/gator_sheet.png",
+      "sha256": "eb98d8e9a373cb12705296c15e848b0145d6ef72d9a42dddd9e06a0165f435c9"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a142f9-40d0-7302-affe-0526d8f15f1c",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a142f9-40d0-7302-affe-0526d8f15f1c/exec-7de62b47-658b-4077-87ff-5dcf1202a6b6.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-1LQpfr",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 123265,
+    "cached_input_tokens": 101248,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 1459,
+    "reasoning_output_tokens": 39
+  },
+  "timestamp_start_utc": "2026-10-16T04:29:52Z",
+  "timestamp_end_utc": "2026-10-16T04:31:10Z",
+  "output_sha256": "f556ac26eeef2be7f1698340fe8fb4ba4b672449e80eb6392a6aadec534496d0",
+  "width": 1774,
+  "height": 887,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/crowd_sheet_v1_2.jpg",
+  "screening": "Best. Alpha, 6 islands, 76 px gaps, 66 px edge margin. Neighbour (navy hoodie, droopy eye, two tooth tips) and sleeper (kraft hoodie, closed eye, smile) read at a glance, distinct from the hero. Bodies 0.9-1.1 wide vs 0.67 asked; greens are not noticeably greyer than the hero."
+}

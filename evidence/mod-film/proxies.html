@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>mod-film · proxies</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<!-- Evidence page, not film: every piece assets.load returns, one row per asset, labelled (labels never reach a frame).
+     Each piece is drawn at its own aspect in a fixed cell; the bar under it is its PIECES size in meters on a log scale. -->
+<script type="module">
+  import * as assets from '/src/assets.js';
+  const c = Object.assign(document.createElement('canvas'), { width: 1920, height: 1600 }), g = c.getContext('2d');
+  document.body.appendChild(c);
+  const ready = (async () => {
+    g.fillStyle = '#3a3f55'; g.fillRect(0, 0, c.width, c.height);
+    const names = Object.keys(assets.PIECES), rowH = c.height / names.length, cell = 118, x0 = 210;
+    for (const [r, name] of names.entries()) {
+      const a = await assets.load(name), y = r * rowH;
+      g.fillStyle = '#ddd'; g.font = '15px sans-serif';
+      g.fillText(`${name}${a.proxy ? ' (proxy)' : ' (REAL)'}`, 8, y + rowH / 2);
+      for (const [i, [p, img]] of Object.entries(a.pieces).entries()) {
+        const s = Math.min((cell - 10) / img.width, (rowH - 26) / img.height), x = x0 + i * (cell + 18);
+        g.drawImage(img, x, y + 4, img.width * s, img.height * s);
+        g.fillStyle = '#ddd'; g.font = '11px sans-serif'; g.fillText(p, x, y + rowH - 6);
+      }
+    }
+  })();
+  window.renderFrame = async () => { await ready; };
+  window.LOOMING = { duration: 1, fps: 24, ready };
+</script>

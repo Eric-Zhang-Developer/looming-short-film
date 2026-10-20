@@ -1,0 +1,14 @@
+# desk plane (y 0), desk top only
+t=4.500  blob w 0.0607 (x 0.006…0.067)  shadow x 0.007…0.101 z 0.076…0.102 y 0.000…0.000  len/w 1.54  xlen/w 1.54  zlen/w 0.42  lit/dark 3.11  cover 14%  px 3904
+t=5.500  blob w 0.0622 (x 0.007…0.069)  shadow x 0.009…0.094 z 0.074…0.105 y 0.000…0.000  len/w 1.38  xlen/w 1.38  zlen/w 0.48  lit/dark 3.15  cover 14%  px 3904
+t=6.900  blob w 0.0626 (x 0.006…0.069)  shadow x 0.009…0.098 z 0.080…0.103 y 0.000…0.000  len/w 1.43  xlen/w 1.43  zlen/w 0.36  lit/dark 3.49  cover 13%  px 4072
+# floor (y -0.034), in front of the desk, before the climb
+t=1.500  blob w 0.0666 (x 0.042…0.109)  shadow x 0.049…0.142 z 0.148…0.208 y -0.034…-0.034  len/w 1.40  xlen/w 1.40  zlen/w 0.91  lit/dark 4.82  cover 7%  px 22324
+t=2.500  blob w 0.0656 (x 0.042…0.107)  shadow x 0.049…0.142 z 0.148…0.211 y -0.034…-0.034  len/w 1.43  xlen/w 1.43  zlen/w 0.95  lit/dark 4.85  cover 7%  px 23344
+# wall (z 0): any pixel whose ray meets the wall above the desk (y > 0) would be a wall shadow
+t=2.500  blob w 0.0656 (x 0.042…0.107)  shadow x 0.058…0.194 z 0.000…0.000 y -0.065…-0.053  len/w 2.08  xlen/w 2.08  zlen/w 0.00  lit/dark 4.85  cover 1%  px 23344
+t=5.500  blob w 0.0622 (x 0.007…0.069)  shadow x 0.007…0.107 z 0.000…0.000 y -0.006…-0.004  len/w 1.62  xlen/w 1.62  zlen/w 0.00  lit/dark 3.15  cover 0%  px 3904
+# s15 desk pool
+t=1.000  blob w 0.0644 (x 0.004…0.069)  shadow x 0.007…0.080 z 0.075…0.106 y -0.000…0.000  len/w 1.15  xlen/w 1.15  zlen/w 0.48  lit/dark 4.65  cover 19%  px 76916
+t=4.600  blob w 0.0661 (x 0.004…0.070)  shadow x 0.006…0.081 z 0.075…0.106 y -0.000…0.000  len/w 1.13  xlen/w 1.13  zlen/w 0.47  lit/dark 4.66  cover 19%  px 77128
+t=7.900  blob w 0.0646 (x 0.005…0.069)  shadow x 0.007…0.081 z 0.075…0.105 y -0.000…0.000  len/w 1.14  xlen/w 1.14  zlen/w 0.48  lit/dark 4.66  cover 19%  px 76088

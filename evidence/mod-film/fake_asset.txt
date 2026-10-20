@@ -1,0 +1,17 @@
+Fake frozen asset test (scratch files in this worktree, never committed, removed afterwards).
+
+cp /Users/ericzhang/code/media/looming/assets/raw/style_tile_v2_4.png assets/frozen/calendar.png
+echo '{ "calendar_sheet1": [838, 265, 311, 331] }' > assets/cut/calendar.boxes.json      # tile piece 3 = the calendar
+node tools/cut.mjs --in=assets/frozen/calendar.png --boxes=assets/cut/calendar.boxes.json
+  no alpha in calendar: keyed #FF00FF (tol 80), 1108532 px cleared, 19644 edge px soft-keyed and despilled
+  calendar_sheet1: [838, 265, 311, 331] -> .../assets/cut/calendar_sheet1.png
+
+With the fake in place: proxies.html reports "calendar (REAL)" with one piece, sheet1 (the painted calendar), and
+index.html at t=10.5 (s02 stub) shows the painted calendar torn by paper.js. After `rm -rf assets/frozen assets/cut`
+the same two renders show "calendar (proxy)" with sheet1 + sheet2 and the flat cream proxy. Side by side: switch.jpg
+(top: s02 frame proxy | real; bottom: the loader's calendar row proxy, then real).
+
+git status after removal: no assets/frozen or assets/cut paths (only the new mod-film files were untracked).
+
+ctx.post check (temporary edit to s01, reverted with git checkout): post({ lut: 'night' }) changed the t=3 hash
+1e0730758e808116 -> 6eb7a920361e81ea, and determinism --t=3,170,3 passed with it (s01 rebuilt after s18, same pixels).

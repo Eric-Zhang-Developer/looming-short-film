@@ -1,0 +1,17 @@
+# ffmpeg -i out/audio/mix.wav -af ebur128=peak=true -f null -   (snd-g4, mix.wav sha256 8c97f32267ea6bc1…)
+# target: integrated -16 LUFS ±1, true peak <= -4 dBFS (v1 was -13.9 / -1.6)
+[Parsed_ebur128_0 @ 0x888c04fc0] Summary:
+
+  Integrated loudness:
+    I:         -15.9 LUFS
+    Threshold: -27.8 LUFS
+
+  Loudness range:
+    LRA:        20.0 LU
+    Threshold: -37.8 LUFS
+    LRA low:   -32.8 LUFS
+    LRA high:  -12.9 LUFS
+
+  True peak:
+    Peak:       -4.8 dBFS
+duration=195.000000

@@ -1,0 +1,55 @@
+blob center at local 8.83: (0.0400, 0.0120, 0.0600) scale 1.000; B = (0.04, 0.012, 0.06); error 0.00 mm → PASS (≤ 2 mm)
+shadow at local 8.9 (widest x chord, blob vs its shadow on the desk): blob 27.13 mm, shadow 26.51 mm, scale 0.977x → PASS (1.0 ± 0.1)
+  overall x extent: blob 27.14 mm (x 0.0272..0.0543), shadow 43.28 mm (x 0.0060..0.0493, 2045 px; longer by the light's shear); shadow centroid on the desk (0.0266, 0, 0.0499), spec's blob-center shadow (0.024, 0, 0.048)
+his face by 24 fps frame around the swap:
+  local 8.2500  eyes tired  mouth neutral
+  local 8.2917  eyes tired  mouth neutral
+  local 8.3333  eyes side   mouth neutral
+  local 8.3750  eyes side   mouth neutral
+  local 8.6250  eyes side   mouth neutral
+  local 8.6667  eyes side   mouth line
+the Exam through 3.33–6.5 (12 fps drawings, center and scale):
+  3.25  not visible
+  3.33  (0.1700, 0.0950, 0.0076) s 0.000
+  3.42  (0.1700, 0.0950, 0.0076) s 0.056
+  3.50  (0.1700, 0.0950, 0.0076) s 0.098
+  3.58  (0.1700, 0.0950, 0.0076) s 0.128
+  3.67  (0.1700, 0.0950, 0.0076) s 0.149
+  3.75  (0.1700, 0.0950, 0.0076) s 0.161
+  3.83  (0.1700, 0.0950, 0.0076) s 0.167
+  3.92  (0.1700, 0.0950, 0.0076) s 0.170
+  4.00  (0.1700, 0.0950, 0.0076) s 0.170
+  4.08  (0.1700, 0.0950, 0.0076) s 0.170
+  4.17  (0.1700, 0.0948, 0.0076) s 0.170
+  4.25  (0.1700, 0.0942, 0.0076) s 0.170
+  4.33  (0.1700, 0.0931, 0.0076) s 0.170
+  4.42  (0.1700, 0.0912, 0.0077) s 0.170
+  4.50  (0.1700, 0.0884, 0.0077) s 0.170
+  4.58  (0.1700, 0.0845, 0.0077) s 0.170
+  4.67  (0.1700, 0.0793, 0.0078) s 0.170
+  4.75  (0.1700, 0.0727, 0.0079) s 0.170
+  4.83  (0.1700, 0.0643, 0.0080) s 0.170
+  4.92  (0.1700, 0.0542, 0.0081) s 0.170
+  5.00  (0.1702, 0.0421, 0.0143) s 0.170
+  5.08  (0.1702, 0.0415, 0.0143) s 0.170
+  5.17  (0.1702, 0.0371, 0.0150) s 0.170
+  5.25  (0.1701, 0.0252, 0.0167) s 0.170
+  5.33  (0.1700, 0.0020, 0.0200) s 0.170
+  5.42  (0.1700, 0.0020, 0.0200) s 0.170
+  5.50  (0.1700, 0.0020, 0.0200) s 0.170
+  5.58  (0.1700, 0.0020, 0.0200) s 0.170
+  5.67  (0.1700, 0.0020, 0.0200) s 0.170
+  5.75  (0.1700, 0.0066, 0.0200) s 0.553
+  5.83  (0.1700, 0.0097, 0.0200) s 0.810
+  5.92  (0.1700, 0.0116, 0.0200) s 0.966
+  6.00  (0.1700, 0.0126, 0.0200) s 1.046
+  6.08  (0.1700, 0.0129, 0.0200) s 1.076
+  6.17  (0.1700, 0.0130, 0.0200) s 1.080
+  6.25  (0.1700, 0.0121, 0.0200) s 1.010
+  6.33  (0.1700, 0.0120, 0.0200) s 1.000
+  6.42  (0.1700, 0.0120, 0.0200) s 1.000
+  6.50  (0.1700, 0.0120, 0.0200) s 1.000
+red-hued pixels in t09_00.jpg (1920x1080), saturation > 0.35: 34 around the circle (1493, 404), 0 elsewhere; all of them in x 1464..1520, y 377..430
+red-hued pixels in t09_00.jpg (1920x1080), saturation > 0.2: 34 around the circle (1493, 404), 242 elsewhere; all of them in x 192..1734, y 377..1074
+[page] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+face vs key-lit wall in t12_40.jpg: head (326,805) luma 55.6, snout (418,854) 57.0, wall (800,300) 94.3 → head 59%, snout 60% (README §10: 30–45%)

@@ -1,0 +1,3 @@
+tLocal 2: shadow on wall x -14.82..7.29 cm, y 0.05..19.73 cm (204436 px); blob 2.72 cm wide; scale 8.13x, spec 8x (1.7%)
+tLocal 7: shadow on wall x -14.98..6.99 cm, y 0.05..19.80 cm (199056 px); blob 2.72 cm wide; scale 8.08x, spec 8x (1.1%)
+tLocal 4.5: shadow on wall x -15.47..6.95 cm, y 0.05..19.80 cm (176486 px); blob 2.77 cm wide; scale 8.10x, spec 8x (1.2%)

@@ -1,0 +1,3 @@
+t=96.05  85cbbb6fbe95ddfc 85cbbb6fbe95ddfc 85cbbb6fbe95ddfc  PASS
+t=97.3  0eeb990605f03de5 0eeb990605f03de5 0eeb990605f03de5  PASS
+determinism: PASS

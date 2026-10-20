@@ -1,0 +1,22 @@
+# v3 fix list (orchestrator's own review, then the cold viewer)
+- s04: the blob's shadow reads as a muddy brown blotch over the cabinets; it should read as the blob's shape.
+- s07: the blinds are small in frame. Each pull-down should be visible as an action, not only as a light change.
+- s05: the roommates and couch are still proxies (roommate sheet not painted).
+- s13: the hero's top-view eye pair (cut-gator).
+- Walks (s09, s18): short boots, so the feet may slide.
+- s09: far too dark. Lift the exterior so the building, tower and gator read at phone brightness.
+- s12: the giant shadow is mostly cropped at the top of the frame. Reframe, or lower the light, so the loom reads.
+- s09–s12: the blob's eyes aren't level with the gator's (README §1 after his new 9.3 cm height). The blob's z mark (0.074) and s15's UNIT (0.0884) disagree.
+- exam.js has no METER, so each shot hard-codes blob radii. Centralise them for v3.
+- s03: the laptop game's shadow on the wall is pale and medium-sized. It should loom (dread meter s03 = 1.25×).
+- s06: the real-scale lamp had to be 120 cm to clear his head. Restage, or use a desk lamp from the kit.
+- s01: the skyline and oaks are proxies. Use the marston_ext_kit oak canopy and night layers.
+- Docs: README §2, assets.md and the s18 spec still describe the old desk unit.
+- s16 inserts: the writing hand is a lime-green placeholder blob. Use the gator's arm or hand piece (green felt plus the cream cuff) holding the pen.
+- s16: the six-step shrink is hard to follow in the wide shot. Hold each step, or cut closer.
+- s13: very dark.
+- Custodian, cart, neighbour and top-view figures: still proxies (no sheets painted). Paint one small cast kit if time allows.
+- s17b/s17c/s18: the handwriting is the Noteworthy system font (machine-dependent). Use the painted props where possible, or bundle a font file.
+- s18: the lamp is in front of its shade; the ink and gator cast no shadows; the cross-off reach shows his legs over the desk.
+- s17: the blob is tiny in the wide. Make sure the shrink reads.
+- Neck (rig-v4): the throat reads pale and flat next to the sheet's green neck with its cream underside. Match the sheet's colours. resolve vs neutral look alike at phone size: a bolder set mouth (close-up heads may cover it).

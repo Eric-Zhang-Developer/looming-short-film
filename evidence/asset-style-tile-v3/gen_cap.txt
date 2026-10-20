@@ -1,0 +1,14 @@
+$ node tools/gen.mjs --asset=style_tile --variants=4 --dry-run | head -1
+# gen.mjs dry run · style_tile · prompt v3 · 4 variant(s) · 7/12 used
+exit 0
+$ node tools/gen.mjs --asset=style_tile --variants=5 --dry-run | head -1
+# gen.mjs dry run · style_tile · prompt v3 · 5 variant(s) · 7/12 used
+exit 0
+$ node tools/gen.mjs --asset=style_tile --variants=6 --dry-run | head -1
+gen: REFUSED: style_tile already has 7 of 12 generations; 6 more would exceed the cap. Doc 08: rethink the spec instead of re-rolling.
+exit 1
+# default check: "cap" temporarily removed from specs.json, then restored
+$ node tools/gen.mjs --asset=style_tile --variants=1 --dry-run | head -1
+# gen.mjs dry run · style_tile · prompt v3 · 1 variant(s) · 7/8 used
+$ node tools/gen.mjs --asset=style_tile --variants=2 --dry-run
+gen: REFUSED: style_tile already has 7 of 8 generations; 2 more would exceed the cap. Doc 08: rethink the spec instead of re-rolling.

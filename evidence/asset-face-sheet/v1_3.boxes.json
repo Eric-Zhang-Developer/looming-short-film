@@ -1,0 +1,68 @@
+{
+  "face_sheet_eyes_open": [
+    120,
+    172,
+    144,
+    140
+  ],
+  "face_sheet_eyes_closed": [
+    368,
+    204,
+    148,
+    67
+  ],
+  "face_sheet_eyes_tired": [
+    628,
+    168,
+    147,
+    148
+  ],
+  "face_sheet_eyes_gasp": [
+    880,
+    164,
+    156,
+    156
+  ],
+  "face_sheet_eyes_worried": [
+    1128,
+    172,
+    188,
+    144
+  ],
+  "face_sheet_eyes_side": [
+    1416,
+    172,
+    139,
+    140
+  ],
+  "face_sheet_eyes_front_open": [
+    676,
+    456,
+    324,
+    144
+  ],
+  "face_sheet_mouth_neutral": [
+    220,
+    748,
+    208,
+    39
+  ],
+  "face_sheet_mouth_smile": [
+    557,
+    728,
+    227,
+    64
+  ],
+  "face_sheet_mouth_o": [
+    972,
+    705,
+    68,
+    99
+  ],
+  "face_sheet_mouth_line": [
+    1264,
+    748,
+    159,
+    24
+  ]
+}

@@ -1,0 +1,32 @@
+== Shadow scale (geometry) and the locked rig
+  spot at (-0.0100, 0.0040, 0.1029), wall scale 7.100x (spec 7.1)
+  t 1.25: wall row y 0.061: shadow x -0.0390…0.1645 = 0.2035 m (centre 0.0628; spec 0.061, frame x −0.098…0.178); blob drawn 0.0285 m → 7.14x
+  t 3: wall row y 0.061: shadow x -0.0280…0.1523 = 0.1803 m (centre 0.0621; spec 0.061, frame x −0.098…0.178); blob drawn 0.0253 m → 7.12x
+  t 3.75: wall row y 0.061: shadow x -0.0232…0.1523 = 0.1755 m (centre 0.0645; spec 0.061, frame x −0.098…0.178); blob drawn 0.0245 m → 7.16x
+  breath: width at 1.25 ÷ at 3.75 = 1.160 (13.8% narrower at the trough; spec 10–14%) → PASS
+  scale at 3.0: 7.12x vs 7.1 → PASS (±20%)
+
+== Acceptance 1: camera matrix and every puppet transform, local 0…10: every 5th frame plus every frame of the 6.0–6.5 dim, vs t 0
+  59 frames: 0 differ in the camera matrix, any joint transform, the head's world position or the spot's position → PASS
+
+== README §10 character fill: face against the phone-lit wall where the shadow falls (blob hidden)
+  t 1: face 0.165, wall 0.390 → 42% (README §10: 30–45%)
+  t 5: face 0.165, wall 0.390 → 42% (README §10: 30–45%)
+  t 8: face 0.126, wall 0.305 → 41% (README §10: 30–45%)
+  mean luminance (no post) t 0.5: 0.0568
+  mean luminance (no post) t 5: 0.0611
+  mean luminance (no post) t 6: 0.0537
+  mean luminance (no post) t 6.25: 0.0475
+  mean luminance (no post) t 6.5: 0.0437
+  mean luminance (no post) t 8: 0.0506
+
+== Acceptance 4: mean display luminance (index.html, with post) of s12 at global 86.0 against other shots
+  s12 @ 86.0: 0.0516   (@ 78.5: 0.0591, @ 82.0: 0.0656, @ 87.9: 0.0508)
+  darkest of 80 samples elsewhere (4 per ~8 s block, s01–s11 and s13–s18; unbuilt shots are stubs and count too):
+    t 88.88: 0.0586
+    t 5.00: 0.0805
+    t 90.63: 0.0884
+    t 92.38: 0.1034
+    t 103.88: 0.1238
+    t 102.00: 0.1254
+  s12 @ 86.0 (0.0516) vs the darkest other sample (0.0586) → PASS

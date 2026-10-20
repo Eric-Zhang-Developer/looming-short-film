@@ -1,0 +1,93 @@
+# cut.mjs --auto on every v2 sheet and hero output, parts written to a scratch dir outside the repo (<scratch>), deleted after; tools/cut.mjs sha256 below
+b09c2a5e7d6f17b3355ce5316f9a872131c203adced6533bbdab911334b23461  tools/cut.mjs
+
+$ node tools/cut.mjs --in=assets/raw/gator_sheet_v2_1.png --auto --out=<scratch>/cut_gator_sheet_v2_1 --boxes=<scratch>/cut_gator_sheet_v2_1/boxes.json
+alpha in gator_sheet_v2_1: 486476 px at alpha 250-254 clamped to 255
+14 alpha island(s): 14 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cut_gator_sheet_v2_1/boxes.json
+gator_sheet_v2_1_1: cleared 8652 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_1: [40, 72, 472, 432] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_1.png
+gator_sheet_v2_1_2: cleared 3151 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_2: [68, 512, 224, 244] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_2.png
+gator_sheet_v2_1_3: cleared 2332 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_3: [108, 780, 240, 112] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_3.png
+gator_sheet_v2_1_4: cleared 2608 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_4: [364, 532, 220, 192] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_4.png
+gator_sheet_v2_1_5: cleared 2169 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_5: [456, 780, 244, 112] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_5.png
+gator_sheet_v2_1_6: cleared 6143 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_6: [572, 76, 240, 428] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_6.png
+gator_sheet_v2_1_7: cleared 2205 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_7: [648, 588, 308, 120] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_7.png
+gator_sheet_v2_1_8: cleared 1000 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_8: [840, 756, 152, 140] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_8.png
+gator_sheet_v2_1_9: cleared 5794 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_9: [908, 76, 284, 432] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_9.png
+gator_sheet_v2_1_10: cleared 3736 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_10: [1008, 592, 280, 120] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_10.png
+gator_sheet_v2_1_11: cleared 1055 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_11: [1084, 756, 152, 140] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_11.png
+gator_sheet_v2_1_12: cleared 2847 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_12: [1296, 128, 288, 256] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_12.png
+gator_sheet_v2_1_13: cleared 3011 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_13: [1320, 564, 308, 148] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_13.png
+gator_sheet_v2_1_14: cleared 2523 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_1_14: [1328, 768, 248, 128] -> <scratch>/cut_gator_sheet_v2_1/gator_sheet_v2_1_14.png
+exit 0
+
+$ node tools/cut.mjs --in=assets/raw/gator_sheet_v2_2.png --auto --out=<scratch>/cut_gator_sheet_v2_2 --boxes=<scratch>/cut_gator_sheet_v2_2/boxes.json
+alpha in gator_sheet_v2_2: 522742 px at alpha 250-254 clamped to 255
+14 alpha island(s): 14 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cut_gator_sheet_v2_2/boxes.json
+gator_sheet_v2_2_1: cleared 10333 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_1: [24, 28, 488, 448] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_1.png
+gator_sheet_v2_2_2: cleared 5140 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_2: [52, 492, 252, 256] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_2.png
+gator_sheet_v2_2_3: cleared 2388 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_3: [104, 780, 236, 120] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_3.png
+gator_sheet_v2_2_4: cleared 3701 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_4: [356, 516, 224, 196] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_4.png
+gator_sheet_v2_2_5: cleared 2509 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_5: [448, 780, 236, 120] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_5.png
+gator_sheet_v2_2_6: cleared 5683 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_6: [560, 40, 236, 436] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_6.png
+gator_sheet_v2_2_7: cleared 5085 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_7: [640, 568, 316, 132] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_7.png
+gator_sheet_v2_2_8: cleared 1974 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_8: [824, 756, 156, 144] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_8.png
+gator_sheet_v2_2_9: cleared 6842 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_9: [900, 40, 284, 440] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_9.png
+gator_sheet_v2_2_10: cleared 4192 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_10: [1008, 572, 292, 128] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_10.png
+gator_sheet_v2_2_11: cleared 1384 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_11: [1072, 756, 148, 144] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_11.png
+gator_sheet_v2_2_12: cleared 4490 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_12: [1300, 116, 320, 256] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_12.png
+gator_sheet_v2_2_13: cleared 4123 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_13: [1320, 544, 324, 156] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_13.png
+gator_sheet_v2_2_14: cleared 1589 px (neighbouring islands, alpha<16 dust)
+gator_sheet_v2_2_14: [1336, 776, 228, 124] -> <scratch>/cut_gator_sheet_v2_2/gator_sheet_v2_2_14.png
+exit 0
+
+$ node tools/cut.mjs --in=assets/raw/gator_hero_v1_1.png --auto --out=<scratch>/cut_gator_hero_v1_1 --boxes=<scratch>/cut_gator_hero_v1_1/boxes.json
+alpha in gator_hero_v1_1: 483971 px at alpha 250-254 clamped to 255
+1 alpha island(s): 1 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cut_gator_hero_v1_1/boxes.json
+gator_hero_v1_1_1: cleared 11953 px (neighbouring islands, alpha<16 dust)
+gator_hero_v1_1_1: [188, 24, 1168, 984] -> <scratch>/cut_gator_hero_v1_1/gator_hero_v1_1_1.png
+exit 0
+
+$ node tools/cut.mjs --in=assets/raw/gator_hero_v1_2.png --auto --out=<scratch>/cut_gator_hero_v1_2 --boxes=<scratch>/cut_gator_hero_v1_2/boxes.json
+no alpha in gator_hero_v1_2: keyed #FF00FF (tol 80), 1121356 px cleared, 9663 edge px soft-keyed and despilled
+1 alpha island(s): 1 kept, 0 dropped under 500 px
+boxes for review: <scratch>/cut_gator_hero_v1_2/boxes.json
+gator_hero_v1_2_1: [219, 60, 1101, 934] -> <scratch>/cut_gator_hero_v1_2/gator_hero_v1_2_1.png
+exit 0
+
+
+# island -> rig part, both v2 sheets (same layout as v1; every piece is one island, nothing merged or split)
+_1 -> turn_side    _6 -> turn_front   _9 -> turn_back   _12 -> turn_head34
+_2 -> body         _4 -> head         _7 -> snout       _10 -> jaw          _13 -> tail
+_3 -> arm_l        _5 -> arm_r        _8 -> leg_l       _11 -> leg_r        _14 -> pocket
+# caveat: on v2_2, island _2 (body) has both sleeves and mitten hands painted on it, so it does not drop onto the rig as a body
+# heroes: one island each (hero_side)

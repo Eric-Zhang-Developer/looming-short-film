@@ -1,0 +1,415 @@
+# snd-g4 cue sheet: 192 cues + 220 score events (groove notes included), sorted by start time
+# time      mark      stem     sound / voice                beat+offset
+ 0:00.00            ambience paperBoil (42.5 s)           notifyBuzz-0.5
+ 0:00.00            ambience roomTone (4 s)               notifyBuzz-0.5
+ 0:00.50  NEW       foley    phoneBuzz                    notifyBuzz
+ 0:02.00  NEW       foley    phoneBuzz                    notifyBuzz+1.5
+ 0:04.00            ambience roomTone (17 s)              notifyBuzz+3.5
+ 0:05.00            music    pad 48/55/64/74              inkDropForms-10
+ 0:15.00            foley    inkDrip                      inkDropForms
+ 0:15.30            music    box:exam 72.14               inkDropForms+0.3
+ 0:15.85            music    box:exam 75.9                inkDropForms+0.85
+ 0:16.00            foley    inkDrip                      inkDropForms+1
+ 0:16.40            music    box:exam 81.18               inkDropForms+1.4
+ 0:16.95            music    box:exam 74.88               inkDropForms+1.95
+ 0:17.42            foley    inkDrip                      inkDropForms+2.42
+ 0:19.04            foley    inkDrip                      inkDropForms+4.04
+ 0:19.83            foley    inkDrip                      inkDropForms+4.83
+ 0:21.00            ambience roomTone (5 s)               laptopUp
+ 0:21.00            ambience phoneHum (21.5 s)            laptopUp
+ 0:21.00            foley    paperRustle                  laptopUp
+ 0:21.00  NEW       foley    gameBlip                     laptopUp
+ 0:21.00            music    sub 42 Hz                    laptopUp
+ 0:21.10  NEW       foley    gameBlip                     laptopUp+0.1
+ 0:22.33  NEW       foley    gameBlip                     laptopUp+1.33
+ 0:22.67  NEW       foley    gameBlip                     laptopUp+1.67
+ 0:23.17  NEW       foley    gameBlip                     laptopUp+2.17
+ 0:23.50  NEW       foley    gameBlip                     laptopUp+2.5
+ 0:24.00  NEW       foley    gameBlip                     laptopUp+3
+ 0:24.50  NEW-CODE  foley    inkDrip                      gulp1
+ 0:24.50  NEW-CODE  music    box:gulp 71.14               gulp1
+ 0:24.67  NEW       foley    gameBlip                     laptopUp+3.67
+ 0:24.77  NEW-CODE  music    box:gulp 74.86               gulp1+0.275
+ 0:25.17  NEW       foley    gameBlip                     laptopUp+4.17
+ 0:25.67  NEW       foley    gameBlip                     laptopUp+4.67
+ 0:26.00            ambience fridgeHum (8 s)              fridge
+ 0:26.00            foley    paperRustle                  fridge
+ 0:26.00            music    piano:groove 48              fridge
+ 0:26.00            music    sub 44 Hz                    fridge
+ 0:26.83            foley    jarClink                     fridge+0.83
+ 0:27.00            music    piano:groove 43              fridge+1
+ 0:28.00            music    piano:groove 45              fridge+2
+ 0:28.17            foley    jarClink                     fridge+2.17
+ 0:28.33            foley    paperRustle                  fridge+2.33
+ 0:29.00            music    piano:groove 40              fridge+3
+ 0:29.33            foley    jarClink                     fridge+3.33
+ 0:29.50            foley    cartonSlosh                  fridge+3.5
+ 0:29.67            foley    cartonSlosh                  fridge+3.67
+ 0:29.83            foley    cartonSlosh                  fridge+3.83
+ 0:30.00            music    piano:groove 41              fridge+4
+ 0:31.00            music    piano:groove 48              fridge+5
+ 0:31.33            foley    paperRustle                  fridge+5.33
+ 0:32.00            music    piano:groove 43              fridge+6
+ 0:33.00            music    piano:groove 50              fridge+7
+ 0:34.00            foley    paperRustle                  gameNight
+ 0:34.00            foley    tvBloops (4.9 s)             gameNight
+ 0:34.00            music    piano:groove 48              gameNight
+ 0:34.00            music    sub 47 Hz                    gameNight
+ 0:34.30            foley    controllerClick              gameNight+0.3
+ 0:34.33  NEW       foley    gameBlip                     gameNight+0.33
+ 0:34.50            music    piano:groove 64/67/72        gameNight+0.5
+ 0:34.83  NEW       foley    gameBlip                     gameNight+0.83
+ 0:35.00            music    piano:groove 43              gameNight+1
+ 0:35.33  NEW       foley    gameBlip                     gameNight+1.33
+ 0:35.50            music    piano:groove 64/67/72        gameNight+1.5
+ 0:35.83  NEW       foley    gameBlip                     gameNight+1.83
+ 0:35.90            foley    controllerClick              gameNight+1.9
+ 0:36.00            music    piano:groove 45              gameNight+2
+ 0:36.33  NEW       foley    gameBlip                     gameNight+2.33
+ 0:36.50            music    piano:groove 64/69/72        gameNight+2.5
+ 0:36.83  NEW       foley    gameBlip                     gameNight+2.83
+ 0:37.00            music    piano:groove 40              gameNight+3
+ 0:37.30            foley    controllerClick              gameNight+3.3
+ 0:37.33            foley    roommateStep                 gameNight+3.33
+ 0:37.33  NEW       foley    gameBlip                     gameNight+3.33
+ 0:37.50            music    piano:groove 64/69/72        gameNight+3.5
+ 0:37.66            foley    roommateStep                 gameNight+3.663
+ 0:37.83  NEW       foley    gameBlip                     gameNight+3.83
+ 0:38.00            foley    roommateStep                 gameNight+3.997
+ 0:38.00            music    piano:groove 41              gameNight+4
+ 0:38.33            foley    roommateStep                 gameNight+4.33
+ 0:38.33  NEW       foley    gameBlip                     gameNight+4.33
+ 0:38.50            music    piano:groove 65/69/72        gameNight+4.5
+ 0:38.66            foley    roommateStep                 gameNight+4.663
+ 0:38.83  NEW       foley    gameBlip                     gameNight+4.83
+ 0:39.00            foley    roommateStep                 gameNight+4.997
+ 0:39.00            foley    winJingle                    gameNight+5
+ 0:39.00            music    piano:groove 48              gameNight+5
+ 0:39.33            foley    roommateStep                 gameNight+5.33
+ 0:39.33  NEW       foley    gameBlip                     gameNight+5.33
+ 0:39.40            foley    controllerClick              gameNight+5.4
+ 0:39.50            music    piano:groove 65/69/72        gameNight+5.5
+ 0:39.66            foley    roommateStep                 gameNight+5.663
+ 0:39.83  NEW       foley    gameBlip                     gameNight+5.83
+ 0:40.00            foley    roommateStep                 gameNight+5.997
+ 0:40.00            foley    tvBloops (2 s)               gameNight+6
+ 0:40.00            music    piano:groove 43              gameNight+6
+ 0:40.33            foley    roommateStep                 gameNight+6.33
+ 0:40.33  NEW       foley    gameBlip                     gameNight+6.33
+ 0:40.50            music    piano:groove 62/67/71        gameNight+6.5
+ 0:40.83  NEW       foley    gameBlip                     gameNight+6.83
+ 0:40.90            foley    controllerClick              gameNight+6.9
+ 0:41.00            music    piano:groove 50              gameNight+7
+ 0:41.33  NEW       foley    gameBlip                     gameNight+7.33
+ 0:41.50            music    piano:groove 62/67/71        gameNight+7.5
+ 0:41.83  NEW       foley    gameBlip                     gameNight+7.83
+ 0:42.00            music    piano:groove 48              lampClickHome-0.5
+ 0:42.50            foley    lampClick                    lampClickHome
+ 0:42.80            ambience paperBoil (2.2 s)            lampClickHome+0.3
+ 0:42.85            music    box:exam 72.14               lampClickHome+0.35
+ 0:43.40            music    box:exam 75.9                lampClickHome+0.9
+ 0:43.95            music    box:exam 81.18               lampClickHome+1.45
+ 0:44.50            music    box:exam 74.88               lampClickHome+2
+ 0:45.00            foley    lampClick                    lampOffHome
+ 0:45.17            ambience paperBoil (63.33 s)          lampOffHome+0.17
+ 0:45.17            ambience phoneHum (4.83 s)            lampOffHome+0.17
+ 0:45.17            foley    paperRustle                  lampOffHome+0.17
+ 0:45.17            music    sub 50 Hz                    lampOffHome+0.17
+ 0:46.00  NEW-CODE  foley    inkDrip                      gulp2
+ 0:46.00  NEW-CODE  music    box:gulp 70.14               gulp2
+ 0:46.00            music    piano:groove 41              lampClickHome+3.5
+ 0:46.27  NEW-CODE  music    box:gulp 73.82               gulp2+0.275
+ 0:46.50  NEW       foley    gameBlip                     gulp2+0.5
+ 0:46.50            music    piano:groove 65/69/72        lampClickHome+4
+ 0:47.00  NEW       foley    gameBlip                     gulp2+1
+ 0:47.00            music    piano:groove 48              lampClickHome+4.5
+ 0:47.50  NEW       foley    gameBlip                     gulp2+1.5
+ 0:47.50            music    piano:groove 65/69/72        lampClickHome+5
+ 0:48.00  NEW       foley    gameBlip                     gulp2+2
+ 0:48.00            music    piano:groove 43              lampClickHome+5.5
+ 0:48.50  NEW       foley    gameBlip                     gulp2+2.5
+ 0:48.50            music    piano:groove 62/67/71        lampClickHome+6
+ 0:49.00  NEW       foley    gameBlip                     gulp2+3
+ 0:49.00            music    piano:groove 50              lampClickHome+6.5
+ 0:49.50  NEW       foley    gameBlip                     gulp2+3.5
+ 0:49.50            music    piano:groove 62/67/71        lampClickHome+7
+ 0:50.00            ambience roomTone (8 s)               blindsStart
+ 0:50.00            ambience phoneHum (6 s)               blindsStart
+ 0:50.00            music    piano:groove 48              blindsStart
+ 0:50.00            music    piano:groove 67              blindsStart
+ 0:50.00            music    sub 53 Hz                    blindsStart
+ 0:50.30            music    piano:groove 64/67/72        blindsStart+0.3
+ 0:50.33            foley    drill (1.34 s)               blindsStart+0.33
+ 0:50.50            music    piano:groove 52              blindsStart+0.5
+ 0:50.50            music    piano:groove 64              blindsStart+0.5
+ 0:50.80            music    piano:groove 64/67/72        blindsStart+0.8
+ 0:50.80            music    piano:groove 67              blindsStart+0.8
+ 0:51.00            music    piano:groove 55              blindsStart+1
+ 0:51.30            music    piano:groove 64/67/72        blindsStart+1.3
+ 0:51.30            music    piano:groove 72              blindsStart+1.3
+ 0:51.50            music    piano:groove 57              blindsStart+1.5
+ 0:51.50            music    piano:groove 67              blindsStart+1.5
+ 0:51.80            music    piano:groove 64/67/72        blindsStart+1.8
+ 0:52.00            music    piano:groove 45              blindsStart+2
+ 0:52.00            music    piano:groove 69              blindsStart+2
+ 0:52.30            music    piano:groove 64/69/72        blindsStart+2.3
+ 0:52.50            music    piano:groove 48              blindsStart+2.5
+ 0:52.50            music    piano:groove 64              blindsStart+2.5
+ 0:52.80            music    piano:groove 64/69/72        blindsStart+2.8
+ 0:52.80            music    piano:groove 69              blindsStart+2.8
+ 0:53.00            music    piano:groove 52              blindsStart+3
+ 0:53.30            music    piano:groove 64/69/72        blindsStart+3.3
+ 0:53.30            music    piano:groove 72              blindsStart+3.3
+ 0:53.50            foley    rodSnap                      blindsStart+3.5
+ 0:53.50            music    piano:groove 54              blindsStart+3.5
+ 0:53.50            music    piano:groove 71              blindsStart+3.5
+ 0:53.80            music    piano:groove 64/69/72        blindsStart+3.8
+ 0:54.00            music    piano:groove 41              blindsStart+4
+ 0:54.00            music    piano:groove 69              blindsStart+4
+ 0:54.30            music    piano:groove 65/69/72        blindsStart+4.3
+ 0:54.33  NEW       foley    gameBlip                     blindsStart+4.33
+ 0:54.50            music    piano:groove 45              blindsStart+4.5
+ 0:54.50            music    piano:groove 65              blindsStart+4.5
+ 0:54.80            music    piano:groove 65/69/72        blindsStart+4.8
+ 0:54.80            music    piano:groove 69              blindsStart+4.8
+ 0:54.83  NEW       foley    gameBlip                     blindsStart+4.83
+ 0:55.00            music    piano:groove 48              blindsStart+5
+ 0:55.17  NEW       foley    gameBlip                     blindsStart+5.17
+ 0:55.30            music    piano:groove 65/69/72        blindsStart+5.3
+ 0:55.30            music    piano:groove 72              blindsStart+5.3
+ 0:55.50            music    piano:groove 50              blindsStart+5.5
+ 0:55.50            music    piano:groove 74              blindsStart+5.5
+ 0:55.80  NEW       foley    blindRattle                  blind1-0.2
+ 0:55.80            music    piano:groove 65/69/72        blindsStart+5.8
+ 0:56.00            ambience phoneHum (2 s)               blind1
+ 0:56.00            music    piano:groove 43              blindsStart+6
+ 0:56.17            foley    paperRustle                  blind1+0.17
+ 0:56.30            music    piano:groove 62/67/71        blindsStart+6.3
+ 0:56.50  NEW-CODE  foley    inkDrip                      gulp3
+ 0:56.50  NEW-CODE  music    box:gulp 69.14               gulp3
+ 0:56.50            music    piano:groove 47              blindsStart+6.5
+ 0:56.77  NEW-CODE  music    box:gulp 72.78               gulp3+0.275
+ 0:56.80            music    piano:groove 62/67/71        blindsStart+6.8
+ 0:57.00            music    piano:groove 50              blindsStart+7
+ 0:57.30            music    piano:groove 62/67/71        blindsStart+7.3
+ 0:57.50            music    piano:groove 53              blindsStart+7.5
+ 0:57.80  NEW       foley    blindRattle                  blind2-0.2
+ 0:57.80            music    piano:groove 62/67/71        blindsStart+7.8
+ 0:58.50            ambience phoneHum (9.5 s)             gulp4
+ 0:58.50            foley    shadowGrowth (3.5 s)         gulp4
+ 0:58.50  NEW-CODE  foley    inkDrip                      gulp4
+ 0:58.50  NEW-CODE  music    box:gulp 68.14               gulp4
+ 0:58.50            music    sub 56 Hz                    gulp4
+ 0:58.77  NEW-CODE  music    box:gulp 71.74               gulp4+0.275
+ 0:59.33  NEW       foley    gameBlip                     gulp4+0.83
+ 0:59.83  NEW       foley    gameBlip                     gulp4+1.33
+ 1:00.33  NEW       foley    gameBlip                     gulp4+1.83
+ 1:00.83  NEW       foley    gameBlip                     gulp4+2.33
+ 1:01.33  NEW       foley    gameBlip                     gulp4+2.83
+ 1:01.83  NEW       foley    gameBlip                     gulp4+3.33
+ 1:02.00            ambience roomTone (6 s)               sunriseGame
+ 1:02.00            music    piano:groove 48              sunriseGame
+ 1:02.00            music    piano:groove 67              sunriseGame
+ 1:02.00            music    piano:groove 79              sunriseGame
+ 1:02.25  NEW       foley    gameBlip                     sunriseGame+0.25
+ 1:02.30            music    piano:groove 64/67/72        sunriseGame+0.3
+ 1:02.50            music    piano:groove 52              sunriseGame+0.5
+ 1:02.50            music    piano:groove 64              sunriseGame+0.5
+ 1:02.50            music    piano:groove 76              sunriseGame+0.5
+ 1:02.75  NEW       foley    gameBlip                     sunriseGame+0.75
+ 1:02.80            music    piano:groove 64/67/72        sunriseGame+0.8
+ 1:02.80            music    piano:groove 67              sunriseGame+0.8
+ 1:02.80            music    piano:groove 79              sunriseGame+0.8
+ 1:03.00            music    piano:groove 55              sunriseGame+1
+ 1:03.25  NEW       foley    gameBlip                     sunriseGame+1.25
+ 1:03.30            music    piano:groove 64/67/72        sunriseGame+1.3
+ 1:03.30            music    piano:groove 72              sunriseGame+1.3
+ 1:03.30            music    piano:groove 84              sunriseGame+1.3
+ 1:03.50            music    piano:groove 57              sunriseGame+1.5
+ 1:03.50            music    piano:groove 67              sunriseGame+1.5
+ 1:03.50            music    piano:groove 79              sunriseGame+1.5
+ 1:03.75  NEW       foley    gameBlip                     sunriseGame+1.75
+ 1:03.80            music    piano:groove 64/67/72        sunriseGame+1.8
+ 1:04.00            music    piano:groove 45              sunriseGame+2
+ 1:04.00            music    piano:groove 69              sunriseGame+2
+ 1:04.25  NEW       foley    gameBlip                     sunriseGame+2.25
+ 1:04.30            music    piano:groove 64/69/72        sunriseGame+2.3
+ 1:04.50            music    piano:groove 48              sunriseGame+2.5
+ 1:04.50            music    piano:groove 64              sunriseGame+2.5
+ 1:04.75  NEW       foley    gameBlip                     sunriseGame+2.75
+ 1:04.80            music    piano:groove 64/69/72        sunriseGame+2.8
+ 1:04.80            music    piano:groove 69              sunriseGame+2.8
+ 1:05.00            music    piano:groove 52              sunriseGame+3
+ 1:05.25  NEW       foley    gameBlip                     sunriseGame+3.25
+ 1:05.30            music    piano:groove 64/69/72        sunriseGame+3.3
+ 1:05.30            music    piano:groove 72              sunriseGame+3.3
+ 1:05.50            music    piano:groove 54              sunriseGame+3.5
+ 1:05.50            music    piano:groove 71              sunriseGame+3.5
+ 1:05.75  NEW       foley    gameBlip                     sunriseGame+3.75
+ 1:05.80            music    piano:groove 64/69/72        sunriseGame+3.8
+ 1:06.00            music    piano:groove 41              sunriseGame+4
+ 1:06.00            music    piano:groove 69              sunriseGame+4
+ 1:06.25  NEW       foley    gameBlip                     sunriseGame+4.25
+ 1:06.50            music    piano:groove 45              sunriseGame+4.5
+ 1:06.50            music    piano:groove 65              sunriseGame+4.5
+ 1:06.75  NEW       foley    gameBlip                     sunriseGame+4.75
+ 1:06.80            music    piano:groove 69              sunriseGame+4.8
+ 1:07.00            music    piano:groove 48              sunriseGame+5
+ 1:07.25  NEW       foley    gameBlip                     sunriseGame+5.25
+ 1:07.30            music    piano:groove 72              sunriseGame+5.3
+ 1:07.50            music    piano:groove 50              sunriseGame+5.5
+ 1:07.50            music    piano:groove 74              sunriseGame+5.5
+ 1:07.75  NEW       foley    gameBlip                     sunriseGame+5.75
+ 1:08.00            ambience roomTone (6 s)               marstonEnter
+ 1:08.00            music    piano 33                     marstonEnter
+ 1:08.00            music    sub 56 Hz                    marstonEnter
+ 1:14.00            ambience fluorescentHum (11 s)        stacksEnter
+ 1:14.00            ambience phoneHum (6 s)               stacksEnter
+ 1:14.00            foley    shadowGrowth (6 s)           stacksEnter
+ 1:14.40            foley    fluorescentFlicker (0.6 s)   stacksFlicker1
+ 1:17.40            foley    fluorescentFlicker (0.6 s)   stacksFlicker2
+ 1:21.00            foley    paperRustle (0.4 s)          laptopOpen
+ 1:23.60            ambience phoneHum (2.4 s)             phoneWake
+ 1:23.60            foley    shadowGrowth (2.4 s)         phoneWake
+ 1:24.20            foley    fluorescentFlicker (0.25 s)  tableLightDies
+ 1:24.50            foley    fluorescentFlicker (0.25 s)  tableLightDies+0.3
+ 1:24.75            foley    fluorescentFlicker (0.25 s)  tableLightDies+0.55
+ 1:25.00            ambience fluorescentHum (18 s)        tableLightDies+0.8
+ 1:25.25  NEW-CODE  foley    inkDrip                      gulp5
+ 1:25.25  NEW-CODE  music    box:gulp 67.14               gulp5
+ 1:25.53  NEW-CODE  music    box:gulp 70.7                gulp5+0.275
+ 1:26.00            ambience phoneHum (22.5 s)            quiet1Start
+ 1:26.00            ambience shadowBreath (10 s)          quiet1Start
+ 1:36.50            foley    paperRustle (0.6 s)          headLift
+ 1:37.40            music    piano 45/52/60               revealSleeper
+ 1:38.40            music    piano 41/48/57/64            revealDrinks
+ 1:39.40            music    piano 40/47/56/62            revealFreshman
+ 1:40.40            ambience phoneHum (0.7 s)             headLift+3.9
+ 1:40.80            ambience phoneHum (0.7 s)             headLift+4.3
+ 1:41.20            ambience phoneHum (0.7 s)             headLift+4.7
+ 1:42.00            ambience mopOnTile (1.5 s)            headLift+5.5
+ 1:43.00            ambience fluorescentHum (5.5 s)       custodianPass-0.5
+ 1:43.50            ambience mopOnTile (4.95 s)           custodianPass
+ 1:48.50            foley    sensorWake                   sensorWakeMarston
+ 1:49.15            ambience paperBoil (85.85 s)          sensorWakeMarston+0.65
+ 1:49.15            ambience fluorescentHum (36.85 s)     sensorWakeMarston+0.65
+ 1:49.15            ambience phoneHum (6.267 s)           sensorWakeMarston+0.65
+ 1:55.42            foley    cardTap                      phoneFaceDown
+ 1:56.00            foley    penUncap                     penUncap
+ 1:56.83            foley    penScratch (1.167 s)         penUncap+0.833
+ 1:58.00            foley    inkDrip                      nameWritten
+ 1:58.00            music    piano:theme 60               nameWritten
+ 2:03.00            foley    penScratch (3.6 s)           crossOut-4.1
+ 2:06.85  NEW       foley    penTap                       crossOut-0.25
+ 2:07.10  NEW       foley    penStroke (0.15 s)           crossOut
+ 2:07.30            foley    penScratch (1.3 s)           crossOut+0.2
+ 2:08.67  NEW       foley    penStroke (0.12 s)           problemOneSolved-0.33
+ 2:08.83  NEW       foley    penStroke (0.12 s)           problemOneSolved-0.17
+ 2:09.00            foley    inkDrip                      problemOneSolved
+ 2:09.00            music    piano:theme 64               problemOneSolved
+ 2:09.25  NEW-CODE  music    box:shrink 71.9              problemOneSolved+0.25
+ 2:09.53  NEW-CODE  music    box:shrink 68.14             problemOneSolved+0.525
+ 2:14.10            foley    penScratch (1.3 s)           problemSolved2-1.4
+ 2:15.50  NEW-CODE  foley    inkDrip                      problemSolved2
+ 2:15.50            music    piano:theme 69               problemSolved2
+ 2:15.50            music    piano 41/48/57               problemSolved2
+ 2:15.75  NEW-CODE  music    box:shrink 72.9              problemSolved2+0.25
+ 2:16.03  NEW-CODE  music    box:shrink 69.14             problemSolved2+0.525
+ 2:16.60            foley    penScratch (1.3 s)           problemSolved3-1.4
+ 2:18.00  NEW-CODE  foley    inkDrip                      problemSolved3
+ 2:18.00            music    piano:theme 67               problemSolved3
+ 2:18.00            music    piano 40/48/55               problemSolved3
+ 2:18.25  NEW-CODE  music    box:shrink 73.9              problemSolved3+0.25
+ 2:18.53  NEW-CODE  music    box:shrink 70.14             problemSolved3+0.525
+ 2:18.60            foley    penScratch (1.3 s)           problemSolved4-1.4
+ 2:20.00  NEW-CODE  foley    inkDrip                      problemSolved4
+ 2:20.00            music    piano:theme 64               problemSolved4
+ 2:20.00            music    piano 45/52                  problemSolved4
+ 2:20.10            foley    penScratch (1.3 s)           problemSolved5-1.4
+ 2:20.25  NEW-CODE  music    box:shrink 74.9              problemSolved4+0.25
+ 2:20.53  NEW-CODE  music    box:shrink 71.14             problemSolved4+0.525
+ 2:21.50  NEW-CODE  foley    inkDrip                      problemSolved5
+ 2:21.50            music    piano:theme 65               problemSolved5
+ 2:21.50            music    piano 38/45/53               problemSolved5
+ 2:21.60            foley    penScratch (1.3 s)           problemSolved6-1.4
+ 2:21.75  NEW-CODE  music    box:shrink 75.9              problemSolved5+0.25
+ 2:22.00            ambience phoneHum (1.5 s)             sensorWakeNeighbor
+ 2:22.03  NEW-CODE  music    box:shrink 72.14             problemSolved5+0.525
+ 2:23.00  NEW-CODE  foley    inkDrip                      problemSolved6
+ 2:23.00            music    piano:theme 62               problemSolved6
+ 2:23.00            music    piano 43/50/55/60            problemSolved6
+ 2:23.25  NEW-CODE  music    box:shrink 76.9              problemSolved6+0.25
+ 2:23.50            music    piano:theme 60/72            problemSolved6+0.5
+ 2:23.50            music    piano 36/43/52               problemSolved6+0.5
+ 2:23.53  NEW-CODE  music    box:shrink 73.14             problemSolved6+0.525
+ 2:23.83            music    piano:theme 64/76            problemSolved6+0.83
+ 2:23.83            music    piano 40/48                  problemSolved6+0.83
+ 2:24.16            music    piano:theme 69/81            problemSolved6+1.16
+ 2:24.16            music    piano 41/48/57               problemSolved6+1.16
+ 2:24.49            music    piano:theme 67/79            problemSolved6+1.49
+ 2:24.49            music    piano 40/48/55               problemSolved6+1.49
+ 2:24.82            music    piano:theme 64/76            problemSolved6+1.82
+ 2:24.82            music    piano 45/52                  problemSolved6+1.82
+ 2:25.15            music    piano:theme 65/77            problemSolved6+2.15
+ 2:25.15            music    piano 38/45/53               problemSolved6+2.15
+ 2:25.48            music    piano:theme 62/74            problemSolved6+2.48
+ 2:25.48            music    piano 43/50/55/60            problemSolved6+2.48
+ 2:26.00            ambience roomTone (18 s)              quiet2Start
+ 2:26.00            ambience fluorescentHum (18 s)        quiet2Start
+ 2:30.00            ambience dawnBirds (3.5 s)            dawnBird1
+ 2:36.00            ambience dawnBirds (3.5 s)            dawnBird2
+ 2:41.00            ambience dawnBirds (3.5 s)            dawnBird3
+ 2:44.00  NEW       ambience examHush (3.05 s)            examRoom
+ 2:44.00  NEW       ambience clockTick (10 s)             examRoom
+ 2:45.60  NEW       foley    cough                        examRoom+1.6
+ 2:47.00  NEW       ambience examHush (1.05 s)            testRecognise
+ 2:48.00  NEW       ambience examHush (5.55 s)            testRecognise+1
+ 2:48.50  NEW-CODE  music    piano:theme 60               testSmile
+ 2:49.50            foley    penScratch (2.9 s)           testSolved-3
+ 2:52.50  NEW-CODE  foley    inkDrip                      testSolved
+ 2:52.50  NEW-CODE  music    piano:theme 64               testSolved
+ 2:52.50  NEW-CODE  music    piano 40/48                  testSolved
+ 2:52.75  NEW-CODE  music    box:shrink 77.9              testSolved+0.25
+ 2:53.03  NEW-CODE  music    box:shrink 74.14             testSolved+0.525
+ 2:53.50  NEW       ambience examHush (4.5 s)             gradeSlide
+ 2:53.50  NEW       foley    paperSlide                   gradeSlide
+ 2:54.00  NEW       ambience clockTick (4 s)              examRoom+10
+ 2:54.33            foley    paperRustle (0.5 s)          gradeSlide+0.83
+ 2:55.00  NEW-CODE  music    box:exam-resolved 72         gradeReveal
+ 2:55.00            music    piano:theme 60               gradeReveal
+ 2:55.00            music    piano 36/43/52               gradeReveal
+ 2:56.00  NEW-CODE  music    box:exam-resolved 76         gradeReveal+1
+ 2:56.00            music    piano:theme 64               gradeReveal+1
+ 2:56.00            music    piano 40/48                  gradeReveal+1
+ 2:56.50            foley    cardTap                      gradeReveal+1.5
+ 2:57.00  NEW-CODE  music    box:exam-resolved 81         gradeReveal+2
+ 2:57.00            music    piano:theme 69               gradeReveal+2
+ 2:57.00            music    piano 41/48/57               gradeReveal+2
+ 2:58.00            ambience roomTone (17 s)              examCrossedOff-2
+ 2:58.00  NEW-CODE  music    box:exam-resolved 79         gradeReveal+3
+ 2:58.00            music    piano:theme 67               gradeReveal+3
+ 2:58.00            music    piano 40/48/55               gradeReveal+3
+ 2:59.00            music    piano:theme 64               gradeReveal+4
+ 2:59.00            music    piano 45/52                  gradeReveal+4
+ 2:59.50  NEW       foley    penStroke (0.18 s)           examCrossedOff-0.5
+ 2:59.80  NEW       foley    penStroke (0.2 s)            examCrossedOff-0.2
+ 3:00.00  NEW-CODE  foley    inkDrip                      examCrossedOff
+ 3:00.00            music    piano:theme 65               gradeReveal+5
+ 3:00.00            music    piano 38/45/53               gradeReveal+5
+ 3:00.25  NEW-CODE  music    box:shrink 78.9              examCrossedOff+0.25
+ 3:00.53  NEW-CODE  music    box:shrink 75.14             examCrossedOff+0.525
+ 3:01.00            music    piano:theme 62               gradeReveal+6
+ 3:01.00            music    piano 43/50/53/59            gradeReveal+6
+ 3:01.50            foley    inkDrip                      blobAbsorbed-2
+ 3:02.00            foley    inkDrip                      blobAbsorbed-1.5
+ 3:02.00            music    piano:theme 60               blobAbsorbed-1.5
+ 3:02.00            music    piano 36/43/52/55            blobAbsorbed-1.5
+ 3:02.00            music    pad 48/55/64/72              blobAbsorbed-1.5
+ 3:03.50  NEW       foley    inkSoak                      blobAbsorbed
+ 3:03.50  NEW-CODE  music    box:exam 74.88               blobAbsorbed
+ 3:05.50  NEW       foley    markerScratch (2 s)          newDate-2
+ 3:09.30  NEW       music    box:reprise 72.14            dropQuivers+0.3
+ 3:09.85  NEW       music    box:reprise 75.9             dropQuivers+0.85
+ 3:11.50            foley    penUncap                     tagPenUncap
+ 3:12.00  NEW-CODE  music    piano:theme 60               tagPenUncap+0.5
+# 76 NEW, 47 NEW-CODE

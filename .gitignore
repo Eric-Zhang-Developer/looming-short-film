@@ -5,3 +5,13 @@ out/
 assets/raw/*
 !assets/raw/thumbs/
 assets/cut/*.png
+
+# Worktrees for builder agents
+.claude/worktrees/
+# Previews muxed with third-party clips (assets/raw/reels) stay local
+evidence/*/preview.mp4
+# Compiled src/ (tsconfig.build.json); every serve rebuilds it
+build/
+
+# The director drops third-party clips here; they are never committed (copies go to assets/raw/reels/).
+audio examples/

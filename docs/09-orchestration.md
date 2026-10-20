@@ -23,6 +23,7 @@ How the film gets built: **one orchestrator agent driving many subagents**, with
 | **Cold viewer** | Subagent with no context | Watches frames or the animatic and answers the three readability questions (doc 02) | Is told the story first |
 | **Judge** | Subagent | Scores the current cut on the five competition criteria and writes the 5 hardest judge questions | Softens scores |
 | **Briefer** | Subagent | Keeps doc 07 current from done notes; drafts the 13 submission answers | Invents numbers or claims |
+| **Chronicler** | Subagent (docs only, no Chrome) | Weaves the `## Story` sections of done notes, doc 07 and the evidence into the making-of chapters in `docs/12-making-of/`, after every wave | Invents drama, quotes or numbers; tells it without evidence links |
 
 ## State files
 
@@ -52,7 +53,7 @@ Report states exactly. Never call something "done" when it's "built."
 ## Ownership
 
 - Each task's brief lists `owns`: the exact paths it may create or change.
-- **Contract files** are shared interfaces that many tasks import: `src/paper.js`, `src/material.js`, `src/lights.js`, `src/puppet.js`, `src/blob.js`, `src/post.js`, `src/timeline.js`, `render.mjs`, `assets/specs.json`. Each one is built in wave 2 by one builder. After that, it changes only through a `contract-<name>` task, which may add to an interface but not break it. The orchestrator re-runs the verifier on every shot that depends on it.
+- **Contract files** are shared interfaces that many tasks import: `src/paper.ts`, `src/material.ts`, `src/lights.ts`, `src/puppet.ts`, `src/blob.ts`, `src/post.ts`, `src/timeline.ts`, `render.ts`, `assets/specs.json`. Each one is built in wave 2 by one builder. After that, it changes only through a `contract-<name>` task, which may add to an interface but not break it. The orchestrator re-runs the verifier on every shot that depends on it.
 - **Interfaces first.** Before wave 2, the orchestrator writes `docs/contracts.md`: every contract module's exported functions and arguments. Builders implement against it, and shot builders call only what it lists.
 - A builder that needs a contract changed stops, writes the request in its done note under Gaps, and finishes what it can.
 
@@ -76,7 +77,7 @@ main ─────●────────────●──────
 
 **Task branches** (`task/<id>`): each subagent works in its own worktree on its own branch, cut from the current wave branch. Once the task is **verified**, the orchestrator squash-merges it into the wave branch, so each task becomes **one commit** and can be reverted on its own. Before merging:
 1. Check the diff touches only the brief's `owns`.
-2. Run `tools/check_timeline.mjs` and `tools/determinism.mjs`.
+2. Run `tools/check_timeline.ts` and `tools/determinism.ts`.
 3. Squash, with a message that names the task and argues the change.
 
 Then copy any gitignored local outputs the task produced (full-size `assets/raw/*.png`) into the main checkout's `assets/raw/`, and only after that delete the task branch and worktree. Wave 1 lost a full-size original this way and had to recover it from `~/.codex/generated_images/`.

@@ -9,9 +9,9 @@
 | Layer | Made by | Why |
 |---|---|---|
 | **Painted surfaces**: character art, props, background plates, paper textures | Generated once with Codex image gen, curated by the director, frozen in `assets/` | Hand-painted surface detail is where pure procedural code looks fake |
-| **Silhouettes**: torn edges, alpha masks | Code (`paper.js`) | Codex images have no alpha. Torn edges are what code does best. |
+| **Silhouettes**: torn edges, alpha masks | Code (`paper.ts`) | Codex images have no alpha. Torn edges are what code does best. |
 | **Light, shadow, translucency** | Code (three.js lights + `paperMaterial`) | This is the film's metaphor, and it has to be real |
-| **Rigging, acting, timing** | Code (`puppet.js`, `timeline.js`) | Puppets don't drift between shots, so there are no character-consistency problems |
+| **Rigging, acting, timing** | Code (`puppet.ts`, `timeline.ts`) | Puppets don't drift between shots, so there are no character-consistency problems |
 | **The ink blob** | Code (shader) | It is the only non-paper thing, and it must look liquid |
 | **Sound** | Code (doc 05) | Locked to the timeline |
 
@@ -41,14 +41,14 @@ Claude drives Codex `image_gen` through `codex exec` with long, layered prompts 
 - At least 2048 px on the long edge for anything that can fill more than half the frame.
 - Frozen picks live in `assets/frozen/` and are recorded in `assets/generated/manifest.json` (prompt file, reference hashes, model, date, sha256). They're never generated at render time.
 
-**Cutting.** `tools/cut.mjs` (offline, run once per asset):
+**Cutting.** `tools/cut.ts` (offline, run once per asset):
 1. Key out the chroma color to get a rough mask.
 2. Split part sheets into individual parts using bounding boxes listed in a small JSON file per sheet.
-3. Write clean RGB plus mask PNGs to `assets/cut/`. Final alpha comes later from `paper.js`.
+3. Write clean RGB plus mask PNGs to `assets/cut/`. Final alpha comes later from `paper.ts`.
 
 **Real paper option.** For plain paper grain (cardstock, kraft, tissue), a phone photo of real paper under flat light may beat generation. It's cheaper, has no model involved, and fits the theme. Both go through the same manifest.
 
-## `paper.js`: from image to cutout
+## `paper.ts`: from image to cutout
 
 `makePaper({ art, mask, weight, seed, tearAmp, tearFreq })` returns `{ map, alphaMap, thickness }`.
 
@@ -69,7 +69,7 @@ Extend `MeshLambertMaterial` with `onBeforeCompile`:
 
 **Shadows from cutouts (important gotcha).** Without alpha-aware depth, every cutout casts a rectangle. Give each paper mesh a `customDepthMaterial` (and a `customDistanceMaterial` for point lights) that samples the same `alphaMap` and discards below 0.5. Wave 1 proved this works: torn edge and eye holes both show in the shadow. r186 may handle alpha-tested shadows on its own, but that hasn't been tested, so keep the custom depth material until a test shows it's redundant.
 
-## Lights (`lights.js`)
+## Lights (`lights.ts`)
 
 | Light | three.js | Notes |
 |---|---|---|
@@ -87,7 +87,7 @@ Extend `MeshLambertMaterial` with `onBeforeCompile`:
 
 **The rule in numbers.** Shadow scale on the wall ≈ `d(light→wall) / d(light→blob)`. Shot files set light positions from this formula, so "loom 3×" is a target, not a guess.
 
-## Puppets (`puppet.js`)
+## Puppets (`puppet.ts`)
 
 - A puppet is a tree of `Group`s. Each part is a paper mesh offset so its pivot is the joint.
 - **Depth gaps:** each child part sits 2–6 mm (scene units) in front of its parent, so parts cast small shadows on each other.
@@ -96,7 +96,7 @@ Extend `MeshLambertMaterial` with `onBeforeCompile`:
 - **Faces:** eye and mouth meshes swap textures from the generated face sheet, on a single frame.
 - **Secondary motion:** tail and hoodie pocket follow with a damped spring, also stepped on 2s.
 
-## The ink blob (`blob.js`)
+## The ink blob (`blob.ts`)
 
 - A plane with a fragment shader: 2D metaballs (3–5 centers animated by `t`) give a smooth field, thresholded into the blob shape.
 - Fake normals from the field's gradient give a glossy specular highlight that responds to the scene's real key light.
@@ -120,9 +120,9 @@ Marston extras are `InstancedMesh` silhouettes cut from 4–6 generated poses, e
 
 ## Timeline and shots
 
-- `timeline.js` is the single source of truth: an ordered list of shots, each with `start`, `duration` and named beats (`{ lampClickHome: 0.36 }` in local time). Sound cues reference beat names.
-- One file per shot in `src/shots/`, exporting `build(scene)` and `update(scene, tLocal)`.
-- `tools/check_timeline.mjs` (port from KnightHacks): no gaps, no overlaps, total 3:00 ±5 s, every cue resolves.
+- `timeline.ts` is the single source of truth: an ordered list of shots, each with `start`, `duration` and named beats (`{ lampClickHome: 0.36 }` in local time). Sound cues reference beat names.
+- One file per shot in `src/shots/`, exporting `build(ctx) → { update(tLocal), dispose?() }` (contract: `docs/contracts.md` §shots).
+- `tools/check_timeline.ts` (port from KnightHacks): no gaps, no overlaps, total 3:21 ±5 s, every cue resolves.
 
 ## Rendering
 
@@ -145,11 +145,11 @@ looming/
   assets/generated/manifest.json
   assets/cut/                        # keyed, split parts
   assets/scans/                      # real paper photos (optional)
-  src/paper.js  material.js  lights.js  puppet.js  blob.js  crowd.js  post.js
-  src/timeline.js  src/shots/s01_*.js … s18_*.js
+  src/paper.ts  material.ts  lights.ts  puppet.ts  blob.ts  crowd.ts  post.ts
+  src/timeline.ts  src/shots/s01_*.ts … s18_*.ts
   src/audio/                         # synthesis (doc 05)
-  tools/gen.mjs  cut.mjs  check_timeline.mjs  determinism.mjs
-  render.mjs  index.html  package.json
+  tools/gen.ts  cut.ts  check_timeline.ts  determinism.ts
+  render.ts  index.html  package.json
   AGENTS.md  NOW.md  templates/      # orchestration (doc 09)
   tasks/  done/  evidence/  reviews/
   docs/contracts.md                  # contract module interfaces, written before wave 2
@@ -159,7 +159,7 @@ looming/
 
 | From | Take |
 |---|---|
-| `~/code/hackathons/knighthacks-2026-video` | `render.mjs` review and render modes, `tools/check_timeline.mjs`, easing and spring helpers from `src/core.js`, the `emotions()` approach to face takes, `build.py` and `sfx/cues.py` for audio, and `ANIMATION_GUIDE.md`'s timing rules |
+| `~/code/hackathons/knighthacks-2026-video` | `render.ts` review and render modes, `tools/check_timeline.ts`, easing and spring helpers from `src/core.js`, the `emotions()` approach to face takes, `build.py` and `sfx/cues.py` for audio, and `ANIMATION_GUIDE.md`'s timing rules |
 | `~/code/media/1776` | Timeline-as-truth design, seeded `rng.ts`, `selftest` invariants, `audio.ts` synthesis |
 
 Copy what's needed into this repo. Don't import across projects.

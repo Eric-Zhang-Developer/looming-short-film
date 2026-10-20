@@ -1,0 +1,36 @@
+ts-convert-shots-b · proof, run after the last code commit (7dc29d5), in the brief's order
+
+$ npm run -s typecheck
+(no errors, exit 0)
+
+$ node src/core/selftest.ts
+ok  hash fixed outputs
+ok  mulberry32 fixed outputs
+ok  seedOf is a stable uint32 and separates parts
+ok  kf hits its keys exactly
+ok  ease endpoints
+ok  spring is 0 before t0 and at t0
+ok  onTwos(0.09) === 1/12
+ok  onTwos survives the film's global-to-local subtraction
+ok  palette has the contract keys
+selftest: all passed
+(audio selftest not run: this batch touches no audio file)
+
+$ node tools/mix.ts   (tail)
+range 0:204 s  premix -18.03 LUFS, -7.21 dBTP  →  loudnorm linear
+mix.wav  integrated -16.0 LUFS  true peak -5.2 dBTP (ebur128)  /  -15.94 LUFS, -5.44 dBTP (loudnorm pass 2)  target -16 ±1 LUFS, ≤ -4 dBTP
+9801f68535b73559936b6c221e7c3b7dd361c1c8c39624ab0331b318896f51d2  /Users/ericzhang/code/media/looming/.claude/worktrees/agent-a8865c677a04dcac5/out/audio/mix.wav
+baseline (evidence/ts-refactor/baseline_audio.txt, first hash): 9801f68535b73559936b6c221e7c3b7dd361c1c8c39624ab0331b318896f51d2
+
+$ node tools/check_timeline.ts   (tail)
+ok (22 shots, 77 beats, 204.0s)
+
+$ node tools/hashes.ts --check=evidence/ts-refactor/baseline.json
+(waited from 23:42:52, swap free 949.5M; started 23:43:22 with swap free 1173.6M and no puppeteer Chrome running;
+ 4 "[page] Failed to load resource: 404" lines filtered out here: the unfrozen kits' boxes.json, which fall back to proxies by design)
+hashes: PASS (240 frames identical)
+exit=0, ended 23:50:27
+
+Extra: emit diff (evidence/ts-convert-shots-b/emit_diff.txt). src/ at 629d7ce and at 7dc29d5, each compiled with
+tsconfig.build.json --removeComments, build/ trees diffed: 6 changed lines, all redundant parentheses left by casts
+(s09c x2, s10b x2, s11 x1, s17 x1). s09b, s10 and s13 emit byte-identical JS.

@@ -1,0 +1,49 @@
+{
+  "output": "assets/raw/gator_sheet_v1_3.png",
+  "prompt_file": "assets/prompts/gator_sheet.v1.md",
+  "prompt_blocks": [
+    "assets/prompts/_blocks/style.md",
+    "assets/prompts/_blocks/lighting.md",
+    "assets/prompts/gator_sheet.v1.md",
+    "assets/prompts/_blocks/technical.md"
+  ],
+  "run_time_prompt_addition": "## Output\n\nGenerate exactly one image. Save it as `out.png` in the current working directory (the workspace root).",
+  "references": [
+    {
+      "file": "assets/frozen/style_tile.png",
+      "sha256": "598a1e005dd80065612e21f4594ab162435e8deafbc4a9c1537cc83f4e24a5c8"
+    }
+  ],
+  "model": "unknown (Codex image_gen)",
+  "model_note": "The image_gen call does not appear in the --json event stream, so the model name is not reported.",
+  "codex_thread_id": "01a14096-c1ae-7713-a65c-aaca1a7adc32",
+  "codex_source_file": "/Users/ericzhang/.codex/generated_images/01a14096-c1ae-7713-a65c-aaca1a7adc32/exec-0e5de197-9fbc-4c6f-b65c-e6b26a0befc4.png",
+  "codex_images_generated": 1,
+  "codex_run_dir": "/var/folders/b9/l1tzxy5x40933k_v05qbrm4w0000gn/T/looming-gen-cU6RRp",
+  "copied_into_workspace_by": "gen.mjs (copied out.png out of the Codex temp dir)",
+  "usage": {
+    "input_tokens": 279572,
+    "cached_input_tokens": 249344,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 2973,
+    "reasoning_output_tokens": 380
+  },
+  "timestamp_start_utc": "2026-10-15T17:23:04Z",
+  "timestamp_end_utc": "2026-10-15T17:25:45Z",
+  "output_sha256": "e93f74f9800688a6def8560d7cf01cd0377569c4330cd1607fc1a76e360c27b8",
+  "width": 1536,
+  "height": 1024,
+  "pixel_format": "rgba",
+  "thumbnail": "assets/raw/thumbs/gator_sheet_v1_3.jpg",
+  "screening": {
+    "verdict": "survivor",
+    "rank": 3,
+    "gaps": "smallest pixel gap 41 px (snout/jaw), smallest box gap 35 px (snout/jaw), no box overlaps, frame margin 29 px",
+    "legs": "17.9% of standing height below the hem (tile 18.4%)",
+    "appeal_vs_v3_4": "Same design but paler, greyer green by eye and a slimmer snout; the least lively of the three.",
+    "material": "Most felt-like: fibrous flecks on the hoodie close to the tile's felt, the problem this sheet was meant to fix.",
+    "parts": "body is painted front-on (a cowl collar facing the viewer), not the side view the side rig needs; other parts follow the conventions.",
+    "flags": "1536x1024 output; the Codex turn used about 280k input tokens, twice the others.",
+    "checklist": "Method: full-size Read of the PNG; composites over #1E2440 and #808080 (evidence/asset-gator-sheet/contact.jpg); turn_side beside the frozen tile's gator at equal height (beside_v3_4.jpg); hoodie at 2.6x beside the tile's; measure.mjs gaps (gaps.txt); legs.mjs leg share (legs.txt). Shared by all three: real alpha (flat background), 14 alpha islands = 14 pieces, no text or labels, no cast or drop shadows, palette green/cream with black only in turn_side's pupil and nostril dots. head, turn_front and turn_head34 painted blank as asked. Shared misses: turn_head34 is a side head (snout to +x), not a 3/4 front view; turn_front shows no muzzle, so front-on he reads as a frog or bear; the asked 40 px is met between pixels but not between boxes or to the frame edge; resolution about 425 px of figure height, too low for the close-ups in s06/s15/s18 H."
+  }
+}
