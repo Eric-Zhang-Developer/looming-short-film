@@ -1,0 +1,21 @@
+<!doctype html>
+<meta charset="utf-8">
+<base href="/">  <!-- s17b's hand font resolves against the page -->
+<title>v8-s16 wall-shadow probe</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
+<script type="module">
+  // s16 built the way film.ts builds a shot, so the probe can read its parts. probe(t) runs update(t) (shot-local) and
+  // returns parts.wall: the blob's shadow on the wall z 0, projected from the phone's screen (src/shots/s16.ts).
+  import * as THREE from 'three';
+  import { createStage } from '/build/core/stage.js';
+  import { createPost } from '/build/post.js';
+  import * as assets from '/build/assets.js';
+  import { PALETTE } from '/build/core/palette.js';
+  const stage = createStage(), { renderer } = stage;
+  const scene = new THREE.Scene(), camera = stage.camera.clone(), fns = [];
+  const sstage = { renderer, scene, camera, onFrame: (fn) => fns.push(fn), setRender: () => {} };
+  const shot = await (await import('/build/shots/s16.js')).build({ stage: sstage, scene, camera, renderer, assets, PALETTE, post: (o) => createPost(sstage, o) });
+  window.probe = (t) => { shot.update(t); return JSON.parse(JSON.stringify(shot.parts.wall)); };
+  window.renderFrame = async (t) => { shot.update(t); renderer.render(scene, camera); };
+</script>

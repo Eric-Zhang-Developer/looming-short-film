@@ -1,0 +1,26 @@
+s16 local t | global | blob r (×) | phone light (m) | S | shadow on the wall: x, eyes y, top y, height over the panel (m) | units (S·r/0.012)
+t  0.25 | 140.25 | r 0.030 (2.50×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.31×)
+t  5.00 | 145.00 | r 0.030 (2.50×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.31×)
+t  6.25 | 146.25 | r 0.030 (2.50×) | (-0.014, 0.002, 0.099) | S 3.97 | x 0.052…0.324 (0.272 wide), eyes 0.122, top 0.231, height 0.212 | 9.9
+t  8.00 | 148.00 | r 0.030 (2.50×) | (-0.014, 0.002, 0.099) | S 3.97 | x 0.053…0.325 (0.272 wide), eyes 0.123, top 0.233, height 0.214 | 9.9
+t  9.05 | 149.05 | r 0.030 (2.50×) | (-0.014, 0.002, 0.099) | S 3.97 | x 0.052…0.324 (0.272 wide), eyes 0.122, top 0.232, height 0.213 | 9.9
+t  9.10 | 149.10 | r 0.036 (3.00×) | (-0.014, 0.002, 0.099) | S 3.97 | x 0.053…0.379 (0.326 wide), eyes 0.148, top 0.279, height 0.260 | 11.9
+t  9.75 | 149.75 | r 0.036 (3.00×) | (-0.016, 0.004, 0.099) | S 3.97 | x 0.058…0.384 (0.326 wide), eyes 0.144, top 0.275, height 0.256 | 11.9
+t 10.40 | 150.40 | r 0.036 (3.00×) | (-0.010, 0.004, 0.114) | S 2.84 | x 0.026…0.259 (0.233 wide), eyes 0.104, top 0.198, height 0.179 | 8.5
+t 10.50 | 150.50 | r 0.036 (3.00×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.40×)
+t 12.00 | 152.00 | r 0.036 (3.00×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.40×)
+t 16.50 | 156.50 | r 0.018 (1.50×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.17×)
+
+Wall shadow height: before the phone (0.25, 5.0): none, the pendant's desk pool only. At 9.75: 0.256 m over the
+privacy panel (top y 0.275, eye holes at 0.144, above the window band 0.078–0.132), 0.326 m wide, 11.9 units.
+After 10.5: none again (the face-down frame), the pool only. 6.0–9.1 the phone already throws it at 2.5× (9.9 units):
+the rule, the moment the screen is lit; B′ only sees its left edge, and the cut to W on gulp4 shows it at 3×.
+10.333–10.417 the phone is over the rest spot on its way down, so the light drops and the shadow shrinks (S 2.84).
+
+Against the film's other wall shadows since Act 1 (units = S × r / 0.012, from the code comments):
+  s03 laptop after gulp1           5.4  (src/shots/s03.ts: S 3.6 at 1.5×)
+  s09b the door, end wall          6.8  (src/shots/s09b.ts: S 2.71 at 2.5×)
+  Marston resting phone (README)   7.1  (docs/shots/README.md §1: S 2.85 at 2.5×)
+  s16 relapse, 9.1–10.25          11.9  (this file)
+Geometry, not pixels: the field's box (2.28 r wide, 2 r tall, eyes 1.08 r up; README §1) projected from the phone's
+screen centre onto z 0. The renders (sheet.jpg 9.1, strip.jpg rows 2–3) show the same shape in frame.

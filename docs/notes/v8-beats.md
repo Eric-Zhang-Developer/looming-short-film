@@ -1,4 +1,4 @@
-# v8 beat sheet: proposal (2026-10-20), for the director's approval
+# v8 beat sheet (2026-10-20): approved by the director ("Now I want you to do version 8"); as built, see the note at the end
 
 Director, after watching v7 with sound: the first half is much stronger and the humor works ("really fucking funny"); **the second half is weak on the moral**. "I procrastinated until 3 am, went to the library, locked in, got a good grade" isn't a heroic story. He asked for a scene where "I look at a practice problem … I get scared, so then I start scrolling" or gaming. Runtime may grow to **3:30**.
 
@@ -82,3 +82,7 @@ Copied to `assets/raw/reels/` (gitignored; never committed). `audio examples/cs-
 ## Open for the director
 - Minecraft visuals on the game-night screen: a blocky green and brown paper screen would sell it without any logo. Yes or no?
 - The 94 stays (shortened). Cutting it entirely is possible now that the tag shows the change, but it's a satisfying beat for a general audience.
+
+## As built (v8-s16, v8-s03, v8-trims)
+- s16: the phone comes off the desk (s11 lays it face down there; a pocket phone would be a second phone). The gulp is 2.5× → 3× (s07–s15 already hold 2.5×), and the first solve takes it 3× → 1.5×. The wall shadow lives while the screen is lit (6.0–10.5) and is first seen whole on the gulp's cut to the wide: 11.9 units, the film's biggest.
+- s03: the banner lands at 4.0 (a full second to read in the insert).
