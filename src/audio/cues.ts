@@ -308,7 +308,7 @@ export const CUES: Cue[] = [
   // taps (0.3 s in) carry the gaming to the cut; s06 resumes the taps half a second after gulp2, as v7. s05's TV is Minecraft
   // (re-recorded with the music off): its dense run of hits (8.3-12 s in) mid-shot; it replaces the TV's bloops and win
   // jingle, and stops 1 s before s06's lamp click (closer, the master limiter's release reaches the click and the three clicks stop matching). In-points by spectrogram and onsets; nobody has listened yet. The +6 dB as v7: s05's groove and s06's run hotter.
-  ...([['cs2_ak', 8.7, 'gulp1', 0, 2, 0], ['cs2_ak', 0.25, 'gulp1', 2, 4.5, 0], ['minecraft', 3.4, 'gameNight', 0, 6.5, 6],
+  ...([['cs2_ak', 8.7, 'gulp1', 0, 2, 0], ['cs2_ak', 0.25, 'gulp1', 2, 4.5, 0], ['minecraft', 3.2, 'gameNight', 0, 6.5, 6],
     ['cs2_ak', 1.6, 'gulp2', 0.5, 4.0, 6]] as [string, number, string, number, number, number][])
     .map(([file, inSec, b, from, to, up]) => ({ beat: b, offset: from, dur: to - from, sound: 'clip', file, in: inSec, gain: GAIN.cs2 * dB(up) })),
 ];
