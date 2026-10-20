@@ -19,9 +19,9 @@ The film must render **bit-identical frames and audio** after your change. That 
 ## Proof (all required, in this order, after your last code commit)
 1. `npm run -s typecheck` → no errors (both configs).
 2. `node src/core/selftest.ts` passes. If your batch touches audio: `node src/audio/selftest.(js|ts)` passes, and its output (minus the `wrote …` line) matches `evidence/ts-refactor/baseline_selftest.txt`.
-3. `node tools/mix.mjs` → `out/audio/mix.wav`'s sha256 (the last line it prints) equals the first hash in `evidence/ts-refactor/baseline_audio.txt` (`9801f685…`).
-4. `node tools/check_timeline.mjs` ok.
-5. `node tools/hashes.mjs --check=evidence/ts-refactor/baseline.json` → `hashes: PASS (240 frames identical)`. About 8 minutes; one Chrome. A FAIL means a runtime change slipped in: find it and fix it. Never update the baseline.
+3. `node tools/mix.ts` → `out/audio/mix.wav`'s sha256 (the last line it prints) equals the first hash in `evidence/ts-refactor/baseline_audio.txt` (`9801f685…`).
+4. `node tools/check_timeline.ts` ok.
+5. `node tools/hashes.ts --check=evidence/ts-refactor/baseline.json` → `hashes: PASS (240 frames identical)`. About 8 minutes; one Chrome. A FAIL means a runtime change slipped in: find it and fix it. Never update the baseline.
 Save the outputs to `evidence/ts-convert-<batch>/proof.txt`.
 
 ## Owns

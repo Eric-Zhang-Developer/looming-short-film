@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-// @ts-check
 // Doc 08 loop for one asset: assemble the five-block prompt, run `codex exec` once per variant
 // in a fresh temp dir, copy each image into assets/raw/, write a thumb + sidecar, print a contact sheet.
-//   node tools/gen.mjs --asset=<name> [--variants=N] [--dry-run]
+//   node tools/gen.ts --asset=<name> [--variants=N] [--dry-run]
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdtempSync, copyFileSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -18,10 +17,11 @@ const args = Object.fromEntries(process.argv.slice(2).map(a => {
   const [k, ...v] = a.replace(/^--/, '').split('=');
   return [k, v.length ? v.join('=') : true];
 }));
-const die = msg => { console.error(`gen: ${msg}`); process.exit(1); };
-if (!args.asset) die('usage: node tools/gen.mjs --asset=<name> [--variants=N] [--dry-run]');
+const die: (msg: string) => never = (msg) => { console.error(`gen: ${msg}`); process.exit(1); };
+if (!args.asset) die('usage: node tools/gen.ts --asset=<name> [--variants=N] [--dry-run]');
 
-const spec = JSON.parse(readFileSync(join(ROOT, 'assets/specs.json'), 'utf8')).find(a => a.name === args.asset);
+type Spec = { name: string; prompt: string; refs: string[]; cap?: number; variants?: number; key?: { name: string; hex: string } };
+const spec = (JSON.parse(readFileSync(join(ROOT, 'assets/specs.json'), 'utf8')) as Spec[]).find(a => a.name === args.asset);
 if (!spec) die(`no asset "${args.asset}" in assets/specs.json`);
 const name = spec.name;
 const CAP = spec.cap ?? CAP_DEFAULT;
@@ -31,11 +31,11 @@ if (!(variants >= 1)) die(`bad --variants: ${args.variants}`);
 
 // Cap: count every generation this asset has, from local raw PNGs and committed sidecars
 // (raw/ is gitignored, so sidecars keep the count honest across worktrees).
-const isMine = f => new RegExp(`^${name}_v\\d+(_\\d+)?\\.(png|json)$`).test(f);
-const ls = d => existsSync(d) ? readdirSync(d) : [];
+const isMine = (f: string) => new RegExp(`^${name}_v\\d+(_\\d+)?\\.(png|json)$`).test(f);
+const ls = (d: string) => existsSync(d) ? readdirSync(d) : [];
 const outputs = new Set([...ls(RAW), ...ls(THUMBS)].filter(isMine).map(f => f.replace(/\.(png|json)$/, '')));
 // One Codex call can generate several images, so count codex_images_generated from each sidecar (1 when absent).
-const gens = o => { try { return JSON.parse(readFileSync(join(THUMBS, `${o}.json`), 'utf8')).codex_images_generated ?? 1; } catch { return 1; } };
+const gens = (o: string): number => { try { return JSON.parse(readFileSync(join(THUMBS, `${o}.json`), 'utf8')).codex_images_generated ?? 1; } catch { return 1; } };
 const used = [...outputs].reduce((n, o) => n + gens(o), 0);
 if (used + variants > CAP)
   die(`REFUSED: ${name} already has ${used} of ${CAP} generations; ${variants} more would exceed the cap. ` +
@@ -43,9 +43,9 @@ if (used + variants > CAP)
 
 // Prompt: shared blocks 1, 2, 4 plus the asset file's "## 3." block and optional "## 5." notes block.
 // A per-asset file with no numbered headings is taken whole as block 3.
-const block = f => readFileSync(join(ROOT, 'assets/prompts/_blocks', f), 'utf8').trim();
+const block = (f: string) => readFileSync(join(ROOT, 'assets/prompts/_blocks', f), 'utf8').trim();
 const assetText = readFileSync(join(ROOT, spec.prompt), 'utf8');
-const section = n => assetText.match(new RegExp(`^## ${n}\\..*?(?=^## \\d\\.|(?![\\s\\S]))`, 'ms'))?.[0].trim();
+const section = (n: number) => assetText.match(new RegExp(`^## ${n}\\..*?(?=^## \\d\\.|(?![\\s\\S]))`, 'ms'))?.[0].trim();
 const assetBlock = section(3) ?? assetText.replace(/^# .*\n/, '').trim();
 const key = spec.key ?? { name: 'green', hex: '#00FF00' };
 const technical = block('technical.md').replaceAll('{KEYNAME}', key.name).replaceAll('{KEYHEX}', key.hex);
@@ -58,13 +58,13 @@ const runPrompt = `${prompt}\n\n## Output\n\n${OUT_LINE}\n`;
 const MAIN = resolve(execFileSync('git', ['rev-parse', '--path-format=absolute', '--git-common-dir'],
   { cwd: ROOT, encoding: 'utf8' }).trim(), '..');
 const refs = spec.refs.map(r => resolve(r.startsWith('reference-videos/') ? MAIN : ROOT, r));
-const codexArgs = run => ['exec', '-C', run, '-s', 'workspace-write', '--json', '--skip-git-repo-check',
+const codexArgs = (run: string) => ['exec', '-C', run, '-s', 'workspace-write', '--json', '--skip-git-repo-check',
   '-o', join(run, 'last_message.txt'), ...refs.flatMap(r => ['-i', r]), '-'];
-const q = s => s.includes('$RUN') ? `"${s}"` : /^[\w./=-]+$/.test(s) ? s : `'${s.replaceAll("'", "'\\''")}'`;
+const q = (s: string) => s.includes('$RUN') ? `"${s}"` : /^[\w./=-]+$/.test(s) ? s : `'${s.replaceAll("'", "'\\''")}'`;
 const firstK = Math.max(0, ...[...outputs].map(o => +(o.match(new RegExp(`^${name}_v${version}_(\\d+)$`))?.[1] ?? 0))) + 1;
 
 if (args['dry-run']) {
-  console.log(`# gen.mjs dry run · ${name} · prompt v${version} · ${variants} variant(s) · ${used}/${CAP} used`);
+  console.log(`# gen.ts dry run · ${name} · prompt v${version} · ${variants} variant(s) · ${used}/${CAP} used`);
   for (const r of refs) if (!existsSync(r)) console.log(`# WARNING: ref missing: ${r} (a live run refuses)`);
   console.log('\n## Assembled prompt (piped on stdin)\n');
   console.log(runPrompt);
@@ -79,7 +79,7 @@ if (args['dry-run']) {
 
 for (const r of refs) if (!existsSync(r)) die(`ref missing: ${r}`);
 mkdirSync(THUMBS, { recursive: true });
-const sha = f => createHash('sha256').update(readFileSync(f)).digest('hex');
+const sha = (f: string) => createHash('sha256').update(readFileSync(f)).digest('hex');
 const refInfo = refs.map(r => ({ file: spec.refs[refs.indexOf(r)], sha256: sha(r) }));
 const thumbs = [];
 
@@ -121,7 +121,7 @@ for (let k = firstK; k < firstK + variants; k++) {
     codex_source_file: [...raw.matchAll(/[~\w/.-]*generated_images\/[\w/.-]+\.png/g)].at(-1)?.[0] ?? null,
     codex_images_generated: new Set(raw.match(/generated_images\/[\w/.-]+\.png/g) ?? []).size,
     codex_run_dir: run,
-    copied_into_workspace_by: `gen.mjs (copied ${images[0]} out of the Codex temp dir)`,
+    copied_into_workspace_by: `gen.ts (copied ${images[0]} out of the Codex temp dir)`,
     usage: events.findLast(e => e.type === 'turn.completed')?.usage ?? null,
     timestamp_start_utc: start,
     timestamp_end_utc: end,

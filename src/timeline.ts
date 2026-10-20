@@ -6,7 +6,7 @@
 // s07, s08 and s10 keep their file names for new shots (bed rot, 3 a.m., the threshold).
 // The climax runs on two grids: the clock's tick at 1 s (s08 from 60.0) and the walk's pulse at 0.5 s (s09c from 84.0),
 // so every lamp, the block, the door push and the light land on whole half-seconds of global time.
-// Durations are written out (not derived) so tools/check_timeline.mjs can catch gaps and overlaps.
+// Durations are written out (not derived) so tools/check_timeline.ts can catch gaps and overlaps.
 export const DURATION = 204;
 
 export type Shot = { id: string; start: number; duration: number; beats: Record<string, number> };

@@ -21,7 +21,7 @@ while read -r kind a b; do
     p=out/parts/new_${a}_${b}.mp4; [ -s $p ] && { echo "== new $a:$b  kept"; continue; }
     echo "== new $a:$b  $(date +%H:%M)"; rm -rf out/frames; mkdir -p out/frames
     for try in 1 2 3; do
-      node render.mjs --page=index.html --frames --range=$a:$b --workers=${WORKERS:-1} < /dev/null 2>&1 | grep -E 'ms/frame|Error' | tail -2 || true
+      node render.ts --page=index.html --frames --range=$a:$b --workers=${WORKERS:-1} < /dev/null 2>&1 | grep -E 'ms/frame|Error' | tail -2 || true
       [ $(ls out/frames | grep -c jpg) -ge $(((b-a)*24)) ] && break
       [ $try = 3 ] && { echo "span $a:$b incomplete after 3 tries"; exit 1; }
     done

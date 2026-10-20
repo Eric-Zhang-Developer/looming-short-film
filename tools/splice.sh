@@ -11,7 +11,7 @@ KEYS=$(ffprobe -v error -select_streams v -skip_frame nokey -show_entries frame=
 for t in $A $([ $B = $DUR ] || echo $B); do echo "$KEYS" | grep -qx "$t.000000" || { echo "$t s is not a keyframe in $M"; exit 1; }; done
 rm -rf out/frames out/splice; mkdir -p out/frames out/splice
 for try in 1 2 3; do
-  node render.mjs --page=index.html --frames --range=$A:$B --workers=1 2>&1 | grep -E 'ms/frame|Error' | tail -2 || true
+  node render.ts --page=index.html --frames --range=$A:$B --workers=1 2>&1 | grep -E 'ms/frame|Error' | tail -2 || true
   [ $(ls out/frames | grep -c jpg) -ge $(((B-A)*24)) ] && break
   [ $try = 3 ] && { echo "span incomplete after 3 tries"; exit 1; }
 done

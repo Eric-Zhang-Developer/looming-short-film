@@ -1,4 +1,4 @@
-// node src/audio/selftest.ts — run after a full `node tools/mix.mjs`. Exits non-zero on the first failure.
+// node src/audio/selftest.ts — run after a full `node tools/mix.ts`. Exits non-zero on the first failure.
 // Checks every cue and score beat resolves, the three lamp clicks are sample-identical in the foley stem and within ±1 LSB in mix.wav,
 // the clock is one buffer, a bed cue with dur/until fills its span, and voices and every foley sound are deterministic and finite.
 // Writes solo WAVs to out/audio/solo/ for spectrograms.

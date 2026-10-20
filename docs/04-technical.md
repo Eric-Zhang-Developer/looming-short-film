@@ -41,7 +41,7 @@ Claude drives Codex `image_gen` through `codex exec` with long, layered prompts 
 - At least 2048 px on the long edge for anything that can fill more than half the frame.
 - Frozen picks live in `assets/frozen/` and are recorded in `assets/generated/manifest.json` (prompt file, reference hashes, model, date, sha256). They're never generated at render time.
 
-**Cutting.** `tools/cut.mjs` (offline, run once per asset):
+**Cutting.** `tools/cut.ts` (offline, run once per asset):
 1. Key out the chroma color to get a rough mask.
 2. Split part sheets into individual parts using bounding boxes listed in a small JSON file per sheet.
 3. Write clean RGB plus mask PNGs to `assets/cut/`. Final alpha comes later from `paper.js`.
@@ -122,7 +122,7 @@ Marston extras are `InstancedMesh` silhouettes cut from 4–6 generated poses, e
 
 - `timeline.js` is the single source of truth: an ordered list of shots, each with `start`, `duration` and named beats (`{ lampClickHome: 0.36 }` in local time). Sound cues reference beat names.
 - One file per shot in `src/shots/`, exporting `build(ctx) → { update(tLocal), dispose?() }` (contract: `docs/contracts.md` §shots).
-- `tools/check_timeline.mjs` (port from KnightHacks): no gaps, no overlaps, total 3:21 ±5 s, every cue resolves.
+- `tools/check_timeline.ts` (port from KnightHacks): no gaps, no overlaps, total 3:21 ±5 s, every cue resolves.
 
 ## Rendering
 
@@ -148,8 +148,8 @@ looming/
   src/paper.js  material.js  lights.js  puppet.js  blob.js  crowd.js  post.js
   src/timeline.js  src/shots/s01_*.js … s18_*.js
   src/audio/                         # synthesis (doc 05)
-  tools/gen.mjs  cut.mjs  check_timeline.mjs  determinism.mjs
-  render.mjs  index.html  package.json
+  tools/gen.ts  cut.ts  check_timeline.ts  determinism.ts
+  render.ts  index.html  package.json
   AGENTS.md  NOW.md  templates/      # orchestration (doc 09)
   tasks/  done/  evidence/  reviews/
   docs/contracts.md                  # contract module interfaces, written before wave 2
@@ -159,7 +159,7 @@ looming/
 
 | From | Take |
 |---|---|
-| `~/code/hackathons/knighthacks-2026-video` | `render.mjs` review and render modes, `tools/check_timeline.mjs`, easing and spring helpers from `src/core.js`, the `emotions()` approach to face takes, `build.py` and `sfx/cues.py` for audio, and `ANIMATION_GUIDE.md`'s timing rules |
+| `~/code/hackathons/knighthacks-2026-video` | `render.ts` review and render modes, `tools/check_timeline.ts`, easing and spring helpers from `src/core.js`, the `emotions()` approach to face takes, `build.py` and `sfx/cues.py` for audio, and `ANIMATION_GUIDE.md`'s timing rules |
 | `~/code/media/1776` | Timeline-as-truth design, seeded `rng.ts`, `selftest` invariants, `audio.ts` synthesis |
 
 Copy what's needed into this repo. Don't import across projects.

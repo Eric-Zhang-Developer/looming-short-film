@@ -1,5 +1,4 @@
-// @ts-check
-// node tools/check_timeline.mjs [--file=path/to/timeline.js]
+// node tools/check_timeline.ts [--file=path/to/timeline.ts]
 // Fails on gaps, overlaps, total outside TARGET ±5 s, duplicate beat names, beats outside their shot.
 // TARGET is the director's runtime: 3:24 (v7-s13: s13 grows 5 → 8 s under the v7 brief's "the director allows small timeline changes"; 3:21 from v6-stacks, he approved "Runtime goes to 3:21" for the stacks walk, 2026-10-18;
 // was 3:15 from G4, 2026-10-15, and 180 before that).
@@ -8,12 +7,11 @@ import { pathToFileURL } from 'node:url';
 
 const arg = process.argv.find((a) => a.startsWith('--file='));
 const file = arg ? resolve(arg.slice(7)) : new URL('../src/timeline.ts', import.meta.url).pathname;
-// @ts-expect-error import() stringifies its specifier, so a file URL object works (spec and Node)
-const { SHOTS, DURATION } = await import(pathToFileURL(file));
+const { SHOTS, DURATION }: typeof import('../src/timeline.ts') = await import(pathToFileURL(file).href);
 
-const errs = [];
-const seen = new Map();
-const rows = [];
+const errs: string[] = [];
+const seen = new Map<string, string>();
+const rows: string[] = [];
 const E = 1e-6;
 const TARGET = 204;
 let end = 0;

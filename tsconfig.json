@@ -12,12 +12,11 @@
     "noEmit": true,
     "skipLibCheck": true,
     "strict": false,
-    "rewriteRelativeImportExtensions": true
+    "rewriteRelativeImportExtensions": true,
+    "types": ["node"]
   },
   "include": [
     "src/**/*.js",
-    "src/globals.d.ts",
-    "render.mjs",
-    "tools/**/*.mjs"
+    "src/globals.d.ts"
   ]
 }

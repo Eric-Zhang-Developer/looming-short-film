@@ -1,8 +1,7 @@
 #!/usr/bin/env node
-// @ts-check
 // Split a sheet into parts: each box's RGBA crop goes to assets/cut/<part>.png.
-//   node tools/cut.mjs --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.json     boxes: { part: [x, y, w, h] }
-//   node tools/cut.mjs --in=... --auto [--boxes=...] [--pad=4] [--min-area=500]           propose boxes from alpha islands, write them, then cut
+//   node tools/cut.ts --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.json     boxes: { part: [x, y, w, h] }
+//   node tools/cut.ts --in=... --auto [--boxes=...] [--pad=4] [--min-area=500]           propose boxes from alpha islands, write them, then cut
 //   --out=<dir> writes parts there instead of assets/cut/ (scratch tests).
 // A sheet with no transparency is keyed first (--key=#FF00FF|#00FF00, default: whichever the corner pixel is nearer, --tol=80):
 // Codex usually returns real alpha, so the key is the fallback doc 08 asks for. Keyed edges are soft-keyed and despilled.
@@ -17,13 +16,13 @@ const args = Object.fromEntries(process.argv.slice(2).map(a => {
   const [k, ...v] = a.replace(/^--/, '').split('=');
   return [k, v.length ? v.join('=') : true];
 }));
-const OUT = args.out ? resolve(/** @type {string} */ (args.out)) : join(ROOT, 'assets/cut');
-const die = msg => { console.error(`cut: ${msg}`); process.exit(1); };
-if (!args.in || (!args.boxes && !args.auto)) die('usage: node tools/cut.mjs --in=<png> (--boxes=<json> | --auto [--boxes=<json>])');
+const OUT = args.out ? resolve(args.out as string) : join(ROOT, 'assets/cut');
+const die = (msg: string): never => { console.error(`cut: ${msg}`); process.exit(1); };
+if (!args.in || (!args.boxes && !args.auto)) die('usage: node tools/cut.ts --in=<png> (--boxes=<json> | --auto [--boxes=<json>])');
 
-const input = resolve(ROOT, /** @type {string} */ (args.in));
+const input = resolve(ROOT, args.in as string);
 const stem = basename(input).replace(/\.\w+$/, '');
-const boxesPath = resolve(ROOT, /** @type {string} */ (args.boxes) ?? `assets/cut/${stem}.boxes.json`);
+const boxesPath = resolve(ROOT, (args.boxes as string) ?? `assets/cut/${stem}.boxes.json`);
 
 // Decode to raw RGBA with ffmpeg (no image library in this repo).
 const [{ width: W, height: H }] = JSON.parse(execFileSync('ffprobe', ['-v', 'error', '-select_streams', 'v:0',
@@ -34,13 +33,13 @@ if (px.length !== W * H * 4) die(`decoded ${px.length} bytes, expected ${W * H *
 let opaque = true;
 for (let i = 3; i < px.length; i += 4) if (px[i] < 255) { opaque = false; break; }
 if (opaque) {
-  const near = (r, g, b, k) => (r - k[0]) ** 2 + (g - k[1]) ** 2 + (b - k[2]) ** 2;
+  const near = (r: number, g: number, b: number, k: number[]) => (r - k[0]) ** 2 + (g - k[1]) ** 2 + (b - k[2]) ** 2;
   const hex = String(args.key ?? (near(px[0], px[1], px[2], [255, 0, 255]) < near(px[0], px[1], px[2], [0, 255, 0]) ? '#FF00FF' : '#00FF00')).replace('#', ''), tol = Number(args.tol ?? 80);
   const K = [0, 2, 4].map(i => parseInt(hex.slice(i, i + 2), 16));
-  const sq = i => (px[i] - K[0]) ** 2 + (px[i + 1] - K[1]) ** 2 + (px[i + 2] - K[2]) ** 2;
+  const sq = (i: number) => (px[i] - K[0]) ** 2 + (px[i + 1] - K[1]) ** 2 + (px[i + 2] - K[2]) ** 2;
   // spill = how much of the key hue a pixel carries: magenta = min(r,b) - g, green = g - max(r,b).
   const magenta = K[0] > 128 && K[2] > 128 && K[1] < 128, green = K[1] > 128 && K[0] < 128 && K[2] < 128;
-  const spill = i => magenta ? Math.min(px[i], px[i + 2]) - px[i + 1] : green ? px[i + 1] - Math.max(px[i], px[i + 2]) : 0;
+  const spill = (i: number) => magenta ? Math.min(px[i], px[i + 2]) - px[i + 1] : green ? px[i + 1] - Math.max(px[i], px[i + 2]) : 0;
   const hard = new Uint8Array(W * H);
   let n = 0, soft = 0;
   for (let p = 0; p < W * H; p++) if (sq(p * 4) < tol * tol) { hard[p] = 1; px[p * 4 + 3] = 0; n++; }
@@ -80,7 +79,7 @@ for (let s = 0; s < cnt.length; s++) {
   const isl = { x0: Infinity, y0: Infinity, x1: -1, y1: -1, area: 0 }, stack = [s];
   label[s] = islands.length;
   while (stack.length) {
-    const c = stack.pop(), cx = c % gw, cy = (c / gw) | 0;
+    const c = stack.pop()!, cx = c % gw, cy = (c / gw) | 0;
     isl.area += cnt[c];
     for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
       const nx = cx + dx, ny = cy + dy, n = ny * gw + nx;
@@ -89,7 +88,7 @@ for (let s = 0; s < cnt.length; s++) {
   }
   islands.push(isl);
 }
-const islandAt = (x, y) => label[((y / C) | 0) * gw + ((x / C) | 0)];
+const islandAt = (x: number, y: number) => label[((y / C) | 0) * gw + ((x / C) | 0)];
 // Exact pixel bounds per island (any alpha, so faint edge pixels count too).
 for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
   if (!px[(y * W + x) * 4 + 3] || islandAt(x, y) < 0) continue;
@@ -97,7 +96,7 @@ for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
   t.x0 = Math.min(t.x0, x); t.x1 = Math.max(t.x1, x); t.y0 = Math.min(t.y0, y); t.y1 = Math.max(t.y1, y);
 }
 
-let boxes;
+let boxes: Record<string, [number, number, number, number]>;
 if (args.auto) {
   // Islands smaller than --min-area opaque px are dropped as specks.
   const minArea = Number(args['min-area'] ?? 500), pad = Number(args.pad ?? 4);

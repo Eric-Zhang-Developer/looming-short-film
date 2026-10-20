@@ -8,7 +8,7 @@
 
 ## How it was checked
 <Each acceptance item from the brief, with the evidence path or the command and its output. Write `not verified` and what's missing where you couldn't check.>
-- [x] Runs 0:00–0:14: `node tools/check_timeline.mjs` → `ok (18 shots, 180.2s)`
+- [x] Runs 0:00–0:14: `node tools/check_timeline.ts` → `ok (18 shots, 180.2s)`
 - [x] Pool size: see `evidence/<id>/crop_after.jpg`
 - [ ] Matches shot 6 hand path: **not verified**, shot 6 not built yet
 

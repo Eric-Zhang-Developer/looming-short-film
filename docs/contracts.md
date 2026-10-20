@@ -41,17 +41,17 @@ export function exposeForRender(stage, { duration, fps = 24 })
   // sets window.renderFrame = stage.renderFrame and window.LOOMING = { duration, fps, ready }
 ```
 
-## `render.mjs` (task `mod-render`)
+## `render.ts` (task `mod-render`)
 
 A port of the KnightHacks `render.mjs` for three.js pages. It serves the repo root over local HTTP (ES modules don't load from file://) and drives Chrome via puppeteer-core.
 
 ```
-node render.mjs --page=index.html --sheet=0,0.5,1 [--cols=4] [--w=480] --out=evidence/<id>/sheet.jpg
-node render.mjs --page=... --strip=0:0.5 [--cols=6] [--w=320] --out=...
-node render.mjs --page=... --stills=0.5,4 --out=evidence/<id>/      (full-res PNG per time)
-node render.mjs --page=... --crop=x,y,w,h --sheet=... --out=...
-node render.mjs --page=index.html --frames [--range=a:b] --workers=4    → out/frames (resumable)
-node render.mjs --encode --out=out/film.mp4 [--audio=out/mix.wav]
+node render.ts --page=index.html --sheet=0,0.5,1 [--cols=4] [--w=480] --out=evidence/<id>/sheet.jpg
+node render.ts --page=... --strip=0:0.5 [--cols=6] [--w=320] --out=...
+node render.ts --page=... --stills=0.5,4 --out=evidence/<id>/      (full-res PNG per time)
+node render.ts --page=... --crop=x,y,w,h --sheet=... --out=...
+node render.ts --page=index.html --frames [--range=a:b] --workers=4    → out/frames (resumable)
+node render.ts --encode --out=out/film.mp4 [--audio=out/mix.wav]
 ```
 
 The default page is `index.html` (the film). The default fps comes from `window.LOOMING.fps`. Evidence images are written as JPEG unless the name ends in `.png`.
@@ -59,10 +59,10 @@ The default page is `index.html` (the film). The default fps comes from `window.
 ## `tools/` (tasks `mod-render`, `mod-timeline`, `tool-gen`)
 
 ```
-node tools/determinism.mjs --page=<html> --t=0.5,4     renders each t twice, prints sha256s and pass/fail
-node tools/check_timeline.mjs                          gaps, overlaps, total 195 s ±5, every beat/cue resolves
-node tools/gen.mjs --asset=<name> [--variants=3]       doc 08 loop: fresh temp dir, codex exec, copy to assets/raw/, thumb + sidecar
-node tools/cut.mjs --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.json   → assets/cut/<part>.png
+node tools/determinism.ts --page=<html> --t=0.5,4     renders each t twice, prints sha256s and pass/fail
+node tools/check_timeline.ts                          gaps, overlaps, total 195 s ±5, every beat/cue resolves
+node tools/gen.ts --asset=<name> [--variants=3]       doc 08 loop: fresh temp dir, codex exec, copy to assets/raw/, thumb + sidecar
+node tools/cut.ts --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.json   → assets/cut/<part>.png
 ```
 
 ## `src/timeline.js` (task `mod-timeline`)
@@ -279,7 +279,7 @@ export const CUES    // [{ beat: 'lampClickHome', sound: 'lampClick', gain: 0.8 
 Added by `contract-sensor`: `FOLEY.sensorWake(seed)` is the motion sensor's wake, 0.65 s: a relay clack on the beat (lampClick's snap pitched down, with a metallic tail), ticks at +0.042 and +0.167, a glassy ping at +0.292, and the tube's 120 Hz hum rising under it to the bed's level. Its peak is 0.5, under `lampClick`'s 0.57. It is cued once each on `sensorWakeMarston` (s15) and `sensorWakeFreshman` (s18), same seed and gain, so the two are sample-identical; there is none on `sensorWakeNeighbor`. `lampOffHome` now has the `lampClick` too, so the home lamp's two clicks are identical. Beds that stop for a click come back at +0.3 s, or at +0.65 s for a wake (the `ON()` helper in `cues.js`; the off click's window is 0.17 s). `src/audio/selftest.js` checks both pairs in `foley.wav` and `mix.wav`.
 
 ```
-node tools/mix.mjs [--range=a:b]   → out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav,
+node tools/mix.ts [--range=a:b]   → out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav,
                                      loudness-normalized to -14 LUFS (ffmpeg loudnorm), prints measured LUFS and true peak
                                      Music stem: fixed +5 dB into a -6 dBFS sample-peak limiter (written post-limiter).
                                      loudnorm is linear (one gain for the file; LRA gate off), so identical cues stay
@@ -316,7 +316,7 @@ export function createFilm(stage)  // stage from createStage(); its own scene an
   //   renderFrame(t): shotAt(t), build or reuse that shot, update(tLocal), run its onFrame fns with t, draw it
 ```
 
-`index.html` creates the stage and the film and calls `exposeForRender(film, { duration: DURATION, fps: 24 })`, so `render.mjs` (`--sheet`, `--strip`, `--frames`) and `tools/determinism.mjs` work on the whole film. Rendering t out of order (t = 170, then 3) gives the same pixels as in order.
+`index.html` creates the stage and the film and calls `exposeForRender(film, { duration: DURATION, fps: 24 })`, so `render.ts` (`--sheet`, `--strip`, `--frames`) and `tools/determinism.ts` work on the whole film. Rendering t out of order (t = 170, then 3) gives the same pixels as in order.
 
 ## `src/assets.js` (task `mod-film`)
 
@@ -340,7 +340,7 @@ load(name)  // → { pieces, sizes, visible, proxy }
   // visible: { pieceName: [u0, v0, u1, v1] }: the box around the bitmap's opaque pixels (alpha ≥ 128), in uv, v down
 ```
 
-- **`sizes[piece]` puts the visible shape at the PIECES size,** for proxies and frozen art alike. Bitmaps carry a transparent border (the proxy margin, `cut.mjs`'s `--pad`), so `sizes` is the whole bitmap's size, scaled so its opaque box spans the PIECES size along the PIECES long axis. It has the bitmap's own aspect, because `makePaper` never stretches art: it is exactly the sheet `makePaper` makes. The short axis follows the art (the torso proxy is drawn 0.9 of its box wide). Checked in `evidence/rig-legs/sizes.txt`: torn shapes within 1.4 % of PIECES on the long axis, proxy and fake frozen piece (the tear's own wobble), against 6.3 % short before.
+- **`sizes[piece]` puts the visible shape at the PIECES size,** for proxies and frozen art alike. Bitmaps carry a transparent border (the proxy margin, `cut.ts`'s `--pad`), so `sizes` is the whole bitmap's size, scaled so its opaque box spans the PIECES size along the PIECES long axis. It has the bitmap's own aspect, because `makePaper` never stretches art: it is exactly the sheet `makePaper` makes. The short axis follows the art (the torso proxy is drawn 0.9 of its box wide). Checked in `evidence/rig-legs/sizes.txt`: torn shapes within 1.4 % of PIECES on the long axis, proxy and fake frozen piece (the tear's own wobble), against 6.3 % short before.
 - A rig or shot placing a pivot in the visible shape maps it into the bitmap with `visible`: `u = u0 + u_shape · (u1 − u0)`, the same for v. `characters/` does this for every part.
 - `s01` pads its proxies locally on top of this; its final pass should drop that pad.
 

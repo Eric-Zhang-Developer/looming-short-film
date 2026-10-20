@@ -30,9 +30,9 @@ Every subagent reads this page first. The docs and your brief are the source of 
 - Two failed fixes for the same problem? Write down what both assumed before trying a third. After three, stop and report it as blocked.
 
 ## Rendering and running
-- Contact sheet: `node render.mjs --sheet=<times> --out=evidence/<id>/sheet.jpg`
-- Motion strip: `node render.mjs --strip=<a>:<b> --out=evidence/<id>/strip.jpg`
-- Checks: `node tools/check_timeline.mjs` and `node tools/determinism.mjs --t=<times>`
+- Contact sheet: `node render.ts --sheet=<times> --out=evidence/<id>/sheet.jpg`
+- Motion strip: `node render.ts --strip=<a>:<b> --out=evidence/<id>/strip.jpg`
+- Checks: `node tools/check_timeline.ts` and `node tools/determinism.ts --t=<times>`
 - Never start a full-film render. The orchestrator schedules those.
 
 ## If you are a painter

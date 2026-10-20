@@ -1,4 +1,4 @@
-// What a Looming page exposes to render.mjs and tools/lib/page.mjs (src/core/stage.js exposeForRender).
+// What a Looming page exposes to render.ts and tools/lib/page.ts (src/core/stage.js exposeForRender).
 interface Window {
   renderFrame(t: number): void | Promise<void>;
   LOOMING?: { duration: number; fps: number; ready: Promise<unknown> };

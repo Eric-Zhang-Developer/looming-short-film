@@ -1,8 +1,8 @@
 // Cue sheet: sounds placed by beat name (src/timeline.js), never by raw time. Moving a beat moves its sound.
-// stem: 'foley' (default) | 'ambience' | 'music'. seed: defaults to seedOf(sound) in tools/mix.mjs,
+// stem: 'foley' (default) | 'ambience' | 'music'. seed: defaults to seedOf(sound) in tools/mix.ts,
 // so the two lamp clicks share one seed and are sample-identical (doc 05).
 // offset: seconds after the beat (may be negative, default 0); the cue starts at beat(beat) + offset.
-// Length (beds): dur in seconds, or until: '<beatName>' (runs from the cue's start to that beat). tools/mix.mjs passes it
+// Length (beds): dur in seconds, or until: '<beatName>' (runs from the cue's start to that beat). tools/mix.ts passes it
 // as FOLEY[sound](seed, dur); with neither, the sound plays at its default length.
 //
 // A point is [beatName, offsetSeconds]. bed() runs a bed from one point to another, so a bed that stops 0.5 s before a
@@ -28,7 +28,7 @@ const ON = (b: string): Point => [b, 0.3];
 const dB = (x: number) => 10 ** (x / 20);
 const GAIN = { jarClink: 0.4, cartonSlosh: 0.5, tvBloops: 0.4, winJingle: 0.3, roommateStep: 0.4, rodSnap: 0.2, cardTap: 0.4, cs2: dB(-30) };
 // v7, s07's reels: [file in assets/raw/reels/, in-point in the clip (s), from, to (s07 local s)]. Third-party audio: the
-// clips are gitignored and never committed; without them tools/mix.mjs leaves these cues silent and says so. The in-points
+// clips are gitignored and never committed; without them tools/mix.ts leaves these cues silent and says so. The in-points
 // are each clip's first onset (by waveform; nobody has listened yet), so retime them here by ear. Director: four reels,
 // 2-4 s each; two before the reminder, two after. The cuts are the flicks; when the picture is reworked, its flicks
 // follow this table. (Deoy-54x6aJ, the fifth clip given, is unused: the quietest and flattest of the five.)
@@ -148,7 +148,7 @@ export const CUES: Cue[] = [
   // The lamp clicks: the identical lampClick, same seed and gain, three times. s06's on and off, and v4's nightstand lamp in
   // s09a (Q17): the click that chose the dark is the click that leaves. One seed, one gain (doc 05). snd-v4 lowered the shared
   // gain 0.8 → 0.6: it is the premix's true peak, and the v4 cut's quieter body needs it 2.5 dB lower to fit -16 LUFS / -4 dBTP
-  // (tools/mix.mjs). It is still the loudest transient: the master limiter's ceiling is its peak.
+  // (tools/mix.ts). It is still the loudest transient: the master limiter's ceiling is its peak.
   { beat: 'lampClickHome', sound: 'lampClick', gain: 0.6 },
   { beat: 'lampOffHome', sound: 'lampClick', gain: 0.6 },
   { beat: 'lampOn', sound: 'lampClick', gain: 0.6 },
@@ -160,7 +160,7 @@ export const CUES: Cue[] = [
   ...REELS.map(([, , o], k) => ({ beat: 'bedRot', offset: o, sound: 'scrollTick', gain: dB(-22), seed: 1 + k })),
   // v7: the doom scroll. Real Reels audio (the director's clips) out of the phone, each cut hard by the next flick, so
   // it plays as scrolling. Quiet for the 7-hours reminder (6.25-7.75: the chime, the swipe, the gulp), then
-  // straight back to the feed, and cut dead by s08's hard cut to the lone tick at 60.0. tools/mix.mjs decodes them
+  // straight back to the feed, and cut dead by s08's hard cut to the lone tick at 60.0. tools/mix.ts decodes them
   // through a phone-speaker band and levels each window to one RMS.
   ...REELS.map(([file, inSec, from, to]) => ({ beat: 'bedRot', offset: from, dur: to - from, sound: 'clip', file, in: inSec, gain: dB(-24) })),
   // s08, new: his breath, nasal, -24 dB, phased to the picture as built (climax-a1): in at 65.67, out at 67.25, in at 68.75

@@ -10,7 +10,7 @@ while true; do
   line="$(date +%H:%M:%S) disk ${free_gb}G free · swap ${swap_mb}M · mem free ${memfree}% · headless $(pgrep -f -- '--headless' | wc -l | tr -d ' ')"
   (( n++ % 15 == 0 )) && echo "$line" >> $LOG
   if (( free_gb < MIN || (swap_mb > MAX && memfree < MEM) )); then
-    pkill -f -- '--headless'; pkill -f 'render.mjs|measure.mjs'
+    pkill -f -- '--headless'; pkill -f 'render.ts|measure.mjs'
     echo "TRIP $line: killed headless Chrome and renders" | tee -a $LOG; exit 1
   fi
   (( memfree < 8 )) && echo "WARN $line" >> $LOG

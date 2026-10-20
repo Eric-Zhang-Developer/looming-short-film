@@ -3,11 +3,11 @@
 # cut frozen art, mix audio, render 30 s chunks (encode, then delete their frames), concat, 720p copy.
 #   tools/render_film.sh <name> [crf=18]   →  out/<name>.mp4, out/<name>_720p.mp4
 #   RESUME=1 tools/render_film.sh <name>   keeps finished chunks and frames from a crashed run of the SAME cut.
-# A chunk whose frames come up short (a Chrome crash) is retried twice; render.mjs --frames skips frames on disk.
+# A chunk whose frames come up short (a Chrome crash) is retried twice; render.ts --frames skips frames on disk.
 set -e
 NAME=${1:?name}; CRF=${2:-18}; cd ${0:A:h}/..
-for f in assets/cut/*.boxes.json; do k=$(basename $f .boxes.json); [ -f assets/frozen/$k.png ] && node tools/cut.mjs --in=assets/frozen/$k.png --boxes=$f >/dev/null; done
-node tools/mix.mjs | tail -1
+for f in assets/cut/*.boxes.json; do k=$(basename $f .boxes.json); [ -f assets/frozen/$k.png ] && node tools/cut.ts --in=assets/frozen/$k.png --boxes=$f >/dev/null; done
+node tools/mix.ts | tail -1
 DUR=$(node -e "import('./src/timeline.ts').then(m=>console.log(m.DURATION))")
 [ -n "$RESUME" ] || rm -rf out/frames out/chunks; mkdir -p out/chunks out/frames; : > out/chunks/list.txt
 a=0
@@ -17,7 +17,7 @@ while [ $a -lt $DUR ]; do
   if [ -n "$RESUME" ] && [ -s $out ]; then echo "== chunk $a:$b  kept"; echo "file '$(basename $out)'" >> out/chunks/list.txt; a=$b; continue; fi
   echo "== chunk $a:$b  free $(df -g / | awk 'NR==2{print $4}') GB  $(date +%H:%M)"
   for try in 1 2 3; do
-    node render.mjs --page=index.html --frames --range=$a:$b --workers=1 2>&1 | grep -E 'ms/frame|Error' | tail -2 || true
+    node render.ts --page=index.html --frames --range=$a:$b --workers=1 2>&1 | grep -E 'ms/frame|Error' | tail -2 || true
     [ $(ls out/frames | grep -c jpg) -ge $n ] && break
     [ $try = 3 ] && { echo "chunk $a incomplete after 3 tries"; exit 1; }
     echo "   chunk $a short ($(ls out/frames | grep -c jpg)/$n frames), retry $try"
