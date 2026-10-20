@@ -1,14 +1,15 @@
 // Single source of timing truth (contracts.md). Data only: no clocks, no rendering.
 // The v4 cut (spec-v4, story approved by the director 2026-10-17): 3:15; v6 adds s10b (the stacks, 6 s): 3:21; v7 grows s13
 // from 5 s to 8 s (v3's music-timed shadows, then the turn): 3:24. v8 (docs/notes/v8-beats.md): s03's flinch +3,
-// s16's relapse +10, s10b −2, s17 −4, s17c −1: 3:30. Shots and beats from docs/02-story.md's beat
+// s16's relapse +10, s10b −2, s17 −4, s17c −1: 3:30. v9 (docs/notes/v9-beats.md §1): s18's fade runs 2 s (s18 20 → 21),
+// then the closing sequence: title, Seneca, two credit cards, the sting: 3:47. Shots and beats from docs/02-story.md's beat
 // sheet and docs/shots/sNN.md (local seconds); a letter after a number means a shot added after the numbering froze
 // (s00 before s01; s09a-c after s08; s10b after s10; s17b after s17). Cut since G4: s09 (Marston exterior), s12 (quiet 1), s14 (custodian);
 // s07, s08 and s10 keep their file names for new shots (bed rot, 3 a.m., the threshold).
 // The climax runs on two grids: the clock's tick at 1 s (s08 from 60.0) and the walk's pulse at 0.5 s (s09c from 84.0),
 // so every lamp, the block, the door push and the light land on whole half-seconds of global time.
 // Durations are written out (not derived) so tools/check_timeline.ts can catch gaps and overlaps.
-export const DURATION = 210;
+export const DURATION = 227;
 
 export type Shot = { id: string; start: number; duration: number; beats: Record<string, number> };
 
@@ -36,7 +37,13 @@ export const SHOTS: Shot[] = [
   { id: 's17',  start: 166, duration: 8,  beats: { quiet2Start: 0, dawnBird1: 3, dawnBird2: 6 } },   // 2:46
   { id: 's17b', start: 174, duration: 10, beats: { examRoom: 0, testRecognise: 4, testSmile: 5.5, testSolved: 9.5 } }, // 2:54
   { id: 's17c', start: 184, duration: 6,  beats: { gradeSlide: 0.5, gradeReveal: 2, gradeGrin: 4 } },   // 3:04
-  { id: 's18',  start: 190, duration: 20, beats: { examCrossedOff: 2, blobAbsorbed: 5.5, lampSitBack: 7.5, newDate: 12.5, dropQuivers: 14, tagPenUncap: 16.5 } }, // 3:10 → 3:30
+  { id: 's18',  start: 190, duration: 21, beats: { examCrossedOff: 2, blobAbsorbed: 5.5, lampSitBack: 7.5, newDate: 12.5, dropQuivers: 14, tagPenUncap: 16.5 } }, // 3:10 → 3:31 (v9: the fade is 19–21)
+  // v9, the closing sequence: cards on hard cuts, each with a card tap (cues.ts), the theme on felt piano under them (score.ts).
+  { id: 's19',  start: 211, duration: 2.5, beats: { titleCard: 0, titleDotQuivers: 0.8 } },         // 3:31 Looming
+  { id: 's20',  start: 213.5, duration: 3.5, beats: { senecaCard: 0 } },                             // 3:33.5 the quote
+  { id: 's21',  start: 217, duration: 3, beats: { creditCardA: 0 } },                                // 3:37 card A
+  { id: 's22',  start: 220, duration: 4, beats: { creditCardB: 0 } },                                // 3:40 card B
+  { id: 's23',  start: 224, duration: 3, beats: { stingBuzz: 0.3, stingShadow: 0.8, stingLookUp: 1.9, stingFlip: 2.3, stingLook: 2.5 } }, // 3:44 the sting → 3:47
 ];
 
 // s13's cascade, the one place its timing lives: for each crowd desk, when its phone wakes (its shadow springs up) and

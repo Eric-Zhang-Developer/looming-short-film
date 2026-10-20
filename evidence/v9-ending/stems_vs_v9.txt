@@ -1,0 +1,3 @@
+music: 0–209 s max |diff| 0; first difference after 209: none up to 210
+foley: 0–209 s max |diff| 0; first difference after 209: none up to 210
+ambience: 0–209 s max |diff| 0; first difference after 209: none up to 210

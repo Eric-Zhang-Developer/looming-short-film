@@ -1,0 +1,17 @@
+    322 cues, 303 score events
+ok  every cue and score event hangs on a beat the v4 timeline has
+    lampClickHome@43.5s, lampOffHome@46s, lampOn@77s; 12960 samples each (-0.1…+0.17 s), peak 0.4234, tail past 0.17 s 0.061% of peak
+ok  three lamp clicks (s06 on, s06 off, s09a nightstand) are sample-identical in out/audio/stems/foley.wav
+    48 ticks, 9…209 s
+ok  the clock is one buffer: clockTick ignores its seed, and every tick cue sits on a whole second of global time
+    penUncap@133.50s, tagPenUncap@206.50s; 12000 samples each, peak 0.4704
+ok  the 2 penUncaps are one seed and gain, sample-identical in foley.wav
+    notifyBuzz@0.50s, notifyBuzz+1.5@2.00s, stingBuzz@224.30s; 15840 samples each, peak 0.3500
+ok  the 3 phoneBuzzs are one seed and gain, sample-identical in foley.wav
+    27 bed cues sound at both ends of their spans
+ok  every bed cue with a length sounds at both ends of its own span
+ok  voices and foley are deterministic and finite
+ok  every foley sound renders, deterministic and finite
+    max diff vs lampClickHome [0,1,1] LSB over 8160 samples each, peak 17892 LSB
+ok  the three lamp clicks are identical within ±1 LSB in out/audio/mix.wav (over the first 0.17 s)
+wrote /Users/ericzhang/code/media/looming/.claude/worktrees/agent-a79b107fb8b0da247/out/audio/solo/{lampclick,clocktick,piano_c4}.wav (19200, 146400 samples)

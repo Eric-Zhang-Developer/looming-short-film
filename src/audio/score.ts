@@ -28,6 +28,7 @@ const THEME = [60, 64, 69, 67, 64, 65, 62];
 const HARM = [[36, 43, 52], [40, 48], [41, 48, 57], [40, 48, 55], [45, 52], [38, 45, 53], [43, 50, 55, 60]];
 const G7 = [43, 50, 53, 59];
 
+const CARD_GAIN = 0.5;   // v9: the closing cards' piano, -6 dB (see the cards below)
 const ev = (beatName: string, at: number, voice: Voice, midi: ScoreEvent['midi'], o: EvOpts = {}): ScoreEvent => ({ beat: beatName, at, voice, midi, ...o });
 const exam = (beatName: string, at: number, o: EvOpts) => EXAM.map(([m, dt]) => ev(beatName, at + dt, 'box', m, { motif: 'exam', ...o }));
 // The gulp (doc 05): the motif's first two notes (its rising third), k semitones down for gulp k, the second 0.275 s later
@@ -250,6 +251,20 @@ export const SCORE: ScoreEvent[] = [
   ev('tagPenUncap', 1.25, 'box', 72, { vel: 0.35, dur: 1.6, motif: 'exam-resolved' }),
   ev('tagPenUncap', 1.917, 'piano', [36, 43, 52, 60, 67, 76], { vel: 0.42, dur: 1.6, gain: 0.35, motif: 'chord' }),
   ev('tagPenUncap', 1.917, 'pad', [48, 55, 64, 72], { dur: 1.2, attack: 0.3, release: 1.2, gain: 0.35, motif: 'chord' }),
+
+  // 3:31–3:44 v9, the closing cards (docs/notes/v9-beats.md §1): the theme on felt piano, softly, s11's statement level,
+  // one note a second over its chords, at CARD_GAIN: alone on the cards, at full gain the phrase measured -15 dBFS RMS in
+  // mix.wav against the tag's -22 (it rode the music limiter), so -6 dB puts it level with the scene it follows. The title states its first two notes (the leaps' start, C then E); E's chord rings
+  // on through Seneca, which is read in silence but for it. Card A picks the phrase up (A G E), card B carries it to the
+  // dominant (F, then D over G7) and lands it on C, home, ringing out before the sting's buzz.
+  ...([['titleCard', 0.25, 0, 1, HARM[0]], ['titleCard', 1.25, 1, 4.5, HARM[1]],
+    ['creditCardA', 0.25, 2, 1, HARM[2]], ['creditCardA', 1.25, 3, 1, HARM[3]], ['creditCardA', 2.25, 4, 1.4, HARM[4]],
+    ['creditCardB', 0.25, 5, 1, HARM[5]], ['creditCardB', 1.25, 6, 1.2, G7]] as [string, number, number, number, number[]][]).flatMap(([b, at, k, dur, chord]) => [
+    ev(b, at, 'piano', THEME[k], { vel: 0.38, dur, gain: CARD_GAIN, motif: 'theme' }),
+    ev(b, at, 'piano', chord, { vel: 0.3, dur, gain: CARD_GAIN }),
+  ]),
+  ev('creditCardB', 2.5, 'piano', 60, { vel: 0.4, dur: 1.4, gain: CARD_GAIN, motif: 'theme' }),
+  ev('creditCardB', 2.5, 'piano', [36, 43, 52, 55], { vel: 0.32, dur: 1.4, gain: CARD_GAIN }),
 ];
 
 // Music sits under the foley: the lamp click (about -5 dBFS in the foley stem) stays the loudest transient.

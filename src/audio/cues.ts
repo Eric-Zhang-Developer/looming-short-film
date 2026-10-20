@@ -20,7 +20,12 @@ const AMB = 'ambience';
 const START: Point = ['notifyBuzz', -beat('notifyBuzz')];                // 0:00. s00's only beat
 const S01: Point = ['notifyBuzz', 4 - beat('notifyBuzz')];                // 0:04, s01 has no beat of its own
 const S18: Point = ['examCrossedOff', -2];                                 // 2:55, s18 @ 0
-const END: Point = ['tagPenUncap', DURATION - beat('tagPenUncap')];        // 3:15
+const END: Point = ['stingBuzz', DURATION - beat('stingBuzz')];            // 3:47, the film's last sample
+// v8's end, 3:30. s18's beds still stop here, as in v8, and not at the cards (3:31): a bed is synthesized for its length,
+// so moving its end would change every sample of it back to its start (paperBoil's runs from 1:17). The second of black
+// before the title is silent, which the fade wants anyway.
+const V8_END: Point = ['tagPenUncap', 210 - beat('tagPenUncap')];
+const S23: Point = ['stingBuzz', -0.3];                                   // 3:44, the sting: his room again
 // Doc 05: every lamp click is dry and exposed. Beds stop on it and come back after its window (the music stem does the
 // same in score.ts), which is also what keeps the three clicks identical in mix.wav. A lamp click is 0.3 s.
 const ON = (b: string): Point => [b, 0.3];
@@ -64,7 +69,8 @@ export const CUES: Cue[] = [
   bed('paperBoil', AMB, START, ['lampClickHome'], 1),
   bed('paperBoil', AMB, ON('lampClickHome'), ['lampOffHome'], 1),
   bed('paperBoil', AMB, ['lampOffHome', 0.17], ['lampOn'], 1),
-  bed('paperBoil', AMB, ON('lampOn'), END, 1),
+  bed('paperBoil', AMB, ON('lampOn'), V8_END, 1),
+  bed('paperBoil', AMB, S23, END, 1, { seed: 2 }),
   // Room tone: s00 at its lowest, s01-s03 morning, then 3 dB down from laptopUp; the lobby's warm hush from lightFlood
   // (very faint) to Quiet 2; Quiet 2; s18's home.
   bed('roomTone', AMB, START, S01, 0.4),
@@ -72,7 +78,9 @@ export const CUES: Cue[] = [
   bed('roomTone', AMB, ['laptopUp'], ['fridge'], 0.7),
   bed('roomTone', AMB, ['lightFlood'], ['quiet2Start'], 0.5),
   bed('roomTone', AMB, ['quiet2Start'], ['examRoom'], 1),
-  bed('roomTone', AMB, S18, END, 1),
+  bed('roomTone', AMB, S18, V8_END, 1),
+  // v9: the cards play over the piano alone (s20 is read in silence but for its last chord); the sting is his room at night.
+  bed('roomTone', AMB, S23, END, 1, { seed: 2 }),
   // v4, new: the night room (nightHum, a darker room tone) in bed (s07), very low at 3 a.m. (s08) and through the choice
   // (s09a), out for the nightstand lamp's click, to the door. Then the hall (hallHum: +6 dB over 0.5 s on doorOpen) to the
   // walk, the campus night air to the light, and the lobby's distant fluorescent hum at -24 dB from the light to the exam room.
@@ -269,6 +277,15 @@ export const CUES: Cue[] = [
   { beat: 'tagPenUncap', sound: 'penUncap', gain: 0.7 },
   { beat: 'tagPenUncap', offset: 1.25, sound: 'inkDrip', gain: 0.3, seed: 32 },               // v6-ending: the drop lands on the nib (s18 17.75), a soft plip
   { beat: 'tagPenUncap', offset: 1.917, sound: 'penStroke', dur: 0.42, gain: 0.45, seed: 6 },  // v6-ending: "1." in its ink (18.42–18.83)
+  // ───────── v9-ending (docs/notes/v9-beats.md §1) ─────────
+  // A card tap on each card's hard cut (s19-s22): the film's cardstock thud, s09a's level, its own seed per card.
+  ...['titleCard', 'senecaCard', 'creditCardA', 'creditCardB'].map((b, k) => ({ beat: b, sound: 'cardTap', gain: GAIN.cardTap, seed: 60 + k })),
+  // s23, the sting: s00's buzz (the same buffer, so the film's first sound is its last joke), then s16's Reel from its
+  // build (the same clip and in-point, through the phone band), cut dead on the face-down flip, which is s16's card tap
+  // (phoneDownLib's seed). The clip starts as the buzz's 0.33 s ends, so the buzz stays sample-identical to s00's.
+  { beat: 'stingBuzz', sound: 'phoneBuzz', gain: 0.7 },
+  { beat: 'stingBuzz', offset: 0.35, dur: beat('stingFlip') - beat('stingBuzz') - 0.35, sound: 'clip', file: 'DepVdpeJdCN', in: 1.05, gain: dB(-24) },
+  { beat: 'stingFlip', sound: 'cardTap', gain: GAIN.cardTap, seed: 2 },
   // ───────── snd-foley-2 ─────────
   // s04 (v7-fridge): the fridge loop's door, from sounds already here, mirroring s04.ts OPENS. Open at 0.17, 2.5, 4.67: the
   // seal peeling and the door swinging to its stop (paperSlide), the jars in the door ticking together. Shut at 1.58, 3.83:

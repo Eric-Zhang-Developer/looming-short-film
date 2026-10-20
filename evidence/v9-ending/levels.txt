@@ -1,0 +1,8 @@
+s18 tag 200-209        rms -21.9 dBFS  peak -5.3 dBFS
+s19 title              rms -21.8 dBFS  peak -7.2 dBFS
+s20 Seneca             rms -30.6 dBFS  peak -12.6 dBFS
+s21 card A             rms -20.0 dBFS  peak -6.6 dBFS
+s22 card B             rms -19.2 dBFS  peak -5.4 dBFS
+s23 sting              rms -18.7 dBFS  peak -7.0 dBFS
+s23 0.65-2.3 (Reel)    rms -21.5 dBFS  peak -7.1 dBFS
+s23 after flip         rms -41.6 dBFS  peak -26.1 dBFS

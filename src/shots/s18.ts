@@ -30,16 +30,19 @@ const F = (n: number) => n / 12, fr = (t: number) => Math.floor(t * 12 + 1e-6);
 const B = SHOTS.find((s) => s.id === ID)!.beats;   // examCrossedOff 2, blobAbsorbed 5.5, lampSitBack 7.5, newDate 12.5, dropQuivers 14, tagPenUncap 16.5
 // v4 (20 s): W 0–3, I 3–7, W 7–10 (he sits back under the lamp: lampSitBack 7.5), I2 10–14.5, W 14.5–20, the fade 19–20. Every G4 time from 7.0 is +3.0.
 const CUT_I = 3, CUT_SIT = 7, CUT_I2 = 10, CUT_W = 14.5, FADE = 19;
+// v9 (docs/notes/v9-beats.md §1): the fade runs 2 s, 19–21, on 1s, and is slow on the "1.": brightness 1 − u² over its 48
+// frames (an ease-in), so the mark holds near full for the first second and the dark comes in the second. Frame 47 (20.958) is black.
+const FADE_N = 48;
 
 // ---------- tunables ----------
 const BLOB_R = { start: 0.004, examCrossedOff: 0.0015 };   // SHRINK[7] → SHRINK[8], the dot (README §1); soaks away at blobAbsorbed
 const BEAD = 0.17;                                           // the tag's new drop: s02's bead, 0.17 of a 1× (r 0.012) blob
-const LAMP_I = 0.035, AMB = 1.25, FACE_I = 0.008;            // the lamp on (constant), v4: a daytime ambient (2.5× G4's 0.5), warm character fill
+export const LAMP_I = 0.035; const AMB = 1.25, FACE_I = 0.008;            // the lamp on (constant), v4: a daytime ambient (2.5× G4's 0.5), warm character fill
 const DAY_I = 0.8;                                           // v4: pale window light from the right, an ordinary afternoon (no shadow: the lamp is still the key)
 // v3: the lamp stands 8.5 mm off the wall (15 cm real), in front of the calendar's curled lip, and its bulb is inside the
 // shade (the bell's own axis), not 16 mm out in front of it as in v2. A bulb at the shade means the pool is a real raking light.
-const LAMP_Z = 0.0085;
-const LAMP_AT: Vec3 = [DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005], LAMP_AIM: Vec3 = [0.036, 0.020, 0.0035];
+export const LAMP_Z = 0.0085;
+export const LAMP_AT: Vec3 = [DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005], LAMP_AIM: Vec3 = [0.036, 0.020, 0.0035];
 const STAIN = [1.0, 0.4];                                  // the soak's trace: opacity at the bloom, and the trace it leaves
 // Cameras: s02's W and I (copied from s02.ts, which doesn't export them), and I2 on the lower sheet.
 const C = DESK.cal, [FX, FY] = C.friXY;
@@ -70,7 +73,7 @@ const PAD = { x: -0.0155, zf: 0.028, w: 0.016, tilt: 50 };  // the new sheet, pr
 const PH = PAD.w * 366 / 263, PH_RAD = PAD.tilt * DEG;      // the sheet's height and tilt
 // A point on the propped sheet: u from its left edge, v up from its lower edge (both 0–1), in the world.
 const padPoint = (u: number, v: number) => new THREE.Vector3(PAD.x + (u - 0.5) * PAD.w, 0.0004 + v * PH * Math.sin(PH_RAD), PAD.zf - v * PH * Math.cos(PH_RAD));
-const PUSH: CamKey = { pos: [-0.008, 0.052, 0.24], look: [-0.008, 0.030, 0.012] };   // W's slow push-in over the tag (11.5–16)
+export const PUSH: CamKey = { pos: [-0.008, 0.052, 0.24], look: [-0.008, 0.030, 0.012] };   // W's slow push-in over the tag (11.5–16)
 const FONT = 17, INK = 'rgb(30, 42, 63)';   // the hand is s17b's bundled Caveat
 const NS = 58, CIRCLE_R = 23, A0 = -2.2;                     // "Final"'s canvas, its red circle (art px), the stroke's start
 
@@ -294,7 +297,7 @@ export async function build(ctx: ShotCtx) {
     m.position.set(DESK.lamp.x, DESK.lampMouth[1] + 0.0005, LAMP_Z + 0.0008); scene.add(m);
   }
 
-  // ---------- the fade: the amber grade scaled to black over 16.0–17.0, on 1s (frame 23 = 194.958 is black) ----------
+  // ---------- the fade: the amber grade scaled to black over FADE … FADE + 2 (v9), on 1s ----------
   // The base grade is amber blended toward s02's dawn (HOME_MIX), so the ending keeps the home's palette instead of the full act-3 orange.
   const amber = loadLUT('amber')!, dawn = loadLUT('dawn')!, fades: THREE.Data3DTexture[] = [];
   const base = Uint8Array.from(amber.image.data!, (v, i) => (i % 4 === 3 ? 255 : Math.round(v * (1 - HOME_MIX) + dawn.image.data![i] * HOME_MIX)));
@@ -302,7 +305,7 @@ export async function build(ctx: ShotCtx) {
     return Object.assign(tex, { format: amber.format, type: amber.type, minFilter: amber.minFilter, magFilter: amber.magFilter,
       wrapS: amber.wrapS, wrapT: amber.wrapT, wrapR: amber.wrapR, unpackAlignment: 1, needsUpdate: true }); };
   const baseLUT = lutOf(base);
-  const fadeLUT = (k: number) => fades[k] ??= lutOf(Uint8Array.from(base, (v, i) => (i % 4 === 3 ? 255 : Math.round(v * (1 - k / 23)))));
+  const fadeLUT = (k: number) => fades[k] ??= lutOf(Uint8Array.from(base, (v, i) => (i % 4 === 3 ? 255 : Math.round(v * (1 - (k / (FADE_N - 1)) ** 2)))));
 
   const c = new THREE.Vector3(), hp = new THREE.Vector3(), look = new THREE.Vector3();
   let anchor: Anchor | null = null;   // the nib and the camera at the end of the stroke (filled below by one dry run of update), so the ink stays put when the pen lifts
@@ -319,8 +322,8 @@ export async function build(ctx: ShotCtx) {
       const push = t >= CUT_W ? ease(clamp((t - CUT_W) / (FADE - CUT_W))) : 0;
       const cam = inI ? CAM_I : inI2 ? CAM_I2 : CAM_W;
       camera.position.set(...(cam.pos.map((v, i) => lerp(v, PUSH.pos[i], push)) as Vec3)); camera.lookAt(look.set(...(cam.look.map((v, i) => lerp(v, PUSH.look[i], push)) as Vec3)));
-      const k = t < FADE ? -1 : Math.min(23, Math.round((t - FADE) * 24));
-      fx.set({ focus: inW ? camera.position.distanceTo(look) : camera.position.z - C.z, aperture: inW ? 0.01 : 0.003, lut: k < 0 ? baseLUT : fadeLUT(k), grain: k === 23 ? 0 : 0.04 });
+      const k = t < FADE ? -1 : Math.min(FADE_N - 1, Math.round((t - FADE) * 24));
+      fx.set({ focus: inW ? camera.position.distanceTo(look) : camera.position.z - C.z, aperture: inW ? 0.01 : 0.003, lut: k < 0 ? baseLUT : fadeLUT(k), grain: k === FADE_N - 1 ? 0 : 0.04 });
 
       // the calendar's marks
       const [k1, k2] = xAt(tc);
