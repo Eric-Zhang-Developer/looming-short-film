@@ -3,6 +3,9 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-18
 
+## v10 (2026-10-20, 17:28): `out/looming_v10.mp4` (3:48, −16.0 LUFS, −5.0 dBFS peak, 5472 frames) and `out/looming_v10_720p.mp4` · director: "small v10 changes … I think we're ready to publish"
+s18 only (`docs/shots/s18.md`, v10 block): "Final" on the month's last Friday, two weeks below the exam (the overlay now bends with the calendar's curled lip); the tag cuts to the propped sheet, where he writes ∫ x² eˣ dx under the "1.", then the 2 s fade (s18 21 → 22 s). Assembled from v9 with `evidence/v10/assemble_spec.txt` (23 s re-rendered); joins in `evidence/v10/joins_sheet.jpg`. **Waiting on the director:** a re-recorded Minecraft clip without the water; the swap is audio-only (re-mix and re-mux, no frames).
+
 ## v9 (2026-10-20, 14:36): `out/looming_v9.mp4` (3:47, −16.0 LUFS, −5.0 dBFS peak, 5448 frames) and `out/looming_v9_720p.mp4` · director: "When I come back, I want to see a version 9"
 The pass in `docs/notes/v9-beats.md`: the ending (2 s fade on the "1.", the *Looming* title with the drop as the i's dot, Seneca, card A, card B, the sting), the blob acting with its lids (blank while huge, plead, sad, shy, sleepy), s17c's 85 with relief instead of the grin, and "Today 9:00 AM" from the phone's clock. Assembled from v8 with `evidence/v9/assemble_spec.txt` (181 s re-rendered in ≤6 s chunks, one page per Chrome; v8 reused for 0–9, 117–138 and 190–206, which hash identical); joins in `evidence/v9/joins_sheet.jpg`. **Not yet heard by anyone:** the ending's piano and the sting's buzz and Reel. **Not done:** the music-box "please" under the gulps (in the beat sheet, in neither brief).
 
