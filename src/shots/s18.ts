@@ -18,7 +18,7 @@ import { createBlob } from '../blob.ts';
 import { makeGator } from '../characters/gator.ts';
 import { specPose } from '../characters/poses.ts';
 import { DESK, tools, homeDesk, seatReach } from './s02.ts';
-import { loadHand, handFont } from './s17b.ts';
+import { loadHand, handFont, runParts, drawInt } from './s17b.ts';
 import { act } from '../characters/acting.ts';
 import { makeClock } from '../clock.ts';
 import type { ShotCtx } from '../film.ts';
@@ -29,7 +29,8 @@ const ID = 's18', DEG = Math.PI / 180;
 const F = (n: number) => n / 12, fr = (t: number) => Math.floor(t * 12 + 1e-6);
 const B = SHOTS.find((s) => s.id === ID)!.beats;   // examCrossedOff 2, blobAbsorbed 5.5, lampSitBack 7.5, newDate 12.5, dropQuivers 14, tagPenUncap 16.5
 // v4 (20 s): W 0–3, I 3–7, W 7–10 (he sits back under the lamp: lampSitBack 7.5), I2 10–14.5, W 14.5–20, the fade 19–20. Every G4 time from 7.0 is +3.0.
-const CUT_I = 3, CUT_SIT = 7, CUT_I2 = 10, CUT_W = 14.5, FADE = 19;
+// v10: CUT_P cuts to the propped sheet, where he writes the problem under the "1." (INT_W); the fade moves to 20–22.
+const CUT_I = 3, CUT_SIT = 7, CUT_I2 = 10, CUT_W = 14.5, CUT_P = 19, FADE = 20, INT_W = [F(230), 20];
 // v9 (docs/notes/v9-beats.md §1): the fade runs 2 s, 19–21, on 1s, and is slow on the "1.": brightness 1 − u² over its 48
 // frames (an ease-in), so the mark holds near full for the first second and the dark comes in the second. Frame 47 (20.958) is black.
 const FADE_N = 48;
@@ -52,8 +53,10 @@ const CAM_I: CamKey = { pos: [FX, (FY + LIP_Y) / 2 + 0.001, 0.09], look: [FX, (F
 // v4: widened and moved right so the clock (x 0.062–0.082, y 0.057–0.077) sits inside the frame beside "Final" and its circle (x ≈ 0.026).
 const CAM_I2: CamKey = { pos: [0.0535, 0.054, 0.136], look: [0.0535, 0.0535, 0] };
 // The calendar's painted grid (art px of props_kit_calendar, 275 × 292): rows at 92/128/165/202/238/275, columns at
-// 17/51/86/120/155/190/224/258. "Final" goes in row 4, column 3 (the spec's cell), on Friday's clean paper.
-const NEW_CELL: [number, number] = [103, 220], CLEAN = [157, 167, 188, 200];
+// 17/51/86/120/155/190/224/258. "Final" goes in row 5, column 5, on Friday's clean paper. v10 (director: a final "not even a
+// week after the midterm is kind of crazy"): the last Friday of the month, two weeks below the crossed-off exam (it was row 4,
+// column 3, five days on).
+const NEW_CELL: [number, number] = [172, 256], CLEAN = [157, 167, 188, 200];
 const XS = 44, X1 = [[8, 8], [36, 37]], X2 = [[37, 7], [7, 36]];   // the X's canvas (calendar art px) and its two strokes
 const HEAD_X = 12;                                           // the head's pitch while he crosses the exam off (+ chin up)
 const HOME_MIX = 0.8;                                        // grade: amber (act 3) blended this far toward s02's dawn, so the ending stays in the home's palette
@@ -73,6 +76,9 @@ const PAD = { x: -0.0155, zf: 0.028, w: 0.016, tilt: 50 };  // the new sheet, pr
 const PH = PAD.w * 366 / 263, PH_RAD = PAD.tilt * DEG;      // the sheet's height and tilt
 // A point on the propped sheet: u from its left edge, v up from its lower edge (both 0–1), in the world.
 const padPoint = (u: number, v: number) => new THREE.Vector3(PAD.x + (u - 0.5) * PAD.w, 0.0004 + v * PH * Math.sin(PH_RAD), PAD.zf - v * PH * Math.cos(PH_RAD));
+// v10: Camera P, square to the propped sheet (its normal is 40° up from +z), close enough that the sheet fills ¾ of the frame.
+const PAD_N = new THREE.Vector3(0, Math.sin(Math.PI / 2 - PH_RAD), Math.cos(Math.PI / 2 - PH_RAD));
+const CAM_P: CamKey = (() => { const c = padPoint(0.5, 0.45); return { pos: c.clone().addScaledVector(PAD_N, 0.085).toArray() as Vec3, look: c.toArray() as Vec3 }; })();
 export const PUSH: CamKey = { pos: [-0.008, 0.052, 0.24], look: [-0.008, 0.030, 0.012] };   // W's slow push-in over the tag (11.5–16)
 const FONT = 17, INK = 'rgb(30, 42, 63)';   // the hand is s17b's bundled Caveat
 const NS = 58, CIRCLE_R = 23, A0 = -2.2;                     // "Final"'s canvas, its red circle (art px), the stroke's start
@@ -131,10 +137,13 @@ export async function build(ctx: ShotCtx) {
   const calH = C.w * ((cv1 - cv0) * AH) / ((cu1 - cu0) * AW);
   const artToWorld = (px: number, py: number) => [C.x0 + (px / AW - cu0) / (cu1 - cu0) * C.w, C.y0 + (cv1 - py / AH) / (cv1 - cv0) * calH];
   const mpp = C.w / ((cu1 - cu0) * AW);                        // metres per calendar art px
+  const curlZ = (y: number) => C.lipZ * clamp((C.y0 + C.lip - y) / C.lip) ** 2;   // how far the sheet's lip has come forward at height y (s02's curl)
   const overlay = ([w, h]: number[], [x, y]: number[], z: number, K = 24) => {             // a canvas over the sheet, w × h art px, centred at world (x, y)
     const cv = Object.assign(document.createElement('canvas'), { width: Math.round(w * K), height: Math.round(h * K) });
     const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
-    const m = new THREE.Mesh(new THREE.PlaneGeometry(w * mpp, h * mpp), new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false }));
+    const geo = new THREE.PlaneGeometry(w * mpp, h * mpp, 1, 24), pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) pos.setZ(i, curlZ(y + pos.getY(i)));   // v10: bent with the sheet's lip, so a mark on the bottom row isn't behind it
+    const m = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false }));
     m.position.set(x, y, C.z + z); m.receiveShadow = true; scene.add(m);
     let drawn: string | null = null;
     return (id: string, draw: (g: CanvasRenderingContext2D) => void) => { if (id === drawn) return; drawn = id; const g = cv.getContext('2d')!; g.setTransform(K, 0, 0, K, 0, 0); g.clearRect(0, 0, w, h); draw(g); tex.needsUpdate = true; };
@@ -250,29 +259,57 @@ export async function build(ctx: ShotCtx) {
   pad.g.rotation.set(-(Math.PI / 2 - PH_RAD), 0, 0);
   pad.g.position.copy(padPoint(0.5, 0.5));
   pad.g.visible = false;
-  const padInk = (() => { const W = 256, H = Math.round(W * PH / PAD.w), cv = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = cv.getContext('2d')!;
+  const padInk = (() => { const S = 2, W = 256 * S, H = Math.round(W * PH / PAD.w), cv = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = cv.getContext('2d')!;
+    // v10: twice v9's resolution (S), so the sheet holds up full-frame in Camera P
     const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
     const m = new THREE.Mesh(new THREE.PlaneGeometry(PAD.w, PH), new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
     m.position.z = 0.00003; pad.mesh.add(m);
-    let drawn = '';
-    const MARK_PX = 120;   // the "1." is about 120 px tall on a 256 px sheet
+    let drawn = '', tip: [number, number] | null = null;
+    const MARK_PX = 120 * S;   // the "1." is about 120 px tall on a 256 px sheet
+    // v10 (director: the "1." alone "can confuse people"): under it, the problem it numbers, s03's integral one power up:
+    // ∫ x² eˣ dx (parts twice). Runs: [text, superscript?], in the hand, with s17b's stroked ∫.
+    const PROB: [string, boolean][] = [['∫ x', false], ['2', true], [' e', false], ['x', true], [' dx', false]], PX = 0.23 * W;
     // v6-ending: the "1." is written where the nib really is (the ray from the camera through the nib, onto the sheet), ending
-    // on its dot, so the stroke comes out of the nib instead of from under his hand. k: how much of it is down.
-    return (k: number, at: Anchor | null) => {
+    // on its dot, so the stroke comes out of the nib instead of from under his hand. k: how much of it is down; kp: the problem's.
+    const draw = (k: number, at: Anchor | null, kp = 0) => {
       let ex = 0, ey = 0;
       if (k > 0 && !at) k = 0;
       if (k > 0) {   // the sheet's plane (a plane, not a mesh hit, so its edges and facing can't drop the stroke)
         const n = new THREE.Vector3(0, 0, 1).transformDirection(m.matrixWorld), o = new THREE.Vector3().setFromMatrixPosition(m.matrixWorld);
         const q = new THREE.Ray(at!.cam, at!.nib.clone().sub(at!.cam).normalize()).intersectPlane(new THREE.Plane().setFromNormalAndCoplanarPoint(n, o), new THREE.Vector3());
         if (q) { const l = m.worldToLocal(q); ex = Math.round((l.x / PAD.w + 0.5) * W); ey = Math.round((0.5 - l.y / PH) * H); } else k = 0; }
-      const id = `${Math.round(k * 200)}|${ex}|${ey}`; if (id === drawn) return; drawn = id; g.clearRect(0, 0, W, H);
-      if (k > 0) { g.font = handFont(MARK_PX); const w = g.measureText('1.').width, x0 = ex - w, y0 = ey + 4;
-        g.save(); g.beginPath(); g.rect(0, 0, x0 + (w + 8) * k, H); g.clip(); g.fillStyle = DROP_INK; g.strokeStyle = DROP_INK; g.lineWidth = 5;
+      const id = `${Math.round(k * 200)}|${ex}|${ey}|${Math.round(kp * 200)}`; if (id === drawn) return tip; drawn = id; g.clearRect(0, 0, W, H); tip = null;
+      if (k > 0) { g.font = handFont(MARK_PX); const w = g.measureText('1.').width, x0 = ex - w, y0 = ey + 4 * S;
+        g.save(); g.beginPath(); g.rect(0, 0, x0 + (w + 8 * S) * k, H); g.clip(); g.fillStyle = DROP_INK; g.strokeStyle = DROP_INK; g.lineWidth = 5 * S;
         g.fillText('1.', x0, y0); g.strokeText('1.', x0, y0);
         // the drop's ink, so the blob's gloss: a pale highlight up and left inside the stroke
-        g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(235, 230, 255, 0.45)'; g.fillText('1.', x0 - 4, y0 - 5);
-        g.fillStyle = DROP_INK; g.fillText('1.', x0 + 1, y0 + 1); g.restore(); }
-      tex.needsUpdate = true; }; })();
+        g.globalCompositeOperation = 'source-atop'; g.fillStyle = 'rgba(235, 230, 255, 0.45)'; g.fillText('1.', x0 - 4 * S, y0 - 5 * S);
+        g.fillStyle = DROP_INK; g.fillText('1.', x0 + S, y0 + S); g.restore();
+        // the problem: centred on the sheet, its baseline a line and a half under the "1."
+        let x = 0;
+        const parts = PROB.flatMap(([str, sup]) => { const px = sup ? PX * 0.62 : PX, r = runParts(g, str, px, x).map((p) => ({ ...p, px, sup })); x = r.at(-1)!.x + r.at(-1)!.w; return r; });
+        const x1 = (W - x) / 2, base = Math.min(ey + 1.5 * PX, 0.86 * H), end = x1 + x * kp;
+        if (kp > 0) {
+          g.save(); g.beginPath(); g.rect(x1 - 4 * S, 0, end - x1 + (kp >= 1 ? 12 : 4) * S, H); g.clip();   // whole: the last glyph's overhang too
+          g.fillStyle = DROP_INK; g.strokeStyle = DROP_INK; g.lineWidth = 1.2 * S; g.lineJoin = 'round'; g.textBaseline = 'alphabetic';
+          for (const p of parts) { const y = base - (p.sup ? PX * 0.42 : 0);
+            if (p.s.includes('∫')) { drawInt(g, x1 + p.x, y, p.px * 1.25, DROP_INK); continue; }
+            g.font = handFont(p.px); g.fillText(p.s, x1 + p.x, y); g.strokeText(p.s, x1 + p.x, y); }
+          g.restore();
+        }
+        tip = [end, base - 0.3 * PX];
+      }
+      tex.needsUpdate = true; return tip; };
+    // canvas px → the sheet's local plane (the pen in Camera P rides on it)
+    const toLocal = ([px, py]: [number, number]) => new THREE.Vector3((px / W - 0.5) * PAD.w, (0.5 - py / H) * PH, 0.0006);
+    return { draw, toLocal };
+  })();
+  // v10: Camera P's hand: his near arm and the pen on the sheet's plane, the nib at the group's origin, writing down-right
+  const penHand = new THREE.Group(); pad.mesh.add(penHand); penHand.visible = false;
+  const pPen = T.cut(props, 'pen', [0.0075, null], 'p_pen', { anchor: [1, 0.5], flip: true, parent: penHand });
+  pPen.g.rotation.z = -50 * DEG;
+  const pArm = T.cut(gsheet, 'arm_r', [0.018, null], 'p_arm', { anchor: [0.9, 0.5], parent: penHand });
+  pArm.g.rotation.z = -45 * DEG; pArm.g.position.set(-0.0034, 0.0040, 0.0003);   // the grip, two thirds up the pen, so the nib shows
   const DROP_AT = [NX, NY - CIRCLE_R * 0.92 * mpp];              // on the new circle's bottom line, under the word
 
   // ---------- his hand in I2 (the near arm seen face-on), holding the red marker; its tip is the group's origin ----------
@@ -315,15 +352,15 @@ export async function build(ctx: ShotCtx) {
       T.boil(t);
       clock.boil(t); clock.set(CLOCK.h, CLOCK.m, t);   // the second hand steps on every whole second
       const f = fr(t), tc = F(f);
-      const inI = t >= CUT_I && t < CUT_SIT, inI2 = t >= CUT_I2 && t < CUT_W, inW = !inI && !inI2;
+      const inI = t >= CUT_I && t < CUT_SIT, inI2 = t >= CUT_I2 && t < CUT_W, inP = t >= CUT_P, inW = !inI && !inI2 && !inP;
 
       // camera (on 1s), straight cuts; the fade on the grade
       // The tag's W (11.5 on) eases in over four and a half seconds, so the drop, the pen and the first mark are bigger as they land.
-      const push = t >= CUT_W ? ease(clamp((t - CUT_W) / (FADE - CUT_W))) : 0;
-      const cam = inI ? CAM_I : inI2 ? CAM_I2 : CAM_W;
+      const push = inW && t >= CUT_W ? ease(clamp((t - CUT_W) / (CUT_P - CUT_W))) : 0;   // v9's push, still landing at 19
+      const cam = inI ? CAM_I : inI2 ? CAM_I2 : inP ? CAM_P : CAM_W;
       camera.position.set(...(cam.pos.map((v, i) => lerp(v, PUSH.pos[i], push)) as Vec3)); camera.lookAt(look.set(...(cam.look.map((v, i) => lerp(v, PUSH.look[i], push)) as Vec3)));
       const k = t < FADE ? -1 : Math.min(FADE_N - 1, Math.round((t - FADE) * 24));
-      fx.set({ focus: inW ? camera.position.distanceTo(look) : camera.position.z - C.z, aperture: inW ? 0.01 : 0.003, lut: k < 0 ? baseLUT : fadeLUT(k), grain: k === FADE_N - 1 ? 0 : 0.04 });
+      fx.set({ focus: inW || inP ? camera.position.distanceTo(look) : camera.position.z - C.z, aperture: inW ? 0.01 : 0.003, lut: k < 0 ? baseLUT : fadeLUT(k), grain: k === FADE_N - 1 ? 0 : 0.04 });
 
       // the calendar's marks
       const [k1, k2] = xAt(tc);
@@ -392,7 +429,7 @@ export async function build(ctx: ShotCtx) {
       if (drop.mesh.visible) {
         const ds = Math.max(1e-3, BEAD * easeOut((tc - 13) / 0.667));
         drop.mesh.scale.setScalar(ds);
-        drop.mesh.position.set(DROP_AT[0], DROP_AT[1] - 0.012 * ds, C.z + 0.0010);
+        drop.mesh.position.set(DROP_AT[0], DROP_AT[1] - 0.012 * ds, C.z + 0.0010 + curlZ(DROP_AT[1] - 0.012 * ds));
         // v6-ending: light from above, so its shadow is a dot, smaller than the drop, just under it (it never grows: he's looking)
         { const y = DROP_AT[1] - 0.0042 * ds / BEAD, kc = clamp((C.y0 + C.lip - y) / C.lip); dropShadow.position.set(DROP_AT[0] + 0.0002, y, C.z + 0.0012 + C.lipZ * kc); }
         dropShadow.scale.set(0.0034 * ds / BEAD, 0.0017 * ds / BEAD, 1);   // on the curl, which comes forward here
@@ -402,7 +439,7 @@ export async function build(ctx: ShotCtx) {
         if (tc >= T_HOP) {   // the hop: a small arc off the circle onto the nib, stretched in the air, squash on landing, then into the nib
           const nib = pen.g.position, h = clamp((tc - T_HOP) / (T_LAND - T_HOP)), e = ease(h);
           const sink = clamp((tc - T_LAND - F(1)) / (T_IN - T_LAND - F(1)));
-          drop.mesh.position.set(lerp(DROP_AT[0], nib.x, e), lerp(DROP_AT[1] - 0.012 * ds, nib.y + 0.0003, e) + 0.0012 * Math.sin(Math.PI * h), lerp(C.z + 0.001, nib.z + 0.0004, e));
+          drop.mesh.position.set(lerp(DROP_AT[0], nib.x, e), lerp(DROP_AT[1] - 0.012 * ds, nib.y + 0.0003, e) + 0.0012 * Math.sin(Math.PI * h), lerp(C.z + 0.001 + curlZ(DROP_AT[1] - 0.012 * ds), nib.z + 0.0004, e));
           squash = h < 1 ? -0.25 : 0.5 * Math.exp(-8 * (tc - T_LAND));
           drop.mesh.scale.setScalar(Math.max(1e-3, ds * (1 - sink)));
           drop.mesh.visible = sink < 1; dropShadow.visible = false; eyes = sink > 0 ? 'closed' : 'open';
@@ -411,10 +448,13 @@ export async function build(ctx: ShotCtx) {
       }
 
       // ---- the first mark (fix-payoff: the dashed ghost of the old blob is gone, cold viewer: "its old size, or the next one forming?") on the propped sheet ----
-      pad.g.visible = inW && tc >= CUT_W;
-      const kMark = inW ? clamp((tc - T_TOUCH) / (T_MARK - T_TOUCH)) : 0;
+      pad.g.visible = (inW || inP) && tc >= CUT_W;
+      const kMark = inW || inP ? clamp((tc - T_TOUCH) / (T_MARK - T_TOUCH)) : 0;
       if (kMark > 0) pad.g.updateMatrixWorld(true);
-      padInk(kMark, anchor);
+      const kProb = inP ? clamp((tc - INT_W[0]) / (INT_W[1] - INT_W[0])) : 0;
+      const tip = padInk.draw(kMark, anchor, kProb);
+      penHand.visible = inP && !!tip;
+      if (penHand.visible) { penHand.position.copy(padInk.toLocal(tip!)); if (kProb >= 1) { const k = ease(clamp((tc - INT_W[1]) / 0.333)); penHand.position.add(new THREE.Vector3(-0.035 * k, 0.035 * k, 0)); } }   // done: out of frame up and left, so the last image is the page
       // the nib follows the stroke: from the top of the "1" down to its dot (where the ink is anchored), then rests there
       if (kMark > 0 && kMark < 1 && holding) pen.g.position.add(new THREE.Vector3(-0.003 * (1 - kMark), 0.004 * (1 - kMark), 0));
       // ---- his hand in I2: in 7.0–7.5 with the marker, writes "Final", circles it, leaves after 9.67 ----
@@ -425,7 +465,7 @@ export async function build(ctx: ShotCtx) {
         else if (tc < 11.833) { px = NX + (kw - 0.5) * finalW * mpp; py = NY - 0.0003 + 0.0003 * Math.sin(kw * 30); }
         else if (tc < 12.667) { const an = A0 + 2 * Math.PI * 1.06 * kc; px = NX + Math.cos(an) * CIRCLE_R * mpp; py = NY - Math.sin(an) * CIRCLE_R * 0.92 * mpp; }
         else { const h = ease((tc - 12.667) / 0.167); px = lerp(NX, NX - 0.03, h); py = lerp(NY, NY - 0.02, h); }
-        hand.position.set(px, py, C.z + 0.004);
+        hand.position.set(px, py, C.z + 0.004 + curlZ(py));
       }
     },
   };

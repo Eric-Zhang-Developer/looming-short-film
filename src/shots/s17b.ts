@@ -72,11 +72,11 @@ export function runParts(g: CanvasRenderingContext2D, s: string, px: number, x0:
     const w = q === '∫' ? px * 0.42 : g.measureText(q).width; out.push({ s: q, w, x }); x += w; });
   return out;
 }
-export function drawInt(g: CanvasRenderingContext2D, x: number, y: number, px: number) {   // baseline y; a slanted stem with a hook at each end
+export function drawInt(g: CanvasRenderingContext2D, x: number, y: number, px: number, ink = INK) {   // baseline y; a slanted stem with a hook at each end
   const h = px, w = px * 0.3;
   g.beginPath(); g.moveTo(x + 0.02 * w, y + 0.2 * h); g.quadraticCurveTo(x + 0.35 * w, y + 0.32 * h, x + 0.55 * w, y + 0.02 * h);
   g.lineTo(x + 0.95 * w, y - 0.72 * h); g.quadraticCurveTo(x + 1.2 * w, y - 1.0 * h, x + 1.55 * w, y - 0.8 * h);
-  g.lineWidth = px * 0.075; g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK; g.stroke();
+  g.lineWidth = px * 0.075; g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = ink; g.stroke();
 }
 export const BLOB_AT = [-0.002, 0.098];                   // the page-corner mark (x, z): 2 mm in from 0.000 so it sits on the exam desk's top
 // Camera P: high over the lower page (problem 3 and the working), tilted 18° off vertical toward camera so the blob,

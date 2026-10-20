@@ -14,7 +14,7 @@ const errs: string[] = [];
 const seen = new Map<string, string>();
 const rows: string[] = [];
 const E = 1e-6;
-const TARGET = 227;
+const TARGET = 228;
 let end = 0;
 for (const s of SHOTS) {
   if (s.start > end + E) errs.push(`gap: ${end}s to ${s.start}s before ${s.id}`);

@@ -260,6 +260,7 @@ export const CUES: Cue[] = [
   // s17b: one soft cough across the room before he recognises the test; the pen on the test, steady.
   { beat: 'examRoom', offset: 1.6, sound: 'cough', gain: 0.5 },
   bed('penScratch', 'foley', ['testSolved', -3.0], ['testSolved', -0.1], 0.4, { seed: 9 }),
+  bed('penScratch', 'foley', ['tagPenUncap', 230 / 12 - 16.5], ['tagPenUncap', 3.5], 0.5, { seed: 12 }),   // v10: the problem under the "1." (s18 19.17–20.0)
   // s17c: the paper slide when the grade comes back, a short flip of the page, one soft finger tap.
   { beat: 'gradeSlide', sound: 'paperSlide', gain: 0.7 },
   { beat: 'gradeSlide', offset: 0.83, dur: 0.5, sound: 'paperRustle', gain: 0.4, seed: 11 },
