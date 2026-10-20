@@ -12,7 +12,7 @@
 // Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
 import { onTwos } from '../core/ease.ts';
-import { act } from '../characters/acting.js';
+import { act } from '../characters/acting.ts';
 import { bedroom, closeHeads, headOn, ROOM, LIE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT, H_CAM, H_FOCUS } from './s07.js';
 
 const ID = 's08', DEG = Math.PI / 180;

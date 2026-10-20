@@ -10,20 +10,20 @@
 // graded paper lands where he wrote and carries his own three lines. Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.ts';
-import { sensorLight, fluorescent, ambient } from '../lights.js';
+import { sensorLight, fluorescent, ambient } from '../lights.ts';
 import { kf, ease, easeOut, spring, clamp, lerp } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
-import { createBlob } from '../blob.js';
-import { makeGator, greenVariant } from '../characters/gator.js';
-import { specPose } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
-import { makeClock } from '../clock.js';
+import { createBlob } from '../blob.ts';
+import { makeGator, greenVariant } from '../characters/gator.ts';
+import { specPose } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
+import { makeClock } from '../clock.ts';
 import { tools } from './s02.js';
 
 const ID = 's17b', DEG = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;          // examRoom 0, testRecognise 4, testSmile 5.5, testSolved 9.5
 const CUT_T1 = 1, CUT_T2 = 3, CUT_T3 = 5, CUT_BACK = 6.5, HOLD_HERO = 1.75;
-const CLOCK = { at: /** @type {Vec3} */ ([0.12, 0.10, 0.0008]), d: 0.014, reads: [9, 0], s0: 12 };   // T1's far wall, upper right (README §13); s0: the second
+const CLOCK = { at: /** @type {Vec3} */ ([0.12, 0.10, 0.0008]), d: 0.014, reads: /** @type {[number, number]} */ ([9, 0]), s0: 12 };   // T1's far wall, upper right (README §13); s0: the second
 // hand starts at :12, so it isn't hidden under the minute hand at 12 for the whole of K (9:00:12 still reads 9:00)
 // Camera K: face-on to the dial, close enough that it fills ~70% of the frame height (fov 20)
 // fix-payoff: the dial fills 84% of the frame height, easing in to 92% over the hold (it was a flat 70%: "I can't read the clock")
@@ -241,7 +241,7 @@ export async function build(ctx) {
       fig.group.scale.setScalar(sc);
       // pose angles, stored over the rig's pose() method (blend() uses its own closure, so the method isn't needed here)
       /** @type {any} */ (fig).pose = seat({ lean: hero ? 12 : 8 + 8 * rng(), arm: -26, head: hero ? -8 : -4 - 8 * rng() });
-      fig.eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';   // down at the page
+      /** @type {any} */ (fig).eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';   // down at the page
       t1.add(fig.group); figures.push(fig);
       if (hero) figures.hero = fig; else if (bobbers.length < 2 && rng() < 0.5) bobbers.push(fig);
       // their page and their blob on the table, to the figure's right
@@ -301,7 +301,7 @@ export async function build(ctx) {
   const fill3 = new THREE.PointLight(C('cream').lerp(C('gator'), 0.15), FILL_T3, 0.08, 2); fill3.position.set(-0.03, 0.045, 0.13);
   t3.add(fill3);
   const P3 = { write: seat({ lean: 12, arm: -26, head: -8 }), breath: seat({ lean: 11, arm: -27, head: -8 }), lean: seat({ lean: 16, arm: -22, head: -10 }) };
-  const BODY3 = [[0, 'write'], [5.333, 'write'], [5.334, 'breath'], [5.999, 'breath'], [6.0, 'lean'], [7, 'lean']];
+  /** @type {[number, string][]} */ const BODY3 = [[0, 'write'], [5.333, 'write'], [5.334, 'breath'], [5.999, 'breath'], [6.0, 'lean'], [7, 'lean']];
   // The acting kit on T3: calm resolve, then pride's wide → smile on testSmile (held small: the preset's own mouth).
   /** @type {[number, string][]} */
   const CUES3 = [[-0.1, 'resolve'], [B.testSmile, 'pride']];

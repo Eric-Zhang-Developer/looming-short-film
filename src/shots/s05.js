@@ -7,16 +7,16 @@
 // walks straight through it at z 0.16. What moves: all puppets on 2s (the Student, both roommates, the Exam), the TV flicker on 1s,
 // the window ramp at 24, boil 10/s. The camera, the phone and the blob don't move.
 import * as THREE from 'three';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
-import { phoneLight, dawnLight, ambient, aim } from '../lights.js';
+import { makePaper, boilSeed } from '../paper.ts';
+import { paperMesh, updatePaperMesh } from '../material.ts';
+import { phoneLight, dawnLight, ambient, aim } from '../lights.ts';
 import { kf, spring, onTwos } from '../core/ease.ts';
 import { hash, mulberry32, seedOf } from '../core/rng.ts';
-import { makeGator } from '../characters/gator.js';
-import { makeRoommateTall, makeRoommateRound, HERON_STAND_Y } from '../characters/roommates.js';
-import { POSES, specPose, walk } from '../characters/poses.js';
-import { createBlob } from '../blob.js';
-import { act } from '../characters/acting.js';
+import { makeGator } from '../characters/gator.ts';
+import { makeRoommateTall, makeRoommateRound, HERON_STAND_Y } from '../characters/roommates.ts';
+import { POSES, specPose, walk } from '../characters/poses.ts';
+import { createBlob } from '../blob.ts';
+import { act } from '../characters/acting.ts';
 import { DESK, gameScreen, firing } from './s02.js';
 
 const DEG = Math.PI / 180;
@@ -26,7 +26,7 @@ const BLOB_R = { start: 0.018 };          // METER.gulp1 (README §1, v4): 1.5×
 // the pulled-down couch cushion the laptop sits on 18 cm.
 const SEAT = 0.025, BACK = 0.048, TABLE = 0.025, CUSHION = 0.010;
 const TABLE_TRIM = 0.3;                    // coffee-table fascia albedo (ponytail: per-object exposure, by eye)
-const L = [0.075, CUSHION + 0.0075, 0.4148]; // the laptop screen's centre: the key (spec x, z: S = 0.4148 / 0.0648 = 6.40)
+/** @type {Vec3} */ const L = [0.075, CUSHION + 0.0075, 0.4148]; // the laptop screen's centre: the key (spec x, z: S = 0.4148 / 0.0648 = 6.40)
 // v7-laptop: the laptop at s02's cartoon scale (DESK.laptop), turned further to the camera (v6: 50°, its screen almost edge-on).
 // Its screen's centre stays on L (the base sinks into a thinner cushion), so the key, S and the 8.0 units are v6's exactly.
 const LAP_K = DESK.laptop.scale, LAP_YAW = 35 * DEG;
@@ -69,7 +69,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // Returns the mesh; mesh.parent is the placed group.
   /**
    * @param {string} layer
-   * @param {import('../paper.js').PaperOptions} opts
+   * @param {import('../paper.ts').PaperOptions} opts
    * @param {{ at: Vec3, flat?: boolean, tilt?: boolean, boil?: boolean, rotZ?: number, vis?: number[], parent?: THREE.Object3D, fit?: number[], [mat: string]: any }} o the rest goes to paperMesh
    */
   function piece(layer, opts, { at, flat = false, tilt = false, boil = true, rotZ = 0, vis = [0, 0, 1, 1], parent = scene, fit, ...mat }) {
@@ -263,7 +263,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       tall.blend(POSES_5, keys, tLocal);
       tall.follow('tail', tLocal, { k: 6, w: 18 });
       if (T >= WALK.t0) tall.joints.head.rotation.z += HEAD_BOB * Math.sin(2 * Math.PI * (T - WALK.t0) / (1 / 3));   // a nod per step
-      for (const [r, ph] of /** @type {[import('../puppet.js').Puppet, number][]} */ ([[tall, 0], [round, 1.3]])) r.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * T / 2.8 + ph);
+      for (const [r, ph] of /** @type {[import('../puppet.ts').Puppet, number][]} */ ([[tall, 0], [round, 1.3]])) r.joints.body.rotation.z += BREATHE * Math.sin(2 * Math.PI * T / 2.8 + ph);
       tall.face(T < F(2.67) ? { eyes: 'open', mouth: 'line' } : { eyes: 'open', mouth: 'neutral' });
       tall.group.position.set(x, y, z);
       tall.group.visible = T <= WALK.t1;

@@ -1,4 +1,3 @@
-// @ts-check
 // paper.js: painted art or a plain shape → a torn sheet of paper (doc 04 §paper.js, contract in docs/contracts.md).
 //
 // How the edge is torn: rasterize the silhouette (art alpha or `path`), take its exact signed distance field,
@@ -18,7 +17,8 @@ import { PALETTE } from './core/palette.ts';
 
 // Pixel values are at 1024 px on the long edge and scale with `res`.
 // tearAmp [wobble, jag]: peak px (layered value noise sits mostly within a third of it) · tearFreq [wobble, jag] features per 1024 px · rimPx [min, max] · grain 0..1 · thickness 0..1
-export const WEIGHTS = Object.freeze({
+export type PaperWeight = { tearAmp: number[], tearFreq: number[], rimPx: number[], grain: number, thickness: number };
+export const WEIGHTS: Readonly<Record<string, PaperWeight>> = Object.freeze({
   cardstock: { tearAmp: [20, 6],   tearFreq: [5, 50],  rimPx: [3, 6],   grain: 0.05, thickness: 0.9 },  // tight edge, white rim
   kraft:     { tearAmp: [24, 9],   tearFreq: [4, 35],  rimPx: [3, 6],   grain: 0.10, thickness: 0.8 },  // coarser tear, fibrous body
   tissue:    { tearAmp: [34, 15],  tearFreq: [4, 22],  rimPx: [3, 6],   grain: 0.06, thickness: 0.15 }, // ragged, uneven, long hairs
@@ -26,7 +26,7 @@ export const WEIGHTS = Object.freeze({
 });
 
 // floor(t * rate); the epsilon keeps frame times like 7/10 from landing a hair under the step.
-export const boilSeed = (t, rate = 10) => Math.floor(t * rate + 1e-6);
+export const boilSeed = (t: number, rate = 10): number => Math.floor(t * rate + 1e-6);
 
 const RIMS = ['auto', 'none', 'broken'];
 // The sheet cache is an LRU capped by texels, not entries, so a shot's worth of boil steps fits whatever the res:
@@ -36,30 +36,30 @@ const RIMS = ['auto', 'none', 'broken'];
 // at 4 Hz (~575 M texels) won't fit and replays cold. Store the alpha as one channel, or clear per shot, if that bites.
 const CAP_TEXELS = 256 * 1024 * 1024;
 let texels = 0;
-const area = (s) => s.map.image.width * s.map.image.height;
-const sheets = new Map();  // `${key}|${seed}|${res}|${rim}` → PaperSheet, in least-recently-used order
-const bases = new Map();   // `${key}|${res}` → per-asset work shared by every boil seed
+const area = (s: PaperSheet) => s.map.image.width * s.map.image.height;
+const sheets = new Map<string, PaperSheet>();  // `${key}|${seed}|${res}|${rim}` → PaperSheet, in least-recently-used order
+const bases = new Map<string, Base>();   // `${key}|${res}` → per-asset work shared by every boil seed
 // ponytail: bases is unbounded (one ~10 MB entry per asset at 1024 px); add an LRU if a scene loads dozens of assets.
 export function clearPaperCache() {
   for (const s of sheets.values()) { s.map.dispose(); s.alphaMap.dispose(); }
   sheets.clear(); bases.clear(); texels = 0;
 }
 
-/**
- * @typedef {object} PaperOptions
- * @property {HTMLCanvasElement | ImageBitmap | HTMLImageElement | OffscreenCanvas} [art] painted art (alpha is the silhouette)
- * @property {number[][]} [path] a plain shape when there's no art: polygon of [x, y] in 0..1 of the sheet
- * @property {string} [color] fill for a plain shape
- * @property {string} [weight] a WEIGHTS key
- * @property {number[]} [size] [w, h] in meters
- * @property {string} [key] names the cache entry
- * @property {number} [seed] boil seed
- * @property {number} [res] px on the long edge
- * @property {'auto' | 'none' | 'broken'} [rim]
- */
+export type PaperArt = HTMLCanvasElement | ImageBitmap | HTMLImageElement | OffscreenCanvas;
+export type PaperOptions = {
+  art?: PaperArt,          // painted art (alpha is the silhouette)
+  path?: number[][],       // a plain shape when there's no art: polygon of [x, y] in 0..1 of the sheet
+  color?: string,          // fill for a plain shape
+  weight?: string,         // a WEIGHTS key
+  size?: number[],         // [w, h] in meters
+  key?: string,            // names the cache entry
+  seed?: number,           // boil seed
+  res?: number,            // px on the long edge
+  rim?: 'auto' | 'none' | 'broken',
+};
+export type PaperSheet = { map: THREE.CanvasTexture, alphaMap: THREE.CanvasTexture, thickness: number, size: [number, number], key: string, seed: number };
 
-/** @param {PaperOptions} [opts] */
-export function makePaper({ art, path, color, weight = 'cardstock', size, key, seed = 0, res = 1024, rim = 'auto' } = {}) {
+export function makePaper({ art, path, color, weight = 'cardstock', size, key, seed = 0, res = 1024, rim = 'auto' }: PaperOptions = {}): PaperSheet {
   if (!key) throw new Error('makePaper: key is required (it names the cache entry)');
   if (!art && !path) throw new Error('makePaper: pass art or path');
   if (!size) throw new Error('makePaper: size [w, h] in meters is required');
@@ -67,32 +67,32 @@ export function makePaper({ art, path, color, weight = 'cardstock', size, key, s
   if (!W8) throw new Error(`makePaper: unknown weight "${weight}"`);
   if (!RIMS.includes(rim)) throw new Error(`makePaper: unknown rim "${rim}"`);
   const id = `${key}|${seed}|${res}|${rim}`;
-  if (sheets.has(id)) { const s = sheets.get(id); sheets.delete(id); sheets.set(id, s); return s; }  // LRU touch
+  if (sheets.has(id)) { const s = sheets.get(id)!; sheets.delete(id); sheets.set(id, s); return s; }  // LRU touch
 
   const bid = `${key}|${res}`;
   if (!bases.has(bid)) bases.set(bid, makeBase({ art, path, color, W8, size, key, res }));
-  const b = bases.get(bid);
+  const b = bases.get(bid)!;
   const mode = rim === 'auto' ? (b.paintedRim ? 'none' : 'broken') : rim;
-  const sheet = { ...tear(b, W8, seedOf(key, seed), mode), thickness: W8.thickness, size: b.size, key, seed };
+  const sheet: PaperSheet = { ...tear(b, W8, seedOf(key, seed), mode), thickness: W8.thickness, size: b.size, key, seed };
 
   sheets.set(id, sheet); texels += area(sheet);
   while (texels > CAP_TEXELS && sheets.size > 1) {
-    const [oldId, old] = sheets.entries().next().value;
+    const [oldId, old] = sheets.entries().next().value!;
     sheets.delete(oldId); texels -= area(old); old.map.dispose(); old.alphaMap.dispose();
   }
   return sheet;
 }
 
 // ---------- noise (seeded through core/rng's hash; no Math.random) ----------
-const lat = (ix, iy, s) => hash(Math.imul(ix, 73856093) ^ Math.imul(iy, 19349663) ^ Math.imul(s, 83492791));
-function vnoise(x, y, s, smooth) {  // value noise in [-1, 1]; smooth = smoothstep (lumps), else linear (corners)
+const lat = (ix: number, iy: number, s: number) => hash(Math.imul(ix, 73856093) ^ Math.imul(iy, 19349663) ^ Math.imul(s, 83492791));
+function vnoise(x: number, y: number, s: number, smooth: boolean): number {  // value noise in [-1, 1]; smooth = smoothstep (lumps), else linear (corners)
   const ix = Math.floor(x), iy = Math.floor(y);
   let fx = x - ix, fy = y - iy;
   if (smooth) { fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy); }
   const a = lat(ix, iy, s), b = lat(ix + 1, iy, s), c = lat(ix, iy + 1, s), d = lat(ix + 1, iy + 1, s);
   return 2 * (a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy) - 1;
 }
-function fbm(x, y, s, octaves, smooth) {
+function fbm(x: number, y: number, s: number, octaves: number, smooth: boolean): number {
   let sum = 0, amp = 1, norm = 0, f = 1;
   for (let o = 0; o < octaves; o++) {
     sum += amp * vnoise(x * f + o * 17.3, y * f + o * 31.7, s + o, smooth);
@@ -103,10 +103,10 @@ function fbm(x, y, s, octaves, smooth) {
 
 // ---------- exact Euclidean distance transform (Felzenszwalb & Huttenlocher) ----------
 const FAR = 1e20;
-function edt1d(f, n, d, v, z) {
+function edt1d(f: Float64Array, n: number, d: Float64Array, v: Int32Array, z: Float64Array) {
   let k = 0; v[0] = 0; z[0] = -FAR; z[1] = FAR;
   for (let q = 1; q < n; q++) {
-    const s0 = (r) => (f[q] + q * q - f[r] - r * r) / (2 * q - 2 * r);
+    const s0 = (r: number) => (f[q] + q * q - f[r] - r * r) / (2 * q - 2 * r);
     let s = s0(v[k]);
     while (s <= z[k]) s = s0(v[--k]);  // z[0] = -FAR and |s| < FAR / 2, so k never drops below 0
     k++; v[k] = q; z[k] = s; z[k + 1] = FAR;
@@ -115,7 +115,7 @@ function edt1d(f, n, d, v, z) {
   for (let q = 0; q < n; q++) { while (z[k + 1] < q) k++; const r = v[k]; d[q] = (q - r) * (q - r) + f[r]; }
 }
 // Squared distance from every pixel to the nearest pixel where site[i] is true.
-function edt(site, W, H) {
+function edt(site: Uint8Array, W: number, H: number): Float64Array {
   const g = new Float64Array(W * H), n = Math.max(W, H);
   const f = new Float64Array(n), d = new Float64Array(n), v = new Int32Array(n), z = new Float64Array(n + 1);
   for (let x = 0; x < W; x++) {
@@ -132,26 +132,27 @@ function edt(site, W, H) {
 }
 
 // ---------- per asset: fill, grain, SDF, edge band ----------
-const canvas = (w, h) => Object.assign(document.createElement('canvas'), { width: w, height: h });
-const rgb = (hex) => { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
+const canvas = (w: number, h: number) => Object.assign(document.createElement('canvas'), { width: w, height: h });
+const rgb = (hex: string) => { const n = parseInt(hex.slice(1), 16); return [n >> 16, (n >> 8) & 255, n & 255]; };
 
-function makeBase({ art, path, color, W8, size, key, res }) {
+type Base = ReturnType<typeof makeBase>;
+function makeBase({ art, path, color, W8, size, key, res }: { art?: PaperArt, path?: number[][], color?: string, W8: PaperWeight, size: number[], key: string, res: number }) {
   const aspect = art ? art.width / art.height : size[0] / size[1];
   const W = Math.round(aspect >= 1 ? res : res * aspect), H = Math.round(aspect >= 1 ? res / aspect : res);
   const long = Math.max(...size);
-  const sz = aspect >= 1 ? [long, long / aspect] : [long * aspect, long];
+  const sz: [number, number] = aspect >= 1 ? [long, long / aspect] : [long * aspect, long];
   const k = res / 1024;
 
   // Fill: the painting as-is, or the flat stock color, then a few fibers and a fine grain multiplied in.
-  const c = canvas(W, H), ctx = c.getContext('2d');
-  const mask = canvas(W, H), mctx = mask.getContext('2d');
+  const c = canvas(W, H), ctx = c.getContext('2d')!;
+  const mask = canvas(W, H), mctx = mask.getContext('2d')!;
   if (art) {
     ctx.drawImage(art, 0, 0, W, H);
     mctx.drawImage(art, 0, 0, W, H);
   } else {
     ctx.fillStyle = color || PALETTE.cream; ctx.fillRect(0, 0, W, H);
     mctx.fillStyle = '#000'; mctx.beginPath();
-    path.forEach(([x, y], i) => (i ? mctx.lineTo(x * W, y * H) : mctx.moveTo(x * W, y * H)));
+    path!.forEach(([x, y], i) => (i ? mctx.lineTo(x * W, y * H) : mctx.moveTo(x * W, y * H)));
     mctx.closePath(); mctx.fill();
   }
   const rng = mulberry32(seedOf(key, 'fibers'));
@@ -175,17 +176,17 @@ function makeBase({ art, path, color, W8, size, key, res }) {
 
   // Signed distance (px, + inside), its gradient (inward normal) and the band of pixels any tear can reach.
   const N = W * H, inside = new Uint8Array(N);
-  for (let i = 0; i < N; i++) inside[i] = /** @type {any} */ (ma[i * 4 + 3] >= 128);
-  const dOut = edt(inside.map((v) => /** @type {any} */ (!v)), W, H), dIn = edt(inside, W, H);
+  for (let i = 0; i < N; i++) inside[i] = (ma[i * 4 + 3] >= 128) as unknown as number;  // the Uint8Array stores the boolean as 0/1
+  const dOut = edt(inside.map((v) => (!v) as unknown as number), W, H), dIn = edt(inside, W, H);
   const sdf = new Float32Array(N);
   for (let i = 0; i < N; i++) sdf[i] = inside[i] ? Math.sqrt(dOut[i]) - 0.5 : 0.5 - Math.sqrt(dIn[i]);
   const reach = (W8.tearAmp[0] + 1.5 * W8.tearAmp[1] + 1.5 * W8.rimPx[1] + 2) * k;  // |cut| + rim + hair can't pass this
-  const band = [], alpha = new Uint8ClampedArray(N);
+  const band: number[] = [], alpha = new Uint8ClampedArray(N);
   for (let i = 0; i < N; i++) {
     if (Math.abs(sdf[i]) < reach) band.push(i);
     else alpha[i] = sdf[i] > 0 ? 255 : 0;
   }
-  const at = (x, y) => sdf[Math.min(H - 1, Math.max(0, y)) * W + Math.min(W - 1, Math.max(0, x))];
+  const at = (x: number, y: number) => sdf[Math.min(H - 1, Math.max(0, y)) * W + Math.min(W - 1, Math.max(0, x))];
   const nx = new Float32Array(band.length), ny = new Float32Array(band.length);
   band.forEach((i, j) => {
     const x = i % W, y = (i / W) | 0, gx = at(x + 1, y) - at(x - 1, y), gy = at(x, y + 1) - at(x, y - 1), gl = Math.hypot(gx, gy) || 1;
@@ -207,15 +208,15 @@ function makeBase({ art, path, color, W8, size, key, res }) {
 // painted rim is an edge clearly lighter than the body half the tear band further in, and it's as wide as the walk
 // stays above the halfway luminance. It counts only if most of the edge has it, so art that is merely pale in places
 // along its edge (a cream hoodie on a green gator) doesn't qualify.
-function measureRim(px, sdf, band, nx, ny, W, H, reach) {
-  const deep = Math.floor(reach / 2), lum = (x, y) => {
+function measureRim(px: Uint8ClampedArray, sdf: Float32Array, band: number[], nx: Float32Array, ny: Float32Array, W: number, H: number, reach: number): number {
+  const deep = Math.floor(reach / 2), lum = (x: number, y: number) => {
     const o = (Math.min(H - 1, Math.max(0, Math.round(y))) * W + Math.min(W - 1, Math.max(0, Math.round(x)))) * 4;
     return (0.2126 * px[o] + 0.7152 * px[o + 1] + 0.0722 * px[o + 2]) / 255;
   };
-  let edges = 0; const widths = [];
+  let edges = 0; const widths: number[] = [];
   band.forEach((i, j) => {
     if (!(sdf[i] >= 1 && sdf[i] < 2)) return;
-    const x = i % W, y = (i / W) | 0, at = (d) => lum(x + nx[j] * (d - sdf[i]), y + ny[j] * (d - sdf[i]));
+    const x = i % W, y = (i / W) | 0, at = (d: number) => lum(x + nx[j] * (d - sdf[i]), y + ny[j] * (d - sdf[i]));
     const edge = at(1.5), body = at(deep);
     edges++;
     if (!(edge > body + 0.12)) return;
@@ -229,7 +230,7 @@ function measureRim(px, sdf, band, nx, ny, W, H, reach) {
 
 // ---------- per boil seed: cut, rim, hairs ----------
 const RIM = rgb(PALETTE.cream).map((v) => v + (255 - v) * 0.75);  // torn white fibre: cream lifted most of the way to white
-function tear(b, W8, s, mode) {
+function tear(b: Base, W8: PaperWeight, s: number, mode: string) {
   const { W, H, k, sdf, band } = b;
   const px = b.px.slice(), alpha = b.alpha.slice();
   const [wobA, jagA] = W8.tearAmp.map((v) => v * k), [wobF, jagF] = W8.tearFreq.map((v) => v / 1024);
@@ -265,10 +266,10 @@ function tear(b, W8, s, mode) {
     if (m > 0) for (let c = 0; c < 3; c++) px[i * 4 + c] += (RIM[c] * (0.94 + 0.06 * streak) - px[i * 4 + c]) * m;
   }
   const mapC = canvas(W, H), aC = canvas(W, H);
-  mapC.getContext('2d').putImageData(new ImageData(px, W, H), 0, 0);
+  mapC.getContext('2d')!.putImageData(new ImageData(px, W, H), 0, 0);
   const a = new Uint8ClampedArray(W * H * 4);
   for (let i = 0; i < W * H; i++) { a[i * 4] = a[i * 4 + 1] = a[i * 4 + 2] = alpha[i]; a[i * 4 + 3] = 255; }
-  aC.getContext('2d').putImageData(new ImageData(a, W, H), 0, 0);
+  aC.getContext('2d')!.putImageData(new ImageData(a, W, H), 0, 0);
   const map = new THREE.CanvasTexture(mapC); map.colorSpace = THREE.SRGBColorSpace; map.anisotropy = 8;
   const alphaMap = new THREE.CanvasTexture(aC);
   return { map, alphaMap };

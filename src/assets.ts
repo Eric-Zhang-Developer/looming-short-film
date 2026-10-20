@@ -1,4 +1,3 @@
-// @ts-check
 // Asset loader (contract: docs/contracts.md §assets). Frozen art when it has been cut, flat proxies until then.
 // Proxies are a palette-coloured silhouette on transparent canvas, so they go through makePaper exactly like real
 // art and blocking reads. The `proxy` flag is the label: frames never carry text.
@@ -8,7 +7,8 @@ import { PALETTE } from './core/palette.ts';
 // (desk unit README §2, s01, s05, s09, s10, s13, s14, s15, s18). Shot specs win over these numbers.
 // Shapes: gator (side silhouette), torso, head, taper, limb, leg (shin with a foot toward +x), rect, round (rounded rect), ellipse.
 const G = 'gator', C = 'cream', K = 'kraft', N = 'navy', I = 'ink';
-export const PIECES = {
+export type Piece = [w: number, h: number, shape: string, color: keyof typeof PALETTE];
+export const PIECES: Record<string, Record<string, Piece>> = {
   // gator_sheet and face_sheet: the frozen art's opaque boxes at the side rig's fit (characters/gator.js: K, FACE).
   gator_sheet: {
     turn_side: [0.1057, 0.0962, 'gator', G], turn_front: [0.0522, 0.0958, 'torso', G], turn_back: [0.0619, 0.0976, 'torso', G],
@@ -152,24 +152,23 @@ export const PIECES = {
   },
 };
 
-/** @typedef {Awaited<ReturnType<typeof loadUncached>>} Kit a loaded asset: piece bitmaps and their sizes and visible boxes */
-/** @typedef {{ assets: { load(name: string): Promise<Kit> } }} AssetCtx what makeGator and friends take as ctx */
-/** @type {Map<string, Promise<Kit>>} */
-const cache = new Map();  // name → Promise of the load result
-export function load(name) {
+export type Kit = Awaited<ReturnType<typeof loadUncached>>;  // a loaded asset: piece bitmaps and their sizes and visible boxes
+export type AssetCtx = { assets: { load(name: string): Promise<Kit> } };  // what makeGator and friends take as ctx
+const cache = new Map<string, Promise<Kit>>();  // name → Promise of the load result
+export function load(name: string): Promise<Kit> {
   if (!PIECES[name]) return Promise.reject(new Error(`assets: unknown asset "${name}" (docs/assets.md)`));
   if (!cache.has(name)) cache.set(name, loadUncached(name));
-  return cache.get(name);
+  return cache.get(name)!;
 }
 
-async function loadUncached(name) {
-  const table = PIECES[name], pieces = /** @type {Record<string, ImageBitmap>} */ ({});
+async function loadUncached(name: string) {
+  const table = PIECES[name], pieces = {} as Record<string, ImageBitmap>;
   const boxes = await fetch(`/assets/cut/${name}.boxes.json`).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const frozen = boxes && (await fetch(`/assets/frozen/${name}.png`, { method: 'HEAD' }).then((r) => r.ok, () => false));
   if (frozen) {
     await Promise.all(Object.keys(boxes).map(async (key) => {
       const img = new Image(); img.src = `/assets/cut/${key}.png`;
-      await img.decode().catch(() => { throw new Error(`assets: ${img.src} is missing: run node tools/cut.mjs --in=assets/frozen/${name}.png`); });
+      await img.decode().catch(() => { throw new Error(`assets: ${img.src} is missing: run node tools/cut.ts --in=assets/frozen/${name}.png`); });
       pieces[key.startsWith(name + '_') ? key.slice(name.length + 1) : key] = await createImageBitmap(despill(img));
     }));
   } else {
@@ -178,8 +177,8 @@ async function loadUncached(name) {
   // Proxy margins and cut padding are transparent, so each size is the whole bitmap's, scaled so its opaque box is the
   // PIECES size along the PIECES long axis, at the bitmap's own aspect (makePaper never stretches art, so this is
   // exactly the sheet it makes).
-  const visible = Object.fromEntries(Object.entries(pieces).map(([p, bmp]) => [p, opaqueBox(bmp)]));
-  const sizes = Object.fromEntries(Object.entries(table).map(([p, [w, h]]) => {
+  const visible = Object.fromEntries(Object.entries(pieces).map(([p, bmp]): [string, Box] => [p, opaqueBox(bmp)]));
+  const sizes = Object.fromEntries(Object.entries(table).map(([p, [w, h]]): [string, [number, number]] => {
     const bmp = pieces[p];
     if (!bmp) return [p, [w, h]];
     const [u0, v0, u1, v1] = visible[p], k = w >= h ? w / (u1 - u0) / bmp.width : h / (v1 - v0) / bmp.height;
@@ -193,15 +192,15 @@ async function loadUncached(name) {
 // pixel takes the colour of its nearest kept one (a breadth-first fill outward), and alpha < 16 dust goes. The kept
 // pixels, the painted cream rim among them, and all alpha >= 16 are untouched, so the silhouette paper.js cuts at 0.5
 // doesn't move. evidence/cut-gator/halo.jpg.
-function despill(img) {
+function despill(img: HTMLImageElement) {
   const W = img.width, H = img.height, c = Object.assign(document.createElement('canvas'), { width: W, height: H });
-  const g = c.getContext('2d');
+  const g = c.getContext('2d')!;
   g.drawImage(img, 0, 0);
   const d = g.getImageData(0, 0, W, H), p = d.data, seen = new Uint8Array(W * H);
-  let q = [];
+  let q: number[] = [];
   for (let i = 0; i < W * H; i++) if (p[i * 4 + 3] >= 128) { seen[i] = 1; q.push(i); }
   while (q.length) {
-    const next = [];
+    const next: number[] = [];
     for (const i of q) {
       const x = i % W;
       for (const n of [x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, i - W, i + W]) {
@@ -217,8 +216,9 @@ function despill(img) {
 }
 
 // [u0, v0, u1, v1]: the box around pixels with alpha ≥ 128 (paper.js cuts at the same 0.5), in uv, v down.
-function opaqueBox(bmp) {
-  const W = bmp.width, H = bmp.height, g = Object.assign(document.createElement('canvas'), { width: W, height: H }).getContext('2d');
+type Box = [u0: number, v0: number, u1: number, v1: number];
+function opaqueBox(bmp: ImageBitmap): Box {
+  const W = bmp.width, H = bmp.height, g = Object.assign(document.createElement('canvas'), { width: W, height: H }).getContext('2d')!;
   g.drawImage(bmp, 0, 0);
   const a = g.getImageData(0, 0, W, H).data;
   let x0 = W, y0 = H, x1 = -1, y1 = -1;
@@ -232,14 +232,14 @@ function opaqueBox(bmp) {
 // A flat silhouette at the piece's aspect, 256 px on the long edge (makePaper resamples it to its own res), inside a
 // transparent margin of 4 % of the long edge (min 8 px) so makePaper has an edge to tear on every side. The bitmap is
 // bigger than the shape, and `sizes` is bigger by the same factor, so the shape itself lands at the PIECES size.
-function proxy(w, h, shape, color) {
+function proxy(w: number, h: number, shape: string, color: string) {
   const L = 256, M = Math.max(8, Math.round(L * 0.04));
   const W = Math.max(8, Math.round(w >= h ? L : L * w / h)), H = Math.max(8, Math.round(w >= h ? L * h / w : L));
-  const c = Object.assign(document.createElement('canvas'), { width: W + 2 * M, height: H + 2 * M }), g = c.getContext('2d');
+  const c = Object.assign(document.createElement('canvas'), { width: W + 2 * M, height: H + 2 * M }), g = c.getContext('2d')!;
   g.translate(M, M);
   g.fillStyle = color; g.beginPath();
-  const ell = (x, y, rx, ry) => { g.moveTo(x + rx, y); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); };
-  const round = (x, y, w, h, r) => g.roundRect(x, y, w, h, r);
+  const ell = (x: number, y: number, rx: number, ry: number) => { g.moveTo(x + rx, y); g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2); };
+  const round = (x: number, y: number, w: number, h: number, r: number) => g.roundRect(x, y, w, h, r);
   switch (shape) {
     case 'gator':  // side view facing +x: tail, body, head with snout, little legs
       g.moveTo(0, H * 0.78); g.quadraticCurveTo(W * 0.2, H * 0.6, W * 0.35, H * 0.55); g.lineTo(W * 0.35, H * 0.95); g.closePath();

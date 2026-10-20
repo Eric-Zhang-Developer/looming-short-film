@@ -7,16 +7,16 @@
 // The K0–K7 hand path keeps s15's timing; its targets are re-solved onto this lamp's chain bead (the unit moved).
 // Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
-import { phoneLight, lampLight, ambient, aim } from '../lights.js';
+import { phoneLight, lampLight, ambient, aim } from '../lights.ts';
 import { kf, onTwos } from '../core/ease.ts';
 import { hash2 } from '../core/rng.ts';
-import { createBlob } from '../blob.js';
-import { makeGator } from '../characters/gator.js';
-import { specPose } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
+import { createBlob } from '../blob.ts';
+import { makeGator } from '../characters/gator.ts';
+import { specPose } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
 import { DESK, LAPTOP, tools, homeDesk, seatReach, firing } from './s02.js';
 import { screenHalo, reminderInsert, HALO } from './s03.js';
-import { COUNTDOWN } from '../props/canvas.js';
+import { COUNTDOWN } from '../props/canvas.ts';
 
 const ID = 's06', DEG = Math.PI / 180;
 const BLOB_R = { start: 0.018, gulp2: 0.024 };            // METER.gulp1 → METER.gulp2 (README §1, v4: 1.5× → 2×)
@@ -137,7 +137,7 @@ export async function build(ctx) {
 
       // The Student.
       gator.boil(t, 10);
-      gator.blend(P, KEYS, t);
+      gator.blend(P, /** @type {[number, string][]} */ (KEYS), t);
       if (f >= 8 && f < 12) gator.joints.head.rotation.z += HEAD_DIP[0][1] * DEG;
       if (f === 12) gator.group.position.y = DESK.hip[1] - 0.001; else gator.group.position.y = DESK.hip[1];
       if (f === 13) { gator.joints.arm_r.rotation.z += 15 * DEG; gator.joints.arm_l.rotation.z += 15 * DEG; }

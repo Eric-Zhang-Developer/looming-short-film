@@ -4,10 +4,10 @@
 // oak canopy) instead of the random proxy rooflines; skyline_sheet and foliage_sheet were never painted.
 // No characters. What moves: the camera push (1s), the boil (10/s), the dawn warming (1s), the oak canopy sway (2s).
 import * as THREE from 'three';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
-import { dawnLight, ambient } from '../lights.js';
-import { definePuppet } from '../puppet.js';
+import { makePaper, boilSeed } from '../paper.ts';
+import { paperMesh, updatePaperMesh } from '../material.ts';
+import { dawnLight, ambient } from '../lights.ts';
+import { definePuppet } from '../puppet.ts';
 import { kf, ease } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
 
@@ -41,7 +41,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const boiling = [];  // [mesh, seed => PaperSheet], re-torn every boil step
   /**
    * @param {string} layer
-   * @param {import('../paper.js').PaperOptions} opts
+   * @param {import('../paper.ts').PaperOptions} opts
    * @param {{ at?: Vec3, parent?: THREE.Object3D, tilt?: boolean, [mat: string]: any }} [o] the rest goes to paperMesh
    */
   const sheet = (layer, opts, { at, parent = scene, tilt = true, ...mat } = {}) => {
@@ -144,7 +144,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   scene.add(oak.group);
   // ±0.6° about the pivot, period 3 s: eased keys between the extremes trace a sine that starts at 0, rising.
   const SWAY = { l: { branch: -0.6 * DEG, sprig: 0 }, r: { branch: 0.6 * DEG, sprig: 0 } };
-  const swayKeys = [-0.75, 0.75, 2.25, 3.75, 5.25, 6.75].map((t, i) => [t * LEN / 6, i % 2 ? 'r' : 'l']);   // period 3 s → 2.5 s with the rest
+  /** @type {[number, string][]} */ const swayKeys = [-0.75, 0.75, 2.25, 3.75, 5.25, 6.75].map((t, i) => [t * LEN / 6, i % 2 ? 'r' : 'l']);   // period 3 s → 2.5 s with the rest
 
   // ---- Key: dawn behind the skyline, about 5° up, so every cardstock layer is a backlit silhouette with a lit rim.
   // Fill: ambient() at its default.

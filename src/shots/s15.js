@@ -9,12 +9,12 @@
 // UNIT below is the pre-G4 master that s16 imports: its values are left as they were. s16 also imports BLOB_AT, PHONE,
 // PAGE, CAM_B2 and the practice-sheet helpers from here.
 import * as THREE from 'three';
-import { sensorLight, fluorescent, ambient } from '../lights.js';
+import { sensorLight, fluorescent, ambient } from '../lights.ts';
 import { kf, clamp } from '../core/ease.ts';
-import { makeGator } from '../characters/gator.js';
-import { createBlob } from '../blob.js';
-import { POSES, specPose } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
+import { makeGator } from '../characters/gator.ts';
+import { createBlob } from '../blob.ts';
+import { POSES, specPose } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
 import { SHOTS } from '../timeline.ts';
 import { kitTools, marstonDesk, MARK, castOnly } from './s11.js';
 import { closeupRig, HEAD_AT } from './s09b.js';
@@ -33,7 +33,7 @@ export const UNIT = {
   camB: /** @type {CamKey} */ ({ pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] }),
   focus: /** @type {Vec3} */ ([-0.024, 0.020, 0.086]), aperture: 0.02, maxblur: 0.01,
   fill: /** @type {Vec3} */ ([-0.046, 0.040, 0.114]),                             // character fill (README §10): before him, just above eye line
-  tube: [0, 0.127, 0.040],                                   // the pendant's light (README §3's trough position)
+  tube: /** @type {Vec3} */ ([0, 0.127, 0.040]),                                   // the pendant's light (README §3's trough position)
   blob: [0, 0.012, 0.0884], phone: [-0.010, 0.0015, 0.116], phoneLight: [-0.014, 0.006, 0.116],
   press: 0.5,                                                // G4's press drawing (kept for the importers' numbers)
 };
@@ -262,7 +262,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const { pendant } = await marstonDesk({ scene, assets, PALETTE, tools, ID });
   const [props, kitp] = await Promise.all(['study_props_sheet', 'props_kit'].map((n) => assets.load(n)));
   // An asset piece in a holder whose origin is the centre of the piece's visible shape, so the spec's boxes place it.
-  /** @param {import('../assets.js').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D, key?: string }} [o] */
+  /** @param {import('../assets.ts').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D, key?: string }} [o] */
   const cut = (a, name, { weight, res = 512, parent = scene, key = name } = {}) => {
     const holder = new THREE.Group(), [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [w, h], key: `${ID}-${key}`, weight, res }, holder);
@@ -331,7 +331,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     hero.group.visible = !close; cu.rig.group.visible = close;
     for (const r of [hero, cu.rig]) {
       r.boil(t, 10);
-      r.blend(P, BODY, tc + 1e-6);
+      r.blend(P, /** @type {[number, string][]} */ (BODY), tc + 1e-6);
     }
     const f = act(hero, t, CUES, { slump: 0, breath: tc >= FLICKER[0] && tc < NAME[0] ? 30 : 6, seed: 15 });
     hero.joints.head.rotation.z += kf(tc, HEAD) * D;

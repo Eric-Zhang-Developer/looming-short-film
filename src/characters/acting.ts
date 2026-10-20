@@ -1,4 +1,3 @@
-// @ts-check
 // The acting kit (rig-v4): one shared module so every shot can give the gators a face to act with. A pure function of t.
 // Director, 2026-10-17: "our gator itself is not very emotional. We need more emotion for our gator, even just some
 // simple face changes."
@@ -25,9 +24,12 @@ import * as THREE from 'three';
 import { onTwos, kf, lerp, ease } from '../core/ease.ts';
 import { hash2 } from '../core/rng.ts';
 import { PALETTE } from '../core/palette.ts';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
-import { FIG_K } from './gator.js';
+import { makePaper, boilSeed } from '../paper.ts';
+import type { PaperSheet } from '../paper.ts';
+import { paperMesh, updatePaperMesh } from '../material.ts';
+import type { PaperMesh } from '../material.ts';
+import type { Puppet } from '../puppet.ts';
+import { FIG_K } from './gator.ts';
 
 const D = Math.PI / 180;
 export const ANTIC = 2 / 24, MIN_HOLD = 12 / 24, SETTLE = 4 / 12;
@@ -36,12 +38,9 @@ const LEAN = 7, DROP = 8, SAG = 0.04;   // per unit of slump: body lean °, head
 
 // brow: [angle °, + = the snout end up (worried); dy figure px, + = down] or null (hidden: the painted design has none).
 // breath: seconds per breath. depth: body y-scale swing.
-/**
- * @typedef {{ eyes: string, mouth: string, bar?: boolean, brow: number[] | null, tilt: number, slump: number, tail: number,
- *   breath: number, depth: number, first?: { eyes: string, mouth: string, for: number } }} Preset
- */
-/** @type {Readonly<Record<string, Preset>>} */
-export const PRESETS = Object.freeze({
+export type Preset = { eyes: string, mouth: string, bar?: boolean, brow: number[] | null, tilt: number, slump: number, tail: number,
+  breath: number, depth: number, first?: { eyes: string, mouth: string, for: number } };
+export const PRESETS: Readonly<Record<string, Preset>> = Object.freeze({
   neutral: { eyes: 'open', mouth: 'neutral', brow: [0, 0], tilt: 0, slump: 0, tail: 0, breath: 3.2, depth: 0.010 },
   numb: { eyes: 'tired', mouth: 'neutral', brow: [-3, 7], tilt: -6, slump: 0.9, tail: -14, breath: 4.2, depth: 0.006 },
   guilt: { eyes: 'side', mouth: 'line', brow: [20, 2], tilt: -12, slump: 0.5, tail: -10, breath: 2.6, depth: 0.010 },
@@ -54,17 +53,20 @@ export const PRESETS = Object.freeze({
   pride: { eyes: 'open', mouth: 'smile', brow: [8, -6], tilt: 10, slump: -0.9, tail: 24, breath: 3.0, depth: 0.012,
     first: { eyes: 'gasp', mouth: 'o', for: 0.5 } },
 });
-const NUM = ['tilt', 'slump', 'tail', 'depth'];
+type Num = 'tilt' | 'slump' | 'tail' | 'depth';
+const NUM: Num[] = ['tilt', 'slump', 'tail', 'depth'];
+type Vals = Record<Num, number> & { brow: number[] | null };   // a preset's numbers after opts, plus its brow
 
 // The firm mouth (resolve): one torn strip of the brow's dark green, 78 × 16 figure px (the face sheet's `line` is 73 px
 // long and about 3 px thick), laid over the mouth slot on the head. Built on first use, boiled with the film's 10/s boil.
 const BAR = { size: [78 * FIG_K, 16 * FIG_K], path: [[0.02, 0.5], [0.14, 0.28], [0.5, 0.2], [0.86, 0.28], [0.98, 0.48], [0.96, 0.74], [0.7, 0.82], [0.4, 0.78], [0.1, 0.82]] };
-const bars = new WeakMap();
-function mouthBar(rig, t) {
+type ActRig = Puppet & { scale: number };
+const bars = new WeakMap<ActRig, { mesh: PaperMesh, make: (seed: number) => PaperSheet }>();
+function mouthBar(rig: ActRig, t: number) {
   let b = bars.get(rig);
   if (!b) {
     const color = '#' + new THREE.Color(PALETTE.gator).lerp(new THREE.Color(PALETTE.ink), 0.72).getHexString();   // sideParts' brow
-    const make = (seed) => makePaper({ path: BAR.path, color, size: BAR.size, key: 'acting-mouthbar', res: 256, seed });
+    const make = (seed: number) => makePaper({ path: BAR.path, color, size: BAR.size, key: 'acting-mouthbar', res: 256, seed });
     const mesh = paperMesh(make(0));
     mesh.castShadow = false;
     rig.joints.head.add(mesh);
@@ -76,7 +78,7 @@ function mouthBar(rig, t) {
   return b.mesh;
 }
 
-function check(cues) {
+function check(cues: [number, string][]) {
   if (!cues.length) throw new Error('act: cues is empty');
   cues.forEach(([t0, n], i) => {
     if (!PRESETS[n]) throw new Error(`act: unknown preset "${n}" (${Object.keys(PRESETS).join(', ')})`);
@@ -86,7 +88,7 @@ function check(cues) {
 }
 
 // Breath phase in cycles: ∫ dt / period from 0, with each cue's period from its t0, so a rate change never jumps.
-function phase(T, cues, period) {
+function phase(T: number, cues: [number, string][], period: number | undefined) {
   let ph = 0;
   for (let i = 0; i < cues.length; i++) {
     const a = i ? Math.max(0, cues[i][0]) : 0, b = Math.min(T, i + 1 < cues.length ? Math.max(0, cues[i + 1][0]) : T);
@@ -96,7 +98,7 @@ function phase(T, cues, period) {
 }
 
 // Is drawing T a blink? Blink k is at onTwos(b_k), b_0 = 1 + 2·h, then 3–5 s apart (seeded).
-function blinking(T, seed) {
+function blinking(T: number, seed: number) {
   let b = 1 + 2 * hash2(seed, 9999);
   for (let k = 0; onTwos(b) <= T + 1e-6; k++) {
     const d = onTwos(b);
@@ -106,31 +108,26 @@ function blinking(T, seed) {
   return false;
 }
 
-/**
- * @param {import('../puppet.js').Puppet & { scale: number }} rig
- * @param {number} t shot-local seconds
- * @param {[number, string][]} cues
- * @param {{ breath?: number, depth?: number, slump?: number, tilt?: number, tail?: number, blink?: boolean, seed?: number }} [opts]
- */
-export function act(rig, t, cues, { breath, depth, slump, tilt, tail, blink = true, seed = 0 } = {}) {
+// t: shot-local seconds
+export function act(rig: ActRig, t: number, cues: [number, string][], { breath, depth, slump, tilt, tail, blink = true, seed = 0 }: { breath?: number, depth?: number, slump?: number, tilt?: number, tail?: number, blink?: boolean, seed?: number } = {}) {
   check(cues);
   const T = onTwos(t), over = { depth, slump, tilt, tail };
   let i = 0;
   while (i + 1 < cues.length && T >= cues[i + 1][0] - 1e-6) i++;
   const [t0, name] = cues[i], P = PRESETS[name];
-  const val = (p) => { const v = {}; for (const k of NUM) v[k] = over[k] ?? p[k]; v.brow = p.brow; return v; };
+  const val = (p: Preset) => { const v = {} as Vals; for (const k of NUM) v[k] = over[k] ?? p[k]; v.brow = p.brow; return v; };
   const cur = val(P), prev = i ? val(PRESETS[cues[i - 1][1]]) : cur;
   const nextAt = cues[i + 1]?.[0], antic = nextAt !== undefined && T >= nextAt - ANTIC - 1e-6;
-  let v = {}, eyes = P.eyes, mouth = P.mouth;
+  let v = {} as Vals, eyes = P.eyes, mouth = P.mouth;
   if (antic) {  // one drawing before the change: squeeze, and push away from where we're going
     const nx = val(PRESETS[cues[i + 1][1]]);
     for (const k of NUM) v[k] = cur[k] + 0.35 * (cur[k] - nx[k]);
-    v.brow = cur.brow && nx.brow ? cur.brow.map((x, j) => x + 0.35 * (x - nx.brow[j])) : cur.brow;
+    v.brow = cur.brow && nx.brow ? cur.brow.map((x, j) => x + 0.35 * (x - nx.brow![j])) : cur.brow;
     eyes = 'closed';
   } else {
     const u = T < t0 ? 1 : ease((T - t0) / SETTLE);
     for (const k of NUM) v[k] = lerp(prev[k], cur[k], u);
-    v.brow = cur.brow && prev.brow ? cur.brow.map((x, j) => lerp(prev.brow[j], x, u)) : cur.brow;
+    v.brow = cur.brow && prev.brow ? cur.brow.map((x, j) => lerp(prev.brow![j], x, u)) : cur.brow;
     if (P.first && T >= t0 && T < t0 + P.first.for - 1e-6) ({ eyes, mouth } = P.first);
     const near = Math.abs(T - t0) < 0.25 || (nextAt !== undefined && nextAt - T < 0.25 + ANTIC);
     if (blink && eyes !== 'closed' && !near && blinking(T, seed)) eyes = 'closed';
@@ -159,9 +156,9 @@ export function act(rig, t, cues, { breath, depth, slump, tilt, tail, blink = tr
 // The self-check the brief's timing rules lean on: node src/characters/acting.js (no browser; a stub rig).
 if (typeof process !== 'undefined' && import.meta.url === `file://${process.argv[1]}`) {
   const j = () => ({ rotation: { z: 0 }, scale: { y: 1 }, position: { y: 0 }, userData: {} });
-  const rig = /** @type {any} */ ({ scale: 1, joints: { body: j(), head: j(), tail: j(), brow: j() }, meshes: { brow: {}, head: { visible: true } }, face(f) { this.f = f; } });
-  const at = (t, cues, o) => { for (const k of Object.values(rig.joints)) { k.rotation.z = 0; } return act(rig, t, cues, { blink: false, ...o }); };
-  const C = [[0, 'numb'], [2, 'dread'], [4, 'pride']];
+  const rig = ({ scale: 1, joints: { body: j(), head: j(), tail: j(), brow: j() }, meshes: { brow: {}, head: { visible: true } }, face(f: unknown) { this.f = f; } }) as any;   // a stub rig: plain objects standing in for three Groups and meshes
+  const at = (t: number, cues: [number, string][], o?: Parameters<typeof act>[3]) => { for (const k of Object.values<{ rotation: { z: number } }>(rig.joints)) { k.rotation.z = 0; } return act(rig, t, cues, { blink: false, ...o }); };
+  const C: [number, string][] = [[0, 'numb'], [2, 'dread'], [4, 'pride']];
   console.assert(at(1, C).eyes === 'tired', 'numb holds');
   console.assert(at(2 - 1 / 12, C).eyes === 'closed', 'one anticipation drawing before the change');
   console.assert(at(2 - 2 / 12, C).eyes === 'tired', 'only one');
@@ -169,7 +166,7 @@ if (typeof process !== 'undefined' && import.meta.url === `file://${process.argv
   console.assert(at(4.25, C).eyes === 'gasp' && at(4.5, C).mouth === 'smile', 'pride: wide, then the smile');
   let threw = false; try { at(0, [[0, 'numb'], [0.5, 'dread']]); } catch { threw = true; }
   console.assert(threw, 'a hold under 12 frames throws');
-  const blinks = []; for (let f = 0; f < 240; f++) if (act(rig, f / 24, [[0, 'neutral']]).eyes === 'closed') blinks.push(f / 24);
+  const blinks: number[] = []; for (let f = 0; f < 240; f++) if (act(rig, f / 24, [[0, 'neutral']]).eyes === 'closed') blinks.push(f / 24);
   const draw = [...new Set(blinks.map((b) => onTwos(b)))];
   console.assert(draw.length >= 2 && draw.every((b, k) => !k || (b - draw[k - 1] >= 3 - 1e-6 && b - draw[k - 1] <= 5 + 1 / 12)), 'blinks 3–5 s apart', draw);
   console.assert(blinks.length === 2 * draw.length, 'each blink is one drawing (2 frames)');

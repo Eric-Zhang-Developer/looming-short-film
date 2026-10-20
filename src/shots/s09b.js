@@ -8,12 +8,12 @@
 // the shadow fills the hall; a close-up (C5, the painted heads, dread → resolve); he steps into the dark.
 // Characters on 2s, light and camera on 1s, boil 10/s. s10 imports closeupRig() from here.
 import * as THREE from 'three';
-import { ambient, aim } from '../lights.js';
+import { ambient, aim } from '../lights.ts';
 import { kf, ease, clamp, onTwos } from '../core/ease.ts';
 import { SHOTS } from '../timeline.ts';
-import { makeGator, HIP } from '../characters/gator.js';
-import { POSES, specPose, walk } from '../characters/poses.js';
-import { createBlob } from '../blob.js';
+import { makeGator, HIP } from '../characters/gator.ts';
+import { POSES, specPose, walk } from '../characters/poses.ts';
+import { createBlob } from '../blob.ts';
 import { kitTools, mppOf, noCast, glow } from './s11.js';
 
 const ID = 's09b', D = Math.PI / 180;

@@ -10,17 +10,17 @@
 // ROOM.NIGHTSTAND / ROOM.LAMP are the nightstand lamp climax-a2's s09b matches (Q17, director 2026-10-18). headOn()
 // builds H for s07 and s08.
 import * as THREE from 'three';
-import { phoneLight, ambient, aim } from '../lights.js';
+import { phoneLight, ambient, aim } from '../lights.ts';
 import { onTwos } from '../core/ease.ts';
 import { hash2, seedOf } from '../core/rng.ts';
-import { createBlob } from '../blob.js';
-import { makeGator, FIG_K } from '../characters/gator.js';
-import { specPose } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
-import { makeClock } from '../clock.js';
+import { createBlob } from '../blob.ts';
+import { makeGator, FIG_K } from '../characters/gator.ts';
+import { specPose } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
+import { makeClock } from '../clock.ts';
 import { tools } from './s02.js';
 import { reminderInsert } from './s03.js';
-import { COUNTDOWN } from '../props/canvas.js';
+import { COUNTDOWN } from '../props/canvas.ts';
 import { REELS } from '../audio/cues.ts';
 
 const DEG = Math.PI / 180;

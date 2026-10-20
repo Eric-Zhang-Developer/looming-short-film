@@ -4,9 +4,9 @@
 // (rows of 6) and tLocal as a cream bar filling left to right. No text: frames never carry legible text.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.ts';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
-import { ambient } from '../lights.js';
+import { makePaper, boilSeed } from '../paper.ts';
+import { paperMesh, updatePaperMesh } from '../material.ts';
+import { ambient } from '../lights.ts';
 
 const ID = 's00', ASSET = 'gator_sheet', PIECE = 'turn_side';
 

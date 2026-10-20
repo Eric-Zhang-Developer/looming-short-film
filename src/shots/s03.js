@@ -5,15 +5,15 @@
 // B.z) = 0.0225 / 0.0075) the moment the screen wakes, and swells to 3.75 units on gulp 1 (4.5), the first meter step.
 // Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
-import { phoneLight, dawnLight, ambient, aim } from '../lights.js';
+import { phoneLight, dawnLight, ambient, aim } from '../lights.ts';
 import { kf, ease } from '../core/ease.ts';
 import { hash2 } from '../core/rng.ts';
-import { createBlob } from '../blob.js';
-import { makeGator } from '../characters/gator.js';
-import { specPose } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
+import { createBlob } from '../blob.ts';
+import { makeGator } from '../characters/gator.ts';
+import { specPose } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
 import { DESK, B, LAPTOP, tools, homeDesk, seatReach, firing } from './s02.js';
-import { banner, todoScreen, COUNTDOWN } from '../props/canvas.js';
+import { banner, todoScreen, COUNTDOWN } from '../props/canvas.ts';
 
 const ID = 's03', DEG = Math.PI / 180;
 
@@ -214,7 +214,7 @@ export async function build(ctx) {
 
       // The Student.
       gator.boil(t, 10);
-      gator.blend(P, KEYS, t);
+      gator.blend(P, /** @type {[number, string][]} */ (KEYS), t);
       gator.follow('tail', t, { k: 6, w: 18 });
       gator.group.position.y = DESK.hip[1] + (f >= 2 && f < 4 ? -0.0015 : 0);
       // v4 acting: guilt (the look at the blob), then numb for the game. slump 0: his hands are on the lid and keys, so the pose

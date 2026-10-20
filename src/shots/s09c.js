@@ -7,14 +7,14 @@
 // toward its door. Characters on 2s, light and camera on 1s, boil 10/s.
 // The 2.5× blob (Q16, director 2026-10-18). s10 imports the lamp constants: lamp 5 is the light behind him at the door.
 import * as THREE from 'three';
-import { ambient } from '../lights.js';
+import { ambient } from '../lights.ts';
 import { kf, ease, clamp, onTwos } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
 import { SHOTS } from '../timeline.ts';
-import { makeGator, hipHeight } from '../characters/gator.js';
-import { POSES, specPose, walk } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
-import { createBlob } from '../blob.js';
+import { makeGator, hipHeight } from '../characters/gator.ts';
+import { POSES, specPose, walk } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
+import { createBlob } from '../blob.ts';
 import { kitTools, mppOf, noCast, glow } from './s11.js';
 import { closeupRig, HEAD_AT } from './s09b.js';
 
@@ -73,7 +73,7 @@ const SELF = 0.45, THROUGH = 0.1;
 
 // A lamppost from marston_ext_kit, globe centre at the light point. Returns its glowing material.
 /**
- * @param {import('../assets.js').Kit} ext marston_ext_kit
+ * @param {import('../assets.ts').Kit} ext marston_ext_kit
  * @param {Function} art kitTools' art
  * @param {THREE.Object3D} parent
  * @param {string} key

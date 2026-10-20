@@ -1,0 +1,62 @@
+diff -r oldout/assets.js new/assets.js
+140c140
+<     const table = PIECES[name], pieces = ({});
+---
+>     const table = PIECES[name], pieces = {};
+diff -r oldout/characters/gator.js new/characters/gator.js
+18c18
+<     const S = THREE.SRGBColorSpace, rgb = (x) => new THREE.Color(x).getRGB(({}), S);
+---
+>     const S = THREE.SRGBColorSpace, rgb = (x) => new THREE.Color(x).getRGB({}, S);
+137c137
+<     return Object.assign(puppet, { hands, hand: hands.arm_r ?? null, scale });
+---
+>     return Object.assign(puppet, { hands: hands, hand: hands.arm_r ?? null, scale });
+diff -r oldout/props/canvas.js new/props/canvas.js
+25c25
+< function text(g, s, x, y, pt, color, weight = 400, align = ('left')) {
+---
+> function text(g, s, x, y, pt, color, weight = 400, align = 'left') {
+diff -r oldout/shots/s02.js new/shots/s02.js
+254c254
+< const SUN = { k: 0.35, pos: [0.8, 0.6, 0.6], scale: 0.8 };
+---
+> const SUN = { k: 0.35, pos: ([0.8, 0.6, 0.6]), scale: 0.8 };
+diff -r oldout/shots/s03.js new/shots/s03.js
+192c192
+<             gator.blend(P, KEYS, t);
+---
+>             gator.blend(P, (KEYS), t);
+diff -r oldout/shots/s06.js new/shots/s06.js
+116c116
+<             gator.blend(P, KEYS, t);
+---
+>             gator.blend(P, (KEYS), t);
+diff -r oldout/shots/s15.js new/shots/s15.js
+23c23
+<     tube: [0, 0.127, 0.040],
+---
+>     tube: ([0, 0.127, 0.040]),
+356c356
+<             r.blend(P, BODY, tc + 1e-6);
+---
+>             r.blend(P, (BODY), tc + 1e-6);
+diff -r oldout/shots/s17.js new/shots/s17.js
+115c115
+<     const zones = [[[0, 0.127, 0.040], [BLOB[0], 0, BLOB[1]]], [[NB, 0.127, 0.040], [NB_BLOB[0], 0, NB_BLOB[1]]]].map(([at, to]) => {
+---
+>     const zones = ([[[0, 0.127, 0.040], [BLOB[0], 0, BLOB[1]]], [[NB, 0.127, 0.040], [NB_BLOB[0], 0, NB_BLOB[1]]]]).map(([at, to]) => {
+diff -r oldout/shots/s17b.js new/shots/s17b.js
+15c15
+< const CLOCK = { at: ([0.12, 0.10, 0.0008]), d: 0.014, reads: [9, 0], s0: 12 };
+---
+> const CLOCK = { at: ([0.12, 0.10, 0.0008]), d: 0.014, reads: ([9, 0]), s0: 12 };
+242c242
+<             fig.eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';
+---
+>             (fig).eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';
+diff -r oldout/shots/s18.js new/shots/s18.js
+22c22
+< const LAMP_AT = [DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005], LAMP_AIM = [0.036, 0.020, 0.0035];
+---
+> const LAMP_AT = ([DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005]), LAMP_AIM = ([0.036, 0.020, 0.0035]);

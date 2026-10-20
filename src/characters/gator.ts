@@ -1,29 +1,32 @@
-// @ts-check
 // The Student's rig, and the helpers every character file builds with (contract: docs/contracts.md §characters).
 // Pieces come from assets.load(): cut frozen art where it exists (gator_sheet, face_sheet), proxies elsewhere.
 // Geometry is s15's desk unit (docs/shots/README.md §2): shoulder = hip + (0.013, 0.030), near arm 0.032 to the
 // fingertip, near arm 12 mm in front of the body, far arm 4 mm behind, pocket 3 mm in front. Everything × scale.
 import * as THREE from 'three';
-import { PIECES } from '../assets.js';
+import { PIECES } from '../assets.ts';
+import type { AssetCtx, Kit } from '../assets.ts';
 import { PALETTE } from '../core/palette.ts';
-import { makePaper } from '../paper.js';
-import { definePuppet } from '../puppet.js';
+import { makePaper } from '../paper.ts';
+import type { PaperSheet } from '../paper.ts';
+import { definePuppet } from '../puppet.ts';
+import type { Pose, PuppetPart } from '../puppet.ts';
 
 // ---------- art helpers: each returns a canvas, built once at rig time ----------
-const canvas = (w, h) => Object.assign(document.createElement('canvas'), { width: w, height: h });
-const mirror = (img) => { const c = canvas(img.width, img.height), g = c.getContext('2d'); g.scale(-1, 1); g.drawImage(img, -img.width, 0); return c; };
-const rot90 = (img) => {  // clockwise: a piece pointing +x now points down
-  const c = canvas(img.height, img.width), g = c.getContext('2d');
+type Img = ImageBitmap | HTMLCanvasElement;
+const canvas = (w: number, h: number) => Object.assign(document.createElement('canvas'), { width: w, height: h });
+const mirror = (img: Img) => { const c = canvas(img.width, img.height), g = c.getContext('2d')!; g.scale(-1, 1); g.drawImage(img, -img.width, 0); return c; };
+const rot90 = (img: Img) => {  // clockwise: a piece pointing +x now points down
+  const c = canvas(img.height, img.width), g = c.getContext('2d')!;
   g.translate(img.height, 0); g.rotate(Math.PI / 2); g.drawImage(img, 0, 0); return c;
 };
 // Multiplies the green paint by green / PALETTE.gator per channel, so painted shading survives. Only green pixels
 // take it (weight by how far g leads r and b), so a tinted cut keeps its cream hoodie, sleeves and rim. hoodie (rig-v4)
 // multiplies the other pixels by hoodie / PALETTE.cream the same way: only HOODIE pieces get it, so the throat stays cream.
-function tint(img, green, hoodie) {
-  const c = canvas(img.width, img.height), g = c.getContext('2d');
+function tint(img: Img, green: string | undefined, hoodie: string | null | undefined) {
+  const c = canvas(img.width, img.height), g = c.getContext('2d')!;
   g.drawImage(img, 0, 0);
-  const S = THREE.SRGBColorSpace, rgb = (x) => new THREE.Color(x).getRGB(/** @type {THREE.RGB} */ ({}), S);  // pixels are sRGB
-  const ratio = (to, from) => (to ? [to.r / from.r, to.g / from.g, to.b / from.b] : [1, 1, 1]);
+  const S = THREE.SRGBColorSpace, rgb = (x: THREE.ColorRepresentation) => new THREE.Color(x).getRGB({} as THREE.RGB, S);  // pixels are sRGB
+  const ratio = (to: THREE.RGB | '' | null | undefined, from: THREE.RGB) => (to ? [to.r / from.r, to.g / from.g, to.b / from.b] : [1, 1, 1]);
   const k = ratio(green && rgb(green), rgb(PALETTE.gator)), kh = ratio(hoodie && rgb(hoodie), rgb(PALETTE.cream));
   const d = g.getImageData(0, 0, c.width, c.height), p = d.data;
   for (let i = 0; i < p.length; i += 4) {
@@ -36,9 +39,8 @@ function tint(img, green, hoodie) {
 const HOODIE = new Set(['body', 'arm_l', 'arm_r', 'pocket']);  // gator_sheet pieces that are hoodie, not skin
 
 // Mixed from PALETTE so no hex is typed here. Crowds are never cloned: every figure gets its own i.
-/** @type {[string, number][]} */
-const MIX = [['navy', 0.22], ['kraft', 0.3], ['cream', 0.2], ['ink', 0.3], ['kraft', 0.55], ['navy', 0.4], ['cream', 0.35], ['phone', 0.14]];
-export function greenVariant(i) {
+const MIX: [keyof typeof PALETTE, number][] = [['navy', 0.22], ['kraft', 0.3], ['cream', 0.2], ['ink', 0.3], ['kraft', 0.55], ['navy', 0.4], ['cream', 0.35], ['phone', 0.14]];
+export function greenVariant(i: number): string {
   const c = new THREE.Color(PALETTE.gator), [a, ka] = MIX[i % MIX.length];
   c.lerp(new THREE.Color(PALETTE[a]), ka);
   if (i >= MIX.length) { const [b, kb] = MIX[(i + 3) % MIX.length]; c.lerp(new THREE.Color(PALETTE[b]), kb * 0.5); }
@@ -49,11 +51,11 @@ export function greenVariant(i) {
 // streaky next to the painted jaw (evidence/trims-home/neck.jpg), so the part takes the painted paper itself: the middle of
 // `piece`'s opaque box, tiled (alternate tiles mirrored, so no seams) over a canvas the shape of `size`, then cut to `path`
 // (0..1, v down). One art pixel of the jaw is 0.7 figure px (sideParts), so the canvas runs at 1 / 0.7 of the figure's.
-function paintedLike(a, piece, path, [w, h]) {
+function paintedLike(a: Kit, piece: string, path: number[][], [w, h]: number[]) {
   const bmp = a.pieces[piece], [u0, v0, u1, v1] = a.visible[piece], bw = bmp.width, bh = bmp.height;
   const sx = Math.round((u0 + 0.22 * (u1 - u0)) * bw), sy = Math.round((v0 + 0.36 * (v1 - v0)) * bh);
   const pw = Math.round(0.28 * (u1 - u0) * bw), ph = Math.round(0.2 * (v1 - v0) * bh);
-  const cw = Math.round(w / K / 0.7), ch = Math.round(h / K / 0.7), c = canvas(cw, ch), g = c.getContext('2d');
+  const cw = Math.round(w / K / 0.7), ch = Math.round(h / K / 0.7), c = canvas(cw, ch), g = c.getContext('2d')!;
   for (let j = 0; j * ph < ch; j++) for (let i = 0; i * pw < cw; i++) {
     g.save(); g.translate((i + (i & 1)) * pw, (j + (j & 1)) * ph); g.scale(i & 1 ? -1 : 1, j & 1 ? -1 : 1);
     g.drawImage(bmp, sx, sy, pw, ph, 0, 0, pw, ph); g.restore();
@@ -73,48 +75,46 @@ function paintedLike(a, piece, path, [w, h]) {
 // (path in 0..1, v down, as makePaper takes it).
 // faces: true adds eyes and mouth slots from face_sheet (parts named eyes/mouth must be in `parts`, from: null).
 // facePair: draw every eye take as a front-view pair this many face px apart (makeFaces).
-/**
- * @typedef {object} PartSpec
- * @property {string} name
- * @property {string[] | null} [from] [asset, piece]; null makes a face slot
- * @property {{ path: number[][], color?: string, weight?: string, like?: string[] }} [paper] a part drawn in code
- * @property {number[]} [size]
- * @property {number[]} [pivot]
- * @property {string} [parent]
- * @property {number[]} [at]
- * @property {number} [z]
- * @property {string} [weight]
- * @property {string} [turn] 'mirror' | 'rot90' | 'mirrorProxy'
- * @property {number} [reach]
- * @property {boolean} [hidden]
- */
-/**
- * @param {import('../assets.js').AssetCtx} ctx
- * @param {{ name: string, seed?: number, scale?: number, green?: string, hoodie?: string, res?: number, parts: PartSpec[],
- *   faces?: Record<string, string> | null, facePair?: number }} opts
- */
-export async function buildRig(ctx, { name, seed = 0, scale = 1, green, hoodie, res = 512, parts, faces = null, facePair = 0 }) {
+export type PartSpec = {
+  name: string,
+  from?: string[] | null,   // [asset, piece]; null makes a face slot
+  paper?: { path: number[][], color?: string, weight?: string, like?: string[] },   // a part drawn in code
+  size?: number[],
+  pivot?: number[],
+  parent?: string,
+  at?: number[],
+  z?: number,
+  weight?: string,
+  turn?: string,            // 'mirror' | 'rot90' | 'mirrorProxy'
+  reach?: number,
+  hidden?: boolean,
+};
+export type Rig = Awaited<ReturnType<typeof buildRig>>;
+export async function buildRig(ctx: AssetCtx, { name, seed = 0, scale = 1, green, hoodie, res = 512, parts, faces = null, facePair = 0 }: {
+  name: string, seed?: number, scale?: number, green?: string, hoodie?: string, res?: number, parts: PartSpec[],
+  faces?: Record<string, string> | null, facePair?: number }) {
   const id = `${name}${seed}`;
-  const loaded = {};
+  const loaded: Record<string, Kit> = {};
   for (const p of parts) if (p.from && !loaded[p.from[0]]) loaded[p.from[0]] = await ctx.assets.load(p.from[0]);
-  const s = (v) => v.map((x) => x * scale);
+  const s = (v: number[]) => v.map((x) => x * scale);
   const faceSet = faces ? await makeFaces(ctx, { id, scale, res: Math.min(res, 256), pair: facePair }) : null;
-  const hands = {}, defs = [];
+  // hands holds [reach, alongX] per hand until the loop after definePuppet swaps in each hand's Group.
+  const hands: Record<string, [number, boolean] | THREE.Group> = {}, defs: PuppetPart[] = [];
   for (const p of parts) {
     if (!p.from && !p.paper) {  // face slot
-      const takes = faceSet.takes[p.name];
-      defs.push({ name: p.name, parent: p.parent, sheet: takes[faces[p.name]], pivot: [0.5, 0.5], at: s(p.at), z: (p.z ?? 0) * scale });
+      const takes = faceSet!.takes[p.name];
+      defs.push({ name: p.name, parent: p.parent, sheet: takes[faces![p.name]], pivot: [0.5, 0.5], at: s(p.at!), z: (p.z ?? 0) * scale });
       continue;
     }
     if (p.paper) {
-      const key = `${id}-${p.name}`, size = s(p.size);
+      const key = `${id}-${p.name}`, size = s(p.size!);
       const paper = p.paper.like ? { art: paintedLike(loaded[p.paper.like[0]], p.paper.like[1], p.paper.path, size) } : p.paper;
-      defs.push({ name: p.name, parent: p.parent, pivot: p.pivot, at: s(p.at), z: (p.z ?? 0) * scale,
-        sheet: (sd) => makePaper({ ...paper, size, key, res, seed: sd }) });
+      defs.push({ name: p.name, parent: p.parent, pivot: p.pivot!, at: s(p.at!), z: (p.z ?? 0) * scale,
+        sheet: (sd: number) => makePaper({ ...paper, size, key, res, seed: sd }) });
       continue;
     }
-    const [asset, piece] = p.from, a = loaded[asset];
-    let art = a.pieces[piece];
+    const [asset, piece] = p.from!, a = loaded[asset];
+    let art: Img = a.pieces[piece];
     if (!art) throw new Error(`${name}: ${asset} has no piece "${piece}"`);
     // size and pivot are the visible shape's (a.visible: its box inside the bitmap's transparent margin)
     let [u0, v0, u1, v1] = a.visible?.[piece] ?? [0, 0, 1, 1];
@@ -129,22 +129,22 @@ export async function buildRig(ctx, { name, seed = 0, scale = 1, green, hoodie, 
       if (asp >= 1) { const w = L / (1 - 0.5 / asp); size = [w, w / asp]; pivot = [0.5 / asp, 0.5]; }
       else { const h = L / (1 - 0.5 * asp); size = [h * asp, h]; pivot = [0.5, 0.5 * asp]; }
     }
-    size = [size[0] / fw, size[1] / fh]; pivot = [u0 + pivot[0] * fw, v0 + pivot[1] * fh];
+    size = [size![0] / fw, size![1] / fh]; pivot = [u0 + pivot![0] * fw, v0 + pivot![1] * fh];
     const key = `${id}-${p.name}`, weight = p.weight ?? 'cardstock';
-    defs.push({ name: p.name, parent: p.parent, pivot, at: s(p.at), z: (p.z ?? 0) * scale,
-      sheet: (sd) => makePaper({ art, size, key, weight, res, seed: sd }) });
+    defs.push({ name: p.name, parent: p.parent, pivot, at: s(p.at!), z: (p.z ?? 0) * scale,
+      sheet: (sd: number) => makePaper({ art, size, key, weight, res, seed: sd }) });
     if (p.reach) hands[p.name] = [p.reach * scale, art.width >= art.height];
   }
   const puppet = definePuppet({ name, parts: defs, faces: faceSet?.takes ?? {} });
   for (const p of parts) if (p.hidden) puppet.meshes[p.name].visible = false;
-  for (const [part, [L, alongX]] of Object.entries(hands)) {
+  for (const [part, [L, alongX]] of Object.entries(hands as Record<string, [number, boolean]>)) {
     const g = new THREE.Group();
     g.name = `${part}-hand`;
     if (alongX) g.position.set(L, 0, 0.001); else g.position.set(0, -L, 0.001);
     puppet.joints[part].add(g);
     hands[part] = g;
   }
-  return Object.assign(puppet, { hands, hand: hands.arm_r ?? null, scale });
+  return Object.assign(puppet, { hands: hands as Record<string, THREE.Group>, hand: (hands.arm_r as THREE.Group | undefined) ?? null, scale });
 }
 
 // Faces: every take is drawn at one scale, FACE m per face_sheet px, onto one canvas per slot (sizes in face px), so
@@ -153,24 +153,23 @@ export async function buildRig(ctx, { name, seed = 0, scale = 1, green, hoodie, 
 // (worried: the eye, not the eye plus its sweat drops). pair: the front view's two eyes, `pair` face px apart, the
 // right one mirrored so both look at the camera.
 const EYES = ['open', 'closed', 'tired', 'gasp', 'worried', 'side'], MOUTHS = ['neutral', 'smile', 'o', 'line'];
-/** @type {Record<string, [string[], number[]]>} */
-const SLOTS = { eyes: [EYES, [232, 160]], mouth: [MOUTHS, [232, 100]] };
-const ANCHOR = { eyes_worried: [22, 0] };
-async function makeFaces(ctx, { id, scale, res, pair = 0 }) {
-  const a = await ctx.assets.load('face_sheet'), takes = {};
+const SLOTS: Record<string, [string[], number[]]> = { eyes: [EYES, [232, 160]], mouth: [MOUTHS, [232, 100]] };
+const ANCHOR: Record<string, number[]> = { eyes_worried: [22, 0] };
+async function makeFaces(ctx: AssetCtx, { id, scale, res, pair = 0 }: { id: string, scale: number, res: number, pair?: number }) {
+  const a = await ctx.assets.load('face_sheet'), takes: Record<string, Record<string, (sd: number) => PaperSheet>> = {};
   for (const [slot, [names, [CW0, CH]]] of Object.entries(SLOTS)) {
     const two = slot === 'eyes' && pair, CW = CW0 + (two ? pair : 0);
     takes[slot] = {};
     for (const n of names) {
       const key = `${slot}_${n}`, art = a.pieces[key], [w, h] = a.sizes[key], [ax, ay] = ANCHOR[key] ?? [0, 0];
       const dw = w / FACE, dh = h / FACE;  // the bitmap, in face px
-      const c = canvas(CW, CH), g = c.getContext('2d');
-      const put = (cx, flip) => {
+      const c = canvas(CW, CH), g = c.getContext('2d')!;
+      const put = (cx: number, flip: boolean) => {
         g.save(); g.translate(cx, CH / 2); if (flip) g.scale(-1, 1);
         g.drawImage(art, -dw / 2 - ax, -dh / 2 - ay, dw, dh); g.restore();
       };
       if (two) { put(CW / 2 - pair / 2, false); put(CW / 2 + pair / 2, true); } else put(CW / 2, false);
-      takes[slot][n] = (sd) => makePaper({ art: c, size: [CW * FACE * scale, CH * FACE * scale], key: `${id}-${slot}-${n}`, res, seed: sd });
+      takes[slot][n] = (sd: number) => makePaper({ art: c, size: [CW * FACE * scale, CH * FACE * scale], key: `${id}-${slot}-${n}`, res, seed: sd });
     }
   }
   return { takes };
@@ -188,16 +187,16 @@ export const FIG_K = 0.030 / 130; const K = FIG_K;                        // m p
 const FACE = 0.4595 * K;                        // m per face_sheet px (makeFaces)
 const SHOULDER = [0.013, 0.030], ARM = 0.032;
 const HIP_F = [200, 352], NECK_F = [240, 180];  // figure px of the hip and the neck
-const at = (x, y, [ox, oy] = HIP_F) => [(x - ox) * K, (oy - y) * K];
-const px = (w, h, s) => [w * s * K, h * s * K];
+const at = (x: number, y: number, [ox, oy] = HIP_F) => [(x - ox) * K, (oy - y) * K];
+const px = (w: number, h: number, s: number) => [w * s * K, h * s * K];
 const LEG = px(140, 127, 0.56), LEG_PIVOT = [0.35, 0.06];
 export const HIP = LEG[1] * (1 - LEG_PIVOT[1]);  // the boot's height below its pivot: 0.01543
 // The foot in the leg's frame (hip at the origin): a sole with round heel and toe of radius R, centred at x = SOLE.
 // hipHeight(pose) is how high the root must sit for the lower foot to touch the floor, from the legs' world angles
 // (body + leg). Measured on the cut boot (leg_l, sheet px): heel and toe circles of r 14 at x 21 and 133, pivot x 56.
 const LK = 0.56 * K, SOLE = [(21 - 56) * LK, (133 - 56) * LK], R = 14 * LK;
-const drop = (a) => R + Math.max(...SOLE.map((x) => (HIP - R) * Math.cos(a) - x * Math.sin(a)));
-export const hipHeight = (p) => Math.max(drop((p.body ?? 0) + (p.leg_r ?? 0)), drop((p.body ?? 0) + (p.leg_l ?? 0)));
+const drop = (a: number) => R + Math.max(...SOLE.map((x) => (HIP - R) * Math.cos(a) - x * Math.sin(a)));
+export const hipHeight = (p: Pose): number => Math.max(drop((p.body ?? 0) + (p.leg_r ?? 0)), drop((p.body ?? 0) + (p.leg_l ?? 0)));
 // rig-v4, the neck. On the sheet's side figure the cream throat runs from under the jaw down into the hood; the cut head
 // is only the green dome, so the rig had nothing under the snout. THROAT is that cream shape traced on the figure (figure
 // px, y down, read off evidence/rig-v4/neck.jpg's grid), drawn in code as cream paper on the head between the green dome and
@@ -210,19 +209,14 @@ const HEAD_LIFT = 10;
 // BROW_AT is its centre at rest (figure px), BROW its box; acting.js moves it (figure px × FIG_K) and turns it (degrees).
 export const BROW_AT = [262, 30], BROW = [58, 17];
 // A polygon in figure px → a paper part: its box (plus a 3 px margin to tear on) as size, pivot at the box's top left.
-function drawn(name, poly, { parent, z, color, like, origin }) {
+function drawn(name: string, poly: number[][], { parent, z, color, like, origin }: { parent: string, z: number, color: string, like: string[], origin: number[] }): PartSpec {
   const m = 3, xs = poly.map(([x]) => x), ys = poly.map(([, y]) => y);
   const x0 = Math.min(...xs) - m, y0 = Math.min(...ys) - m, w = Math.max(...xs) + m - x0, h = Math.max(...ys) + m - y0;
   return { name, parent, z, paper: { path: poly.map(([x, y]) => [(x - x0) / w, (y - y0) / h]), color, like }, size: [w * K, h * K],
     pivot: [0, 0], at: at(x0, y0, origin) };
 }
-/**
- * @param {string} sheet
- * @param {{ pocket?: boolean, backpack?: boolean, head34?: boolean, throat?: boolean, brow?: boolean, green?: string }} [opts]
- * @returns {PartSpec[]}
- */
-export function sideParts(sheet, { pocket = true, backpack = false, head34 = false, throat = false, brow = false, green } = {}) {
-  const P = (piece) => [sheet, piece], N = (x, y) => at(x, y, NECK_F), neck = at(NECK_F[0], NECK_F[1] - (throat ? HEAD_LIFT : 0));
+export function sideParts(sheet: string, { pocket = true, backpack = false, head34 = false, throat = false, brow = false, green }: { pocket?: boolean, backpack?: boolean, head34?: boolean, throat?: boolean, brow?: boolean, green?: string } = {}): PartSpec[] {
+  const P = (piece: string) => [sheet, piece], N = (x: number, y: number) => at(x, y, NECK_F), neck = at(NECK_F[0], NECK_F[1] - (throat ? HEAD_LIFT : 0));
   const skin = '#' + new THREE.Color(green ?? PALETTE.gator).lerp(new THREE.Color(PALETTE.ink), 0.72).getHexString();
   const cream = '#' + new THREE.Color(PALETTE.cream).lerp(new THREE.Color(PALETTE.kraft), 0.12).getHexString();  // the painted jaw's cream
   const [bw, bh] = BROW, [bx, by] = BROW_AT;
@@ -248,13 +242,10 @@ export function sideParts(sheet, { pocket = true, backpack = false, head34 = fal
 }
 const FACES = { eyes: 'open', mouth: 'neutral' };
 
-/**
- * @param {import('../assets.js').AssetCtx} ctx
- * @param {{ seed?: number, scale?: number, green?: string, hoodie?: string, res?: number, facing?: 'side' | 'front' | 'back' }} [opts]
- */
-export async function makeGator(ctx, { seed = 0, scale = 1, green, hoodie, res = 512, facing = 'side' } = {}) {
-  const G = (piece) => ['gator_sheet', piece];
-  let parts;
+export type Gator = Rig & { facing: string, head34: (on: boolean) => void };
+export async function makeGator(ctx: AssetCtx, { seed = 0, scale = 1, green, hoodie, res = 512, facing = 'side' }: { seed?: number, scale?: number, green?: string, hoodie?: string, res?: number, facing?: 'side' | 'front' | 'back' } = {}): Promise<Gator> {
+  const G = (piece: string) => ['gator_sheet', piece];
+  let parts: PartSpec[];
   if (facing === 'side') parts = sideParts('gator_sheet', { head34: true, throat: true, brow: true, green });
   // The turnarounds are whole figures at the side figure's scale K (sole to head top 0.096), so s09's side → back swap
   // holds his size. turn_front is painted without arms (the rig adds them at the side rig's shoulder height) and
@@ -270,11 +261,11 @@ export async function makeGator(ctx, { seed = 0, scale = 1, green, hoodie, res =
   else if (facing === 'back') parts = [{ name: 'body', from: G('turn_back'), size: px(268, 423, 1), pivot: [0.5, 1], at: [0, 0] }];
   else throw new Error(`makeGator: unknown facing "${facing}"`);
   const rig = await buildRig(ctx, { name: `gator-${facing}`, seed, scale, green, hoodie, res, parts, faces: facing === 'back' ? null : FACES,
-    facePair: facing === 'front' ? 98 / 0.4595 : 0 });
+    facePair: facing === 'front' ? 98 / 0.4595 : 0 }) as Gator;   // facing and head34 are set just below
   rig.facing = facing;
   // s14: the 3/4 head replaces head, snout and jaw on one drawing. It has its own painted eyes and smile, so the face
   // slots hide with it. Stateful, like face(): call it every frame.
-  rig.head34 = (on) => {
+  rig.head34 = (on: boolean) => {
     if (facing !== 'side') return;
     rig.meshes.head34.visible = on;
     for (const p of ['head', 'snout', 'jaw', 'eyes', 'mouth', 'throat']) rig.meshes[p].visible = !on;

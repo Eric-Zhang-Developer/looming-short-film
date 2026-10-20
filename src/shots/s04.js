@@ -9,15 +9,15 @@
 // throws nothing on the wall. Sizes are the scale table's (evidence/asset-home-kit/scale_table.md: 1 real m = 0.055 film
 // m against the 0.096 m gator). Characters and the door on 2s, the light switches with the door, boil 10/s.
 import * as THREE from 'three';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
-import { phoneLight, dawnLight, ambient, aim } from '../lights.js';
+import { makePaper, boilSeed } from '../paper.ts';
+import { paperMesh, updatePaperMesh } from '../material.ts';
+import { phoneLight, dawnLight, ambient, aim } from '../lights.ts';
 import { kf, onTwos } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
-import { createBlob } from '../blob.js';
-import { makeGator, hipHeight } from '../characters/gator.js';
-import { specPose, walk, POSES } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
+import { createBlob } from '../blob.ts';
+import { makeGator, hipHeight } from '../characters/gator.ts';
+import { specPose, walk, POSES } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
 
 const ID = 's04', DEG = Math.PI / 180;
 const BLOB_R = { start: 0.018 };                               // METER.gulp1 (README §1, v4): 1.5× all shot
@@ -245,7 +245,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     handle: reachTo(HANDLE),
     stand: up({ lean: 0, arm: -95, head: 0 }),
   };
-  const KEYS = [
+  /** @type {[number, string][]} */ const KEYS = [
     [0, 'handle'], [0.17, 'handle'], [0.33, 'stare'], [1.42, 'stare'], [1.5, 'handle'], [1.58, 'handle'], [1.67, 'stand'],
     [2.42, 'handle'], [2.58, 'handle'], [2.75, 'stare'], [3.67, 'stare'], [3.75, 'handle'], [3.83, 'handle'], [3.92, 'stand'],
     [4.33, 'stand'], [4.5, 'handle'], [4.75, 'handle'], [4.92, 'stare'], [5.75, 'stare'], [6.0, 'stare_in'], [7.5, 'stare_in'],

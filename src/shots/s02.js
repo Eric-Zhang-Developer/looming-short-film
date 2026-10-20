@@ -10,16 +10,16 @@
 // He slumps at the desk's left end and never looks up until 9.33 (v4: numb, one small flinch). The wall clock reads 9:00 beside the
 // calendar. Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
-import { dawnLight, ambient } from '../lights.js';
+import { makePaper, boilSeed } from '../paper.ts';
+import { paperMesh, updatePaperMesh } from '../material.ts';
+import { dawnLight, ambient } from '../lights.ts';
 import { kf, ease, easeIn, easeOut, spring, lerp, clamp } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
-import { createBlob } from '../blob.js';
-import { makeGator } from '../characters/gator.js';
-import { POSES } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
-import { makeClock } from '../clock.js';
+import { createBlob } from '../blob.ts';
+import { makeGator } from '../characters/gator.ts';
+import { POSES } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
+import { makeClock } from '../clock.ts';
 
 const DEG = Math.PI / 180;
 
@@ -269,7 +269,7 @@ export const B = [0.030, 0, 0.015];                // s03's mark: S = screenZ / 
 // Cameras: W (the desk wide), I (face-on insert on Friday). Push W → I over 1.5–3.5, cut back to W at 7.083.
 const CAM_W = { pos: [0.004, 0.062, 0.40], look: [0.004, 0.030, 0.012] };
 const CAM_I = { pos: [FX, (FY + LIP_Y) / 2 + 0.001, 0.09], look: [FX, (FY + LIP_Y) / 2, 0] };
-const SUN = { k: 0.35, pos: [0.8, 0.6, 0.6], scale: 0.8 };   // the morning window, off right
+const SUN = { k: 0.35, pos: /** @type {Vec3} */ ([0.8, 0.6, 0.6]), scale: 0.8 };   // the morning window, off right
 const FACE_I = 0.0045;                            // character fill (README §10)
 
 const F = (n) => n / 12, frameOf = (t) => Math.floor(t * 12 + 1e-6);
@@ -380,7 +380,7 @@ export async function build(ctx) {
   const gator = await makeGator(ctx, { seed: 2 });
   gator.group.position.set(...DESK.hip);
   scene.add(gator.group);
-  const SLUMP = [[0, 'slump'], [10, 'slump']];
+  /** @type {[number, string][]} */ const SLUMP = [[0, 'slump'], [10, 'slump']];
 
   // The Exam, its stain where it lands, and the faint trail it leaves down the calendar.
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 }), R = BLOB_R.start;

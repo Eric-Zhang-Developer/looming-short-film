@@ -8,14 +8,14 @@
 // underLight2). No faltering tubes. Face: resolve, then relief under the first light, then eyes open on a small smile.
 // Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
-import { ambient } from '../lights.js';
+import { ambient } from '../lights.ts';
 import { kf, ease, onTwos, clamp } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
 import { SHOTS } from '../timeline.ts';
-import { makeGator, hipHeight } from '../characters/gator.js';
-import { POSES, walk } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
-import { createBlob } from '../blob.js';
+import { makeGator, hipHeight } from '../characters/gator.ts';
+import { POSES, walk } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
+import { createBlob } from '../blob.ts';
 import { kitTools, mppOf, wallCanvas, carpetCanvas, noCast, glow, castOnly } from './s11.js';
 
 const ID = 's10b';

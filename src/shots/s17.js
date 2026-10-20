@@ -8,14 +8,14 @@
 // constant warm: they fell asleep working). No sensors, no laptop. Only the blobs, the wall and the desk tops cast.
 // Characters on 2s, boil 4/s (quiet rate), light, grade at 24.
 import * as THREE from 'three';
-import { sensorLight, dawnLight, fluorescent, ambient } from '../lights.js';
+import { sensorLight, dawnLight, fluorescent, ambient } from '../lights.ts';
 import { clamp, onTwos } from '../core/ease.ts';
-import { act } from '../characters/acting.js';
-import { makeGator } from '../characters/gator.js';
-import { makeCrowd } from '../characters/crowd.js';
-import { BLOB_R as OTHER_R } from '../characters/exam.js';
-import { createBlob } from '../blob.js';
-import { POSES, specPose } from '../characters/poses.js';
+import { act } from '../characters/acting.ts';
+import { makeGator } from '../characters/gator.ts';
+import { makeCrowd } from '../characters/crowd.ts';
+import { BLOB_R as OTHER_R } from '../characters/exam.ts';
+import { createBlob } from '../blob.ts';
+import { POSES, specPose } from '../characters/poses.ts';
 import { kitTools, marstonDesk, crop, mppOf, noCast, glow, castOnly } from './s11.js';
 
 const ID = 's17', D = Math.PI / 180, RATE = 4;
@@ -57,7 +57,7 @@ const P = {
   settle: seat({ lean: -7, arm: -50, head: 6 }),        // 5.000, held to 18.0
 };
 // G4's keys × 2/3 on the 2s grid: the anticipation 2.0, the sit-back 3.0, settled 3.333.
-const BODY = [[0, 'write_a'], [23 / 12, 'write_a'], [2, 'antic'], [28 / 12, 'back1'], [32 / 12, 'back2'], [3, 'sit_back'], [40 / 12, 'settle']];
+/** @type {[number, string][]} */ const BODY = [[0, 'write_a'], [23 / 12, 'write_a'], [2, 'antic'], [28 / 12, 'back1'], [32 / 12, 'back2'], [3, 'sit_back'], [40 / 12, 'settle']];
 // The acting kit: neutral with G4's small smile, relief from the sit-back (its anticipation is the lean in at 2.917).
 // relief's own eyes are closed, so they're half-lid (tired) for the sit-back, to the blob at 4.0, and closed from 6.0.
 /** @type {[number, string][]} */
@@ -78,7 +78,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
   const flat = (g) => { g.rotation.x = -Math.PI / 2; return g; };
   // An asset piece in a holder whose origin is the centre of its visible shape; [w] sets its visible width.
-  /** @param {import('../assets.js').Kit} a @param {string} name @param {{ w?: number, weight?: string, res?: number, parent?: THREE.Object3D, tag?: string }} [o] */
+  /** @param {import('../assets.ts').Kit} a @param {string} name @param {{ w?: number, weight?: string, res?: number, parent?: THREE.Object3D, tag?: string }} [o] */
   const cut = (a, name, { w, weight, res = 512, parent = scene, tag = '' } = {}) => {
     const holder = new THREE.Group(), [sw, sh] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [sw, sh], key: `${ID}-${name}${tag}`, weight, res }, holder);
@@ -144,7 +144,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // ---------- light ----------
   // The pendants (README v4): his and the neighbor's lit at a constant level, warm; the empty desk's unlit.
   castOnly(scene, [exam.mesh, nbBlob.mesh]); wall.castShadow = true;   // the wall and mullions cast: dawn comes in only through the panes
-  const zones = [[[0, 0.127, 0.040], [BLOB[0], 0, BLOB[1]]], [[NB, 0.127, 0.040], [NB_BLOB[0], 0, NB_BLOB[1]]]].map(([at, to]) => {
+  const zones = /** @type {[Vec3, Vec3][]} */ ([[[0, 0.127, 0.040], [BLOB[0], 0, BLOB[1]]], [[NB, 0.127, 0.040], [NB_BLOB[0], 0, NB_BLOB[1]]]]).map(([at, to]) => {
     const z = sensorLight({ at, aimAt: to, intensity: ZONE_I }); z.light.color.copy(C('lamp').lerp(C('cream'), WARM));
     scene.add(z.light, z.light.target); return z;
   });

@@ -1,4 +1,3 @@
-// @ts-check
 // The film's light rigs and the light rule in numbers (doc 02 · The visual rule, doc 04 · Lights).
 // Every update takes time as an argument. Randomness comes only from src/core/rng.js.
 // Intensities are physical (candela for spots, lux for directionals) with decay 2, tuned for
@@ -8,10 +7,11 @@ import { PALETTE } from './core/palette.ts';
 import { clamp } from './core/ease.ts';
 import { hash2, mulberry32, seedOf } from './core/rng.ts';
 
-const color = (k) => new THREE.Color(PALETTE[k]);
-const mix = (a, b, x) => color(a).lerp(color(b), x);
+type Swatch = keyof typeof PALETTE;
+const color = (k: Swatch) => new THREE.Color(PALETTE[k]);
+const mix = (a: Swatch, b: Swatch, x: number) => color(a).lerp(color(b), x);
 
-function shadowed(light, { mapSize = 2048, radius = 3, bias = -0.0004, normalBias = 0 } = {}) {
+function shadowed<L extends THREE.SpotLight | THREE.DirectionalLight>(light: L, { mapSize = 2048, radius = 3, bias = -0.0004, normalBias = 0 } = {}): L {
   light.castShadow = true;
   light.shadow.mapSize.set(mapSize, mapSize);
   light.shadow.radius = radius;          // r186 PCFShadowMap is a soft Vogel-disk PCF; radius sets the softness
@@ -25,7 +25,7 @@ function shadowed(light, { mapSize = 2048, radius = 3, bias = -0.0004, normalBia
 // d(light→wall) / d(light→subject), measured along the light→subject line to the plane z = wallZ.
 // Every point of a cutout parallel to the wall lands at this scale, so it is exact, not approximate.
 // > 1 when the subject is between the light and the wall; Infinity when the line never reaches the wall.
-export function shadowScale(lightPos, subjectPos, wallZ) {
+export function shadowScale(lightPos: THREE.Vector3, subjectPos: THREE.Vector3, wallZ: number): number {
   const dir = subjectPos.clone().sub(lightPos);
   const k = (wallZ - lightPos.z) / dir.z;          // the line's parameter at the wall (subject is k = 1)
   if (!(k > 0) || !Number.isFinite(k)) return Infinity;
@@ -36,7 +36,7 @@ export function shadowScale(lightPos, subjectPos, wallZ) {
 // The light position that gives `scale`. The ratio along any line equals the ratio of its z spans,
 // so z is solved in closed form: scale·(Lz − Sz) = Lz − wallZ. `height` and `side` are the light's
 // y and x offsets from the subject (m); they move where the shadow lands, never its scale.
-export function placeForScale({ subjectPos, wallZ, scale, height = 0, side = 0 }) {
+export function placeForScale({ subjectPos, wallZ, scale, height = 0, side = 0 }: { subjectPos: THREE.Vector3, wallZ: number, scale: number, height?: number, side?: number }): THREE.Vector3 {
   if (!(scale > 1)) throw new RangeError(`placeForScale: scale must be > 1, got ${scale}`);
   if (!(subjectPos.z > wallZ)) throw new RangeError('placeForScale: subject must be in front of the wall');
   const z = (scale * subjectPos.z - wallZ) / (scale - 1);
@@ -50,14 +50,9 @@ export function placeForScale({ subjectPos, wallZ, scale, height = 0, side = 0 }
 // near is tabletop-scale (min(4 mm, d/20)) so a caster just in front of the light is inside the frustum; pass
 // { nearest } (m, the closest caster to the light) to set it explicitly.
 const _box = new THREE.Box3(), _sphere = new THREE.Sphere(), _lp = new THREE.Vector3();
-/**
- * @param {THREE.SpotLight} spot
- * @param {any} target a Vector3 or an Object3D
- * @param {{ nearest?: number }} [opts]
- */
-export function aim(spot, target, { nearest } = {}) {
-  if (target.isObject3D) _box.setFromObject(target).getBoundingSphere(_sphere);
-  else _sphere.set(_lp.copy(target), 0);
+export function aim(spot: THREE.SpotLight, target: THREE.Vector3 | THREE.Object3D, { nearest }: { nearest?: number } = {}) {
+  if ((target as THREE.Object3D).isObject3D) _box.setFromObject(target as THREE.Object3D).getBoundingSphere(_sphere);
+  else _sphere.set(_lp.copy(target as THREE.Vector3), 0);
   const c = _sphere.center.clone(), r = _sphere.radius;
   const t = spot.target;
   t.position.copy(c);
@@ -76,8 +71,7 @@ export function aim(spot, target, { nearest } = {}) {
 
 // Low, close, wide cyan wedge. Shadow on. Place it with placeForScale, then aim it at the subject.
 // penumbra near 1 turns the hard fan on the desk into a soft fall-off.
-/** @param {{ color?: THREE.ColorRepresentation, intensity?: number, angle?: number, distance?: number, penumbra?: number }} [opts] */
-export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle = 1.2, distance = 0.6, penumbra = 0.45 } = {}) {
+export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle = 1.2, distance = 0.6, penumbra = 0.45 }: { color?: THREE.ColorRepresentation, intensity?: number, angle?: number, distance?: number, penumbra?: number } = {}) {
   return shadowed(new THREE.SpotLight(c, intensity, distance, angle, penumbra, 2), { bias: -0.0004 });
 }
 
@@ -90,8 +84,7 @@ export function phoneLight({ color: c = PALETTE.phone, intensity = 0.06, angle =
 // light, like the blob in its pool, hides the vellum behind it instead of wearing an amber film. Its sides fade to
 // nothing by view angle, over a width that wanders with the vellum's frost, so they read as light, not mesh lines.
 // Add light, light.target, cone and dust to the scene root (dust is in world space).
-/** @param {{ color?: THREE.ColorRepresentation, intensity?: number, angle?: number, penumbra?: number, seed?: number, reach?: number }} [opts] */
-export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.6, penumbra = 0.5, seed = 1, reach = 2.5 } = {}) {
+export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.6, penumbra = 0.5, seed = 1, reach = 2.5 }: { color?: THREE.ColorRepresentation, intensity?: number, angle?: number, penumbra?: number, seed?: number, reach?: number } = {}) {
   const light = shadowed(new THREE.SpotLight(c, intensity, 0, angle, penumbra, 2), { radius: 2, bias: -0.0003 });
 
   // Unit cone: apex at the origin, opening down −Y, length 1. Scaled to the light→target distance.
@@ -137,7 +130,7 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
     ph: rng() * Math.PI * 2, w: 0.15 + 0.25 * rng(), spin: (rng() < 0.5 ? -1 : 1) * (0.03 + 0.05 * rng()),
   }));
   const dotTex = (() => {
-    const cv = Object.assign(document.createElement('canvas'), { width: 32, height: 32 }), g = cv.getContext('2d');
+    const cv = Object.assign(document.createElement('canvas'), { width: 32, height: 32 }), g = cv.getContext('2d')!;
     const grd = g.createRadialGradient(16, 16, 0, 16, 16, 16);
     grd.addColorStop(0, 'rgba(255,255,255,1)'); grd.addColorStop(0.4, 'rgba(255,255,255,0.5)'); grd.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = grd; g.fillRect(0, 0, 32, 32);
@@ -153,7 +146,7 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
 
   const apex = new THREE.Vector3(), tip = new THREE.Vector3(), axis = new THREE.Vector3();
   const b1 = new THREE.Vector3(), b2 = new THREE.Vector3(), p = new THREE.Vector3(), down = new THREE.Vector3(0, -1, 0);
-  function update(t) {
+  function update(t: number) {
     cone.visible = dust.visible = light.visible;
     light.getWorldPosition(apex); light.target.getWorldPosition(tip);
     const len = apex.distanceTo(tip) * reach;
@@ -187,7 +180,7 @@ export function lampLight({ color: c = PALETTE.lamp, intensity = 0.5, angle = 0.
 // (+0.042, +0.167, +0.292); the third catches and settles at 1. Every wake in the film uses these, so they read as one event.
 // The README's times are these frames of a 24 fps film (1, 2, 4, 5, 7, 9) rounded to ms; the exact fractions keep a frame
 // that lands on a key on that key.
-export const SENSOR_WAKE = [[0, 0], [1 / 24, 0.9], [2 / 24, 0.1], [4 / 24, 1.0], [5 / 24, 0.2], [7 / 24, 1.15], [9 / 24, 1.0]];
+export const SENSOR_WAKE: [number, number][] = [[0, 0], [1 / 24, 0.9], [2 / 24, 0.1], [4 / 24, 1.0], [5 / 24, 0.2], [7 / 24, 1.15], [9 / 24, 1.0]];
 const EPS = 1e-6;   // t arrives as a difference of floats; a frame that lands on a key or a frame edge must not fall just short
 // s11's death as built: a seeded on/off chatter per 24 fps frame for 0.8 s under a ceiling falling 1 → 0.3, first frame a drop,
 // dead after. Every timeout (s11, s14) uses s11's seed.
@@ -198,11 +191,11 @@ const TIMEOUT = 0.8;
 //   wake      time of the relay clack, or undefined. With a wake, the zone is dark before it.
 //   timeoutAt time the chatter starts, or undefined. Without one the zone never times out.
 // No wake: lit (1) until timeoutAt. Wake and timeout may both be given (s14: woken at 1.0, times out at 4.2).
-/** @param {number} t @param {{ wake?: number, timeoutAt?: number, seed?: number }} [opts] */
-export function sensorLevel(t, { wake, timeoutAt, seed = SENSOR_SEED } = {}) {
+export type SensorOpts = { wake?: number, timeoutAt?: number, seed?: number };
+export function sensorLevel(t: number, { wake, timeoutAt, seed = SENSOR_SEED }: SensorOpts = {}): number {
   if (wake !== undefined) {
     if (t < wake) return 0;
-    if (t < wake + SENSOR_WAKE.at(-1)[0] - EPS) return SENSOR_WAKE.findLast(([dt]) => t - wake >= dt - EPS)[1];
+    if (t < wake + SENSOR_WAKE.at(-1)![0] - EPS) return SENSOR_WAKE.findLast(([dt]) => t - wake >= dt - EPS)![1];
   }
   if (timeoutAt === undefined || t < timeoutAt) return 1;
   if (t >= timeoutAt + TIMEOUT - EPS) return 0;
@@ -215,14 +208,14 @@ export function sensorLevel(t, { wake, timeoutAt, seed = SENSOR_SEED } = {}) {
 // `light.target` to the scene. update(t, { wake, timeoutAt }) sets the light and the tube, and returns the level, so a
 // shot can drive the phone's outshone rule from it (≥ 0.5 → phone spot 0.2). Mirrored units: pass `at` and `aimAt`.
 // intensity 0.8 is s15's lamp pool at the blob: LAMP_I 0.16 × (0.136 / 0.060)² (tube→blob over shade→blob distances).
-export function sensorLight({ at = [0, 0.127, 0.040], aimAt = [0, 0, 0.098], intensity = 0.8, angle = 0.8, penumbra = 0.5, seed = SENSOR_SEED } = {}) {
+export function sensorLight({ at = [0, 0.127, 0.040], aimAt = [0, 0, 0.098], intensity = 0.8, angle = 0.8, penumbra = 0.5, seed = SENSOR_SEED }: { at?: Vec3, aimAt?: Vec3, intensity?: number, angle?: number, penumbra?: number, seed?: number } = {}) {
   const tone = mix('cream', 'gator', 0.15), dull = mix('cream', 'kraft', 0.35).multiplyScalar(0.55);
   const light = shadowed(new THREE.SpotLight(tone, intensity, 0, angle, penumbra, 2), { radius: 2, bias: -0.0003 });
   light.position.set(...at);
   aim(light, new THREE.Vector3(...aimAt));
 
   const group = new THREE.Group(), card = new THREE.MeshLambertMaterial({ color: color('kraft') });
-  const part = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = false; group.add(m); return m; };
+  const part = (geo: THREE.BufferGeometry, mat: THREE.Material, x: number, y: number, z: number) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = false; group.add(m); return m; };
   const L = 0.060, D = 0.016, H = 0.006, T = 0.0006, cy = at[1] + 0.001;   // housing centre y 0.128, bottom 0.125
   part(new THREE.BoxGeometry(L, T, D), card, 0, cy + H / 2 - T / 2, 0);                                  // top
   for (const s of [-1, 1]) part(new THREE.BoxGeometry(L, H, T), card, 0, cy, s * (D / 2 - T / 2));       // front and back walls
@@ -235,14 +228,14 @@ export function sensorLight({ at = [0, 0.127, 0.040], aimAt = [0, 0, 0.098], int
   group.position.set(at[0], 0, at[2]);                               // children carry their own y; x/z from `at`
   light.position.set(...at);
 
-  function update(t, opts = {}) {
+  function update(t: number, opts: SensorOpts = {}) {
     const level = sensorLevel(t, { seed, ...opts });
     light.intensity = intensity * level;
     tubeMat.color.copy(dull).lerp(tone, Math.min(1, level)).multiplyScalar(0.55 + 0.45 * Math.min(1.15, level));
     return level;
   }
   update(0);
-  return { light, group, tube, update, level: (t, opts) => sensorLevel(t, { seed, ...opts }) };
+  return { light, group, tube, update, level: (t: number, opts?: SensorOpts) => sensorLevel(t, { seed, ...opts }) };
 }
 
 // Window light, cold night (k = 0) to gold (k = 1): low and blue, then warmer, brighter and a little higher.
@@ -253,7 +246,7 @@ export function dawnLight() {
   Object.assign(light.shadow.camera, { left: -0.6, right: 0.6, top: 0.6, bottom: -0.6, near: 0.1, far: 4 });
   const navy = color('navy'), cold = navy.multiplyScalar(1 / Math.max(navy.r, navy.g, navy.b));  // navy's hue as a light
   const gold = mix('lamp', 'cream', 0.35), dir = new THREE.Vector3();
-  function update(t, k) {
+  function update(t: number, k: number) {
     k = clamp(k);
     light.color.copy(cold).lerp(gold, k);
     light.intensity = 0.6 + 2.2 * k * k;
@@ -274,14 +267,14 @@ export function fluorescent({ flickerSeed = 1, intensity = 2.2 } = {}) {
   Object.assign(light.shadow.camera, { left: -0.6, right: 0.6, top: 0.6, bottom: -0.6, near: 0.1, far: 4 });
   light.position.set(0.1, 1.5, 0.8);
   const seed = seedOf('fluorescent', flickerSeed);
-  function update(t) { light.intensity = intensity * flicker(seed, t); }
+  function update(t: number) { light.intensity = intensity * flicker(seed, t); }
   return { light, update };
 }
 
 // Flicker multiplier in (0, 1]. Time is cut into 0.7 s windows; about 1 in 8 holds one stutter of
 // 0.08–0.38 s where the tube drops 40–90% and chatters frame to frame. Outside a stutter: a ±1.5% hum.
 const WIN = 0.7;
-export function flicker(seed, t) {
+export function flicker(seed: number, t: number): number {
   const w = Math.floor(t / WIN), r = mulberry32((seed + Math.imul(w, 0x9e3779b9)) >>> 0);
   const hum = 1 - 0.015 * (0.5 + 0.5 * Math.sin(t * 2.1 + seed % 7));
   if (r() >= 0.125) return hum;

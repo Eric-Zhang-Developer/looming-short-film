@@ -9,16 +9,16 @@
 // Characters on 2s; the quiver on 1s; light, camera and fade on 1s; boil 10/s.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.ts';
-import { lampLight, ambient } from '../lights.js';
+import { lampLight, ambient } from '../lights.ts';
 import { loadLUT } from '../post.ts';
 import { ease, easeOut, clamp, lerp } from '../core/ease.ts';
-import { createBlob } from '../blob.js';
-import { makeGator } from '../characters/gator.js';
-import { specPose } from '../characters/poses.js';
+import { createBlob } from '../blob.ts';
+import { makeGator } from '../characters/gator.ts';
+import { specPose } from '../characters/poses.ts';
 import { DESK, tools, homeDesk, seatReach } from './s02.js';
 import { loadHand, handFont } from './s17b.js';
-import { act } from '../characters/acting.js';
-import { makeClock } from '../clock.js';
+import { act } from '../characters/acting.ts';
+import { makeClock } from '../clock.ts';
 
 const ID = 's18', DEG = Math.PI / 180;
 const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
@@ -34,7 +34,7 @@ const DAY_I = 0.8;                                           // v4: pale window 
 // v3: the lamp stands 8.5 mm off the wall (15 cm real), in front of the calendar's curled lip, and its bulb is inside the
 // shade (the bell's own axis), not 16 mm out in front of it as in v2. A bulb at the shade means the pool is a real raking light.
 const LAMP_Z = 0.0085;
-const LAMP_AT = [DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005], LAMP_AIM = [0.036, 0.020, 0.0035];
+const LAMP_AT = /** @type {Vec3} */ ([DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005]), LAMP_AIM = /** @type {Vec3} */ ([0.036, 0.020, 0.0035]);
 const STAIN = [1.0, 0.4];                                  // the soak's trace: opacity at the bloom, and the trace it leaves
 // Cameras: s02's W and I (copied from s02.js, which doesn't export them), and I2 on the lower sheet.
 const C = DESK.cal, [FX, FY] = C.friXY;

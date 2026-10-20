@@ -6,10 +6,10 @@
 // (3.5) for the cut to s01. No character, no blob. Camera straight down, the phone's top up. Phone, light and camera
 // on 1s (a real vibration), boil 10/s on the paper only: the screen type stays crisp.
 import * as THREE from 'three';
-import { ambient } from '../lights.js';
+import { ambient } from '../lights.ts';
 import { ease } from '../core/ease.ts';
 import { DESK, tools, homeDesk } from './s02.js';
-import { todoScreen, banner, COUNTDOWN, EXAM_Y } from '../props/canvas.js';
+import { todoScreen, banner, COUNTDOWN, EXAM_Y } from '../props/canvas.ts';
 
 const ID = 's00';
 const BUZZ = [0.5, 2.0], BUZZ_LEN = 0.33, JIT = 0.0004;    // notifyBuzz and the second buzz; ±0.4 mm on alternating frames

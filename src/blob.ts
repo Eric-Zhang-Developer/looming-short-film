@@ -1,4 +1,3 @@
-// @ts-check
 // The Exam: the one thing in the film that isn't paper. A vertical plane carrying a 2D metaball field, drawn as a flat
 // drop of matte ink (Q7 b): no 3D shading, pigment pooled darker at its edge, a faint grain, one painted cream
 // highlight up and left of the eyes, and two cream eyes near its top.
@@ -16,7 +15,7 @@ const EYE_X = 0.42, EYE_DROP = 0.92, EYE_R = 0.2;   // in radius units, measured
 // outward (tired), −2 disc under a level lid, slid toward `look` (side-glance). The lidded shapes are negative so the
 // catchlight test (shape < 0.5) keeps them, and their GLSL compiles only while one is showing (EYE_LIDS): any extra
 // live code in the field shader moves a few pixels by 1/255 on this GPU, and s13's frames must stay bit-identical.
-const EYES = { open: [0, 1, 0], closed: [1, 1, 0], worried: [0, 0.68, 0.15], tired: [-1, 1, -0.04], gasp: [0, 1.35, 0.08], side: [-2, 1, 0] };
+const EYES: Record<string, number[]> = { open: [0, 1, 0], closed: [1, 1, 0], worried: [0, 0.68, 0.15], tired: [-1, 1, -0.04], gasp: [0, 1.35, 0.08], side: [-2, 1, 0] };
 const SIDE_SHIFT = 0.2;    // how far `side` slides both eyes toward `look`, radius units
 // Painted highlight: one tapered brush stroke along the upper-left shoulder, an arc about the body ball's centre
 // HI_IN inside the outline (radius units), centred on the ray at HI_A and HI_SPAN radians either side, HI_W at its
@@ -62,7 +61,8 @@ float height(vec2 p) { return 0.85 * sqrt(max(0.0, 4.0 * sqrt(field(p)) - 3.0));
 float eyesDist(vec2 p) { return min(eyeDist(p, uEye[0]), eyeDist(p, uEye[1])); }
 `;
 
-function fieldJS(balls, sx, sy, x, y) {
+type Ball = [number, number, number, number];   // [x, y, support, weight]
+function fieldJS(balls: Ball[], sx: number, sy: number, x: number, y: number): number {
   x /= sx; y /= sy;
   let f = 0;
   for (const [bx, by, R, w] of balls) {
@@ -73,7 +73,11 @@ function fieldJS(balls, sx, sy, x, y) {
 }
 
 // Highest point of the outline on the column x (radius units): march down, then bisect.
-function topAt(balls, sx, sy, x) {
+// A light of any kind, read by its flags the way three's renderer reads it: Light plus each kind's own fields, optional.
+type AnyLight = THREE.Light & { isAmbientLight?: true, isHemisphereLight?: true, isSpotLight?: true, isPointLight?: true, isDirectionalLight?: true,
+  groundColor?: THREE.Color, distance?: number, decay?: number, angle?: number, penumbra?: number, target?: THREE.Object3D };
+
+function topAt(balls: Ball[], sx: number, sy: number, x: number): number {
   let hi = 4, lo = 4;
   while (lo > 0 && fieldJS(balls, sx, sy, x, lo) < T) { hi = lo; lo -= 0.05; }
   for (let i = 0; i < 12; i++) { const m = (lo + hi) / 2; if (fieldJS(balls, sx, sy, x, m) < T) hi = m; else lo = m; }
@@ -82,7 +86,7 @@ function topAt(balls, sx, sy, x) {
 
 export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   const rng = mulberry32(seedOf('blob', seed));
-  const r = (a, b) => a + (b - a) * rng();
+  const r = (a: number, b: number) => a + (b - a) * rng();
   // Body plus three lobes: two low ones widen the base into a drop, one on top makes a soft crown.
   const lobes = [-2.6, -0.55, Math.PI / 2].map((a) => ({
     a: a + r(-0.15, 0.15), dist: r(0.48, 0.56), R: r(1.0, 1.15), w: r(0.3, 0.38),
@@ -202,7 +206,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
 
   // Puts this blob's field into a stock material's shader (sharing its uniforms, so it wobbles with the blob) and
   // runs `cut` at the top of main(), with bp = the fragment in radius units.
-  const withField = (shader, cut) => {
+  const withField = (shader: THREE.WebGLProgramParametersWithUniforms, cut: string) => {
     Object.assign(shader.uniforms, { uBalls: uniforms.uBalls, uScale: uniforms.uScale, uEye: uniforms.uEye, uRadius: uniforms.uRadius, uFloor: uniforms.uFloor });
     shader.vertexShader = 'varying vec2 vLocal;\n' + shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\nvLocal = position.xy;');
     shader.fragmentShader = 'varying vec2 vLocal;\n' + GLSL_FIELD + shader.fragmentShader.replace('void main() {',
@@ -250,9 +254,9 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   // falloff × cone), or the Light passed to update(..., { key }).
   // ponytail: one key light only; a second light (phone vs lamp) adds no highlight. Add a second slot when a shot needs it.
   const tmp = new THREE.Vector3(), tmpColor = new THREE.Color(), at = new THREE.Vector3(), lp = new THREE.Vector3(), axis = new THREE.Vector3();
-  let keyOverride = null;
+  let keyOverride: AnyLight | null = null;
   // Strength of light `o` at the blob, the way three's punctual lights attenuate (distance cutoff, decay, spot cone).
-  function contribution(o) {
+  function contribution(o: AnyLight) {
     let k = o.intensity * (o.color.r * 0.2126 + o.color.g * 0.7152 + o.color.b * 0.0722);
     if (o.isDirectionalLight) return k;
     o.getWorldPosition(lp);
@@ -260,9 +264,9 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     k /= Math.max(Math.pow(d, decay), 0.01);
     if (cut > 0 && decay > 0) k *= Math.pow(Math.min(1, Math.max(0, 1 - Math.pow(d / cut, 4))), 2);
     if (o.isSpotLight) {
-      axis.copy(o.target.getWorldPosition(tmp)).sub(lp).normalize();
+      axis.copy(o.target!.getWorldPosition(tmp)).sub(lp).normalize();
       const cos = tmp.copy(at).sub(lp).normalize().dot(axis);
-      const c0 = Math.cos(o.angle), c1 = Math.cos(o.angle * (1 - o.penumbra));
+      const c0 = Math.cos(o.angle!), c1 = Math.cos(o.angle! * (1 - o.penumbra!));
       const x = Math.min(1, Math.max(0, (cos - c0) / (c1 - c0 || 1e-6)));
       k *= x * x * (3 - 2 * x);
     }
@@ -270,10 +274,10 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   }
   mesh.onBeforeRender = (renderer, scene) => {
     syncFloor();
-    let key = null, best = -1;
+    let key: AnyLight | null = null, best = -1;
     mesh.getWorldPosition(at);
     uniforms.uAmb.value.setRGB(0, 0, 0);
-    scene.traverseVisible((/** @type {any} */ o) => {  // any light kind
+    scene.traverseVisible((o: any) => {  // any light kind: an Object3D read by its isLight flags, as three's renderer reads it
       if (!o.isLight || o.intensity <= 0) return;
       if (o.isAmbientLight) uniforms.uAmb.value.add(tmpColor.copy(o.color).multiplyScalar(o.intensity));
       else if (o.isHemisphereLight) uniforms.uAmb.value.add(tmpColor.copy(o.color).lerp(o.groundColor, 0.5).multiplyScalar(o.intensity));
@@ -288,24 +292,18 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     uniforms.uLightColor.value.copy(key.color).multiplyScalar(key.intensity);
     key.getWorldPosition(uniforms.uLightPos.value);
     if (key.target) uniforms.uLightDir.value.copy(key.target.getWorldPosition(tmp)).sub(uniforms.uLightPos.value).normalize();
-    if (key.isSpotLight) uniforms.uCone.value.set(Math.cos(key.angle), Math.cos(key.angle * (1 - key.penumbra)));
+    if (key.isSpotLight) uniforms.uCone.value.set(Math.cos(key.angle!), Math.cos(key.angle! * (1 - key.penumbra!)));
     uniforms.uFalloff.value.set(key.distance || 0, key.decay ?? 2);
   };
 
   // Every material running the field; update() flips EYE_LIDS on all of them when a lidded eye comes or goes.
-  /** @type {THREE.Material[]} */
-  const shaders = [mat, depth];
+  const shaders: THREE.Material[] = [mat, depth];
   let lidded = false;
 
-  /**
-   * @param {number} tLocal
-   * @param {{ squash?: number, wobble?: number, eyes?: string, look?: number, key?: THREE.Light | null, left?: number }} [opts]
-   */
-  function update(tLocal, { squash = 0, wobble = 1, eyes = 'open', look = 1, key = null, left } = {}) {
+  function update(tLocal: number, { squash = 0, wobble = 1, eyes = 'open', look = 1, key = null, left }: { squash?: number, wobble?: number, eyes?: string, look?: number, key?: THREE.Light | null, left?: number } = {}) {
     keyOverride = key;
     const t = onTwos(tLocal);   // a character: it moves on 2s like the puppets (doc 03 · Motion)
-    /** @type {[number, number, number, number][]} */
-    const balls = [[0, 0.88 + 0.015 * wobble * Math.sin(6.283 * breath.f * t + breath.p), 2, 1]];
+    const balls: Ball[] = [[0, 0.88 + 0.015 * wobble * Math.sin(6.283 * breath.f * t + breath.p), 2, 1]];
     for (const l of lobes) {
       const a = l.a + 0.22 * wobble * Math.sin(6.283 * l.fa * t + l.pa);
       const d = l.dist + 0.06 * wobble * Math.sin(6.283 * l.fd * t + l.pd);
@@ -323,7 +321,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     const [shape, size, lift] = EYES[eyes], er = EYE_R * size, dx = shape === -2 ? SIDE_SHIFT * look : 0;
     if (lidded !== shape < 0) {
       lidded = shape < 0;
-      for (const m of shaders) { m.defines.EYE_LIDS = lidded; m.needsUpdate = true; }
+      for (const m of shaders) { m.defines!.EYE_LIDS = lidded; m.needsUpdate = true; }
     }
     [-1, 1].forEach((side, i) => {
       const x = side * EYE_X * sx;   // height from the unshifted spot, so a side glance keeps the eyes level
@@ -352,7 +350,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     cover.fill(Math.round(255 * Math.max(0, Math.min(1, (edge - d) / 0.04))), o, o + 4);
     tone[o + 3] = Math.round(255 * Math.min(1, wash + ring));
   }
-  const tex = (data) => Object.assign(new THREE.DataTexture(data, S, S), { magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter, needsUpdate: true });
+  const tex = (data: Uint8Array) => Object.assign(new THREE.DataTexture(data, S, S), { magFilter: THREE.LinearFilter, minFilter: THREE.LinearFilter, needsUpdate: true });
   const alphaMap = tex(cover), map = tex(tone);
   const stain = new THREE.Mesh(
     new THREE.PlaneGeometry(3.2 * radius, 2.2 * radius).rotateX(-Math.PI / 2),

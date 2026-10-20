@@ -1,4 +1,3 @@
-// @ts-check
 // The Canvas Student screens (brief v6-canvas-a), drawn in code on a 2D canvas → a self-lit screen texture. Light mode,
 // after the director's reference layout: status bar, a plain header (hamburger, title, filter; no school logo, no Canvas
 // wordmark), the To-do list grouped by day, the floating tab bar. Crisp screen type; the paper boil stays on the phone.
@@ -29,7 +28,7 @@ export const COUNTDOWN = {
 const W = 390, S = 2;                              // layout in iPhone points; canvas px per point
 const SANS = '"Helvetica Neue", Helvetica, Arial, sans-serif';
 const C = { bg: '#FFFFFF', head: '#F5F5F6', ink: '#2D3B45', grey: '#6B7780', line: '#E2E5E8', orange: '#E8670C', red: PALETTE.calendarRed };
-const font = (pt, weight = 400) => `${weight} ${pt}px ${SANS}`;
+const font = (pt: number, weight = 400) => `${weight} ${pt}px ${SANS}`;
 
 export const ROWS = [
   { day: 'Thu', icon: 'quiz', course: 'MAC2312', title: 'Quiz 8', due: '11:59 PM' },
@@ -40,16 +39,13 @@ export const ROWS = [
 const TOP = 112, ROW = 92;                        // first row's top, row height (points)
 export const EXAM_Y = TOP + ROW * ROWS.findIndex((r) => r.exam) + ROW / 2;   // the exam row's centre (points)
 
-const canvasOf = (w, h) => Object.assign(document.createElement('canvas'), { width: Math.round(w * S), height: Math.round(h * S) });
-const textureOf = (c) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
-/** @param {CanvasRenderingContext2D} g */
-const rrect = (g, x, y, w, h, r) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
-/** @param {CanvasRenderingContext2D} g */
-function text(g, s, x, y, pt, color, weight = 400, align = /** @type {CanvasTextAlign} */ ('left')) {
+const canvasOf = (w: number, h: number) => Object.assign(document.createElement('canvas'), { width: Math.round(w * S), height: Math.round(h * S) });
+const textureOf = (c: HTMLCanvasElement) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+const rrect = (g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) => { g.beginPath(); g.roundRect(x, y, w, h, r); };
+function text(g: CanvasRenderingContext2D, s: string, x: number, y: number, pt: number, color: string, weight = 400, align = 'left' as CanvasTextAlign) {
   g.font = font(pt, weight); g.fillStyle = color; g.textAlign = align; g.textBaseline = 'alphabetic'; g.fillText(s, x, y);
 }
-/** @param {CanvasRenderingContext2D} g @param {string} kind */
-function icon(g, kind, x, y, color) {            // a 22 pt line icon centred on (x, y)
+function icon(g: CanvasRenderingContext2D, kind: string, x: number, y: number, color: string) {            // a 22 pt line icon centred on (x, y)
   g.save(); g.translate(x, y); g.strokeStyle = color; g.fillStyle = color; g.lineWidth = 1.8; g.lineJoin = g.lineCap = 'round';
   if (kind === 'quiz') {                          // a rocket
     g.beginPath(); g.moveTo(0, -10); g.quadraticCurveTo(6, -4, 4, 6); g.lineTo(-4, 6); g.quadraticCurveTo(-6, -4, 0, -10); g.stroke();
@@ -66,26 +62,24 @@ function icon(g, kind, x, y, color) {            // a 22 pt line icon centred on
   }
   g.restore();
 }
-/** @param {CanvasRenderingContext2D} g */
-function checkbox(g, x, y, color) { g.strokeStyle = color; g.lineWidth = 2; rrect(g, x - 12, y - 12, 24, 24, 6); g.stroke(); }
+function checkbox(g: CanvasRenderingContext2D, x: number, y: number, color: string) { g.strokeStyle = color; g.lineWidth = 2; rrect(g, x - 12, y - 12, 24, 24, 6); g.stroke(); }
 
-/** The app glyph: an orange square with a cream page on it (not Canvas's logo). @param {CanvasRenderingContext2D} g */
-function glyph(g, x, y, s) {
+/** The app glyph: an orange square with a cream page on it (not Canvas's logo). */
+function glyph(g: CanvasRenderingContext2D, x: number, y: number, s: number) {
   g.fillStyle = C.orange; rrect(g, x, y, s, s, s * 0.24); g.fill();
   g.fillStyle = PALETTE.cream; rrect(g, x + s * 0.26, y + s * 0.2, s * 0.48, s * 0.6, s * 0.06); g.fill();
   g.fillStyle = C.orange; for (const k of [0.38, 0.52, 0.66]) g.fillRect(x + s * 0.34, y + s * k, s * (k > 0.6 ? 0.2 : 0.32), s * 0.05);
 }
 
 const BW = 362, BH = 82;                          // the banner card (points)
-/** An iOS-style notification card, light. @param {{ body: string, title?: string }} o */
-export function banner({ body, title = 'Calc 2 Exam' }) {
-  const canvas = canvasOf(BW, BH), g = canvas.getContext('2d');
+/** An iOS-style notification card, light. */
+export function banner({ body, title = 'Calc 2 Exam' }: { body: string, title?: string }) {
+  const canvas = canvasOf(BW, BH), g = canvas.getContext('2d')!;
   g.scale(S, S);
   drawBanner(g, 0, 0, title, body);
   return { texture: textureOf(canvas), canvas, w: BW, h: BH, title, body };
 }
-/** @param {CanvasRenderingContext2D} g */
-function drawBanner(g, x, y, title, body, shadow = false) {
+function drawBanner(g: CanvasRenderingContext2D, x: number, y: number, title: string, body: string, shadow = false) {
   g.save();
   if (shadow) { g.shadowColor = 'rgba(0,0,0,0.18)'; g.shadowBlur = 14; g.shadowOffsetY = 4; }
   g.fillStyle = '#F4F4F6'; rrect(g, x, y, BW, BH, 22); g.fill();
@@ -97,8 +91,8 @@ function drawBanner(g, x, y, title, body, shadow = false) {
   text(g, body, x + 66, y + 69, 16, '#1C1C1E');
 }
 
-/** The exam's detail view (what the banner opens into), in a w × h box at the origin. @param {CanvasRenderingContext2D} g */
-function drawDetail(g, w, h) {
+/** The exam's detail view (what the banner opens into), in a w × h box at the origin. */
+function drawDetail(g: CanvasRenderingContext2D, w: number, h: number) {
   g.fillStyle = C.bg; g.fillRect(0, 0, w, h);
   g.fillStyle = C.head; g.fillRect(0, 0, w, 104);
   g.strokeStyle = C.ink; g.lineWidth = 2.4; g.lineCap = 'round';
@@ -114,12 +108,11 @@ function drawDetail(g, w, h) {
   g.fillStyle = '#EDEFF1'; for (let i = 0; i < 6; i++) { rrect(g, 20, 292 + i * 26, (w - 40) * [1, 0.92, 0.97, 0.6, 0.88, 0.4][i], 10, 5); g.fill(); }
 }
 
-/** The To-do screen. @param {{ aspect?: number }} [o] */
-export function todoScreen({ aspect = 844 / 390 } = {}) {
-  const H = Math.round(W * aspect), canvas = canvasOf(W, H), g = canvas.getContext('2d'), texture = textureOf(canvas);
+/** The To-do screen. */
+export function todoScreen({ aspect = 844 / 390 }: { aspect?: number } = {}) {
+  const H = Math.round(W * aspect), canvas = canvasOf(W, H), g = canvas.getContext('2d')!, texture = textureOf(canvas);
   let last = '';
-  /** @param {number} t @param {{ banner?: { title: string, body: string } | null, swipe?: number, open?: number, marker?: number, clock?: string }} [o] */
-  const set = (t, { banner: b = null, swipe = 0, open = 0, marker = 1, clock = '' } = {}) => {
+  const set = (t: number, { banner: b = null, swipe = 0, open = 0, marker = 1, clock = '' }: { banner?: { title: string, body: string } | null, swipe?: number, open?: number, marker?: number, clock?: string } = {}) => {
     const key = JSON.stringify([b && [b.title, b.body], swipe, open, marker, clock]);   // t alone never changes the screen
     if (key === last) return;
     last = key;
@@ -143,8 +136,7 @@ export function todoScreen({ aspect = 844 / 390 } = {}) {
   return { texture, canvas, H, set };
 }
 
-/** @param {CanvasRenderingContext2D} g */
-function list(g, H, marker, clock) {
+function list(g: CanvasRenderingContext2D, H: number, marker: number, clock: string) {
   g.fillStyle = C.bg; g.fillRect(0, 0, W, H);
   // Status bar and header.
   g.fillStyle = C.head; g.fillRect(0, 0, W, 104);
@@ -192,4 +184,4 @@ function list(g, H, marker, clock) {
 }
 
 /** A point on the screen in UI points → [u, v] in 0..1 of the texture (v from the bottom, as three's uv). */
-export const uiPoint = (scr, x, y) => [x / W, 1 - y / scr.H];
+export const uiPoint = (scr: { H: number }, x: number, y: number): number[] => [x / W, 1 - y / scr.H];

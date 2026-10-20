@@ -10,13 +10,13 @@
 // C5 (C3 panned left) 4.25–6. Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { onTwos, lerp } from '../core/ease.ts';
-import { act } from '../characters/acting.js';
-import { hipHeight } from '../characters/gator.js';
-import { specPose, POSES } from '../characters/poses.js';
+import { act } from '../characters/acting.ts';
+import { hipHeight } from '../characters/gator.ts';
+import { specPose, POSES } from '../characters/poses.ts';
 import { DIM, AMB_DIM } from './s08.js';
 import { bedroom, closeHeads, ROOM, CAM, LOOK, LIE, LIE_HEAD, KNEE, HIP, PHONE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT } from './s07.js';
 import { reminderInsert } from './s03.js';
-import { COUNTDOWN } from '../props/canvas.js';
+import { COUNTDOWN } from '../props/canvas.ts';
 
 const ID = 's09a', DEG = Math.PI / 180;
 export const BLOB_R = { start: 0.030 };                       // 2.5× (README §1, Q16)

@@ -9,15 +9,15 @@
 // Characters and handled props on 2s, light and camera on 1s, boil 10/s.
 // s09b, s09c, s10, s13, s15, s16 and s17 import the shared kit helpers and the desk set from here.
 import * as THREE from 'three';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
-import { sensorLight, fluorescent, ambient } from '../lights.js';
+import { makePaper, boilSeed } from '../paper.ts';
+import { paperMesh, updatePaperMesh } from '../material.ts';
+import { sensorLight, fluorescent, ambient } from '../lights.ts';
 import { kf, ease } from '../core/ease.ts';
 import { SHOTS } from '../timeline.ts';
-import { makeGator } from '../characters/gator.js';
-import { POSES, specPose, walk } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
-import { createBlob } from '../blob.js';
+import { makeGator } from '../characters/gator.ts';
+import { POSES, specPose, walk } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
+import { createBlob } from '../blob.ts';
 
 const ID = 's11', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;          // deskSit 0.5, blobClimbs 3, blobSettles 5
@@ -53,7 +53,7 @@ const P = {
   hands_flat: seat({ lean: 6, arm: -30 }),             // 2.67: hands flat either side of the page (s15's settle)
   to_page: seat({ lean: 10, arm: -30 }),               // 6.25: leans 4° toward the page
 };
-const BODY = [
+/** @type {[number, string][]} */ const BODY = [
   [dr(5), 'dip'], [dr(6), 'sit'], [dr(7), 'pack_off'], [dr(9), 'pack_off'], [dr(10), 'sit'],
   [1.0, 'to_pack'], [dr(14), 'lay'], [dr(16), 'lay'], [1.5, 'to_pack'], [dr(20), 'to_pack'], [dr(21), 'lay'],
   [dr(23), 'lay'], [2.0, 'pocket'], [dr(26), 'look_phone'], [dr(27), 'look_phone'], [dr(28), 'tip_phone'], [2.5, 'tip_phone'],
@@ -106,7 +106,7 @@ export const idle = (rig, t, { breath = 0.012, period = 3.2, sway = 0.06, swayPe
 export function kitTools(ID) {
   const boiling = [];
   let last = null;
-  /** @param {import('../paper.js').PaperOptions & { mat?: PaperMat }} opts @param {THREE.Object3D} parent */
+  /** @param {import('../paper.ts').PaperOptions & { mat?: PaperMat }} opts @param {THREE.Object3D} parent */
   const sheet = (opts, parent) => {
     const mesh = paperMesh(makePaper({ ...opts, seed: 0 }), opts.mat);
     boiling.push({ mesh, opts }); parent.add(mesh); return mesh;
@@ -146,7 +146,7 @@ export const glow = (holder) => {   // the painted face lights itself (a lit fix
 
 // Navy wall from the kit's wall_strip: its painted navy tiled at the kit's scale, the cream baseboard along the bottom,
 // and `holes` ([x0, y0, x1, y1] in wall metres from its bottom-left) cleared for windows. pxm: canvas pixels per metre.
-/** @param {import('../assets.js').Kit} kit @param {number[]} WH [W, H] @param {number[][]} [holes] @param {number} [pxm] */
+/** @param {import('../assets.ts').Kit} kit @param {number[]} WH [W, H] @param {number[][]} [holes] @param {number} [pxm] */
 export function wallCanvas(kit, [W, H], holes = [], pxm = 1500) {
   const img = kit.pieces.wall_strip, k = mppOf(kit, 'wall_strip') * pxm, c = canvas(W * pxm, H * pxm), g = c.getContext('2d');
   const [x0, y0, x1, y1] = [8, 10, 373, 90], tw = (x1 - x0) * k, th = (y1 - y0) * k, base = 15 * k;
@@ -238,7 +238,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const { pendant, wall } = await marstonDesk({ scene, assets, PALETTE, tools, ID });
   const [props, kitp] = await Promise.all([assets.load('study_props_sheet'), assets.load('props_kit')]);
   // An asset piece in a holder whose origin is the centre of its visible shape (s15's cut()).
-  /** @param {import('../assets.js').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D }} [o] */
+  /** @param {import('../assets.ts').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D }} [o] */
   const cut = (a, name, { weight, res = 512, parent = scene } = {}) => {
     const holder = new THREE.Group(), [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [w, h], key: `${ID}-${name}`, weight, res }, holder);

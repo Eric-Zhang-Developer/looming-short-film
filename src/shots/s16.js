@@ -8,15 +8,15 @@
 // 0.58 → 0.42. Both pendants are constant warm spots (no sensors). Only the blob casts. Characters on 2s; light and
 // camera at 24.
 import * as THREE from 'three';
-import { sensorLight, fluorescent, ambient } from '../lights.js';
+import { sensorLight, fluorescent, ambient } from '../lights.ts';
 import { kf, clamp } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
-import { createBlob } from '../blob.js';
-import { makeGator } from '../characters/gator.js';
-import { makeCrowd } from '../characters/crowd.js';
-import { BLOB_R as OTHER_R } from '../characters/exam.js';
-import { POSES, specPose } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
+import { createBlob } from '../blob.ts';
+import { makeGator } from '../characters/gator.ts';
+import { makeCrowd } from '../characters/crowd.ts';
+import { BLOB_R as OTHER_R } from '../characters/exam.ts';
+import { POSES, specPose } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
 import { SHOTS } from '../timeline.ts';
 import { UNIT, BLOB_AT, PHONE, PAGE, CAM_B2, practiceSheet, SHEET_INK, penLine } from './s15.js';
 import { loadHand } from './s17b.js';
@@ -64,7 +64,7 @@ const POPS = [[9, 'flip'], [9.5, 'write_a'], [10, 'write_b'], [10.5, 'write_c'],
   [15, 'solve'], [15.5, 'write_a']];
 /** @param {[number, string][]} pops @returns {[number, string][]} */
 const held = (pops) => pops.flatMap(([t, n], i) => (i + 1 < pops.length ? [[t, n], [pops[i + 1][0] - dr(1), n]] : [[t, n]]));   // pop, hold, pop
-const BODY = [[0, 'line1'], [dr(1), 'line1'], [dr(2), 'antic'], [dr(3), 'brace'], [6.5, 'brace'], [6.5 + 1e-3, 'still'], [9 - dr(1), 'still'], ...held(POPS)];
+/** @type {[number, string][]} */ const BODY = [[0, 'line1'], [dr(1), 'line1'], [dr(2), 'antic'], [dr(3), 'brace'], [6.5, 'brace'], [6.5 + 1e-3, 'still'], [9 - dr(1), 'still'], ...held(POPS)];
 const popAt = (tc) => (tc < 9 ? null : POPS.findLast(([t]) => tc >= t - 1e-6)?.[1]);
 const isWrite = (n) => !!n?.startsWith('write');
 // Head on body (deg): s15 ends at −4; the brace 4 more; 7.167 another −4; montage −8, think +6
@@ -169,7 +169,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const { pendant: nPendant } = await marstonDesk({ scene: nRoom, assets, PALETTE, tools, ID: `${ID}-nbr` });
   for (const c of nRoom.children) if (c.position.z < 0.03 || (c.rotation.x < 0 && c.position.y < -0.03) || c.position.x === 0.150) c.visible = false;
   const [props, kitp, gsheet] = await Promise.all(['study_props_sheet', 'props_kit', 'gator_sheet'].map((n) => assets.load(n)));
-  /** @param {import('../assets.js').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D, key?: string }} [o] */
+  /** @param {import('../assets.ts').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D, key?: string }} [o] */
   const cut = (a, name, { weight, res = 512, parent = scene, key = name } = {}) => {   // s15's: origin at the visible centre
     const holder = new THREE.Group(), [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [w, h], key: `${ID}-${key}`, weight, res }, holder);

@@ -6,13 +6,13 @@
 // not because anything moved. The blob blinks, confused; he looks up; close-up: the painted heads, resolve → relief on the
 // exhale. Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
-import { ambient, aim } from '../lights.js';
+import { ambient, aim } from '../lights.ts';
 import { kf, ease, onTwos } from '../core/ease.ts';
 import { SHOTS } from '../timeline.ts';
-import { makeGator, HIP, hipHeight } from '../characters/gator.js';
-import { POSES, specPose, walk } from '../characters/poses.js';
-import { act } from '../characters/acting.js';
-import { createBlob } from '../blob.js';
+import { makeGator, HIP, hipHeight } from '../characters/gator.ts';
+import { POSES, specPose, walk } from '../characters/poses.ts';
+import { act } from '../characters/acting.ts';
+import { createBlob } from '../blob.ts';
 import { kitTools, mppOf, noCast, glow, wallCanvas } from './s11.js';
 import { lamppost, lampKey, LAMP_COOL, LAMP_H, KEY_I } from './s09c.js';
 import { closeupRig, HEAD_AT } from './s09b.js';

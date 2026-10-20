@@ -15,10 +15,10 @@
 // top_props_sheet / top_figures_sheet proxies. Shadows are decals cut from each blob's own silhouette (doc 04 Crowds).
 // This shot only: the floor is z = 0 and z is height above it; +Y is north (up the frame).
 import * as THREE from 'three';
-import { makePaper, boilSeed } from '../paper.js';
-import { paperMesh, updatePaperMesh } from '../material.js';
-import { ambient } from '../lights.js';
-import { createBlob } from '../blob.js';
+import { makePaper, boilSeed } from '../paper.ts';
+import { paperMesh, updatePaperMesh } from '../material.ts';
+import { ambient } from '../lights.ts';
+import { createBlob } from '../blob.ts';
 import { kf, clamp, ease, easeOut, onTwos } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
 import { SHOTS, S13_DESKS } from '../timeline.ts';

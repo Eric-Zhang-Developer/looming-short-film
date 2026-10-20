@@ -1,4 +1,3 @@
-// @ts-check
 // Paper material: Lambert from the front, light through the sheet from behind, a glowing torn rim when backlit
 // (doc 04 · paperMaterial, contract in docs/contracts.md).
 //
@@ -15,6 +14,7 @@
 // The light's shadow is already in directLight.color, so anything between the light and the sheet shadows the glow.
 import * as THREE from 'three';
 import { mulberry32, seedOf } from './core/rng.ts';
+import type { PaperSheet } from './paper.ts';
 
 const EDGE_TEXELS = 12;    // rim catch width in texels at 1024 px (scaled by the alphaMap's size)
 const EDGE_SCREEN_PX = 6;  // ...but never thinner than this on screen (before the wandering width scales it down)
@@ -61,14 +61,16 @@ paperEdge = 0.0;
 #endif
 `;
 
-function onBeforeCompile(shader) {
+function onBeforeCompile(this: THREE.Material, shader: THREE.WebGLProgramParametersWithUniforms) {
   Object.assign(shader.uniforms, this.userData.paper);
   shader.fragmentShader = shader.fragmentShader
     .replace('#include <lights_lambert_pars_fragment>', '#include <lights_lambert_pars_fragment>\n' + PARS)
     .replace('#include <alphamap_fragment>', EDGE);
 }
 
-function setMaps(mesh, sheet) {
+export type PaperMesh = THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>;
+
+function setMaps(mesh: PaperMesh, sheet: PaperSheet) {
   const m = mesh.material, u = m.userData.paper, img = sheet.alphaMap.image;
   m.map = sheet.map; m.alphaMap = sheet.alphaMap;
   u.uThickness.value = sheet.thickness;
@@ -80,7 +82,7 @@ function setMaps(mesh, sheet) {
   mesh.userData.sheet = sheet;
 }
 
-export function paperMesh(sheet, { translucency = sheet.thickness < 0.5 ? 0.8 : 0.05, edgeCatch = 0.6 } = {}) {
+export function paperMesh(sheet: PaperSheet, { translucency = sheet.thickness < 0.5 ? 0.8 : 0.05, edgeCatch = 0.6 } = {}): PaperMesh {
   const material = new THREE.MeshLambertMaterial({ side: THREE.DoubleSide, alphaTest: 0.5 });
   material.userData.paper = {
     uTranslucency: { value: translucency }, uThickness: { value: 0 }, uEdgeCatch: { value: edgeCatch }, uTexel: { value: new THREE.Vector2() }, uRimSeed: { value: new THREE.Vector2() },
@@ -99,6 +101,6 @@ export function paperMesh(sheet, { translucency = sheet.thickness < 0.5 ? 0.8 : 
 }
 
 // Swap textures for a new boil seed. Same geometry, same material and program: only texture uniforms change.
-export function updatePaperMesh(mesh, sheet) {
+export function updatePaperMesh(mesh: PaperMesh, sheet: PaperSheet) {
   if (mesh.userData.sheet !== sheet) setMaps(mesh, sheet);
 }

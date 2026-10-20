@@ -9,13 +9,13 @@
 // Characters and the paper on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.ts';
-import { ambient } from '../lights.js';
+import { ambient } from '../lights.ts';
 import { easeOut, ease, clamp, lerp } from '../core/ease.ts';
-import { createBlob } from '../blob.js';
+import { createBlob } from '../blob.ts';
 import { tools } from './s02.js';
 import { kitTools } from './s11.js';
 import { closeupRig, HEAD_AT } from './s09b.js';
-import { specPose } from '../characters/poses.js';
+import { specPose } from '../characters/poses.ts';
 import { PAGE, CAM_P, BLOB_AT, pageWithInk, flatHand, overheadSpot, loadHand } from './s17b.js';
 
 const ID = 's17c', DEG = Math.PI / 180;
