@@ -1,0 +1,46 @@
+gate open: mem free 49%
+evidence/v11-home/row_s02.jpg  (3 frames)
+ms/frame: 1675 (3 frames, fps 24)
+gate open: mem free 53%
+evidence/v11-home/row_s03.jpg  (3 frames)
+ms/frame: 1486 (3 frames, fps 24)
+gate open: mem free 53%
+evidence/v11-home/row_s04.jpg  (3 frames)
+ms/frame: 1556 (3 frames, fps 24)
+gate open: mem free 52%
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+evidence/v11-home/row_s05.jpg  (3 frames)
+ms/frame: 4746 (3 frames, fps 24)
+gate open: mem free 51%
+evidence/v11-home/row_s06.jpg  (3 frames)
+ms/frame: 1454 (3 frames, fps 24)
+gate open: mem free 51%
+t=17.2  07cfe6ac5205addb 07cfe6ac5205addb 07cfe6ac5205addb  PASS
+determinism: PASS
+gate open: mem free 53%
+t=24.5  3888961f830af9b6 3888961f830af9b6 3888961f830af9b6  PASS
+determinism: PASS
+gate open: mem free 53%
+t=34.5  c1b113f765cdd949 c1b113f765cdd949 c1b113f765cdd949  PASS
+determinism: PASS
+gate open: mem free 51%
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=42  01dbc6e52006e0dd 01dbc6e52006e0dd 01dbc6e52006e0dd  PASS
+determinism: PASS
+gate open: mem free 46%
+t=47  45d174501a14fdaf 45d174501a14fdaf 45d174501a14fdaf  PASS
+determinism: PASS
+> typecheck
+> tsc -p tsconfig.json
+
+        gulp1                local   5.5  global   24.5
+        gulpFridge           local   5.5  global   34.5
+        gulpGame             local   6.0  global   42.0
+        gulp2                local   4.0  global   47.0
+        gulp3                local   7.5  global   58.5
+        gulp4                local   9.1  global  149.1
+ok (27 shots, 93 beats, 228.0s)

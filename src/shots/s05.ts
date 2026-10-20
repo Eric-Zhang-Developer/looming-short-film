@@ -26,7 +26,9 @@ import type { MatOpts } from './s02.ts';
 
 const DEG = Math.PI / 180;
 const F = (s: number) => Math.round(s * 12) / 12;  // spec times (2.67, 3.33, 4.83 ...) are 2s drawings: snap them to twelfths
-const BLOB_R = { start: 0.018 };          // METER.gulp1 (README §1, v4): 1.5× all shot
+// v11 (docs/notes/v11-beats.md): game night feeds it. 1.25× of v10's birth → gulpGame (6.0, a second clear of s06's lamp click) → 1.8×.
+const BLOB_R = { start: 0.015, gulpGame: 0.022 };
+const GULP = F(6.0);
 // Real heights at the scale table's 0.055 m per real m: couch seat and coffee-table top 45 cm, couch back 88 cm,
 // the pulled-down couch cushion the laptop sits on 18 cm.
 const SEAT = 0.025, BACK = 0.048, TABLE = 0.025, CUSHION = 0.010;
@@ -38,7 +40,8 @@ const LAP_K = DESK.laptop.scale, LAP_YAW = 35 * DEG;
 // v4: the blob is 1.5×, the wall shadow keeps the spec's 8.0 units (README §1): S = 8.0 · 0.012 / r = 5.33, so with the laptop's light
 // where it is (L.z 0.4148) the blob's depth is z = L.z · (1 − 1 / S) = 0.337 (G4: 0.35 for the 1.25× blob). x keeps the shadow's centre
 // where G4 had it: L.x + (x − L.x) · S = 0.075 − 0.015 · 6.4. The blob still sits on the table top (z 0.33…0.36, x 0.025…0.080).
-const UNITS = 8.0, S_WALL = UNITS * 0.012 / BLOB_R.start;
+// v11: the mark stays v10's (solved for r 0.018); the shadow follows the body by the light alone: 6.7 units, 9.8 after the gulp.
+const UNITS = 8.0, V10_R = 0.018, S_WALL = UNITS * 0.012 / V10_R;
 const B = [L[0] - 0.096 / S_WALL, TABLE, L[2] * (1 - 1 / S_WALL)] as Vec3;   // blob contact point on the table top
 const CAM: CamKey = { pos: [-0.04, 0.17, 1.15], look: [-0.04, 0.10, 0.15] };
 const KEY = 0.40;                          // phone spot, cd: a cream wall 0.42 m away lands lit but below white (NoToneMapping)
@@ -273,14 +276,23 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
 
       // ---- The Exam: eyes up toward the roommates and the TV (side, −x), track the walker (flip as he passes at 4.5),
       // 5.00 squash, 5.08 hop (4 mm up), 5.17 lands and settles on a spring, 5.50 eyes open on the Student.
-      // v9 (v9-beats §2, s04–s05 growing): from 5.50 `worried` on him, not open, with one two-drawing blink at 6.33.
+      // v9 (v9-beats §2, s04–s05 growing): from 5.50 `worried` on him, not open.
+      // v11: gulpGame (6.0) replaces v9's blink at 6.33: squash 0.3 eyes closed on 5.917, snap to 1.8× stretched on 6.0, settled
+      // by 6.25 (s03's gulp1), wobble down for a second, `plead` at him 6.17–6.67, then worried again.
       let eyes = 'side', look = -1;
       if (T >= F(3.33)) look = T < F(4.5) ? -1 : 1;
-      if (T >= F(5.5)) eyes = T >= F(6.33) && T < F(6.5) ? 'closed' : 'worried';   // v9: worried on him, one blink (6.33)
+      if (T >= F(5.5)) eyes = T >= GULP + F(1 / 6) && T < GULP + F(2 / 3) ? 'plead' : 'worried';
       const at = (t: number) => Math.abs(T - F(t)) < 1e-6;
-      const squash = at(5.0) ? 0.25 : at(5.08) ? 0 : 0.2 * spring(T, F(5.17));
+      const grown = T >= GULP - 1e-6, tg = T - GULP, r = grown ? BLOB_R.gulpGame : BLOB_R.start;
+      let squash = at(5.0) ? 0.25 : at(5.08) ? 0 : 0.2 * spring(T, F(5.17));
+      if (at(5.917)) { squash = 0.3; eyes = 'closed'; }
+      if (grown && tg < 0.25 - 1e-6) squash = -0.2 * Math.exp(-6 * tg) * Math.cos(18 * tg);
       exam.mesh.position.y = B[1] + (at(5.08) ? 0.004 : 0);
-      exam.update(tLocal, { squash, wobble: 1, eyes, look, key: spot });
+      exam.mesh.scale.setScalar(r / BLOB_R.start);
+      exam.stain.scale.setScalar(r / BLOB_R.start);
+      // It grows away from him: the contact slides left on the snap so its right edge (half-width 1.14 r) stays put, clear of his snout.
+      exam.mesh.position.x = exam.stain.position.x = B[0] - (grown ? 1.14 * (BLOB_R.gulpGame - BLOB_R.start) : 0);
+      exam.update(tLocal, { squash, wobble: grown && tg < 1 ? 0.8 : 1, eyes, look, key: spot });
 
       // ---- Light. The key is steady (the phone doesn't move); the TV flickers on 1s (4 Hz); the window ramps at 24.
       tv.intensity = TV * (0.85 + 0.15 * hash(Math.floor(tLocal * 4)));

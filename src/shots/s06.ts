@@ -22,10 +22,12 @@ import type { SpecOpts } from '../characters/poses.ts';
 import type { ShotCtx } from '../film.ts';
 
 const ID = 's06', DEG = Math.PI / 180;
-const BLOB_R = { start: 0.018, gulp2: 0.024 };            // METER.gulp1 → METER.gulp2 (README §1, v4: 1.5× → 2×)
+const BLOB_R = { start: 0.022, gulp2: 0.030 };            // v11 (docs/notes/v11-beats.md): 1.8× → 2.5× of v10's birth
 // v4: the wall shadow keeps the spec's 5.1 units before the gulp (units = S · r / 0.012), so S = 5.1 · 0.012 / 0.018 = 3.4 and the mark sits
 // at z = screenZ · (1 − 1 / S) = 0.0159 (v3: 0.01696 for S 4.06 on the 1.25× blob). The gulp then swells it by the meter's step, to 6.8 units.
-const UNITS0 = 5.1, S_WALL = UNITS0 * 0.012 / BLOB_R.start;
+// v11: the bigger body would push the loom off the top of frame, so the mark steps back toward the wall to keep v10's 6.8 units
+// after the gulp: S = 6.8 · 0.012 / 0.030 = 2.72, z 0.0142; before it the light gives 5.0 units (v10: 5.1).
+const UNITS1 = 6.8, S_WALL = UNITS1 * 0.012 / BLOB_R.gulp2;
 const MARK_Z = DESK.screenZ * (1 - 1 / S_WALL);
 const MARK_X = 0.026 + 1.15 * (BLOB_R.start - 0.015), GROW_DX = 1.15 * (BLOB_R.gulp2 - BLOB_R.start), HOP_DX = -0.003;   // v3's left edge (0.0088) stays put, on the gulp too
 // v7-laptop: the 1.8× laptop centred 1 cm nearer him than s02's, so its lid clears the blob's left edge (0.0088).
@@ -37,7 +39,10 @@ const FOCUS = 0.58;
 // top, so it lit the blob from the side and threw its shadow off the desk front, and no pool showed. Here it stands
 // right behind the blob, tall enough (mouth 0.041) that the shade hangs over the blob's head and the pool falls under
 // it. s02/s03's lamp (DESK.lamp) is unchanged: s06 is another night and another cut.
-const LAMP = { x: 0.020, h: 0.064 };
+// v11: the 1.8× blob stands 0.044 tall, above v10's mouth (0.041), so the lamp grows again to keep its mouth 5 mm over the blob's top.
+// At x 0.020 the chain's bead (0.0075 left of the stem) fell inside the bigger blob's outline and his pull read as a touch on the
+// blob, so the lamp steps left until the bead hangs in the gap between the laptop's lid and the blob's left edge (0.0088).
+const LAMP = { x: 0.012, h: 0.076 };
 const LAMP_MOUTH = [LAMP.x, LAMP.h * 0.646, DESK.lamp.z], LAMP_BEAD = [LAMP.x - LAMP.h * 21 / 212, LAMP.h * 0.505, DESK.lamp.z];
 // OUTSHONE: v3 left a ghost loom (eye holes) on the lit wall at 0.05. LAMP_I: the mouth is 1.45× higher.
 const SPOT_I = 0.03, OUTSHONE = 0.004, LAMP_I = 0.12, AMB = 0.45, FACE_SCREEN = 0.006, FACE_LAMP = 0.004;

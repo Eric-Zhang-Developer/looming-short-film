@@ -19,8 +19,8 @@ export const SHOTS: Shot[] = [
   { id: 's01',  start: 4,   duration: 5,  beats: {} },
   { id: 's02',  start: 9,   duration: 10, beats: { calendarZoom: 1.5, inkDropForms: 5 } },               // 0:09; clock at ~9:00
   { id: 's03',  start: 19,  duration: 10, beats: { laptopUp: 1, problemShown: 1.5, gulp1: 5.5 } },                          // 0:19
-  { id: 's04',  start: 29,  duration: 7,  beats: { fridge: 0 } },
-  { id: 's05',  start: 36,  duration: 7,  beats: { gameNight: 0 } },
+  { id: 's04',  start: 29,  duration: 7,  beats: { fridge: 0, gulpFridge: 5.5 } },   // v11: the fridge feeds it
+  { id: 's05',  start: 36,  duration: 7,  beats: { gameNight: 0, gulpGame: 6 } },   // v11: game night feeds it (1 s clear of lampClickHome)
   { id: 's06',  start: 43,  duration: 8,  beats: { lampClickHome: 0.5, lampOffHome: 3, gulp2: 4 } },     // 0:43
   { id: 's07',  start: 51,  duration: 12, beats: { bedRot: 0, clockGlance: 6, gulp3: 7.5 } },            // 0:51 bed rot; clock ~1:45
   { id: 's08',  start: 63,  duration: 10, beats: { clockThree: 0, circleGlance: 4, sweatDrop: 6.5 } },   // 1:03 3 a.m.: music out, tick alone
