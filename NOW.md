@@ -3,6 +3,9 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-18
 
+## v8 (2026-10-20, 12:23): `out/looming_v8.mp4` (3:30, −16.0 LUFS, 5040 frames) and `out/looming_v8_720p.mp4` · director: "Now I want you to do version 8"
+The story pass (`docs/notes/v8-beats.md`): the flinch in s03 (practice problem, countdown, alt-tab to the AK), the relapse in s16 (the phone, a Reel, the shadow up the library wall, face down by his own hand), s18's tag mirrors s03; s10b/s17/s17c trimmed; Minecraft on s05's TV. Assembled from v7 with `evidence/v8/assemble_spec.txt` (77 s re-rendered in ≤6 s chunks); joins checked (`evidence/v8/joins_sheet.jpg`). **Not yet heard by anyone:** every new clip's in-point is by spectrogram (the Reel's bass hit on gulp4 at 2:29.1, the AK spray on the alt-tab at 0:24.5, Minecraft's level under s05). Open: the shut laptop in s18's tag is small at film size; s17b's clock second hand sits 7 ticks off its rendered neighbours' global time (cosmetic, ticks stay on whole seconds).
+
 ## TypeScript pass done (2026-10-20, merged into `wave/3-assets`): film work can resume
 Director: "I don't like the JavaScript there. It scares me." Every file in `src/`, `tools/` and `render.ts` is strict TypeScript; Node runs `.ts` directly and `tools/lib/page.ts` compiles `src/` to `build/` before every serve. Commands: `npm run typecheck`, `node render.ts …`, `node tools/*.ts`. Proof (`evidence/ts-refactor/final_proof.txt`): 240/240 frames and the mix sha identical to v7's. Left as they were, by decision: the `evidence/*` and `smoke/` scripts. Found and typed, not fixed (each is a runtime change): s17b's crowd figures overwrite the rig's `pose()` method; s09a at 74.0/74.5 is order-dependent.
 
