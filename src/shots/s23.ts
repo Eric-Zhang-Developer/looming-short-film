@@ -9,7 +9,7 @@
 // The wall shadow is s13's loom (the blob's own silhouette on the wall, springing up from 1× over half a second), sized
 // and placed by the point-light projection from the screen (README §1: S = z_L / (z_L − z_B)).
 // Eyes: the states that exist today. Its "here we go again" (1.9–2.3) is `tired` until v9-blob's `sad` merges; the
-// orchestrator swaps it (SAD below) and re-renders this shot.
+// orchestrator swapped it in (SAD below).
 // Characters on 2s; light and camera on 1s; boil 10/s.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.ts';
@@ -37,7 +37,7 @@ const GROW = 0.5, FALL = 0.25, LOOM_K = 0.85;        // s13's loom: springs up o
 const REEL_AT = 0.65;                                // the lock screen, then the Reel with its sound (cues.ts: after the buzz's 0.33 s)
 const FILL_I = 0.0016, FLICK = 0.03, HALO_K = 0.45;  // the phone's cyan on the wall and desk (no shadow), ±3% per drawing, the glow
 const AMB = 0.9;                                     // night: the room's fill (s18's day ambient was 1.25)
-const SAD = 'tired';                                 // → 'sad' once v9-blob's lids merge
+const SAD = 'sad';
 const CLOSE: CamKey = { pos: [0.008, 0.044, 0.170], look: [0.008, 0.026, 0.012] };   // where the push ends: the blob and its shadow
 const PUSH_K = 0.45;                                 // how far toward CLOSE the camera pushes over the 3 s
 
