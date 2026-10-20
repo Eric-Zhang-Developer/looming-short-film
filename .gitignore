@@ -12,3 +12,6 @@ assets/cut/*.png
 evidence/*/preview.mp4
 # Compiled src/ (tsconfig.build.json); every serve rebuilds it
 build/
+
+# The director drops third-party clips here; they are never committed (copies go to assets/raw/reels/).
+audio examples/
