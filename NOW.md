@@ -3,6 +3,9 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-18
 
+## v9 (2026-10-20, 14:36): `out/looming_v9.mp4` (3:47, −16.0 LUFS, −5.0 dBFS peak, 5448 frames) and `out/looming_v9_720p.mp4` · director: "When I come back, I want to see a version 9"
+The pass in `docs/notes/v9-beats.md`: the ending (2 s fade on the "1.", the *Looming* title with the drop as the i's dot, Seneca, card A, card B, the sting), the blob acting with its lids (blank while huge, plead, sad, shy, sleepy), s17c's 85 with relief instead of the grin, and "Today 9:00 AM" from the phone's clock. Assembled from v8 with `evidence/v9/assemble_spec.txt` (181 s re-rendered in ≤6 s chunks, one page per Chrome; v8 reused for 0–9, 117–138 and 190–206, which hash identical); joins in `evidence/v9/joins_sheet.jpg`. **Not yet heard by anyone:** the ending's piano and the sting's buzz and Reel. **Not done:** the music-box "please" under the gulps (in the beat sheet, in neither brief).
+
 ## v8 (2026-10-20, 12:23): `out/looming_v8.mp4` (3:30, −16.0 LUFS, 5040 frames) and `out/looming_v8_720p.mp4` · director: "Now I want you to do version 8"
 The story pass (`docs/notes/v8-beats.md`): the flinch in s03 (practice problem, countdown, alt-tab to the AK), the relapse in s16 (the phone, a Reel, the shadow up the library wall, face down by his own hand), s18's tag mirrors s03; s10b/s17/s17c trimmed; Minecraft on s05's TV. Assembled from v7 with `evidence/v8/assemble_spec.txt` (77 s re-rendered in ≤6 s chunks); joins checked (`evidence/v8/joins_sheet.jpg`). **Not yet heard by anyone:** every new clip's in-point is by spectrogram (the Reel's bass hit on gulp4 at 2:29.1, the AK spray on the alt-tab at 0:24.5, Minecraft's level under s05). Open: the shut laptop in s18's tag is small at film size; s17b's clock second hand sits 7 ticks off its rendered neighbours' global time (cosmetic, ticks stay on whole seconds).
 
