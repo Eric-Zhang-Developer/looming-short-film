@@ -1,0 +1,12 @@
+gate open: free 45%
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+s16 local t | global | blob r (×) | phone light (m) | S | shadow on the wall: x, eyes y, top y, height over the panel (m) | units (S·r/0.012)
+t  0.25 | 140.25 | r 0.054 (4.50×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.74×)
+t  6.25 | 146.25 | r 0.054 (4.50×) | (-0.014, 0.002, 0.099) | S 2.54 | x 0.029…0.342 (0.313 wide), eyes 0.145, top 0.271, height 0.252 | 11.4
+t  9.05 | 149.05 | r 0.054 (4.50×) | (-0.014, 0.002, 0.099) | S 2.54 | x 0.029…0.342 (0.313 wide), eyes 0.145, top 0.271, height 0.252 | 11.4
+t  9.10 | 149.10 | r 0.060 (5.00×) | (-0.014, 0.002, 0.099) | S 2.54 | x 0.029…0.377 (0.348 wide), eyes 0.161, top 0.302, height 0.283 | 12.7
+t  9.75 | 149.75 | r 0.060 (5.00×) | (-0.016, 0.004, 0.099) | S 2.54 | x 0.032…0.380 (0.348 wide), eyes 0.159, top 0.299, height 0.280 | 12.7
+t 10.40 | 150.40 | r 0.060 (5.00×) | (-0.010, 0.004, 0.114) | S 2.11 | x 0.017…0.305 (0.288 wide), eyes 0.132, top 0.249, height 0.230 | 10.5
+t 10.50 | 150.50 | r 0.060 (5.00×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.90×)
+t 12.00 | 152.00 | r 0.060 (5.00×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.90×)
+t 16.50 | 156.50 | r 0.018 (1.50×) | phone dark | no wall shadow: the pendant's desk pool only (0.127 / (0.127 − r) = 1.17×)
