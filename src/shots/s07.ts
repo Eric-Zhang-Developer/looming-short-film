@@ -1,4 +1,3 @@
-// @ts-check
 // s07 · Bed rot (docs/shots/s07.md, v7-bed; README §1 2.5× peak, director 2026-10-18). The doom scroll, head-on (H): he
 // lies propped on the pillow, the phone flat on his chest lighting his face from below, scrolling Reels, deadpan. Each
 // flick (REELS' cuts) turns the phone's colour. The Exam sits big and dark on the blanket near the lens, its back to us.
@@ -18,14 +17,17 @@ import { makeGator, FIG_K } from '../characters/gator.ts';
 import { specPose } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { makeClock } from '../clock.ts';
-import { tools } from './s02.js';
-import { reminderInsert } from './s03.js';
+import { tools } from './s02.ts';
+import { reminderInsert } from './s03.ts';
 import { COUNTDOWN } from '../props/canvas.ts';
 import { REELS } from '../audio/cues.ts';
+import type { PaperMesh } from '../material.ts';
+import type { Gator } from '../characters/gator.ts';
+import type { ShotCtx, Palette, Tools } from './s02.ts';
 
 const DEG = Math.PI / 180;
-const F = (s) => Math.round(s * 12) / 12;                    // spec times are 2s drawings
-export const at2 = (T, a, b) => T >= F(a) - 1e-6 && T < F(b) - 1e-6;
+const F = (s: number) => Math.round(s * 12) / 12;                    // spec times are 2s drawings
+export const at2 = (T: number, a: number, b: number) => T >= F(a) - 1e-6 && T < F(b) - 1e-6;
 
 // ---------- the bedroom (m; back wall z 0, floor y 0, the kits' 1 real m = 0.055 film m) ----------
 const BED = { x0: 0.125, w: 0.120, z: 0.355, back: 0.27, matB: 0.021, matH: 0.016 };
@@ -38,15 +40,15 @@ export const ROOM = {
   BLANKET_Z: 0.318,
   BLOB_Z: 0.322,                                              // the Exam stands just in front of the blanket card
   DESK: { x0: -0.030, w: 0.077, top: 0.041 },                 // the desk corner against the back wall, left of the bed
-  CAL: { x0: -0.020, w: 0.050, y0: 0.062, z: 0.0015, fri: [173 / 275, 183 / 292] },   // props_kit calendar, s02's art and cell
-  CLOCK: /** @type {Vec3} */ ([0.044, 0.099, 0.0015]),                              // README §13: 0.014 right of the calendar, 0.70 of its height up
+  CAL: { x0: -0.020, w: 0.050, y0: 0.062, z: 0.0015, fri: [173 / 275, 183 / 292] } as { x0: number, w: number, y0: number, z: number, fri: number[], h: number, friXY: [number, number] },   // props_kit calendar, s02's art and cell
+  CLOCK: [0.044, 0.099, 0.0015] as Vec3,                              // README §13: 0.014 right of the calendar, 0.70 of its height up
   // The nightstand lamp (s09a lampOn, s09b's light behind him): on the bed's door side (frame right, his feet's end),
   // at the bed's near corner and a little proud of it, so it is low and in front of the blob, and throws its shadow back
   // onto the wall behind the bed.
   NIGHTSTAND: { x0: 0.255, x1: 0.287, z0: 0.355, z1: 0.395, h: 0.033 },
-  LAMP: /** @type {Vec3} */ ([0.271, 0.054, 0.380]),                                // the shade's mouth centre: the light (s09a, s09b)
+  LAMP: [0.271, 0.054, 0.380] as Vec3,                                // the shade's mouth centre: the light (s09a, s09b)
   SHADE: [0.016, 0.012],                                      // the cream tissue shade, w × h (its centre 4 mm over LAMP)
-  BACKPACK: /** @type {Vec3} */ ([0.180, 0, 0.392]),                                // on the floor in front of the bed, where he stands up
+  BACKPACK: [0.180, 0, 0.392] as Vec3,                                // on the floor in front of the bed, where he stands up
 };
 { const c = ROOM.CAL; c.h = c.w * 292 / 275; c.friXY = [c.x0 + c.fri[0] * c.w, c.y0 + c.h * (1 - c.fri[1])]; }
 // s07's camera: s08 C3 and s09a C3 use it exactly.
@@ -57,18 +59,18 @@ export const CAM = new THREE.Vector3(0.255, 0.040, 0.90), LOOK = new THREE.Vecto
 // the ceiling and his feet point +x. Both arms up to the phone on his chest; legs forward under the blanket.
 // LIE_HEAD (v6-bed): the head lies back on the pillow, snout tilted ~40° up toward the phone. At −14° the snout stood on
 // end (76°) and the eye dome dropped beside the headboard, reading as two heads. Every lying pose uses it.
-export const HIP = /** @type {Vec3} */ ([0.195, MT + 0.011, ROOM.BODY_Z]);
+export const HIP = [0.195, MT + 0.011, ROOM.BODY_Z] as Vec3;
 export const LIE_HEAD = -50;
 export const LIE = specPose({ lean: -90, arm: 0, far: 10, head: LIE_HEAD, leg: 80, farLeg: 84, tail: -88 });
 const FLICK = 1.8;                                            // thumb flick: 1 mm at the near arm's tip (0.032)
 // ---------- the Exam on his knees ----------
 export const BLOB_R = { start: 0.024, gulp3: 0.030 };         // 2× → 2.5× (README §1, Q16 answered 2.5×)
-export const KNEE = /** @type {Vec3} */ ([0.230, MT + 0.037, ROOM.BLOB_Z]);         // the blob's contact point on the blanket's top over his knees
+export const KNEE = [0.230, MT + 0.037, ROOM.BLOB_Z] as Vec3;         // the blob's contact point on the blanket's top over his knees
 // ---------- the phone (the key) ----------
-export const PHONE = { at: /** @type {Vec3} */ ([0.193, MT + 0.023, 0.326]), long: 0.0083 };   // screen centre P: in his hands on his chest, under the blob
+export const PHONE = { at: [0.193, MT + 0.023, 0.326] as Vec3, long: 0.0083 };   // screen centre P: in his hands on his chest, under the blob
 
 // The bedroom, built once per shot. Returns handles; each shot animates what it needs.
-export async function bedroom(ctx, ID) {
+export async function bedroom(ctx: ShotCtx, ID: string) {
   const { scene, assets, PALETTE } = ctx;
   const T = tools(ctx, ID), { cut, rect, tiled, paper, group, col } = T;
   const [home, props] = await Promise.all([assets.load('home_kit'), assets.load('props_kit')]);
@@ -84,8 +86,8 @@ export async function bedroom(ctx, ID) {
   // Windows (no blinds, v4): the kit's frame over tissue glass that glows faint moon-blue (emissive: the moon is behind
   // the wall and lights nothing in the room).
   const MOON = new THREE.Color(PALETTE.phone).lerp(new THREE.Color(PALETTE.cream), 0.3);
-  const panes = [];
-  for (const k of ['A', 'B']) {
+  const panes: THREE.MeshLambertMaterial[] = [];
+  for (const k of ['A', 'B'] as const) {
     const glass = cut(home, 'window_glass', [2 * WIN.hw + 0.004, 0.052], `glass${k}`, { weight: 'tissue', mat: { translucency: 0, edgeCatch: 0 } });
     glass.g.position.set(WIN[k], WIN.y, 0.002);
     glass.mesh.material.color.setRGB(0.25, 0.3, 0.42);
@@ -93,7 +95,7 @@ export async function bedroom(ctx, ID) {
     const fr = cut(home, 'window_frame', [null, WIN.h], `frame${k}`, { mat: { edgeCatch: 0 } });
     fr.g.position.set(WIN[k], WIN.y - 0.002, 0.003);
   }
-  const moonPanes = (k) => { for (const m of panes) m.emissive.copy(MOON).multiplyScalar(k); };
+  const moonPanes = (k: number) => { for (const m of panes) m.emissive.copy(MOON).multiplyScalar(k); };
 
   // The desk corner, the calendar ("Calc 2 exam", the red circle) and the clock on the wall above it (s02's pieces).
   const { DESK, CAL } = ROOM;
@@ -133,7 +135,7 @@ export async function bedroom(ctx, ID) {
   rect('lamp-stem', col('navy', 'kraft', 0.2), [0.0012, ly - NS.h - 0.002], [lx, (ly + NS.h) / 2, lz + 0.0012]);
   const shade = group(paper('lamp-shade', { path: [[0.22, 0.04], [0.78, 0.04], [0.97, 0.96], [0.03, 0.96]], color: PALETTE.cream, weight: 'tissue', size: ROOM.SHADE, res: 512 },
     { translucency: 0.9 }), [lx, ly + 0.004, lz + 0.002]);
-  const shadeMat = /** @type {THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>} */ (shade.children[0]).material;
+  const shadeMat = (shade.children[0] as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>).material;
 
   // The backpack on the floor by the nightstand (s09a picks it up).
   const backpack = cut(props, 'backpack', [null, 0.021], 'backpack', { anchor: [0.5, 0] });
@@ -151,7 +153,7 @@ export async function bedroom(ctx, ID) {
   scene.add(phone);
   const ph = cut(props, 'phone_face_up', [PHONE.long, null], 'phone', { parent: phone });
   const glowTex = (() => {   // a feed: cards of cyan and cream, no text
-    const c = Object.assign(document.createElement('canvas'), { width: 128, height: 64 }), g = c.getContext('2d');
+    const c = Object.assign(document.createElement('canvas'), { width: 128, height: 64 }), g = c.getContext('2d')!;
     g.fillStyle = col('phone', 'cream', 0.35); g.fillRect(0, 0, 128, 64);
     g.fillStyle = col('phone', 'navy', 0.25); for (let i = 0; i < 4; i++) g.fillRect(6 + i * 31, 6, 20, 52);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
@@ -211,7 +213,7 @@ export async function bedroom(ctx, ID) {
 
   // Blob placement and the lights' aim, every frame: r is its current radius, at its contact point.
   const C = new THREE.Vector3(), nrm = new THREE.Vector3(), ax = new THREE.Vector3(), ay = new THREE.Vector3(), az = new THREE.Vector3(), basis = new THREE.Matrix4();
-  const placeBlob = (r, contact = KNEE) => {
+  const placeBlob = (r: number, contact = KNEE) => {
     exam.mesh.position.set(...contact);
     exam.mesh.scale.setScalar(r / BLOB_R.start);
     // The caster faces the phone with its width along world x (its top toward the wall), so on the ceiling the shadow
@@ -239,12 +241,11 @@ export async function bedroom(ctx, ID) {
 // px over 213 head px: 0.535 figure px per head px). The neck is each bitmap's bottom row centre (measured: x 120, y 317),
 // sunk 2 mm under the hood.
 const HEAD_K = (114 / 213) * FIG_K, HEAD_EYE = [142, 104], HEAD_NECK = [120, 317], HEAD_SINK = 0.002;
-export async function closeHeads(ctx, T, rig, names = ['numb', 'dread', 'resolve']) {
-  const kit = await ctx.assets.load('closeup_heads'), g = new THREE.Group(), heads = {};
+export async function closeHeads(ctx: ShotCtx, T: Tools, rig: Gator, names = ['numb', 'dread', 'resolve']) {
+  const kit = await ctx.assets.load('closeup_heads'), g = new THREE.Group(), heads: Record<string, PaperMesh> = {};
   rig.joints.head.add(g);
   g.position.y = -HEAD_SINK;
-  /** @param {number[]} xy @param {number} W @param {number} H */
-  const at = ([x, y], W, H) => [(W / 2 - x) * -HEAD_K, (H / 2 - y) * HEAD_K];   // bitmap px → offset from the bitmap centre
+  const at = ([x, y]: number[], W: number, H: number) => [(W / 2 - x) * -HEAD_K, (H / 2 - y) * HEAD_K];   // bitmap px → offset from the bitmap centre
   for (const n of names) {
     const bmp = kit.pieces[n], W = bmp.width, H = bmp.height;
     const mesh = T.paper(`head-${n}`, { art: bmp, size: [W * HEAD_K, H * HEAD_K], res: 1024 });
@@ -257,7 +258,7 @@ export async function closeHeads(ctx, T, rig, names = ['numb', 'dread', 'resolve
   // A closed lid for the breath (s09a): a patch of the heads' painted green (mean of their green pixels, measured
   // rgb 101,148,84) over the eye disc, with a dark lash arc. Drawn in code like the rig's brow.
   const lid = (() => {
-    const c = Object.assign(document.createElement('canvas'), { width: 256, height: 256 }), x = c.getContext('2d');
+    const c = Object.assign(document.createElement('canvas'), { width: 256, height: 256 }), x = c.getContext('2d')!;
     x.fillStyle = 'rgb(101,148,84)'; x.beginPath(); x.ellipse(128, 128, 112, 106, 0, 0, 7); x.fill();
     x.strokeStyle = 'rgb(38,62,34)'; x.lineWidth = 16; x.lineCap = 'round';
     x.beginPath(); x.arc(128, 70, 92, 0.25 * Math.PI, 0.75 * Math.PI); x.stroke();
@@ -270,7 +271,7 @@ export async function closeHeads(ctx, T, rig, names = ['numb', 'dread', 'resolve
   })();
   const RIG_HEAD = ['head', 'snout', 'jaw', 'eyes', 'mouth', 'throat', 'brow'];
   // show(name): that painted head (or none: the rig's head back). Call every frame after act(), like face().
-  const show = (name, { closed = false } = {}) => {
+  const show = (name: string | null, { closed = false } = {}) => {
     for (const [n, m] of Object.entries(heads)) m.visible = n === name;
     for (const p of RIG_HEAD) if (rig.meshes[p]) rig.meshes[p].visible = !name;   // every act() preset shows the brow
     lid.visible = !!name && closed;
@@ -289,17 +290,17 @@ const HX = 3.0;
 // Four reels, four phone colours, all turns of phone cyan [hue, saturation, lightness]. Red is the exam's (doc 03), and
 // a warm yellow would read as the lamp's amber, so: cyan, violet, green, and a pale cool white.
 const HUE_TURNS = [[0, 0, 0], [0.21, 0, 0], [-0.19, 0, 0], [0, -0.5, 0.12]];
-export const HUES = (P) => HUE_TURNS.map(([h, s, l]) => new THREE.Color(P.phone).offsetHSL(h, s, l));
+export const HUES = (P: Palette) => HUE_TURNS.map(([h, s, l]) => new THREE.Color(P.phone).offsetHSL(h, s, l));
 /** Which reel's colour is on the phone at s07 local drawing T: each flick (REELS' cuts) turns it; before the first flick
  * the feed is on the last reel's, so the loop reads as one feed. */
-export const hueAt = (T) => (FLICKS.filter((f) => T >= f - 1e-6).length + 3) % 4;
-export const H_CAM = { pos: /** @type {Vec3} */ ([HX - 0.004, 0.066, 0.263]), look: /** @type {Vec3} */ ([HX - 0.004, 0.071, 0.03]) };
+export const hueAt = (T: number) => (FLICKS.filter((f) => T >= f - 1e-6).length + 3) % 4;
+export const H_CAM = { pos: [HX - 0.004, 0.066, 0.263] as Vec3, look: [HX - 0.004, 0.071, 0.03] as Vec3 };
 const H_BED = 0.036;                                                // the blanket's top over his legs
-const H_ROOT = /** @type {Vec3} */ ([HX - 0.022, 0.0, 0.030]);       // his feet (front rig root); the blanket hides everything below the chest
-const H_PHONE = /** @type {Vec3} */ ([HX - 0.022, 0.048, 0.051]);   // on his chest, over the blanket's fold, in his hands
+const H_ROOT = [HX - 0.022, 0.0, 0.030] as Vec3;       // his feet (front rig root); the blanket hides everything below the chest
+const H_PHONE = [HX - 0.022, 0.048, 0.051] as Vec3;   // on his chest, over the blanket's fold, in his hands
 export const H_FOCUS = H_CAM.pos[2] - H_ROOT[2];                     // his face
-export const H_BLOB = /** @type {Vec3} */ ([HX + 0.047, H_BED, 0.100]);   // contact on the blanket near the lens, frame right
-export async function headOn(ctx, ID) {
+export const H_BLOB = [HX + 0.047, H_BED, 0.100] as Vec3;   // contact on the blanket near the lens, frame right
+export async function headOn(ctx: ShotCtx, ID: string) {
   const { scene, assets, PALETTE } = ctx;
   const T = tools(ctx, `${ID}-h`), { cut, rect, paper, group, col } = T;
   const [home, props, faces] = await Promise.all([assets.load('home_kit'), assets.load('props_kit'), assets.load('face_sheet')]);
@@ -346,7 +347,7 @@ export async function headOn(ctx, ID) {
   // in the foreground. The rig's own pair mirrors the right eye, so its pupils meet below: on the phone.
   const glance = (() => {
     const FACE = 0.4595 * FIG_K, art = faces.pieces.eyes_tired, [w, h] = faces.sizes.eyes_tired, pair = 98 / 0.4595;
-    const CW0 = 232 + pair, CH = 160, c = Object.assign(document.createElement('canvas'), { width: Math.round(CW0), height: CH }), g = c.getContext('2d');
+    const CW0 = 232 + pair, CH = 160, c = Object.assign(document.createElement('canvas'), { width: Math.round(CW0), height: CH }), g = c.getContext('2d')!;
     for (const cx of [CW0 / 2 - pair / 2, CW0 / 2 + pair / 2]) g.drawImage(art, cx - w / FACE / 2, CH / 2 - h / FACE / 2, w / FACE, h / FACE);
     const m = paper('glance', { art: c, size: [CW0 * FACE, CH * FACE], res: 256 });
     m.position.z = 0.0002; m.visible = false;
@@ -375,7 +376,8 @@ export async function headOn(ctx, ID) {
   exam.mesh.onBeforeRender = (...a) => { ob(...a); U.uLightKind.value = 0; U.uAmb.value.setRGB(0, 0, 0); for (const e of U.uEye.value) e.y = 99; U.uHiR.value = 99; };
   // The rim: the blob's own outline a touch bigger, just behind it, in the phone's colour, nudged toward the phone (up and
   // left), so the light catches the edge on his side.
-  const rimMat = exam.silhouette({ color: PALETTE.phone, soft: 0.04 });
+  // blob.ts infers silhouette()'s color as PALETTE.ink's literal type (its default); it takes any colour string.
+  const rimMat = exam.silhouette({ color: PALETTE.phone as string as Palette['ink'], soft: 0.04 });
   const rim = new THREE.Mesh(exam.mesh.geometry, rimMat);
   rim.castShadow = false;
   scene.add(rim);
@@ -389,7 +391,7 @@ export async function headOn(ctx, ID) {
 
   const hues = HUES(PALETTE), hue = new THREE.Color(), base = new THREE.Color(PALETTE.phone);
   /** Place the blob at radius r (its contact stays planted); colour the phone's light. */
-  const set = (t, { r, colour, squash = 0, wobble = 1, level = 1 }) => {
+  const set = (t: number, { r, colour, squash = 0, wobble = 1, level = 1 }: { r: number, colour: THREE.Color, squash?: number, wobble?: number, level?: number }) => {
     exam.mesh.scale.setScalar(r / BLOB_R.start);
     exam.update(t, { squash, wobble, eyes: 'open' });
     rim.position.set(H_BLOB[0] - 0.0012 * r / BLOB_R.start, H_BLOB[1] + 0.0010 * r / BLOB_R.start, H_BLOB[2] - 0.003);
@@ -418,8 +420,8 @@ const ID = 's07';
 // 7.25), W (the side-on wide, CAM/LOOK) 7.5–8.5 for gulp3, where the ceiling shadow jumps: the rule, which H can't show
 // (its shadow falls toward the lens). Then H to the end, the silhouette now 2.5×. H replaces v6's cut-in (2.0–5.5).
 const INS = [6.25, 7.5], W = [7.5, 8.5];
-const GLANCE = [6.0, 6.167];                                  // clockGlance: his eyes to the blob in the foreground, then back down
-export async function build(ctx) {
+const GLANCE: [number, number] = [6.0, 6.167];                                  // clockGlance: his eyes to the blob in the foreground, then back down
+export async function build(ctx: ShotCtx) {
   const { camera, post } = ctx;
   const R = await bedroom(ctx, ID), { rig, exam, spot, fill, clock } = R;
   const Hs = await headOn(ctx, ID);
@@ -431,7 +433,7 @@ export async function build(ctx) {
 
   return {
     ...R, head: Hs,
-    update(t) {
+    update(t: number) {
       const T = onTwos(t), insert = t >= INS[0] - 1e-6 && t < INS[1] - 1e-6, h = t < INS[0] - 1e-6 || t >= W[1] - 1e-6;
       R.T.boil(t); clock.boil(t); rig.boil(t, 10);
       Hs.T.boil(t); Hs.clock.boil(t); Hs.rig.boil(t, 10);

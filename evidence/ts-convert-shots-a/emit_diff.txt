@@ -1,0 +1,99 @@
+diff -r base/build/shots/s02.js new/build/shots/s02.js
+16c16
+<     hip: ([-0.056, -0.0135, 0.016]),
+---
+>     hip: [-0.056, -0.0135, 0.016],
+254c254
+< const SUN = { k: 0.35, pos: ([0.8, 0.6, 0.6]), scale: 0.8 };
+---
+> const SUN = { k: 0.35, pos: [0.8, 0.6, 0.6], scale: 0.8 };
+257c257
+< const CLOCK = { at: ([C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z]), h: 9, m: 0 };
+---
+> const CLOCK = { at: [C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z], h: 9, m: 0 };
+diff -r base/build/shots/s03.js new/build/shots/s03.js
+192c192
+<             gator.blend(P, (KEYS), t);
+---
+>             gator.blend(P, KEYS, t);
+diff -r base/build/shots/s05.js new/build/shots/s05.js
+21c21
+< const B = ([L[0] - 0.096 / S_WALL, TABLE, L[2] * (1 - 1 / S_WALL)]);
+---
+> const B = [L[0] - 0.096 / S_WALL, TABLE, L[2] * (1 - 1 / S_WALL)];
+223c223
+<             for (const [r, ph] of ([[tall, 0], [round, 1.3]]))
+---
+>             for (const [r, ph] of [[tall, 0], [round, 1.3]])
+diff -r base/build/shots/s06.js new/build/shots/s06.js
+116c116
+<             gator.blend(P, (KEYS), t);
+---
+>             gator.blend(P, KEYS, t);
+diff -r base/build/shots/s07.js new/build/shots/s07.js
+28c28
+<     CLOCK: ([0.044, 0.099, 0.0015]),
+---
+>     CLOCK: [0.044, 0.099, 0.0015],
+30c30
+<     LAMP: ([0.271, 0.054, 0.380]),
+---
+>     LAMP: [0.271, 0.054, 0.380],
+32c32
+<     BACKPACK: ([0.180, 0, 0.392]),
+---
+>     BACKPACK: [0.180, 0, 0.392],
+40c40
+< export const HIP = ([0.195, MT + 0.011, ROOM.BODY_Z]);
+---
+> export const HIP = [0.195, MT + 0.011, ROOM.BODY_Z];
+45,46c45,46
+< export const KNEE = ([0.230, MT + 0.037, ROOM.BLOB_Z]);
+< export const PHONE = { at: ([0.193, MT + 0.023, 0.326]), long: 0.0083 };
+---
+> export const KNEE = [0.230, MT + 0.037, ROOM.BLOB_Z];
+> export const PHONE = { at: [0.193, MT + 0.023, 0.326], long: 0.0083 };
+96c96
+<     const shadeMat = (shade.children[0]).material;
+---
+>     const shadeMat = shade.children[0].material;
+230c230
+< export const H_CAM = { pos: ([HX - 0.004, 0.066, 0.263]), look: ([HX - 0.004, 0.071, 0.03]) };
+---
+> export const H_CAM = { pos: [HX - 0.004, 0.066, 0.263], look: [HX - 0.004, 0.071, 0.03] };
+232,233c232,233
+< const H_ROOT = ([HX - 0.022, 0.0, 0.030]);
+< const H_PHONE = ([HX - 0.022, 0.048, 0.051]);
+---
+> const H_ROOT = [HX - 0.022, 0.0, 0.030];
+> const H_PHONE = [HX - 0.022, 0.048, 0.051];
+235c235
+< export const H_BLOB = ([HX + 0.047, H_BED, 0.100]);
+---
+> export const H_BLOB = [HX + 0.047, H_BED, 0.100];
+diff -r base/build/shots/s08.js new/build/shots/s08.js
+30c30
+<     const DROP_AT = ([(75 - 120) * H.k, (317 - 62) * H.k, 0.0006]);
+---
+>     const DROP_AT = [(75 - 120) * H.k, (317 - 62) * H.k, 0.0006];
+diff -r base/build/shots/s09a.js new/build/shots/s09a.js
+28,30c28,30
+< const EDGE_AT = ([0.175, ROOM.MT + 0.006, 0.352]);
+< const FOOT = ([0.232, ROOM.MT + 0.001, 0.300]);
+< const FLOOR = ([0.236, 0, 0.368]);
+---
+> const EDGE_AT = [0.175, ROOM.MT + 0.006, 0.352];
+> const FOOT = [0.232, ROOM.MT + 0.001, 0.300];
+> const FLOOR = [0.236, 0, 0.368];
+78c78
+<     const cShadeMat = (cShade.children[0]).material, cShadeBase = cShadeMat.emissive.clone();
+---
+>     const cShadeMat = cShade.children[0].material, cShadeBase = cShadeMat.emissive.clone();
+171c171
+<                 contact = T < F(4.417) ? (KNEE.map((v, i) => lerp(v, FOOT[i], (T - UP + 1 / 12) / (1 / 6)) + (i === 1 ? 0.006 : 0))) : FOOT;
+---
+>                 contact = T < F(4.417) ? KNEE.map((v, i) => lerp(v, FOOT[i], (T - UP + 1 / 12) / (1 / 6)) + (i === 1 ? 0.006 : 0)) : FOOT;
+174c174
+<                 contact = (FOOT.map((v, i) => lerp(v, FLOOR[i], k) + (i === 1 ? 0.01 * Math.sin(Math.PI * k) : 0)));
+---
+>                 contact = FOOT.map((v, i) => lerp(v, FLOOR[i], k) + (i === 1 ? 0.01 * Math.sin(Math.PI * k) : 0));

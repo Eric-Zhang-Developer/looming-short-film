@@ -1,0 +1,46 @@
+# ts-convert-shots-a: proof, run after the last code commit (27b039d), in the brief's order.
+# Branch worktree-agent-ae4ca9559e7f54433, cut from refactor/typescript at 629d7ce.
+
+## 1. typecheck (2026-10-19 23:46:07)
+$ npm run -s typecheck
+(no output)
+exit 0
+
+## 2. core selftest (no audio file in this batch, so no audio selftest)
+$ node src/core/selftest.ts
+ok  hash fixed outputs
+ok  mulberry32 fixed outputs
+ok  seedOf is a stable uint32 and separates parts
+ok  kf hits its keys exactly
+ok  ease endpoints
+ok  spring is 0 before t0 and at t0
+ok  onTwos(0.09) === 1/12
+ok  onTwos survives the film's global-to-local subtraction
+ok  palette has the contract keys
+selftest: all passed
+exit 0
+
+## 3. mix (last lines)
+$ node tools/mix.ts
+range 0:204 s  premix -18.03 LUFS, -7.21 dBTP  →  loudnorm linear
+mix.wav  integrated -16.0 LUFS  true peak -5.2 dBTP (ebur128)  /  -15.94 LUFS, -5.44 dBTP (loudnorm pass 2)  target -16 ±1 LUFS, ≤ -4 dBTP
+9801f68535b73559936b6c221e7c3b7dd361c1c8c39624ab0331b318896f51d2  out/audio/mix.wav
+exit 0
+$ head -1 evidence/ts-refactor/baseline_audio.txt
+9801f68535b73559936b6c221e7c3b7dd361c1c8c39624ab0331b318896f51d2  /Users/ericzhang/code/media/looming/out/audio/mix.wav
+→ equal
+
+## 4. timeline
+$ node tools/check_timeline.ts
+(per-shot beat table omitted)
+ok (22 shots, 77 beats, 204.0s)
+exit 0
+
+## 5. frame hashes (23:51:50 → 23:58:52; started with 1128 MB swap free and no other puppeteer Chrome running)
+$ node tools/hashes.ts --check=evidence/ts-refactor/baseline.json
+(4 "[page] Failed to load resource: 404" lines omitted: the unfrozen kits' boxes.json, which fall back to proxies by design)
+hashes: PASS (240 frames identical)
+exit 0
+
+## extra: emitted JS, 629d7ce vs 27b039d (tsconfig.build.json --removeComments, ESM)
+evidence/ts-convert-shots-a/emit_diff.txt: 99 lines, every one a redundant pair of parentheses left by a JSDoc cast.

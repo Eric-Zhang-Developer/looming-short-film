@@ -1,4 +1,3 @@
-// @ts-check
 // s02 · The ink drop is born (docs/shots/s02.md, G4). v2 on the frozen kits, and the home desk unit re-staged at real
 // scale (brief v2-home-a: the director's "massive table"). The desk, chair, lamp and laptop are home_kit art at the
 // scale table's sizes (evidence/asset-home-kit/scale_table.md: 1 real m = 0.055 film m against the 0.096 m gator); the
@@ -20,14 +19,35 @@ import { makeGator } from '../characters/gator.ts';
 import { POSES } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { makeClock } from '../clock.ts';
+import type { PaperOptions, PaperSheet } from '../paper.ts';
+import type { PaperMesh } from '../material.ts';
+import type { AssetCtx, Kit } from '../assets.ts';
+import type { PALETTE as PALETTE_T } from '../core/palette.ts';
+import type { Post, PostSettings } from '../post.ts';
 
 const DEG = Math.PI / 180;
+
+// What film.ts hands every shot's build() (its ctx also carries stage and renderer, which no shot reads). Shared by the shots.
+export type Palette = typeof PALETTE_T;
+export type ShotCtx = AssetCtx & { scene: THREE.Scene, camera: THREE.PerspectiveCamera, PALETTE: Palette, post: (opts?: PostSettings) => Post };
+// paperMesh's options (translucency, edgeCatch).
+export type MatOpts = NonNullable<Parameters<typeof paperMesh>[1]>;
+// DESK, with the fields computed after the literal (lampMouth, bead, cal.h, cal.friXY).
+type Desk = {
+  floor: number, x0: number, w: number, d: number, hip: Vec3,
+  chair: { h: number, x: number, z: number },
+  lamp: { x: number, z: number, h: number },
+  cal: { x0: number, w: number, y0: number, z: number, lip: number, lipZ: number, fri: number[], h: number, friXY: [number, number] },
+  page: number[], phone: number[], pen: number[], screenZ: number,
+  laptop: { scale: number, yaw: number },
+  lampMouth: Vec3, bead: Vec3,
+};
 
 // ---------- the home desk unit at real scale (m). Wall z 0, desk top y 0, the Student in profile facing +x. ----------
 export const DESK = {
   floor: -0.0413,                  // the desk's painted height (75 cm): its top edge is y 0
   x0: -0.033, w: 0.0768, d: 0.033, // painted desk front (mirrored: drawers right, kneehole left by him), 60 cm deep
-  hip: /** @type {Vec3} */ ([-0.056, -0.0135, 0.016]),   // seated hip on the desk_chair's cushion; body plane z 0.016 (near arm +0.012)
+  hip: [-0.056, -0.0135, 0.016] as Vec3,   // seated hip on the desk_chair's cushion; body plane z 0.016 (near arm +0.012)
   chair: { h: 0.0495, x: -0.061, z: 0.008 },
   // A tall table lamp (home_kit's "floor_lamp" art at 80 cm; v3: it was a 120 cm cartoon allowance so its shade cleared his
   // head). Now a normal tall table lamp, moved right of his snout so the shade stays visible, behind the blob's mark;
@@ -45,7 +65,7 @@ export const DESK = {
   // toward the camera so the lit screen shows (v6: −55°, edge-on). homeDesk's laptopScale/laptopYaw default to v6's for
   // the shots that don't ask (s00, s18).
   laptop: { scale: 1.8, yaw: -30 * DEG },
-};
+} as Desk;
 DESK.lampMouth = [DESK.lamp.x, DESK.lamp.h * 0.646, DESK.lamp.z];
 DESK.bead = [DESK.lamp.x - DESK.lamp.h * 21 / 212, DESK.lamp.h * 0.505, DESK.lamp.z];
 /** homeDesk's options for the v7 laptop (s02, s03, s06). */
@@ -54,36 +74,36 @@ export const LAPTOP = { laptopScale: DESK.laptop.scale, laptopYaw: DESK.laptop.y
 
 // Paper helpers shared by the home desk shots (from s04: torn rects, kit pieces cut by their visible box, tiles).
 const PAD = 0.04;
-function torn(w, h) {
+function torn(w: number, h: number) {
   const m = PAD * Math.max(w, h), W = w + 2 * m, H = h + 2 * m, u = m / W, v = m / H;
   return { path: [[u, v], [1 - u, v], [1 - u, 1 - v], [u, 1 - v]], size: [W, H] };
 }
-export function tools({ scene, PALETTE }, ID) {
-  const col = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
-  /** @returns {Vec3} */
-  const tiltOf = (k, deg = 1.5) => { const r = mulberry32(seedOf(ID, k)); return [(2 * r() - 1) * deg * DEG, (2 * r() - 1) * deg * DEG, 0]; };
-  const boiling = [];
-  const paper = (key, opts, mat) => {
-    const make = (s) => makePaper({ ...opts, key: `${ID}-${key}`, seed: s });
+export type Tools = ReturnType<typeof tools>;
+export type Cut = ReturnType<Tools['cut']>;
+export function tools({ scene, PALETTE }: Pick<ShotCtx, 'scene' | 'PALETTE'>, ID: string) {
+  const col = (a: keyof Palette, b: keyof Palette, k: number) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
+  const tiltOf = (k: string, deg = 1.5): Vec3 => { const r = mulberry32(seedOf(ID, k)); return [(2 * r() - 1) * deg * DEG, (2 * r() - 1) * deg * DEG, 0]; };
+  const boiling: [PaperMesh, (s: number) => PaperSheet][] = [];
+  const paper = (key: string, opts: PaperOptions, mat?: MatOpts) => {
+    const make = (s: number) => makePaper({ ...opts, key: `${ID}-${key}`, seed: s });
     const mesh = paperMesh(make(0), mat);
     mesh.castShadow = false;   // only the blob casts, unless a shot turns a piece on
     boiling.push([mesh, make]);
     return mesh;
   };
-  /** @param {THREE.Object3D} mesh @param {Vec3} at @param {{ rot?: Vec3 | null, parent?: THREE.Object3D }} [o] */
-  const group = (mesh, at, { rot = null, parent = scene } = {}) => {
+  const group = (mesh: THREE.Object3D, at: Vec3, { rot = null, parent = scene }: { rot?: Vec3 | null, parent?: THREE.Object3D } = {}) => {
     const g = new THREE.Group(); g.add(mesh); g.position.set(...at);
     if (rot) g.rotation.set(...rot);
     parent.add(g);
     return g;
   };
-  const rect = (key, color, [w, h], at, o = {}) =>
+  const rect = (key: string, color: string, [w, h]: number[], at: Vec3, o: { weight?: string, res?: number, mat?: MatOpts, rot?: Vec3 | null, parent?: THREE.Object3D } = {}) =>
     group(paper(key, { ...torn(w, h), color, weight: o.weight ?? 'cardstock', res: o.res ?? 512 }, o.mat), at, o);
   // A cut piece whose visible box is [w, h] (null keeps the aspect), its origin at that box's anchor [ax, ay] (0..1 from
   // the left / bottom). flip mirrors it left-right about the same box.
-  const cut = (a, p, [w, h], key, o = {}) => {
+  const cut = (a: Kit, p: string, [w, h]: (number | null)[], key: string, o: { anchor?: number[], weight?: string, res?: number, mat?: MatOpts, flip?: boolean, tilt?: boolean, parent?: THREE.Object3D } = {}) => {
     const [sw, sh] = a.sizes[p], [u0, v0, u1, v1] = a.visible[p], vw = sw * (u1 - u0), vh = sh * (v1 - v0);
-    const sx = w != null ? w / vw : h / vh, sy = h != null ? h / vh : sx, [ax, ay] = o.anchor ?? [0.5, 0.5];
+    const sx = w != null ? w / vw : h! / vh, sy = h != null ? h / vh : sx, [ax, ay] = o.anchor ?? [0.5, 0.5];
     const mesh = paper(key, { art: a.pieces[p], size: [sw, sh], weight: o.weight ?? 'cardstock', res: o.res ?? 512 }, o.mat);
     const f = o.flip ? -1 : 1;
     mesh.scale.set(sx * f, sy, 1);
@@ -94,34 +114,34 @@ export function tools({ scene, PALETTE }, ID) {
     const g = new THREE.Group(); g.add(inner); (o.parent ?? scene).add(g);
     return { g, inner, mesh, size: [vw * sx, vh * sy] };
   };
-  const tiled = (a, p, nx, ny) => {
+  const tiled = (a: Kit, p: string, nx: number, ny: number) => {
     const bmp = a.pieces[p], [u0, v0, u1, v1] = a.visible[p], E = 4;
     const tw = Math.round((u1 - u0) * bmp.width) - 2 * E, th = Math.round((v1 - v0) * bmp.height) - 2 * E;
-    const c = Object.assign(document.createElement('canvas'), { width: tw * nx, height: th * ny }), g = c.getContext('2d');
+    const c = Object.assign(document.createElement('canvas'), { width: tw * nx, height: th * ny }), g = c.getContext('2d')!;
     for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) g.drawImage(bmp, u0 * bmp.width + E, v0 * bmp.height + E, tw, th, i * tw, j * th, tw, th);
     return c;
   };
-  const boil = (t) => { const s = boilSeed(t, 10); for (const [m, make] of boiling) updatePaperMesh(m, make(s)); };
+  const boil = (t: number) => { const s = boilSeed(t, 10); for (const [m, make] of boiling) updatePaperMesh(m, make(s)); };
   return { col, tiltOf, paper, group, rect, cut, tiled, boil };
 }
 
 // The seated lean and near-arm angle (degrees, specPose) that put his fingertip, seen from camera `cam`, on world point p:
 // p is slid along the camera ray to the hand's plane (body z + 0.013), then the lean in [l0, l1] whose shoulder is
 // closest to one arm's length from it wins (the spec's "hold the tip, absorb the error in the lean").
-export function seatReach(cam, p, [l0, l1] = [0, 34], hip = DESK.hip) {
+export function seatReach(cam: THREE.Vector3, p: THREE.Vector3, [l0, l1] = [0, 34], hip = DESK.hip) {
   const z = hip[2] + 0.013, T = cam.clone().add(p.clone().sub(cam).multiplyScalar((z - cam.z) / (p.z - cam.z)));
-  let best = null;
+  let best: { err: number, lean: number, arm: number } | null = null;
   for (let lean = l0; lean <= l1 + 1e-9; lean += 0.1) {
     const c = Math.cos(-lean * DEG), s = Math.sin(-lean * DEG), sx = hip[0] + 0.013 * c - 0.030 * s, sy = hip[1] + 0.013 * s + 0.030 * c;
     const err = Math.abs(Math.hypot(T.x - sx, T.y - sy) - 0.032);
     if (!best || err < best.err) best = { err, lean, arm: Math.atan2(T.y - sy, T.x - sx) / DEG };
   }
-  return best;
+  return best!;   // the loop runs at least once
 }
 
 // The room: cream wall, plank floor, desk (top + painted front), chair, lamp, calendar, page, phone, laptop (and pen).
 // Returns handles; each shot animates what it needs (lid, screen glow, phone screen, lamp).
-export async function homeDesk(ctx, T, { laptopAt = [0.0, 0.022], laptopYaw = -55 * DEG, laptopScale = 1, pen = false } = {}) {
+export async function homeDesk(ctx: ShotCtx, T: Tools, { laptopAt = [0.0, 0.022], laptopYaw = -55 * DEG, laptopScale = 1, pen = false } = {}) {
   const { scene, assets, PALETTE } = ctx;
   const [home, props] = await Promise.all([assets.load('home_kit'), assets.load('props_kit')]);
   const { cut, rect, tiled, paper, group, col } = T;
@@ -158,7 +178,7 @@ export async function homeDesk(ctx, T, { laptopAt = [0.0, 0.022], laptopYaw = -5
   circle.g.rotation.z = 0.2;
 
   // Page, pen, phone, flat on the desk.
-  const flat = (o, x, z, y, turn = 0) => { o.g.position.set(x, y, z); o.g.rotation.set(-Math.PI / 2, 0, turn); return o; };
+  const flat = (o: Cut, x: number, z: number, y: number, turn = 0) => { o.g.position.set(x, y, z); o.g.rotation.set(-Math.PI / 2, 0, turn); return o; };
   const page = flat(cut(props, 'blank_page', [0.0119, null], 'exam_page'), DESK.page[0], DESK.page[1], 0.0003, 0.06);
   const penO = pen ? flat(cut(props, 'pen', [0.0075, null], 'pen'), DESK.pen[0], DESK.pen[1], 0.0006, -0.1) : null;
   const phone = flat(cut(props, 'phone_face_up', [0.0083, null], 'phone'), DESK.phone[0], DESK.phone[1], 0.0004, 0.04);
@@ -183,7 +203,7 @@ export async function homeDesk(ctx, T, { laptopAt = [0.0, 0.022], laptopYaw = -5
   glow.position.set(0, LH * 0.6, 0.0002);
   lid.g.add(glow);
   glow.visible = false;
-  const setLid = (deg) => { hinge.rotation.x = -deg * DEG; };
+  const setLid = (deg: number) => { hinge.rotation.x = -deg * DEG; };
   const screenCentre = (out = new THREE.Vector3()) => { laptop.updateMatrixWorld(true); return glow.getWorldPosition(out); };
   const screenNormal = (out = new THREE.Vector3()) => { laptop.updateMatrixWorld(true); return out.set(0, 0, 1).transformDirection(glow.matrixWorld); };
   // Slide the laptop in z so the open screen's centre sits at DESK.screenZ: the light's depth, which fixes every S.
@@ -198,12 +218,12 @@ export async function homeDesk(ctx, T, { laptopAt = [0.0, 0.022], laptopYaw = -5
 // first-person view down a sandy lane between blocky walls and crates, a crosshair in the middle, his gun at lower right
 // held in a green hand. No logos, no text, no HUD numbers. fire(on) redraws it with a muzzle flash and the gun kicked
 // back (only when the state changes). Shared by every laptop screen (homeDesk's, s05's).
-export function gameScreen(PALETTE) {
-  const W = 320, H = 200, c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
-  const col = (a, b, k) => '#' + new THREE.Color(PALETTE[a] ?? a).lerp(new THREE.Color(PALETTE[b] ?? b), k).getHexString();
+export function gameScreen(PALETTE: Palette) {
+  const W = 320, H = 200, c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d')!;
+  const col = (a: string, b: string, k: number) => '#' + new THREE.Color(PALETTE[a as keyof Palette] ?? a).lerp(new THREE.Color(PALETTE[b as keyof Palette] ?? b), k).getHexString();
   const r = mulberry32(seedOf('laptop', 'game'));
-  const torn = (pts) => pts.map(([x, y]) => [x + (r() - 0.5) * 2.4, y + (r() - 0.5) * 2.4]);   // cut-paper wobble, fixed once
-  const SHAPES = [   // [fill, points] back to front, in canvas px; the horizon at y 92
+  const torn = (pts: number[][]) => pts.map(([x, y]) => [x + (r() - 0.5) * 2.4, y + (r() - 0.5) * 2.4]);   // cut-paper wobble, fixed once
+  const SHAPES: [string, number[][]][] = [   // [fill, points] back to front, in canvas px; the horizon at y 92
     ['sky', [[0, 0], [W, 0], [W, 96], [0, 96]]],
     ['sand', [[0, 92], [W, 92], [W, H], [0, H]]],
     ['wallFar', [[120, 54], [205, 54], [205, 94], [120, 94]]],                  // the far wall, a dark doorway in it
@@ -215,22 +235,22 @@ export function gameScreen(PALETTE) {
     ['crate', [[214, 82], [240, 82], [240, 108], [214, 108]]],                  // two crates on the right
     ['crate2', [[232, 92], [256, 92], [256, 116], [232, 116]]],
   ];
-  const FILL = {
+  const FILL: Record<string, string> = {
     sky: col('phone', 'cream', 0.25), sand: col('cream', 'phone', 0.3), wallFar: col('kraft', 'cream', 0.15), door: col('navy', 'ink', 0.2),
     wallL: col('kraft', 'navy', 0.15), wallLtop: col('kraft', 'cream', 0.3), wallR: col('kraft', 'navy', 0.3), wallRtop: col('kraft', 'cream', 0.2),
     crate: col('kraft', 'lamp', 0.25), crate2: col('kraft', 'navy', 0.1),
   };
-  const shapes = SHAPES.map(([k, p]) => [FILL[k], k === 'sky' || k === 'sand' ? p : torn(p)]);
+  const shapes = SHAPES.map(([k, p]): [string, number[][]] => [FILL[k], k === 'sky' || k === 'sand' ? p : torn(p)]);
   const gun = torn([[318, 200], [236, 200], [214, 172], [196, 150], [205, 142], [226, 152], [262, 150], [292, 166], [318, 168]]);   // the receiver and barrel, aimed in
   const hand = torn([[250, 200], [238, 176], [256, 166], [282, 176], [290, 200]]);
-  const star = (k0, k1) => Array.from({ length: 10 }, (_, i) => { const a = -2.4 + i * Math.PI / 5, k = i % 2 ? k0 : k1; return [200 + k * Math.cos(a), 146 + k * Math.sin(a)]; });
+  const star = (k0: number, k1: number) => Array.from({ length: 10 }, (_, i) => { const a = -2.4 + i * Math.PI / 5, k = i % 2 ? k0 : k1; return [200 + k * Math.cos(a), 146 + k * Math.sin(a)]; });
   const flash = star(14, 36), core = star(6, 16);   // at the barrel's tip
-  const poly = (fill, pts, dx = 0, dy = 0) => {
+  const poly = (fill: string, pts: number[][], dx = 0, dy = 0) => {
     g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x + dx, y + dy) : g.moveTo(x + dx, y + dy))); g.closePath();
     g.fillStyle = fill; g.fill();
     g.strokeStyle = 'rgba(242,232,213,0.5)'; g.lineWidth = 1; g.stroke();   // the pale torn rim
   };
-  const draw = (on) => {
+  const draw = (on: boolean) => {
     for (const [f, p] of shapes) poly(f, p);
     g.strokeStyle = col('navy', 'kraft', 0.3); g.lineWidth = 2;                // the crates' cross-braces
     for (const [x0, y0, s] of [[214, 82, 26], [232, 92, 24]]) { g.beginPath(); g.moveTo(x0 + 3, y0 + 3); g.lineTo(x0 + s - 3, y0 + s - 3); g.moveTo(x0 + s - 3, y0 + 3); g.lineTo(x0 + 3, y0 + s - 3); g.stroke(); }
@@ -243,15 +263,15 @@ export function gameScreen(PALETTE) {
     for (const [x, y, w, h] of [[W / 2 - 20, H / 2 - 2.5, 14, 5], [W / 2 + 6, H / 2 - 2.5, 14, 5], [W / 2 - 2.5, H / 2 - 20, 5, 14], [W / 2 - 2.5, H / 2 + 6, 5, 14]]) { g.strokeRect(x, y, w, h); g.fillRect(x, y, w, h); }
   };
   const texture = new THREE.CanvasTexture(c); texture.colorSpace = THREE.SRGBColorSpace;
-  let state = null;
-  const fire = (on) => { if (on === state) return; state = on; draw(on); texture.needsUpdate = true; };
+  let state: boolean | null = null;
+  const fire = (on: boolean) => { if (on === state) return; state = on; draw(on); texture.needsUpdate = true; };
   fire(false);
   return { texture, fire };
 }
 // The CS2 clip's bursts of fire, in the clip's own seconds (v7-laptop: its loudness envelope at 1/24 s, assets/raw/reels/cs2.mp3).
 // cues.js plays it from `inSec` at shot-local `from`; firing(t, from, inSec) is on during a burst, flashing on alternate 2s drawings.
 const CS2_BURSTS = [[1.38, 1.82], [3.44, 4.70], [9.95, 10.72], [11.38, 12.0]];
-export const firing = (t, from, inSec) => {
+export const firing = (t: number, from: number, inSec: number) => {
   const c = t - from + inSec, f = Math.floor(t * 12 + 1e-6);
   return t >= from && CS2_BURSTS.some(([a, b]) => c >= a && c < b) && f % 2 === 0;
 };
@@ -269,19 +289,20 @@ export const B = [0.030, 0, 0.015];                // s03's mark: S = screenZ / 
 // Cameras: W (the desk wide), I (face-on insert on Friday). Push W → I over 1.5–3.5, cut back to W at 7.083.
 const CAM_W = { pos: [0.004, 0.062, 0.40], look: [0.004, 0.030, 0.012] };
 const CAM_I = { pos: [FX, (FY + LIP_Y) / 2 + 0.001, 0.09], look: [FX, (FY + LIP_Y) / 2, 0] };
-const SUN = { k: 0.35, pos: /** @type {Vec3} */ ([0.8, 0.6, 0.6]), scale: 0.8 };   // the morning window, off right
+const SUN = { k: 0.35, pos: [0.8, 0.6, 0.6] as Vec3, scale: 0.8 };   // the morning window, off right
 const FACE_I = 0.0045;                            // character fill (README §10)
 
-const F = (n) => n / 12, frameOf = (t) => Math.floor(t * 12 + 1e-6);
+const F = (n: number) => n / 12, frameOf = (t: number) => Math.floor(t * 12 + 1e-6);
 // v4: the wall clock beside the calendar (README §13): 0.014 right of its right edge, 0.70 of its height up, in its plane. 9:00.
-const CLOCK = { at: /** @type {Vec3} */ ([C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z]), h: 9, m: 0 };
+const CLOCK = { at: [C.x0 + C.w + 0.014, C.y0 + 0.70 * C.h, C.z] as Vec3, h: 9, m: 0 };
 // v4 acting: numb, one small flinch as the blob arrives (9.33), numb again. act() needs 12 frames between changes, so the flinch
 // holds 0.58 s and the second numb lands on the last drawing (9.92), not the spec's 9.67.
-/** @type {[number, string][]} */
-const ACT = [[0, 'numb'], [9.33, 'flinch'], [9.92, 'numb']];
+const ACT: [number, string][] = [[0, 'numb'], [9.33, 'flinch'], [9.92, 'numb']];
 
 // The drop on its 2s grid. space 'page' (y on the calendar), 'fall' (k from lip to landing), 'desk' (contact x, z).
-export function examAt(t) {
+type ExamState = { s: number, squash: number, eyes: string, look?: number }
+  & ({ space: 'page', y: number } | { space: 'fall', k: number } | { space: 'desk', x: number, z: number, lift: number });
+export function examAt(t: number): ExamState | null {
   const f = frameOf(t), tc = F(f);
   if (f < 52) return null;                                                             // 4.33
   if (f < 60) return { space: 'page', y: BEAD_AT, s: BEAD * easeOut((tc - F(52)) / F(8)), squash: 0, eyes: 'closed' };
@@ -298,7 +319,7 @@ export function examAt(t) {
     return { space: 'page', y: LIP_Y, s, squash, eyes, look };
   }
   if (f < 89) return { space: 'fall', k: easeIn((tc - F(85)) / F(4)), s: PERCH, squash: -0.35, eyes: 'open' };   // 7.083–7.42
-  const land = { space: 'desk', x: LAND[0], z: LAND[2], lift: 0, eyes: 'open', look: -1 };
+  const land = { space: 'desk' as const, x: LAND[0], z: LAND[2], lift: 0, eyes: 'open', look: -1 };
   if (f < 93) return { ...land, s: PERCH, squash: f === 89 ? 0.6 : 0.6 * spring(tc, F(88)) };
   if (f < 99) return { ...land, s: kf(tc, [[F(93), PERCH], [F(97), 1.08], [F(99), 1]], easeOut), squash: 0 };   // 7.75–8.25
   // 8.25–9.83: two hops (0.79 s each): antic squash 0.25 (2 drawings), airborne on an 8 mm arc with stretch −0.15,
@@ -317,14 +338,14 @@ export function examAt(t) {
 // the painted letters is covered with the square's paper (GHOST of it left) when it leaves, and travels down to the
 // bead, straight first and converging late, lower pixels first and columns staggered so the letters run in streaks.
 const DRIP = [3.5, 5.0], GHOST = 0.18, RUNS = 0.55, K = 4;   // window (s), ghost alpha, one pixel's run (of the window), canvas px per art px
-function wordDrip({ square, props }, PALETTE) {
+function wordDrip({ square, props }: { square: Cut, props: Kit }, PALETTE: Palette) {
   const bmp = props.pieces.calc_exam_square, [sw, sh] = props.sizes.calc_exam_square, [u0, v0, u1, v1] = props.visible.calc_exam_square;
   const bw = bmp.width, bh = bmp.height, m = square.mesh, px = m.scale.x * sw / bw, py = m.scale.y * sh / bh;
-  const src = Object.assign(document.createElement('canvas'), { width: bw, height: bh }).getContext('2d');
+  const src = Object.assign(document.createElement('canvas'), { width: bw, height: bh }).getContext('2d')!;
   src.drawImage(bmp, 0, 0);
   const img = src.getImageData(0, 0, bw, bh).data;
   // The letters: dark pixels (their antialiased edges too, so no outline stays) inside the square's border (14% inset); the paper: the mean of the light ones there.
-  const ink = [], paper = [0, 0, 0, 0], r = mulberry32(seedOf(ID, 'drip')), cols = Array.from({ length: bw }, () => r());
+  const ink: { i: number, j: number, c: string, d?: number }[] = [], paper = [0, 0, 0, 0], r = mulberry32(seedOf(ID, 'drip')), cols = Array.from({ length: bw }, () => r());
   const [i0, i1, j0, j1] = [u0 + 0.14 * (u1 - u0), u1 - 0.14 * (u1 - u0), v0 + 0.14 * (v1 - v0), v1 - 0.14 * (v1 - v0)].map((u, k) => Math.round(u * (k < 2 ? bw : bh)));
   for (let j = j0; j < j1; j++) for (let i = i0; i < i1; i++) {
     const o = 4 * (j * bw + i), lum = 0.3 * img[o] + 0.59 * img[o + 1] + 0.11 * img[o + 2];
@@ -336,7 +357,7 @@ function wordDrip({ square, props }, PALETTE) {
   // The overlay's box (inner-local m): the art's width, from its top down past the bead.
   const xL = m.position.x - m.scale.x * sw / 2, yT = m.position.y + m.scale.y * sh / 2, bead = [FX - square.g.position.x, BEAD_AT + 0.0006 - square.g.position.y];
   const yB = bead[1] - 0.0012, H = Math.ceil((yT - yB) / py);
-  const c = Object.assign(document.createElement('canvas'), { width: bw * K, height: H * K }), g = c.getContext('2d');
+  const c = Object.assign(document.createElement('canvas'), { width: bw * K, height: H * K }), g = c.getContext('2d')!;
   const tex = new THREE.CanvasTexture(c); tex.colorSpace = THREE.SRGBColorSpace;
   const plane = new THREE.Mesh(new THREE.PlaneGeometry(bw * px, H * py), new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false }));
   plane.position.set(xL + bw * px / 2, yT - H * py / 2, 0.0005);   // in front of the circle (square + 0.0003)
@@ -345,19 +366,19 @@ function wordDrip({ square, props }, PALETTE) {
   const bx = (bead[0] - xL) / px, by = (yT - bead[1]) / py, top = Math.min(...ink.map((q) => q.j)), bot = Math.max(...ink.map((q) => q.j));
   for (const q of ink) q.d = 0.3 * (bot - q.j) / Math.max(1, bot - top) + 0.15 * cols[q.i];   // lower pixels and staggered columns first
   let last = -1;
-  return (t) => {
+  return (t: number) => {
     const f = Math.floor(t * 12 + 1e-6), p = clamp((f / 12 - DRIP[0]) / (DRIP[1] - DRIP[0]));
     plane.visible = p > 0;
     if (!plane.visible || f === last) return;
     last = f;
     g.clearRect(0, 0, c.width, c.height);
     for (const q of ink) {                       // the hole each pixel leaves: paper, a ghost of the letter showing
-      if (p <= q.d) continue;
+      if (p <= q.d!) continue;
       g.fillStyle = pap; g.globalAlpha = 1 - GHOST; g.fillRect(q.i * K - 1, q.j * K - 1, K + 2, K + 2);
     }
     g.globalAlpha = 1;
     for (const q of ink) {                       // and the pixel on its way to the bead
-      const k = clamp((p - q.d) / RUNS);
+      const k = clamp((p - q.d!) / RUNS);
       if (k <= 0 || k >= 1) continue;
       const x = lerp(q.i, bx, k ** 3), y = lerp(q.j, by, easeIn(k));
       g.fillStyle = q.c; g.fillRect(x * K - 1, y * K - K * 4 * k, K + 2, K * (1 + 4 * k));   // a streak, longer as it runs
@@ -366,7 +387,7 @@ function wordDrip({ square, props }, PALETTE) {
   };
 }
 
-export async function build(ctx) {
+export async function build(ctx: ShotCtx) {
   const { scene, camera, PALETTE, post } = ctx;
   scene.background = new THREE.Color(PALETTE.navy);
   const T = tools(ctx, ID);
@@ -380,7 +401,7 @@ export async function build(ctx) {
   const gator = await makeGator(ctx, { seed: 2 });
   gator.group.position.set(...DESK.hip);
   scene.add(gator.group);
-  /** @type {[number, string][]} */ const SLUMP = [[0, 'slump'], [10, 'slump']];
+  const SLUMP: [number, string][] = [[0, 'slump'], [10, 'slump']];
 
   // The Exam, its stain where it lands, and the faint trail it leaves down the calendar.
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 }), R = BLOB_R.start;
@@ -404,11 +425,11 @@ export async function build(ctx) {
   face.position.set(-0.035, 0.035, 0.06);
   scene.add(sun.light, sun.light.target, ambient(), face);
 
-  const onPage = (y, out, s = 0) => { const k = (C.y0 + C.lip - (y - R * s)) / C.lip;   // clear of the curl under the drop's bottom
+  const onPage = (y: number, out: THREE.Vector3, s = 0) => { const k = (C.y0 + C.lip - (y - R * s)) / C.lip;   // clear of the curl under the drop's bottom
     return out.set(FX, y, C.z + 0.0015 + (k > 0 ? C.lipZ * Math.min(1, k) ** 2 : 0)); };
   const lip = onPage(LIP_Y, new THREE.Vector3(), PERCH);
   const c = new THREE.Vector3(), P = new THREE.Vector3(), L = new THREE.Vector3(), Pi = new THREE.Vector3(...CAM_I.pos), Li = new THREE.Vector3(...CAM_I.look);
-  const place = (e) => {
+  const place = (e: ExamState) => {
     if (e.space === 'page') onPage(e.y, c, e.s);
     else if (e.space === 'fall') c.set(lerp(lip.x, LAND[0], e.k), lerp(lip.y, R * e.s, e.k), lerp(lip.z, LAND[2], e.k));
     else c.set(e.x, e.lift + R * e.s, e.z);
@@ -419,7 +440,7 @@ export async function build(ctx) {
 
   return {
     exam, gator,
-    update(t) {
+    update(t: number) {
       T.boil(t);
       drip(t);
       clock.boil(t); clock.set(CLOCK.h, CLOCK.m, t);   // the second hand steps on every whole second of the shot
@@ -455,7 +476,7 @@ export async function build(ctx) {
 
       // One-frame glint on the bead at 5.0 (the 24 fps frame on the beat).
       glint.visible = !!at && Math.round(t * 24) === 120;
-      if (glint.visible) glint.position.set(at.x - 0.0005, at.y + 0.0006, at.z + 0.0025);
+      if (glint.visible) glint.position.set(at!.x - 0.0005, at!.y + 0.0006, at!.z + 0.0025);
     },
   };
 }

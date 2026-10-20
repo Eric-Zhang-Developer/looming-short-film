@@ -1,4 +1,3 @@
-// @ts-check
 // s06 · The lamp beat (docs/shots/s06.md, G4). v2 on the real-scale home desk (s02.js's unit), at night.
 // He's gaming; the laptop screen throws the 1.25× blob's shadow 4.06× up the wall (S = screenZ / (screenZ − z_B)).
 // He pulls the lamp's chain (lampClickHome 0.5): light from above shrinks the shadow to a small pool and shows the
@@ -14,9 +13,12 @@ import { createBlob } from '../blob.ts';
 import { makeGator } from '../characters/gator.ts';
 import { specPose } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
-import { DESK, LAPTOP, tools, homeDesk, seatReach, firing } from './s02.js';
-import { screenHalo, reminderInsert, HALO } from './s03.js';
+import { DESK, LAPTOP, tools, homeDesk, seatReach, firing } from './s02.ts';
+import { screenHalo, reminderInsert, HALO } from './s03.ts';
 import { COUNTDOWN } from '../props/canvas.ts';
+import type { Pose } from '../puppet.ts';
+import type { SpecOpts } from '../characters/poses.ts';
+import type { ShotCtx } from './s02.ts';
 
 const ID = 's06', DEG = Math.PI / 180;
 const BLOB_R = { start: 0.018, gulp2: 0.024 };            // METER.gulp1 → METER.gulp2 (README §1, v4: 1.5× → 2×)
@@ -28,7 +30,7 @@ const MARK_X = 0.026 + 1.15 * (BLOB_R.start - 0.015), GROW_DX = 1.15 * (BLOB_R.g
 // v7-laptop: the 1.8× laptop centred 1 cm nearer him than s02's, so its lid clears the blob's left edge (0.0088).
 const LAPTOP_AT = [-0.010, 0.022];
 const ON = 0.5, OFF = 3.0, GULP = 4.0;                     // lampClickHome, lampOffHome, gulp2 (local)
-const CAM = { pos: [0.05, 0.125, 0.60], look: [0.05, 0.058, 0.02] };   // high and wide enough to hold the 6.1-unit loom
+const CAM: CamKey = { pos: [0.05, 0.125, 0.60], look: [0.05, 0.058, 0.02] };   // high and wide enough to hold the 6.1-unit loom
 const FOCUS = 0.58;
 // v3-readability: the lamp has to read as light from *above*. At s02's 0.044 its mouth (0.028) sat level with the blob's
 // top, so it lit the blob from the side and threw its shadow off the desk front, and no pool showed. Here it stands
@@ -40,10 +42,10 @@ const LAMP_MOUTH = [LAMP.x, LAMP.h * 0.646, DESK.lamp.z], LAMP_BEAD = [LAMP.x - 
 const SPOT_I = 0.03, OUTSHONE = 0.004, LAMP_I = 0.12, AMB = 0.45, FACE_SCREEN = 0.006, FACE_LAMP = 0.004;
 const LAMP_KEYS = [[ON, 0], [ON + 1 / 24, 1.15], [ON + 3 / 24, 0.95], [ON + 5 / 24, 1.0]];
 const BREATHE = 0.7 * DEG;                                  // v3 secondary motion: a 2.8 s breath, on 2s
-const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
+const F = (n: number) => n / 12, fr = (t: number) => Math.floor(t * 12 + 1e-6);
 const TAPS = [48, 54, 60, 66, 72, 78, 84, 90];               // every 0.5 s from 4.0
 
-export async function build(ctx) {
+export async function build(ctx: ShotCtx) {
   const { scene, camera, PALETTE, post } = ctx;
   scene.background = new THREE.Color(PALETTE.navy).lerp(new THREE.Color(PALETTE.ink), 0.5);
   camera.position.set(...CAM.pos);
@@ -63,10 +65,10 @@ export async function build(ctx) {
   const cam = new THREE.Vector3(...CAM.pos), bead = new THREE.Vector3(...LAMP_BEAD);
   set.laptop.updateMatrixWorld(true);
   const keys = set.laptop.localToWorld(new THREE.Vector3(0, 0.0038, 0.002 * LAPTOP.laptopScale));   // v7: hovering 3 mm over the 1.8× deck (s03)
-  const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
-  const at = (p, range, o = {}) => { const r = seatReach(cam, p, range); return seat({ lean: r.lean, arm: r.arm, ...o }); };
-  const up = (dy) => bead.clone().add(new THREE.Vector3(0, dy, 0));
-  const P = {
+  const seat = (o: SpecOpts) => specPose({ leg: 60, farLeg: 54, ...o });
+  const at = (p: THREE.Vector3, range: [number, number], o: SpecOpts = {}) => { const r = seatReach(cam, p, range); return seat({ lean: r.lean, arm: r.arm, ...o }); };
+  const up = (dy: number) => bead.clone().add(new THREE.Vector3(0, dy, 0));
+  const P: Record<string, Pose> = {
     rest: seat({ lean: 0, arm: -70 }), antic: seat({ lean: -4, arm: -80, head: -3 }), lift: seat({ lean: 6, arm: 0 }),
     reach: at(up(0.003), [8, 30]), touch: at(bead, [8, 30]), press: at(up(-0.0015), [8, 30]),
     recoil: seat({ lean: -6, arm: -55, far: -60, head: 4, tail: 12 }), stare: seat({ lean: -6, arm: -70, head: 4 }),
@@ -75,15 +77,15 @@ export async function build(ctx) {
     keys: at(keys, [4, 36], { head: -12 }),
   };
   P.tap = { ...P.keys, arm_r: P.keys.arm_r + 2 * DEG };
-  const press = (t0) => ['rest', 'rest', 'antic', 'lift', 'reach', 'touch', 'press', 'touch'].map((n, i) => [t0 + F(i), n]);
+  const press = (t0: number) => ['rest', 'rest', 'antic', 'lift', 'reach', 'touch', 'press', 'touch'].map((n, i) => [t0 + F(i), n]);
   const KEYS = [
     ...press(0), [F(12), 'touch'], [F(13), 'recoil'], [F(14), 'stare'], [F(25), 'stare'], [F(26), 'away'], [F(31), 'away'],
     ...press(2.5).slice(2), [F(38), 'rest'], [F(40), 'grab'], [F(42), 'keys'],
     ...TAPS.flatMap((n) => [[F(n - 1), 'keys'], [F(n), 'tap'], [F(n + 1), 'keys']]), [8, 'keys'],
   ];
   const HEAD_DIP = [[F(8), -10]];   // 0.667: head turns down toward the blob
-  const eyesAt = (f) => f < 6 ? 'tired' : f < 8 ? 'closed' : f < 10 ? 'open' : f < 13 ? 'side' : f < 21 ? 'gasp' : f < 42 ? 'worried' : 'tired';
-  const mouthAt = (f) => (f >= 13 && f < 21 ? 'o' : 'line');
+  const eyesAt = (f: number) => f < 6 ? 'tired' : f < 8 ? 'closed' : f < 10 ? 'open' : f < 13 ? 'side' : f < 21 ? 'gasp' : f < 42 ? 'worried' : 'tired';
+  const mouthAt = (f: number) => (f >= 13 && f < 21 ? 'o' : 'line');
 
   // ---- the Exam on its mark ----
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
@@ -128,7 +130,7 @@ export async function build(ctx) {
   const C = new THREE.Vector3(), hit = new THREE.Vector3(), foot = new THREE.Vector3();
   return {
     exam, gator, spot, lamp,
-    update(t) {
+    update(t: number) {
       T.boil(t);
       const f = fr(t);
       const lk = t >= ON - 1e-6 && t < OFF - 1e-6 ? kf(t, LAMP_KEYS, (x) => (x >= 1 ? 1 : 0)) : 0;   // stepped, on 1s
@@ -137,7 +139,7 @@ export async function build(ctx) {
 
       // The Student.
       gator.boil(t, 10);
-      gator.blend(P, /** @type {[number, string][]} */ (KEYS), t);
+      gator.blend(P, KEYS as [number, string][], t);
       if (f >= 8 && f < 12) gator.joints.head.rotation.z += HEAD_DIP[0][1] * DEG;
       if (f === 12) gator.group.position.y = DESK.hip[1] - 0.001; else gator.group.position.y = DESK.hip[1];
       if (f === 13) { gator.joints.arm_r.rotation.z += 15 * DEG; gator.joints.arm_l.rotation.z += 15 * DEG; }

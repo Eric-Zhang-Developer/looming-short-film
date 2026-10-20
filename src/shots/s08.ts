@@ -1,4 +1,3 @@
-// @ts-check
 // s08 · 3:00 a.m., rock bottom (docs/shots/s08.md, v4; brief climax-a1). s07's bedroom, unchanged: him on his back with
 // the phone on under his chin, the Exam at 2.5× on his knees and its shadow over the ceiling. The music is out; the clock
 // ticks alone. Four setups, cut on ticks:
@@ -13,19 +12,20 @@
 import * as THREE from 'three';
 import { onTwos } from '../core/ease.ts';
 import { act } from '../characters/acting.ts';
-import { bedroom, closeHeads, headOn, ROOM, LIE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT, H_CAM, H_FOCUS } from './s07.js';
+import { bedroom, closeHeads, headOn, ROOM, LIE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT, H_CAM, H_FOCUS } from './s07.ts';
+import type { ShotCtx } from './s02.ts';
 
 const ID = 's08', DEG = Math.PI / 180;
 export const BLOB_R = { start: 0.030 };                       // 2.5× all shot (README §1, Q16)
 // Cameras (re-solved at build). C1: face-on to the clock, the dial 60% of the frame height (Ø 0.020 / 0.6 = 0.0333 m of
 // frame at fov 20 → 0.0945 away), nudged right so the calendar's edge is just in at frame left.
-const C1 = { pos: [0.047, 0.099, 0.0960], look: [0.047, 0.099, 0] };
+const C1: CamKey = { pos: [0.047, 0.099, 0.0960], look: [0.047, 0.099, 0] };
 // C2: in front of the bed, level with his head, close: the head fills the lower right; the clock and the red circle soft
 // on the wall behind and above, up and left (his eye-line).
-export const C2 = { pos: [0.114, 0.074, 0.51], look: [0.114, 0.076, 0.31] };
+export const C2: CamKey = { pos: [0.114, 0.074, 0.51], look: [0.114, 0.076, 0.31] };
 // CC: the calendar's Friday square and its red circle, face-on, a little soft.
-const CC = { pos: [ROOM.CAL.friXY[0] + 0.004, ROOM.CAL.friXY[1] + 0.002, 0.075], look: [ROOM.CAL.friXY[0] + 0.004, ROOM.CAL.friXY[1] + 0.002, 0] };
-const setupAt = (T) => (T < 2 ? 'C1' : T < 4 ? 'C2' : T < 5 ? 'CC' : T < 7 ? 'C2' : 'C3');
+const CC: CamKey = { pos: [ROOM.CAL.friXY[0] + 0.004, ROOM.CAL.friXY[1] + 0.002, 0.075], look: [ROOM.CAL.friXY[0] + 0.004, ROOM.CAL.friXY[1] + 0.002, 0] };
+const setupAt = (T: number) => (T < 2 ? 'C1' : T < 4 ? 'C2' : T < 5 ? 'CC' : T < 7 ? 'C2' : 'C3');
 export const SPILL_C1 = 1.4;                                 // the clock's spill in its own insert: just enough for the hands (s08.md C1)
 // fix-bedroom: 3 a.m. is the bottom, so it is darker than s07 (it measured 68.17 vs 68.18): every light in the room at
 // DIM of s07's, the ambient at AMB_DIM. The phone is the same phone; the night around it has got deeper.
@@ -33,7 +33,7 @@ export const DIM = 0.4, AMB_DIM = 0.2;
 
 // Breath in breaths per minute, integrated so a rate change never jumps: 8 to 5.0 (held 3.0–3.5), 14 at 5.0 rising to
 // 20 by 6.5, then 20 (s08.md Acting). → phase in cycles at drawing T.
-function breathPhase(T) {
+function breathPhase(T: number) {
   let ph = 0;
   for (let s = 0; s < T - 1e-6; s += 1 / 12) {
     const held = s >= 3.0 - 1e-6 && s < 3.5 - 1e-6;
@@ -43,7 +43,7 @@ function breathPhase(T) {
   return ph;
 }
 
-export async function build(ctx) {
+export async function build(ctx: ShotCtx) {
   const { camera, post } = ctx;
   const R = await bedroom(ctx, ID), { T: tl, rig, exam, spot, fill, spill, clock } = R;
   const Hs = await headOn(ctx, ID);
@@ -51,18 +51,17 @@ export async function build(ctx) {
   // The sweat drop (6.5): one drawn tissue drop at his temple on the dread head, sliding 1.5 mm down by 7.0.
   const drop = tl.paper('sweat', { path: [[0.5, 0.02], [0.8, 0.5], [0.85, 0.75], [0.5, 0.98], [0.15, 0.75], [0.2, 0.5]], color: '#' + new THREE.Color(ctx.PALETTE.cream).lerp(new THREE.Color(ctx.PALETTE.phone), 0.35).getHexString(), weight: 'vellum', size: [0.0024, 0.0034], res: 256 });
   H.group.add(drop);
-  const DROP_AT = /** @type {Vec3} */ ([(75 - 120) * H.k, (317 - 62) * H.k, 0.0006]);   // head px (75, 62): the temple, behind the brow
+  const DROP_AT = [(75 - 120) * H.k, (317 - 62) * H.k, 0.0006] as Vec3;   // head px (75, 62): the temple, behind the brow
   const fx = post({ focus: 0.5, aperture: 0.012, lut: 'night' });
   const q = new THREE.Quaternion(), down = new THREE.Vector3();
-  const focusOf = (pos, look, p) => new THREE.Vector3(...p).sub(new THREE.Vector3(...pos)).dot(new THREE.Vector3(...look).sub(new THREE.Vector3(...pos)).normalize());
-  /** @type {[number, string][]} */
-  const cues = [[0, 'numb'], [3, 'guilt'], [5, 'dread']];
+  const focusOf = (pos: Vec3, look: Vec3, p: Vec3) => new THREE.Vector3(...p).sub(new THREE.Vector3(...pos)).dot(new THREE.Vector3(...look).sub(new THREE.Vector3(...pos)).normalize());
+  const cues: [number, string][] = [[0, 'numb'], [3, 'guilt'], [5, 'dread']];
   R.moonPanes(DIM * MOON_PANES);
   const headBase = rig.joints.head.position.x;
 
   return {
     ...R, heads: H,
-    update(t) {
+    update(t: number) {
       const T = onTwos(t), S = setupAt(t);
       tl.boil(t); clock.boil(t); rig.boil(t, 10); Hs.T.boil(t); Hs.clock.boil(t); Hs.rig.boil(t, 10);
       clock.set(3, 0, t); Hs.clock.set(3, 0, t);                // 3:00:00 at 0.0, ticking on every whole second

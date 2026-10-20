@@ -1,4 +1,3 @@
-// @ts-check
 // s01 · Dawn skyline, push to the window (docs/shots/s01.md). v2: the apartment is built from home_kit (frames, door,
 // glass) on a brick-kraft facade. v3: the skyline and oaks are marston_ext_kit's (century tower, facade block, stepped bay,
 // oak canopy) instead of the random proxy rooflines; skyline_sheet and foliage_sheet were never painted.
@@ -10,20 +9,24 @@ import { dawnLight, ambient } from '../lights.ts';
 import { definePuppet } from '../puppet.ts';
 import { kf, ease } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
+import type { PaperOptions, PaperSheet } from '../paper.ts';
+import type { PaperMesh } from '../material.ts';
+import type { Kit } from '../assets.ts';
+import type { ShotCtx, Palette, MatOpts } from './s02.ts';
 
 const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
 // A shape that fills its canvas has no edge to tear (paper.js tears where alpha ends), so a visible rectangle is
 // inset by a margin of 4% of its long side: { path, size } with the size grown so the inset shape keeps [w, h].
 const PAD = 0.04;
-function torn(w, h) {
+function torn(w: number, h: number) {
   const m = PAD * Math.max(w, h), W = w + 2 * m, H = h + 2 * m, u = m / W, v = m / H;
   return { path: [[u, v], [1 - u, v], [1 - u, 1 - v], [u, 1 - v]], size: [W, H] };
 }
 // The same margin around a piece of art (proxies fill their canvas edge to edge): → { cv, size } for makePaper.
-function tornArt(art, [w, h]) {
+function tornArt(art: HTMLCanvasElement | ImageBitmap, [w, h]: number[]) {
   const m = Math.round(PAD * Math.max(art.width, art.height));
   const cv = Object.assign(document.createElement('canvas'), { width: art.width + 2 * m, height: art.height + 2 * m });
-  cv.getContext('2d').drawImage(art, m, m);
+  cv.getContext('2d')!.drawImage(art, m, m);
   return { cv, size: [w * cv.width / art.width, h * cv.height / art.height] };
 }
 const DEG = Math.PI / 180;
@@ -32,23 +35,18 @@ const CAM = { pos: [[0, [0, 0.42, 2.5]], [LEN, [0.17, 0.33, 1.0]]], look: [[0, [
 const FACADE_Z = 0.6;
 const ROOM_I = 0.05, BOUNCE_I = 0.35;   // his room light behind the pane (cd), the street bounce on the facade
 
-export async function build({ scene, camera, assets, PALETTE, post }) {
-  const hex = (a, b, k) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
-  /** @returns {Vec3} */
-  const tiltOf = (layer) => { const r = mulberry32(seedOf('s01', layer)); return [(2 * r() - 1) * 1.5 * DEG, (2 * r() - 1) * 1.5 * DEG, 0]; };
+export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
+  const hex = (a: keyof Palette, b: keyof Palette, k: number) => '#' + new THREE.Color(PALETTE[a]).lerp(new THREE.Color(PALETTE[b]), k).getHexString();
+  const tiltOf = (layer: string): Vec3 => { const r = mulberry32(seedOf('s01', layer)); return [(2 * r() - 1) * 1.5 * DEG, (2 * r() - 1) * 1.5 * DEG, 0]; };
   scene.background = new THREE.Color(PALETTE.navy);
 
-  const boiling = [];  // [mesh, seed => PaperSheet], re-torn every boil step
-  /**
-   * @param {string} layer
-   * @param {import('../paper.ts').PaperOptions} opts
-   * @param {{ at?: Vec3, parent?: THREE.Object3D, tilt?: boolean, [mat: string]: any }} [o] the rest goes to paperMesh
-   */
-  const sheet = (layer, opts, { at, parent = scene, tilt = true, ...mat } = {}) => {
-    const make = (s) => makePaper({ ...opts, key: `s01-${layer}`, seed: s });
+  const boiling: [PaperMesh, (s: number) => PaperSheet][] = [];  // [mesh, seed => PaperSheet], re-torn every boil step
+  // o: the rest goes to paperMesh
+  const sheet = (layer: string, opts: PaperOptions, { at, parent = scene, tilt = true, ...mat }: { at?: Vec3, parent?: THREE.Object3D, tilt?: boolean } & MatOpts = {}) => {
+    const make = (s: number) => makePaper({ ...opts, key: `s01-${layer}`, seed: s });
     const mesh = paperMesh(make(0), mat);
     if (tilt) mesh.rotation.set(...tiltOf(layer));
-    mesh.position.set(...at);
+    mesh.position.set(...at!);
     parent.add(mesh); boiling.push([mesh, make]);
     return mesh;
   };
@@ -63,20 +61,19 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     ['sky-navy', PALETTE.navy, 0.30, 0.95, 0],
     ['sky-mid', hex('navy', 'lamp', 0.42), 0.10, 0.52, 0.004],
     ['sky-low', hex('cream', 'lamp', 0.4), -0.05, 0.27, 0.008],
-  ]) sheet(layer, { ...torn(1.8, y1 - y0), color, weight: 'tissue' }, { at: [0, (y0 + y1) / 2, z], parent: sky0, tilt: false }).castShadow = false;
+  ] as [string, string, number, number, number][]) sheet(layer, { ...torn(1.8, y1 - y0), color, weight: 'tissue' }, { at: [0, (y0 + y1) / 2, z], parent: sky0, tilt: false }).castShadow = false;
 
   // ---- Far (z 0.12) and mid (z 0.30): marston_ext_kit. Far: a long brick block, the stepped bay and the century tower (the
   // one landmark). Mid: two oak canopies as the tree line. Backlit, so they read as silhouettes with a lit torn rim, and
   // the blocks' window holes show the sky. Each is placed by its visible width and the centre of its visible box.
   const ext = await assets.load('marston_ext_kit');
-  const kitPiece = (kit, p, w, key, at, o = {}) => {
+  const kitPiece = (kit: Kit, p: string, w: number, key: string, at: Vec3, o: { weight?: string, parent?: THREE.Object3D, tilt?: boolean, mat?: MatOpts } = {}) => {
     const [sw, sh] = kit.sizes[p], [u0, v0, u1, v1] = kit.visible[p], k = w / (sw * (u1 - u0));
     const m = sheet(key, { art: kit.pieces[p], size: [sw * k, sh * k], weight: o.weight ?? 'cardstock' }, { at, parent: o.parent ?? scene, tilt: o.tilt ?? true, ...o.mat });
     m.position.x += (0.5 - (u0 + u1) / 2) * sw * k; m.position.y += ((v0 + v1) / 2 - 0.5) * sh * k;
     return m;
   };
-  /** @type {[string, number, number][]} */
-  const FAR = [['facade_block', 0.95, -0.50], ['stepped_bay', 0.36, 0.52], ['century_tower', 0.07, -0.18]];   // [piece, visible width, centre x]
+  const FAR: [string, number, number][] = [['facade_block', 0.95, -0.50], ['stepped_bay', 0.36, 0.52], ['century_tower', 0.07, -0.18]];   // [piece, visible width, centre x]
   for (const [p, w, x] of FAR) {
     const h = w * ext.sizes[p][1] * (ext.visible[p][3] - ext.visible[p][1]) / (ext.sizes[p][0] * (ext.visible[p][2] - ext.visible[p][0]));
     // The far layer casts nothing: at this ~5° key its shadow would cover the whole mid layer's back, and the mid
@@ -97,11 +94,11 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   facade.position.set(0.15, 0.27, FACADE_Z);
   scene.add(facade);
   const body = (() => {   // the stock, with the hero hole cut through it
-    const W = 1024, H = Math.round(W * FH / FW), c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d');
+    const W = 1024, H = Math.round(W * FH / FW), c = Object.assign(document.createElement('canvas'), { width: W, height: H }), g = c.getContext('2d')!;
     g.fillStyle = hex('kraft', 'navy', 0.5); g.fillRect(0, 0, W, H);
     g.strokeStyle = hex('kraft', 'navy', 0.62); g.lineWidth = 2;                           // faint brick courses
     for (let y = 0; y < H; y += 14) { g.beginPath(); g.moveTo(0, y); g.lineTo(W, y); g.stroke(); }
-    const px = (x) => (x / FW + 0.5) * W, py = (y) => (0.5 - y / FH) * H;
+    const px = (x: number) => (x / FW + 0.5) * W, py = (y: number) => (0.5 - y / FH) * H;
     g.clearRect(px(HERO[0] - HOLE[0] / 2), py(HERO[1] + HOLE[1] / 2), HOLE[0] / FW * W, HOLE[1] / FH * H);
     return tornArt(c, [FW, FH]);
   })();
@@ -110,7 +107,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   for (const [i, y, h] of [[0, FH / 2 - 0.01, 0.02], [1, -0.04, 0.008], [2, 0.125, 0.008]])
     sheet(`band${i}`, { ...torn(FW + (i ? 0 : 0.02), h), color: hex('kraft', 'cream', 0.35) }, { at: [0, y, 0.004], parent: facade, tilt: false });
   // The kit's frames: navy panes behind the dark ones, the tissue glass behind his.
-  const cutPiece = (p, w, key, at, o = {}) => {
+  const cutPiece = (p: string, w: number, key: string, at: Vec3, o: { weight?: string, mat?: MatOpts } = {}) => {
     const [sw, sh] = home.sizes[p], [u0, v0, u1, v1] = home.visible[p], k = w / (sw * (u1 - u0));
     const m = sheet(key, { art: home.pieces[p], size: [sw * k, sh * k], weight: o.weight ?? 'cardstock' }, { at, parent: facade, tilt: false, ...o.mat });
     m.position.x += (0.5 - (u0 + u1) / 2) * sw * k; m.position.y += ((v0 + v1) / 2 - 0.5) * sh * k;
@@ -144,7 +141,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   scene.add(oak.group);
   // ±0.6° about the pivot, period 3 s: eased keys between the extremes trace a sine that starts at 0, rising.
   const SWAY = { l: { branch: -0.6 * DEG, sprig: 0 }, r: { branch: 0.6 * DEG, sprig: 0 } };
-  /** @type {[number, string][]} */ const swayKeys = [-0.75, 0.75, 2.25, 3.75, 5.25, 6.75].map((t, i) => [t * LEN / 6, i % 2 ? 'r' : 'l']);   // period 3 s → 2.5 s with the rest
+  const swayKeys: [number, string][] = [-0.75, 0.75, 2.25, 3.75, 5.25, 6.75].map((t, i) => [t * LEN / 6, i % 2 ? 'r' : 'l']);   // period 3 s → 2.5 s with the rest
 
   // ---- Key: dawn behind the skyline, about 5° up, so every cardstock layer is a backlit silhouette with a lit rim.
   // Fill: ambient() at its default.
@@ -167,7 +164,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const pos = new THREE.Vector3(), look = new THREE.Vector3(), dir = new THREE.Vector3();
 
   return {
-    update(tLocal) {
+    update(tLocal: number) {
       // Light on 1s. dawnLight places itself by k; the spec places it, so the position is set after update.
       dawn.update(tLocal, kf(tLocal, [[0, 0.1], [LEN, 0.25]]));
       dawn.light.position.set(-1.2, 0.5, -1.5);

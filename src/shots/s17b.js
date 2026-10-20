@@ -18,7 +18,7 @@ import { makeGator, greenVariant } from '../characters/gator.ts';
 import { specPose } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { makeClock } from '../clock.ts';
-import { tools } from './s02.js';
+import { tools } from './s02.ts';
 
 const ID = 's17b', DEG = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;          // examRoom 0, testRecognise 4, testSmile 5.5, testSolved 9.5

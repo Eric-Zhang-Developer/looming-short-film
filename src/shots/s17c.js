@@ -12,7 +12,7 @@ import { SHOTS } from '../timeline.ts';
 import { ambient } from '../lights.ts';
 import { easeOut, ease, clamp, lerp } from '../core/ease.ts';
 import { createBlob } from '../blob.ts';
-import { tools } from './s02.js';
+import { tools } from './s02.ts';
 import { kitTools } from './s11.ts';
 import { closeupRig, HEAD_AT } from './s09b.ts';
 import { specPose } from '../characters/poses.ts';

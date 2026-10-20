@@ -1,4 +1,3 @@
-// @ts-check
 // s00 · The notification (docs/shots/s00.md; v6-canvas-a). Cold open: a phone face-up on the real-scale home desk
 // (s02.js's unit), pre-dawn dark. It buzzes (notifyBuzz 0.5) and the screen wakes on Canvas Student's To-do list, light
 // mode (src/props/canvas.js), its last row "MAC2312 · Calc 2 Exam · Tomorrow 9:00 AM". A slow push toward that row; the
@@ -8,7 +7,8 @@
 import * as THREE from 'three';
 import { ambient } from '../lights.ts';
 import { ease } from '../core/ease.ts';
-import { DESK, tools, homeDesk } from './s02.js';
+import { DESK, tools, homeDesk } from './s02.ts';
+import type { ShotCtx } from './s02.ts';
 import { todoScreen, banner, COUNTDOWN, EXAM_Y } from '../props/canvas.ts';
 
 const ID = 's00';
@@ -20,7 +20,7 @@ const D0 = 0.0165, D1 = 0.011, PUSH = [0.5, 3.5];          // camera height: hea
 const FOCUS_Y = (52 + EXAM_Y + 46) / 2;                    // UI points: midway between the banner's top and the exam row's bottom
 const GLOW_I = 0.0009, AMB = 0.15;                         // screen face fill (cd), ambient at 15% of s02's (pre-dawn)
 
-export async function build(ctx) {
+export async function build(ctx: ShotCtx) {
   const { scene, camera, PALETTE, post } = ctx;
   scene.background = new THREE.Color(PALETTE.navy).lerp(new THREE.Color(PALETTE.ink), 0.6);
   const T = tools(ctx, ID);
@@ -43,7 +43,7 @@ export async function build(ctx) {
   screen.add(face);
   scene.updateMatrixWorld(true);
   const up = new THREE.Vector3(0, 1, 0).transformDirection(face.matrixWorld);
-  const ui = (y) => face.localToWorld(new THREE.Vector3(0, (0.5 - y / scr.H) * sl, 0));   // a UI row's centre, world
+  const ui = (y: number) => face.localToWorld(new THREE.Vector3(0, (0.5 - y / scr.H) * sl, 0));   // a UI row's centre, world
   const at = ui(FOCUS_Y);                                  // the push is straight down onto it: the banner stays in frame
   camera.up.copy(up);
 
@@ -53,7 +53,7 @@ export async function build(ctx) {
   scene.add(glow, amb);
 
   return {
-    update(t) {
+    update(t: number) {
       T.boil(t);
       const on = t >= BUZZ[0] - 1e-6, level = t >= DIM_AT - 1e-6 ? DIM : 1, tc = Math.floor(t * 24 + 1e-6) / 24;   // on 1s
       screen.visible = on;

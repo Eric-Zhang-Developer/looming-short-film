@@ -15,7 +15,7 @@ import { ease, easeOut, clamp, lerp } from '../core/ease.ts';
 import { createBlob } from '../blob.ts';
 import { makeGator } from '../characters/gator.ts';
 import { specPose } from '../characters/poses.ts';
-import { DESK, tools, homeDesk, seatReach } from './s02.js';
+import { DESK, tools, homeDesk, seatReach } from './s02.ts';
 import { loadHand, handFont } from './s17b.js';
 import { act } from '../characters/acting.ts';
 import { makeClock } from '../clock.ts';

@@ -1,4 +1,3 @@
-// @ts-check
 // Shot stub (contract: docs/contracts.md §shots). Copy to sNN.js, set the three constants, then replace the body.
 // What a stub shows: navy wall, kraft desk strip, one proxy (or real art) for the shot, the shot number as cream dots
 // (rows of 6) and tLocal as a cream bar filling left to right. No text: frames never carry legible text.
@@ -7,11 +6,14 @@ import { SHOTS } from '../timeline.ts';
 import { makePaper, boilSeed } from '../paper.ts';
 import { paperMesh, updatePaperMesh } from '../material.ts';
 import { ambient } from '../lights.ts';
+import type { PaperOptions } from '../paper.ts';
+import type { PaperMesh } from '../material.ts';
+import type { ShotCtx } from './s02.ts';
 
 const ID = 's00', ASSET = 'gator_sheet', PIECE = 'turn_side';
 
-export async function build({ scene, camera, assets, PALETTE }) {
-  const shot = SHOTS.find((s) => s.id === ID), n = Number(ID.slice(1));
+export async function build({ scene, camera, assets, PALETTE }: ShotCtx) {
+  const shot = SHOTS.find((s) => s.id === ID)!, n = Number(ID.slice(1));
   scene.background = new THREE.Color(PALETTE.navy);
   camera.position.set(0, 0.06, 0.55);
   camera.lookAt(0, 0.035, 0.06);
@@ -23,8 +25,8 @@ export async function build({ scene, camera, assets, PALETTE }) {
   key.shadow.bias = -0.0005;
   scene.add(key, ambient());
 
-  const boiling = [];  // { mesh, opts }: re-torn every boil step
-  const piece = (opts) => {
+  const boiling: { mesh: PaperMesh, opts: PaperOptions }[] = [];  // { mesh, opts }: re-torn every boil step
+  const piece = (opts: PaperOptions) => {
     const mesh = paperMesh(makePaper({ ...opts, seed: 0 }));
     boiling.push({ mesh, opts }); scene.add(mesh); return mesh;
   };
@@ -47,7 +49,7 @@ export async function build({ scene, camera, assets, PALETTE }) {
   const bar = piece({ path: RECT, color: PALETTE.cream, size: [0.16, 0.006], key: `${ID}-bar` });
 
   return {
-    update(tLocal) {
+    update(tLocal: number) {
       const seed = boilSeed(tLocal, 10);
       for (const p of boiling) updatePaperMesh(p.mesh, makePaper({ ...p.opts, seed }));
       const k = Math.max(0.01, Math.min(1, tLocal / shot.duration));
