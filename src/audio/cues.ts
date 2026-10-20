@@ -97,7 +97,6 @@ export const CUES: Cue[] = [
   // Dawn birds: one sparse phrase group per bird beat.
   { beat: 'dawnBird1', sound: 'dawnBirds', stem: AMB, dur: 3.5, seed: 41, gain: 0.5 },
   { beat: 'dawnBird2', sound: 'dawnBirds', stem: AMB, dur: 3.5, seed: 42, gain: 0.5 },
-  { beat: 'dawnBird3', sound: 'dawnBirds', stem: AMB, dur: 3.5, seed: 43, gain: 0.5 },
 
   // ───────── v4, new: the clock (doc 05 clockTick) ─────────
   // s02, W only, -30 dB: 9.0 and 10.0 (W 0.0-1.5), 17.0 and 18.0 (W 7.083-10.0). Planted so s08 can take everything else away.
@@ -152,8 +151,9 @@ export const CUES: Cue[] = [
   { beat: 'lampClickHome', sound: 'lampClick', gain: 0.6 },
   { beat: 'lampOffHome', sound: 'lampClick', gain: 0.6 },
   { beat: 'lampOn', sound: 'lampClick', gain: 0.6 },
-  // The blob's gulps (doc 05): a soft inkDrip swallow at -18 dB under the score's two notes, one per gulp (three in v4).
-  ...[1, 2, 3].map((k) => ({ beat: `gulp${k}`, sound: 'inkDrip', gain: 0.126, seed: 20 + k })),
+  // The blob's gulps (doc 05): a soft inkDrip swallow at -18 dB under the score's two notes, one per gulp (v8: four, the
+  // fourth s16's relapse).
+  ...[1, 2, 3, 4].map((k) => ({ beat: `gulp${k}`, sound: 'inkDrip', gain: 0.126, seed: 20 + k })),
   // s07: the thumb's scroll ticks, -22 dB, seeded per flick. v7: one per reel, on its cut (REELS), where the picture's
   // flicks are too (was every 0.75 s). No clock tick under s07, though its second hand moves from 48.0: the tick's first
   // close appearance is s08's, on the frame the music goes out.
@@ -179,11 +179,11 @@ export const CUES: Cue[] = [
   { beat: 'backpackGrab', offset: 0.75, sound: 'footstepSoft', gain: dB(-20), seed: 5 },
   { beat: 'backpackGrab', offset: 1, sound: 'inkDrip', gain: 0.2, seed: 39 },
   // v6-canvas-b: the Canvas reminder, four times, one chime: two high gameBlip notes 80 ms apart, the same pair each time
-  // (the same notification every time; phoneBuzz stays s00's two). On arrival: s03 22.25 (the laptop), s06 43.21 (the
+  // (the same notification every time; phoneBuzz stays s00's two). On arrival: s03 23.5 (v8: over the practice problem, 1.0 s before the alt-tab), s06 43.21 (the
   // phone on the desk lights with the lamp-off at 43.0; the chime waits out the click's 0.17 s window so the three clicks
   // stay identical), s07 54.25, s09a 70.0 (on the tick). Each swipe is a soft thumbFlick as the banner starts to go,
   // 0.25 s before its gulp, clear of the gulp's frame.
-  ...([['gulp1', -1.25], ['lampOffHome', 0.21], ['gulp3', -1.25], ['phoneFaceDown', -0.5]] as [string, number][]).flatMap(([b, o]) => [
+  ...([['gulp1', -1.0], ['lampOffHome', 0.21], ['gulp3', -1.25], ['phoneFaceDown', -0.5]] as [string, number][]).flatMap(([b, o]) => [
     { beat: b, offset: o, sound: 'gameBlip', gain: 0.1, seed: 105 },
     { beat: b, offset: o + 0.08, sound: 'gameBlip', gain: 0.1, seed: 107 }]),
   ...['gulp1', 'gulp2', 'gulp3'].map((b, k) => ({ beat: b, offset: -0.25, sound: 'thumbFlick', gain: dB(-24), seed: 40 + k })),
@@ -230,7 +230,13 @@ export const CUES: Cue[] = [
   bed('penScratch', 'foley', ['crossOut', -4.1], ['crossOut', -0.5], 0.6, { seed: 2 }),
   { beat: 'crossOut', offset: -0.25, sound: 'penTap', gain: 0.5 },
   { beat: 'crossOut', sound: 'penStroke', dur: 0.15, gain: 0.75 },
-  bed('penScratch', 'foley', ['crossOut', 0.2], ['crossOut', 1.5], 0.6, { seed: 8 }),
+  bed('penScratch', 'foley', ['rewrite', 0.05], ['rewrite', 1.35], 0.6, { seed: 8 }),   // v8: the right answer waits out the relapse
+  // v8, the relapse (docs/notes/v8-beats.md): the phone out of his hoodie, a thumb on glass, the director's Reel through the
+  // phone band, its bass hit (3.65 s into the clip; by spectrogram, not by ear) landing on gulp4, cut dead when the phone
+  // goes face down on the desk (the card tap, s09a's).
+  { beat: 'phoneOut', offset: 0.5, sound: 'scrollTick', gain: dB(-20), seed: 31 },
+  { beat: 'phoneOut', offset: 0.5, dur: 4, sound: 'clip', file: 'DepVdpeJdCN', in: 1.05, gain: dB(-24) },
+  { beat: 'phoneDownLib', sound: 'cardTap', gain: GAIN.cardTap, seed: 2 },
   { beat: 'problemOneSolved', offset: -0.33, sound: 'penStroke', dur: 0.12, gain: 0.55, seed: 2 },
   { beat: 'problemOneSolved', offset: -0.17, sound: 'penStroke', dur: 0.12, gain: 0.55, seed: 3 },
   // A shrink blip (inkDrip, -18 dB) under every shrink: s16's five, the test, the cross-off.
@@ -275,18 +281,14 @@ export const CUES: Cue[] = [
     { beat: 'fridge', offset: o + 0.03, sound: 'jarClink', gain: GAIN.jarClink * 0.5, seed: 8 }]),
   // s05: TV bloops through the shot, paused for the win jingle at 5.0 and back when he resumes mashing at 6.0;
   // the roommate's paper-tap footsteps every 1/3 s over 3.33-6.33, all alike (they must not change in the shadow).
-  bed('tvBloops', 'foley', ['gameNight'], ['gameNight', 4.9], GAIN.tvBloops),
-  bed('tvBloops', 'foley', ['gameNight', 6], ['lampClickHome', -0.5], GAIN.tvBloops, { seed: 2 }),
-  { beat: 'gameNight', offset: 5, sound: 'winJingle', gain: GAIN.winJingle },
   ...Array.from({ length: 10 }, (_, k) => ({ beat: 'gameNight', offset: 3.33 + k / 3, sound: 'roommateStep', gain: GAIN.roommateStep, seed: 1 + (k % 2) })),
-  // ───────── v7: the laptop game is real CS2 (the director's clip), replacing snd-g4's synthesized blips ─────────
-  // Out of the laptop's speakers (the same device band as the reels), under the score. [in-point (s), beat, from, to]:
-  // s03 from just after the lid opens, aligned so the clip's first burst (1.4 s in) is him playing, its quiet stretch
-  // carries the reminder (gulp1 - 1.25) and the swipe, and its long spray (3.45 s in) lands 0.2 s after gulp1: back to
-  // the game. s05 plays the clip's second half under the TV's bloops (its last bursts, 10-12 s in, from 4.5 s, as he
-  // snorts at the screen). s06 resumes half a second after gulp2, where his taps did.
-  // The last number is extra dB: s05's groove and s06's run 6 dB hotter than s03's, and at one gain the game sat 12-15 dB
-  // under them (measured on the music and foley stems), lost; +6 puts it as far under them as it sits under s03's.
-  ...([[0, 'laptopUp', 0.25, 6.0, 0], [5.75, 'gameNight', 0.33, 6.58, 6], [0, 'gulp2', 0.5, 4.0, 6]] as [number, string, number, number, number][])
-    .map(([inSec, b, from, to, up]) => ({ beat: b, offset: from, dur: to - from, sound: 'clip', file: 'cs2', in: inSec, gain: GAIN.cs2 * dB(up) })),
+  // ───────── v7: the games are real (the director's clips), replacing snd-g4's synthesized blips ─────────
+  // Out of the device's speakers (the same band as the reels), under the score. [file, in-point (s), beat, from, to, extra dB].
+  // v8: the laptop is the AK (cs2_ak, T side): its spray (8.7 s in) starts on s03's alt-tab frame, the gag, then its single
+  // taps (0.3 s in) carry the gaming to the cut; s06 resumes the taps half a second after gulp2, as v7. s05's TV is Minecraft
+  // (re-recorded with the music off): its dense run of hits (8.3-12 s in) mid-shot; it replaces the TV's bloops and win
+  // jingle, and stops 1 s before s06's lamp click (closer, the master limiter's release reaches the click and the three clicks stop matching). In-points by spectrogram and onsets; nobody has listened yet. The +6 dB as v7: s05's groove and s06's run hotter.
+  ...([['cs2_ak', 8.7, 'gulp1', 0, 2, 0], ['cs2_ak', 0.25, 'gulp1', 2, 4.5, 0], ['minecraft', 3.4, 'gameNight', 0, 6.5, 6],
+    ['cs2_ak', 1.6, 'gulp2', 0.5, 4.0, 6]] as [string, number, string, number, number, number][])
+    .map(([file, inSec, b, from, to, up]) => ({ beat: b, offset: from, dur: to - from, sound: 'clip', file, in: inSec, gain: GAIN.cs2 * dB(up) })),
 ];

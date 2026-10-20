@@ -150,8 +150,10 @@ export const SCORE: ScoreEvent[] = [
   ev('inkDropForms', -10, 'pad', [48, 55, 64, 74], { dur: 8, attack: 3, release: 3, gain: 0.5 }),
   ...exam('inkDropForms', 0.3, { vel: 0.55, dur: 1.4 }),
   ev('laptopUp', 0, 'sub', null, { hz: 42, dur: 5, attack: 3, gain: 0.2 }),           // shadow climbs the wall
-  // The three gulps: 0:23.5 (s03), 0:44 (s06), 0:55.5 (s07, bed rot).
-  ...[1, 2, 3].flatMap(gulp),
+  // The gulps: 0:24.5 (s03), 0:47 (s06), 0:58.5 (s07, bed rot); v8's fourth, 2:29.1 (s16, the relapse), the deepest.
+  ...[1, 2, 3, 4].flatMap(gulp),
+  // Its sub under the shadow springing up the library wall, cut dead when the phone goes face down.
+  ev('gulp4', 0, 'sub', null, { hz: 56, dur: beat('phoneDownLib') - beat('gulp4'), attack: 0.3, gain: 0.3, until: 'phoneDownLib' }),
 
   // 0:19–0:48 Avoidance. The groove adds a layer per dodge; a sub swell per dodge, each lower-floored and louder.
   ...groove(),
