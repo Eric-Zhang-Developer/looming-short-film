@@ -453,7 +453,7 @@ export async function build(ctx: ShotCtx) {
       act(Hs.rig, t, [[0, 'numb']], { slump: 0, tilt: 0, tail: 0 });
       const glancing = at2(T, ...GLANCE);
       Hs.glance.visible = glancing; Hs.rig.meshes.eyes.visible = !glancing;
-      Hs.set(t, { r: t >= 7.5 - 1e-6 ? BLOB_R.gulp3 : BLOB_R.start, colour });
+      Hs.set(t, { r: t >= 7.5 - 1e-6 ? BLOB_R.gulp3 : BLOB_R.start, colour, wobble: t >= 7.5 - 1e-6 ? 0 : 1 });   // v9: still after gulp3
 
       // ---- W: lie_phone, the thumb, numb; the Exam gulps at 7.5 (README §1) ----
       rig.blend({ lie: LIE }, [[0, 'lie']], 0);
@@ -463,7 +463,9 @@ export async function build(ctx: ShotCtx) {
       const g = t >= 7.5 - 1e-6, r = g ? BLOB_R.gulp3 : BLOB_R.start;
       let squash = 0, eyes = 'side', wobble = 1;
       if (at2(T, 7.417, 7.5)) { squash = 0.3; eyes = 'closed'; }
-      else if (g) { eyes = 'open'; wobble = 0.8; if (T < 7.75) squash = -0.2 * Math.exp(-10 * (T - 7.5)); }
+      // v9 (v9-beats §2): after gulp3 it is weather. `blank`, no blink, no wobble, from here through s10b (bar s10's
+      // confused beat at the threshold). The gulp's snap-back squash stays: that's the swallow, not the wobble.
+      else if (g) { eyes = 'blank'; wobble = 0; if (T < 7.75) squash = -0.2 * Math.exp(-10 * (T - 7.5)); }
       R.placeBlob(r);
       exam.update(t, { squash, wobble, eyes, look: -1, key: spot });
 

@@ -1,0 +1,122 @@
+# node evidence/v9-blob/hashat.ts (tools/hashes.ts at chosen times), e15fefb
+== 0,0.5,1,2,3,4,5 vs evidence/ts-refactor/baseline.json
+t=0  want abaf10b300ecac7f  got abaf10b300ecac7f  same
+t=0.5  want 13d201572864fff3  got 13d201572864fff3  same
+t=1  want cdc97fe336aabf97  got cdc97fe336aabf97  same
+t=2  want c62dbc28cb1c3b6d  got c62dbc28cb1c3b6d  same
+t=3  want 47ed6c81982f030a  got 47ed6c81982f030a  same
+t=4  want c547776c1270895d  got c547776c1270895d  same
+t=5  want 5d5ba35417059a3f  got 5d5ba35417059a3f  same
+hashes: PASS (7 frames identical)
+== 6,7,8,9,10,10.5,11 vs evidence/ts-refactor/baseline.json
+t=6  want d767ebbce30a290a  got d767ebbce30a290a  same
+t=7  want e64611e436790860  got e64611e436790860  same
+t=8  want d0bc9c08ab711e84  got d0bc9c08ab711e84  same
+t=9  want c68136b2cc190094  got c68136b2cc190094  same
+t=10  want ea8956235c0ca8bb  got ea8956235c0ca8bb  same
+t=10.5  want 5cb2f059a92fc68c  got 5cb2f059a92fc68c  same
+t=11  want f875d2b0ea37ab77  got f875d2b0ea37ab77  same
+hashes: PASS (7 frames identical)
+== 12,13,14,15 vs evidence/ts-refactor/baseline.json
+t=12  want bc562a25cecf06e5  got bc562a25cecf06e5  same
+t=13  want 9c1559cca2293949  got 9c1559cca2293949  same
+t=14  want f5d1ed9c0a9e5771  got f5d1ed9c0a9e5771  same
+t=15  want 34a6cc566585ad38  got 34a6cc566585ad38  same
+hashes: PASS (4 frames identical)
+== 0,0.5,1,2,3,4,5 vs evidence/v9-blob/v9-pre.json
+t=0  want abaf10b300ecac7f  got abaf10b300ecac7f  same
+t=0.5  want 13d201572864fff3  got 13d201572864fff3  same
+t=1  want cdc97fe336aabf97  got cdc97fe336aabf97  same
+t=2  want c62dbc28cb1c3b6d  got c62dbc28cb1c3b6d  same
+t=3  want 47ed6c81982f030a  got 47ed6c81982f030a  same
+t=4  want c547776c1270895d  got c547776c1270895d  same
+t=5  want 5d5ba35417059a3f  got 5d5ba35417059a3f  same
+hashes: PASS (7 frames identical)
+== 6,7,8,9,10,10.5,11 vs evidence/v9-blob/v9-pre.json
+t=6  want d767ebbce30a290a  got d767ebbce30a290a  same
+t=7  want e64611e436790860  got e64611e436790860  same
+t=8  want d0bc9c08ab711e84  got d0bc9c08ab711e84  same
+t=9  want c68136b2cc190094  got c68136b2cc190094  same
+t=10  want ea8956235c0ca8bb  got ea8956235c0ca8bb  same
+t=10.5  want 5cb2f059a92fc68c  got 5cb2f059a92fc68c  same
+t=11  want f875d2b0ea37ab77  got f875d2b0ea37ab77  same
+hashes: PASS (7 frames identical)
+== 12,13,14,15 vs evidence/v9-blob/v9-pre.json
+t=12  want bc562a25cecf06e5  got bc562a25cecf06e5  same
+t=13  want 9c1559cca2293949  got 9c1559cca2293949  same
+t=14  want f5d1ed9c0a9e5771  got f5d1ed9c0a9e5771  same
+t=15  want 34a6cc566585ad38  got 34a6cc566585ad38  same
+hashes: PASS (4 frames identical)
+== 117,118,119,120,121,122 vs evidence/v9-blob/v9-pre.json
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=117  want c498661c62ca94d6  got c498661c62ca94d6  same
+t=118  want a0dc1adcda82f837  got a0dc1adcda82f837  same
+t=119  want c104e53fe4858786  got c104e53fe4858786  same
+t=120  want ea6efef9509c9bca  got ea6efef9509c9bca  same
+t=121  want 87897a56411a70b8  got 87897a56411a70b8  same
+t=122  want 22c598e81380bd8a  got 22c598e81380bd8a  same
+hashes: PASS (6 frames identical)
+== 123,123.5 vs evidence/v9-blob/v9-pre.json
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=123  want 4d3b8169b4de8162  got 4d3b8169b4de8162  same
+t=123.5  want 4ab8878c27061c05  got 4ab8878c27061c05  same
+hashes: PASS (2 frames identical)
+== 124,124.5,125.25,126,127,128,129 vs evidence/v9-blob/v9-pre.json
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=124  want 655d7605fc5d231c  got 655d7605fc5d231c  same
+t=124.5  want 8c628099ba8305c8  got 8c628099ba8305c8  same
+t=125.25  want c2f9a434f7e1911c  got c2f9a434f7e1911c  same
+t=126  want 77277adfb32f72cf  got 77277adfb32f72cf  same
+t=127  want d6de7bff30caae68  got d6de7bff30caae68  same
+t=128  want 6e9a317e756ff655  got 6e9a317e756ff655  same
+t=129  want 1e53564aaed0ff72  got 1e53564aaed0ff72  same
+hashes: PASS (7 frames identical)
+== 130,131 vs evidence/v9-blob/v9-pre.json
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=130  want 3098b3043f68184e  got 3098b3043f68184e  same
+t=131  want 2490e80f4f3b3197  got 2490e80f4f3b3197  same
+hashes: PASS (2 frames identical)
+== 132,133,134,135,136,137 vs evidence/v9-blob/v9-pre.json
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=132  want d5910e39f58ffe0d  got d5910e39f58ffe0d  same
+t=133  want e6fac1195ee121dc  got e6fac1195ee121dc  same
+t=134  want f2bbe6b38e25e5a5  got f2bbe6b38e25e5a5  same
+t=135  want 491369868b2fb471  got 491369868b2fb471  same
+t=136  want 0a9e6fc783f2f4e5  got 0a9e6fc783f2f4e5  same
+t=137  want cd3021b29b7ea87d  got cd3021b29b7ea87d  same
+hashes: PASS (6 frames identical)
+== 138,139,139.5 vs evidence/v9-blob/v9-pre.json
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=138  want 24f7d275b8249cea  got 24f7d275b8249cea  same
+t=139  want d668670fcb11e464  got d668670fcb11e464  same
+t=139.5  want 83ddd1be3e3df472  got 83ddd1be3e3df472  same
+hashes: PASS (3 frames identical)
+== 190,191,192,193,194,195,195.5 vs evidence/v9-blob/v9-pre.json
+t=190  want efe4c7274800bdd8  got efe4c7274800bdd8  same
+t=191  want 78a4aedb105867ac  got 78a4aedb105867ac  same
+t=192  want d45b1b9b3a381663  got d45b1b9b3a381663  same
+t=193  want 6ec552985c974446  got 6ec552985c974446  same
+t=194  want 39858264ccc65b4d  got 39858264ccc65b4d  same
+t=195  want 43cd4aa3cf43d866  got 43cd4aa3cf43d866  same
+t=195.5  want 3d3d1913436e904b  got 3d3d1913436e904b  same
+hashes: PASS (7 frames identical)
+== 196,197,198,199,200,201 vs evidence/v9-blob/v9-pre.json
+t=196  want c81aa4c6d3ef73d7  got c81aa4c6d3ef73d7  same
+t=197  want 3bd4831a79aebb8a  got 3bd4831a79aebb8a  same
+t=198  want 2cdf70643b75400b  got 2cdf70643b75400b  same
+t=199  want b3e89f849a0b5fea  got b3e89f849a0b5fea  same
+t=200  want 3cdf1026c7c30919  got 3cdf1026c7c30919  same
+t=201  want be5696bf6f779d01  got be5696bf6f779d01  same
+hashes: PASS (6 frames identical)
+== 202,202.5,203,204,205,206,206.5,207,208,209 vs evidence/v9-blob/v9-pre.json
+t=202  want d366320a4349a4e8  got d366320a4349a4e8  same
+t=202.5  want a1e678d5b43af3b8  got a1e678d5b43af3b8  same
+t=203  want 9a8aeaf119a1fae2  got 9a8aeaf119a1fae2  same
+t=204  want 7e599b8ccdfa2972  got 7e599b8ccdfa2972  same
+t=205  want b84694fb29384f05  got b84694fb29384f05  same
+t=206  want 61dd60b4ccaa1aac  got 61dd60b4ccaa1aac  same
+t=206.5  want 6ff109cfd1724ba6  got 6ff109cfd1724ba6  same
+t=207  want 9433d3643e6457a9  got 9433d3643e6457a9  same
+t=208  want 58d94e85644cf7af  got 58d94e85644cf7af  same
+t=209  want 9907f59058320144  got 9907f59058320144  same
+hashes: PASS (10 frames identical)

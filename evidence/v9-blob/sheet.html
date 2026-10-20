@@ -1,0 +1,41 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>v9-blob · evidence sheet</title>
+<style>html,body{margin:0;background:#000}</style>
+<script type="module">
+  // Lays the rendered sheets out as one labelled evidence sheet (no film code runs here):
+  //   node render.ts --page=evidence/v9-blob/sheet.html --stills=0 --out=<dir>  (then to JPEG)
+  const W = 1920, PAD = 16, FONT = '600 26px Helvetica, Arial, sans-serif', SMALL = '400 21px Helvetica, Arial, sans-serif';
+  const ROWS = [
+    ['eyes.jpg', 'The eye states (src/blob.ts), radius 2.5 cm, close', 'open · blank (v9) · plead (v9)  /  sad (v9) · shy (v9) · sleepy (v9)  /  tired · side · closed (v8, for comparison)'],
+    ['beats/s02.jpg', 's02 · newborn: side glance, the first slow blink (sleepy, closed), the second on the desk', '15.33 · 15.42 · 15.5 · 16.92'],
+    ['beats/s03.jpg', 's03 · after gulp1: plead up at him as he alt-tabs', '24.75 · 25.25'],
+    ['beats/s07.jpg', 's07 · after gulp3: blank, no blink, no wobble (W); H the silhouette from behind', '58.75 · 60'],
+    ['beats/s09a.jpg', 's09a · the detail screen: "Today 9:00 AM" (canvas.ts reads the 3:00 clock); the blob blank in the black', '73.71 · 75 · 77.5'],
+    ['beats/s10.jpg', 's10 · the threshold: confused (side, look flicking, wobble on), the blink on blobBlinks, down at its puddle', '106.6 · 107 · 107.5 · 108'],
+    ['beats/s16a.jpg', 's16 · the relapse: sad at the phone; plead at its wall shadow after gulp4 (W, then B′)', '146.5 · 149.5 · 150.25'],
+    ['beats/s16b.jpg', 's16 · "That was it?": shy, down and away, a little squash', '156.75 · 157'],
+    ['beats/s17.jpg', 's17 sleepy and drifting off · s17b calm, the blink as the exam starts', '171.25 · 171.75 · 172.5 · 177.25 · 177.38'],
+    ['beats/s17c.jpg', 's17c · the 85 (the 94 under a patch of its own paper, two red marks on his lines); relief, not pride; the tap on the 85', '186.5 · 188.5 · 189.25'],
+    ['s17c_85_crop.jpg', 's17c · the 85 at full resolution (186.5): no seam where the 94 was', 'crop 640 × 620 of the 1920 frame'],
+  ];
+  const load = (src) => new Promise((ok, bad) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => bad(new Error(src)); i.src = src; });
+  window.renderFrame = async () => {};
+  window.LOOMING = { fps: 24, duration: 1, ready: (async () => {
+    const imgs = await Promise.all(ROWS.map(([f]) => load(f)));
+    const fit = (im, maxH) => { const k = Math.min((W - 2 * PAD) / im.width, maxH / im.height, 1.5); return [im.width * k, im.height * k]; };
+    const sizes = imgs.map((im, i) => fit(im, i === 0 ? 900 : i === ROWS.length - 1 ? 620 : 420));
+    const H = sizes.reduce((h, [, sh]) => h + sh + 84, 70);
+    const c = Object.assign(document.createElement('canvas'), { width: W, height: Math.ceil(H) }), g = c.getContext('2d');
+    g.fillStyle = '#111'; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#eee'; g.font = '700 32px Helvetica, Arial, sans-serif'; g.fillText('v9-blob · the blob acts, s17c\'s 85, "Today 9:00 AM"', PAD, 44);
+    let y = 70;
+    imgs.forEach((im, i) => {
+      g.fillStyle = '#eee'; g.font = FONT; g.fillText(ROWS[i][1], PAD, y + 30);
+      g.fillStyle = '#aaa'; g.font = SMALL; g.fillText(ROWS[i][2], PAD, y + 60);
+      g.drawImage(im, PAD, y + 74, ...sizes[i]);
+      y += sizes[i][1] + 84;
+    });
+    document.body.appendChild(c);
+  })() };
+</script>

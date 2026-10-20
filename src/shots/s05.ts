@@ -273,9 +273,10 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
 
       // ---- The Exam: eyes up toward the roommates and the TV (side, −x), track the walker (flip as he passes at 4.5),
       // 5.00 squash, 5.08 hop (4 mm up), 5.17 lands and settles on a spring, 5.50 eyes open on the Student.
+      // v9 (v9-beats §2, s04–s05 growing): from 5.50 `worried` on him, not open, with one two-drawing blink at 6.33.
       let eyes = 'side', look = -1;
       if (T >= F(3.33)) look = T < F(4.5) ? -1 : 1;
-      if (T >= F(5.5)) eyes = 'open';
+      if (T >= F(5.5)) eyes = T >= F(6.33) && T < F(6.5) ? 'closed' : 'worried';   // v9: worried on him, one blink (6.33)
       const at = (t: number) => Math.abs(T - F(t)) < 1e-6;
       const squash = at(5.0) ? 0.25 : at(5.08) ? 0 : 0.2 * spring(T, F(5.17));
       exam.mesh.position.y = B[1] + (at(5.08) ? 0.004 : 0);

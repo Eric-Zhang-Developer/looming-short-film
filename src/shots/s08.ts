@@ -94,16 +94,15 @@ export async function build(ctx: ShotCtx) {
         drop.position.set(...DROP_AT).addScaledVector(down, 0.0015 * k);
       }
 
-      // ---- the Exam: 2.5× on his knees; follows his look to the circle at 4.0 and back at 5.0 (C3's blink: dropped, v7-bed) ----
-      let eyes = 'open', look = -1;
-      if (T >= 4 - 1e-6 && T < 5 - 1e-6) eyes = 'side';
+      // ---- the Exam: 2.5× on his knees. v9 (v9-beats §2): weather, not a creature. `blank` throughout, no wobble; it no
+      // longer follows his look to the circle (v8's side glance at 4.0–5.0) ----
       R.placeBlob(BLOB_R.start);
-      exam.update(t, { wobble: 0.8, eyes, look, key: spot });
+      exam.update(t, { wobble: 0, eyes: 'blank', look: -1, key: spot });
 
       // ---- C3, H: frozen in dread (the worried eyes carry the sweat), hands still on the phone; only his breath moves ----
       Hs.rig.pose({ body: 0, arm_l: -112 * DEG, arm_r: 112 * DEG });
       act(Hs.rig, t, [[0, 'dread']], { slump: 0, tilt: 0, tail: 0, breath: 3, depth: 0.008, blink: false });
-      Hs.set(t, { r: BLOB_R.start, colour: Hs.hues[0], wobble: 0.8, level: DIM });
+      Hs.set(t, { r: BLOB_R.start, colour: Hs.hues[0], wobble: 0, level: DIM });
 
       // ---- light: s07's end state; the spill lifted only in the clock insert ----
       spot.intensity = DIM * SPOT;

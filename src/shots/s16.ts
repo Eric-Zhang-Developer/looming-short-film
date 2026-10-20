@@ -406,23 +406,29 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     exam.mesh.position.set(M[0], 0, M[2]); exam.stain.position.set(M[0], 0.0004, M[2]);
     if (relapse) {
       const swallow = t >= B.gulp4 - dr(1) - 1e-6 && !grown, settle = grown && t < B.gulp4 + 1;
+      // v9 (v9-beats §2): at the phone (phoneOut 6.0) `sad`, "here we go again"; after the gulp's snap, `plead` up at its
+      // own shadow on the wall until he turns the phone down (phoneDownLib 10.5); open, watching him, after.
+      const eyes = swallow ? 'closed' : tr >= B.phoneOut - 1e-6 && !grown ? 'sad' : grown && tr >= B.gulp4 + 0.25 - 1e-6 && tr < B.phoneDownLib - 1e-6 ? 'plead' : 'open';
       exam.update(t, {
         key: lit ? spot : zone.light,
         wobble: settle ? 0.8 : 1,
         squash: swallow ? 0.3 : grown ? -0.2 * kick(t, B.gulp4, 1) : 0,
-        eyes: swallow ? 'closed' : 'open',
+        eyes,
         look: -1,
       });
       const gulping = t >= B.gulp4 - dr(1) - 1e-6 && t < B.gulp4 + 0.25 - 1e-6;
       exam.mesh.rotation.z = (tr >= 5 - 1e-6 && !gulping ? 10 : 0) * D;   // the head tilt at 5.0; upright for the gulp
     } else {
       const braced = tc >= dr(2) && tc < 6.5;
+      // v9: "That was it?" (problemOneSolved, v4's 6.5): when its eyes open again (6.75) it is `shy`, embarrassed at how
+      // small the problem was: a glance down and away from him and a little extra squash, to 7.5; then open, watching.
+      const shy = tc >= 6.75 && tc < 7.5;
       exam.update(t, {
         key: zone.light,
         wobble: braced ? 0.3 : 1,
-        squash: braced ? 0.25 : t0 === undefined ? 0 : kick(tc, t0, 0.3),
-        eyes: tc >= 15.5 || (tc >= dr(3) && tc < 6.75) ? 'closed' : 'open',
-        look: -1,
+        squash: braced ? 0.25 : (t0 === undefined ? 0 : kick(tc, t0, 0.3)) + (shy ? 0.1 : 0),
+        eyes: tc >= 15.5 || (tc >= dr(3) && tc < 6.75) ? 'closed' : shy ? 'shy' : 'open',
+        look: shy ? 1 : -1,
       });
       const watching = (tc >= 8 && tc < 9) || (tc >= 9 && t0 !== undefined && tc - t0 >= 0.25 - 1e-6 && tc < 15.5);
       exam.mesh.rotation.z = (watching ? 10 : 0) * D;   // tilted toward him; upright for each squash

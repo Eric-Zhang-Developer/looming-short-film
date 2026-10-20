@@ -198,14 +198,13 @@ export async function build(ctx: ShotCtx) {
 
       // ---- the Exam: its eyes in the black, a blink at 1.0; slides to the bed's foot as he sits up (3.5–3.67); gasps at
       // 4.25; watches him to the backpack; hops down after him (5.75–6.0) ----
-      let contact = KNEE, eyes = 'open', look = 1, squash = 0;
+      // v9 (v9-beats §2): `blank` and still (wobble 0) the whole shot: no blink at 1.0, no gasp at 4.25, no look after him.
+      // It moves (the slide, the hop) but it doesn't react: the choice is his.
+      let contact = KNEE, squash = 0;
       if (T >= UP - 1e-6) contact = T < F(4.417) ? KNEE.map((v, i) => lerp(v, FOOT[i], (T - UP + 1 / 12) / (1 / 6)) + (i === 1 ? 0.006 : 0)) as Vec3 : FOOT;
       if (T >= F(5.75)) { const k = Math.min(1, (T - 5.75) / 0.25); contact = FOOT.map((v, i) => lerp(v, FLOOR[i], k) + (i === 1 ? 0.01 * Math.sin(Math.PI * k) : 0)) as Vec3; squash = k >= 1 ? 0.15 : -0.1; }
-      if (at2(T, 1.0, 1.08)) eyes = 'closed';
-      if (T >= 4.25 - 1e-6) eyes = 'gasp';
-      if (T >= 5 - 1e-6) { eyes = 'side'; look = -1; }
       R.placeBlob(BLOB_R.start, contact);
-      exam.update(t, { wobble: 0.8, eyes, look, squash, key: lit ? lamp : dark ? null : spot });
+      exam.update(t, { wobble: 0, eyes: 'blank', squash, key: lit ? lamp : dark ? null : spot });
 
       // ---- light. 2.75 (was phoneFaceDown 0.5): the phone spot, its fill and its spill go to 0 on one frame, and the ceiling shadow with them.
       // 4.0 lampOn: the nightstand lamp, low and warm; only the blob casts (its own field now: the lamp sees its face). ----

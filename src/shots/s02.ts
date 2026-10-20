@@ -312,6 +312,10 @@ export function examAt(t: number): ExamState | null {
     const s = f < 74 ? lerp(RUN, PERCH, (f - 72) / 2) : PERCH;
     let squash = f < 74 ? 0.3 : 0.3 * spring(tc, 6.0), eyes = f < 74 ? 'closed' : 'open', look = 1;
     if (f >= 76 && f < 81) squash = -0.15;                                             // 6.33: stretches up at the words
+    // v9: newborn and curious. It glances along the calendar (6.33), then the first slow blink: half down (6.42), shut
+    // for two drawings, half up (6.67); then to him as v8 (6.75).
+    if (f === 76) eyes = 'side';
+    if (f >= 77 && f < 81) eyes = f === 77 || f === 80 ? 'sleepy' : 'closed';
     if (f >= 81) { eyes = 'side'; look = -1; squash = 0; }                             // 6.75: looks toward him
     if (f >= 84) squash = 0.2;                                                         // 7.00: lets go
     return { space: 'page', y: LIP_Y, s, squash, eyes, look };
@@ -319,7 +323,8 @@ export function examAt(t: number): ExamState | null {
   if (f < 89) return { space: 'fall', k: easeIn((tc - F(85)) / F(4)), s: PERCH, squash: -0.35, eyes: 'open' };   // 7.083–7.42
   const land = { space: 'desk' as const, x: LAND[0], z: LAND[2], lift: 0, eyes: 'open', look: -1 };
   if (f < 93) return { ...land, s: PERCH, squash: f === 89 ? 0.6 : 0.6 * spring(tc, F(88)) };
-  if (f < 99) return { ...land, s: kf(tc, [[F(93), PERCH], [F(97), 1.08], [F(99), 1]], easeOut), squash: 0 };   // 7.75–8.25
+  // v9: the second slow blink as it swells on the desk, looking at him (7.83–8.17)
+  if (f < 99) return { ...land, s: kf(tc, [[F(93), PERCH], [F(97), 1.08], [F(99), 1]], easeOut), squash: 0, eyes: f === 94 || f === 97 ? 'sleepy' : f === 95 || f === 96 ? 'closed' : 'open' };   // 7.75–8.25
   // 8.25–9.83: two hops (0.79 s each): antic squash 0.25 (2 drawings), airborne on an 8 mm arc with stretch −0.15,
   // land squash 0.3, settle. Targets reached at 9.04 and 9.83.
   const hop = f < 109 ? 0 : 1, k = f - (hop ? 109 : 99), done = f >= 118;

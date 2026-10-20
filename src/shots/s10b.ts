@@ -169,7 +169,8 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       // The blob rides his root behind him, one hop per two of his steps, squashing on landing.
       const ph = (T % HOP) / HOP, land = ph < 1 / 8 + 1e-6;
       exam.mesh.position.set(root.x + BLOB[0], HOP_H * Math.sin(Math.PI * ph), root.z + BLOB[2]);
-      exam.update(tLocal, { wobble: 0.8, squash: land ? 0.12 : 0, eyes: 'open' });   // key: the tube that lights it most (v6-stacks-2: the cones are narrower now)
+      // v9 (v9-beats §2): still weather under the tubes, `blank` and no wobble; it shrinks into feeling from s11.
+      exam.update(tLocal, { wobble: 0, squash: land ? 0.12 : 0, eyes: 'blank' });   // key: the tube that lights it most (v6-stacks-2: the cones are narrower now)
     },
   };
 }

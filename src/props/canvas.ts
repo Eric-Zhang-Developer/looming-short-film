@@ -34,8 +34,13 @@ export const ROWS = [
   { day: 'Thu', icon: 'quiz', course: 'MAC2312', title: 'Quiz 8', due: '11:59 PM' },
   { icon: 'page', course: 'MAC2312', title: 'WebAssign 9.3', due: '11:59 PM' },
   { icon: 'page', course: 'CHM2045', title: 'Lab Report 6', due: '11:59 PM' },
-  { day: 'Fri', icon: 'exam', course: 'MAC2312', title: 'Calc 2 Exam', due: 'Tomorrow 9:00 AM', exam: true },
+  { day: 'Fri', icon: 'exam', course: 'MAC2312', title: 'Calc 2 Exam', exam: true },   // due: dueLabel(clock)
 ];
+// v9 (docs/notes/v9-beats.md §4): the exam's due line comes from the screen's own clock. The exam is at 9:00 AM, so a
+// clock after midnight and before 9:00 is the exam's day ("Today"); no clock (s00, pre-dawn the day before) or any
+// later hour is the day before. ponytail: the status-bar clock is 12-hour with no AM/PM, and every clock the film
+// shows before 9 is after midnight (s09a 3:00); a 12:xx AM clock would need the AM/PM it doesn't carry.
+export const dueLabel = (clock = ''): string => { const h = parseInt(clock, 10); return h >= 0 && h < 9 ? 'Today 9:00 AM' : 'Tomorrow 9:00 AM'; };
 const TOP = 112, ROW = 92;                        // first row's top, row height (points)
 export const EXAM_Y = TOP + ROW * ROWS.findIndex((r) => r.exam) + ROW / 2;   // the exam row's centre (points)
 
@@ -92,7 +97,7 @@ function drawBanner(g: CanvasRenderingContext2D, x: number, y: number, title: st
 }
 
 /** The exam's detail view (what the banner opens into), in a w × h box at the origin. */
-function drawDetail(g: CanvasRenderingContext2D, w: number, h: number) {
+function drawDetail(g: CanvasRenderingContext2D, w: number, h: number, clock: string) {
   g.fillStyle = C.bg; g.fillRect(0, 0, w, h);
   g.fillStyle = C.head; g.fillRect(0, 0, w, 104);
   g.strokeStyle = C.ink; g.lineWidth = 2.4; g.lineCap = 'round';
@@ -103,7 +108,7 @@ function drawDetail(g: CanvasRenderingContext2D, w: number, h: number) {
   text(g, 'Calc 2 Exam', 20, 196, 32, C.ink, 700);
   g.fillStyle = C.red; rrect(g, 20, 216, 64, 26, 13); g.fill();
   text(g, 'EXAM', 52, 234, 13, '#FFFFFF', 700, 'center');
-  text(g, 'Tomorrow 9:00 AM', 96, 235, 17, C.red, 600);
+  text(g, dueLabel(clock), 96, 235, 17, C.red, 600);
   g.fillStyle = C.line; g.fillRect(20, 266, w - 40, 1);
   g.fillStyle = '#EDEFF1'; for (let i = 0; i < 6; i++) { rrect(g, 20, 292 + i * 26, (w - 40) * [1, 0.92, 0.97, 0.6, 0.88, 0.4][i], 10, 5); g.fill(); }
 }
@@ -127,7 +132,7 @@ export function todoScreen({ aspect = 844 / 390 }: { aspect?: number } = {}) {
     if (b && open > 0) {                          // it expands from the banner's rect to the whole screen
       const k = open * open * (3 - 2 * open), x = 14 * (1 - k), y = 52 * (1 - k), w = BW + (W - BW) * k, h = BH + (H - BH) * k;
       g.save(); rrect(g, x, y, w, h, 22 * (1 - k)); g.clip(); g.translate(x, y);
-      g.globalAlpha = Math.min(1, open * 3); drawDetail(g, W, H); g.restore();
+      g.globalAlpha = Math.min(1, open * 3); drawDetail(g, W, H, clock); g.restore();
     }
     g.restore();
     texture.needsUpdate = true;
@@ -161,7 +166,7 @@ function list(g: CanvasRenderingContext2D, H: number, marker: number, clock: str
     g.fillStyle = red ? C.red : C.grey; g.fillRect(110, y + 18, 2, 15);
     text(g, r.course, 118, y + 31, 14, C.grey, 500);
     text(g, r.title, 110, y + 58, 21, C.ink, 600);
-    text(g, r.due, 110, y + 80, 15, red ? C.red : C.grey, red ? 600 : 400);
+    text(g, r.due ?? dueLabel(clock), 110, y + 80, 15, red ? C.red : C.grey, red ? 600 : 400);
     checkbox(g, W - 34, y + ROW / 2, C.orange);
     g.fillStyle = C.line; g.fillRect(r.day && i ? 0 : 60, y, W - (r.day && i ? 0 : 60), 1);
   });

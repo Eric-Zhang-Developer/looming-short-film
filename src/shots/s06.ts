@@ -157,7 +157,7 @@ export async function build(ctx: ShotCtx) {
       let x = MARK_X + (f >= 26 ? HOP_DX : f >= 24 ? HOP_DX / 2 : 0) + (grown ? GROW_DX : 0), lift = f >= 24 && f < 26 ? 0.003 : 0;
       let squash = 0, eyes = 'open', wobble = 1, look = -1;
       if (f >= 6 && f < 10) squash = 0.3 * Math.exp(-6 * (F(f) - ON)) * Math.cos(18 * (F(f) - ON));
-      if (f === 8) eyes = 'closed';
+      if (f === 8 || f === 9) eyes = 'closed';   // v9: the startle blink is two drawings
       if (f >= 9 && f < 36) wobble = 0.4;
       if (f >= 16 && f < 36) eyes = 'worried';
       if (f === 23) squash = 0.25; if (f === 26) squash = 0.2;
@@ -166,6 +166,7 @@ export async function build(ctx: ShotCtx) {
       if (f >= 48 && f < 51) squash = -0.2 * Math.exp(-6 * (F(f) - GULP)) * Math.cos(18 * (F(f) - GULP));
       if (f >= 48 && f < 60) wobble = 0.8;
       if (f >= 54 && f < 60) squash = 0.15 * (f - 54) / 6; else if (f >= 60) { squash = 0.15; eyes = 'side'; }
+      if (f >= 50 && f < 57) eyes = 'plead';     // v9: once, briefly, after the gulp (4.17–4.75); then it settles big
       exam.mesh.position.set(x, lift, MARK_Z);
       exam.mesh.scale.setScalar(r / BLOB_R.start);
       exam.stain.position.x = x;

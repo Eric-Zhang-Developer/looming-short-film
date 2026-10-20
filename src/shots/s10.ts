@@ -207,7 +207,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
 
     // ---------- the Exam, on 2s: at his heels; one hop in after him (1.25 → 1.5); the blink; looks down, then up
     const HOP = [B.doorPush + 0.25, B.lightFlood];
-    let p, y = 0, sq = 0, eyes = 'open', look = 1;
+    let p, y = 0, sq = 0, eyes = 'blank', look = 1;
     if (T < HOP[0]) {
       const h = kf(T, HIM, (x) => x); p = [h[0] + 0.03, h[1] - 0.03];
       const ph = ((T + 1e-6) % 0.5) / 0.5; if (T < 0.5) { y = 0.003 * Math.sin(Math.PI * ph); sq = ph < 1 / 6 ? 0.2 : 0; }
@@ -216,10 +216,13 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       p = [kf(k, [[0, h0[0] + 0.03], [0.5, -0.022], [1, BLOB_IN[0]]], (x) => x), kf(k, [[0, h0[1] - 0.03], [0.5, DOOR_Z], [1, BLOB_IN[1]]], (x) => x)];
       y = 0.012 * Math.sin(Math.PI * k); sq = -0.15;
     } else { p = BLOB_IN; sq = T < B.lightFlood + 1 / 12 ? 0.2 : T >= 3.25 ? 0.15 : 0; }
-    if (T >= B.doorPush && T < B.lightFlood) { eyes = 'side'; look = -1; }   // following him in
-    if (T >= B.blobBlinks && T < B.blobBlinks + 1 / 12) eyes = 'closed';
+    // v9 (v9-beats §2): `blank` and still, as it has been since s07's gulp, until the light floods. Then the one confused
+    // beat: wobble back on for the first time since s07, eyes side-glancing one way then the other (look flicks every
+    // 1/3 s), the blink on blobBlinks (two drawings), down at its puddle (tired); then blank again from 3.25.
+    const confused = T >= B.lightFlood && T < 3.25;
+    if (confused) { eyes = 'side'; look = Math.floor((T - B.lightFlood + 1e-6) * 3) % 2 ? 1 : -1; }
+    if (T >= B.blobBlinks && T < B.blobBlinks + 1 / 6) eyes = 'closed';
     else if (T >= 2.75 && T < 3.25) eyes = 'tired';      // down at its puddle
-    else if (T >= 3.25) eyes = 'worried';                // up at him
     const sx = T >= HOP[0] && T < HOP[1] && Math.abs(p[1] - DOOR_Z) < 0.03 ? 0.75 : 1;
     exam.mesh.visible = !close;
     exam.mesh.position.set(p[0], y, p[1]); exam.mesh.scale.set(sx, 1, 1);
@@ -231,7 +234,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     // both eye holes still legible at 960; under the doubled fill it falls to ~9% and only the puddle reads.
     room.intensity = flooded ? ROOM_FLOOD : ROOM_I;
     BC.set(p[0], 0.03, p[1]); aim(key5, BC); key5.shadow.camera.near = 0.004; key5.shadow.camera.updateProjectionMatrix();
-    exam.update(t, { squash: sq, wobble: flooded ? 0.6 : 1, eyes, look, key: flooded ? over : key5 });
+    exam.update(t, { squash: sq, wobble: confused ? 0.6 : 0, eyes, look, key: flooded ? over : key5 });
     lantern.emissiveIntensity = 0.9;
 
     // ---------- camera, on 1s: locked wide; locked CU from his left (he faces screen right)

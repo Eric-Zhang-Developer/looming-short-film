@@ -330,11 +330,13 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       rig.face({ eyes: 'open', mouth: 'neutral' });
       rig.boil(t, 10);
 
-      // Exam: scoots on 2s while the door is shut, squash 0.2 for the drawing it lands on; eyes on him throughout.
+      // Exam: scoots on 2s while the door is shut, squash 0.2 for the drawing it lands on. v9: worried, growing; a side
+      // glance at him on each scoot and the second after it lands, and one blink (5.5, two drawings): fewer than s02's.
       const [bx, bz] = kf(T, BLOB);
       exam.mesh.position.set(bx, SEAT_Y, bz);
       const squash = LANDS.some((l) => F === fr(l)) ? 0.2 : 0;
-      exam.update(t, { squash, wobble: 1, eyes: 'side', look: 1, key: spot });
+      const glance = BLOB.some(([k], i) => i % 2 === 1 && F >= fr(k) && F < fr(k) + 14);
+      exam.update(t, { squash, wobble: 1, eyes: F === 66 || F === 67 ? 'closed' : glance ? 'side' : 'worried', look: 1, key: spot });
       exam.mesh.updateMatrixWorld();
 
       // Key aimed along L → blob centre to its wall hit (aim() at the blob first so its frustum holds it).

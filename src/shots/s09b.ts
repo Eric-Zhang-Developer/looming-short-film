@@ -209,7 +209,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     }
 
     // ---------- the Exam, on 2s
-    let p, y = 0, sx = 1, sq = 0, eyes = 'open', look = 1;
+    let p, y = 0, sx = 1, sq = 0;
     const HOP0 = 1.75, LAND = 2.0 + 1 / 6;
     if (T < HOP0) p = BLOB_ROOM;
     else if (T < LAND) {                                 // one hop after him, onto his threshold
@@ -217,15 +217,12 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       p = [BLOB_ROOM[0] + (BLOB_AT[0] - BLOB_ROOM[0]) * k, BLOB_ROOM[1] + (BLOB_AT[1] - BLOB_ROOM[1]) * k];
       y = 0.015 * Math.sin(Math.PI * k); sx = 0.9; sq = k < 0.2 ? 0.25 : -0.15;
     } else { p = BLOB_AT; sq = T < LAND + 1 / 12 ? 0.2 : 0; }
-    // eyes: on him; it lands and turns back to him (worried: frightened of where he's going), on his back as he goes
-    if (T >= 1.0 && T < HOP0) { eyes = 'side'; look = 1; }
-    // lands glancing at him; on shadowAhead it looks up, eyes open (the shadow's eye holes are round on the poster frame);
-    // worried as he walks away from it
-    if (T >= LAND) { eyes = T >= B.stepIntoShadow ? 'worried' : T >= B.shadowAhead ? 'open' : 'side'; look = 1; }
+    // v9 (v9-beats §2): `blank` throughout and no wobble (v8 glanced, looked up and went worried here). It still hops
+    // after him: it moves, it doesn't feel. Blank eyes are full discs, so the poster frame's eye holes stay round.
     exam.mesh.visible = !close;
     exam.mesh.position.set(p[0], y, p[1]);
     exam.mesh.scale.set(sx, 1, 1);
-    exam.update(t, { squash: sq, wobble: 1, eyes, look, key: lamp });
+    exam.update(t, { squash: sq, wobble: 0, eyes: 'blank', key: lamp });
 
     // ---------- light, on 1s
     BC.set(p[0], 0.03, p[1]);

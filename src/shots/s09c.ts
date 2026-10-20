@@ -316,7 +316,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
 
     // ---------- the Exam, on 2s: one hop per pulse at his heels; the block; the hop after him
     const ph = ((T + 1e-6) % HOP) / HOP, landing = ph < 1 / 6;
-    let bx, by = 0, bz, sq = landing ? 0.2 : 0, mirror = false, eyes = 'open', look = 1;
+    let bx, by = 0, bz, sq = landing ? 0.2 : 0, mirror = false;
     const heel = (tt: number) => [X(tt) + HEEL[0] - GAP, WALK_Z + HEEL[1]];
     if (T < 9.5) { [bx, bz] = heel(T); by = HOP_H * Math.sin(Math.PI * ph); }
     else if (T < B.blobBlocks) {                          // one big hop past him on the camera side: crouch, two drawings up
@@ -324,18 +324,15 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       if (T < 9.5 + 1 / 12) { [bx, bz] = [x0, z0]; sq = 0.25; }
       else if (T < 9.75) { bx = X(9.5) + HEEL[0] + 0.06; by = 0.022; bz = 0.125; sq = -0.2; }
       else { bx = BLOCK[0] - 0.02; by = 0.014; bz = 0.115; sq = -0.15; }
-      eyes = 'open';
     } else if (T < B.stepAround + 0.5) {                  // planted square in his path, turned to face him
       [bx, bz] = BLOCK; mirror = true; sq = T < B.stepAround + 0.5 ? 0.25 : 0;
-      eyes = T < DECIDE ? 'worried' : T < B.stepAround ? 'side' : 'gasp'; look = T < DECIDE ? 1 : -1;
     } else if (T < B.stepAround + 1) {                    // un-squashes, surprised, and hops after him
       const k = (T - B.stepAround - 0.5) / 0.5, [hx, hz] = heel(B.stepAround + 1);
       bx = BLOCK[0] + (hx - BLOCK[0]) * k; bz = BLOCK[1] + (hz - BLOCK[1]) * k; by = 0.010 * Math.sin(Math.PI * k);
-      sq = k < 1 / 6 ? -0.1 : 0; eyes = 'gasp';
+      sq = k < 1 / 6 ? -0.1 : 0;
     } else if (T < TURN) { [bx, bz] = heel(T); by = HOP_H * Math.sin(Math.PI * ph); }
     else { bx = root[0] - 0.045 - GAP; bz = root[2] + 0.02; by = HOP_H * Math.sin(Math.PI * ph); }   // beside and a step behind him
     if (LAMP_BEATS.some((b) => Math.abs(T - B[b]) < 1e-3)) sq = 0.3;   // the light presses it down on each puddle beat
-    if (T >= B.marstonSeen && T < TURN) { eyes = 'side'; look = 1; }
     exam.mesh.position.set(bx, by, bz);
     cuKey.intensity = close ? CU_I : 0;
     if (close) cuKey.position.set(root[0] + 0.03, 0.10, root[2] + 0.05);
@@ -356,7 +353,9 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     warm.intensity = WARM_I * clamp((t - 17) / 0.5);
     warm.target.position.set(root[0], 0.04, root[2]); warm.target.updateMatrixWorld();
     winMats.forEach((m) => { m.emissiveIntensity = 0.75; });
-    exam.update(t, { squash: sq, wobble: 1, eyes, look, key });
+    // v9 (v9-beats §2): `blank` and no wobble the whole walk (v8: worried at the block, side, a gasp as he stepped
+    // around, side at Marston). It still hops, blocks and follows: weather moves, it doesn't emote.
+    exam.update(t, { squash: sq, wobble: 0, eyes: 'blank', key });
     selfLit(side.group); selfLit(back.group);            // last: after every boil, face and mouth-bar swap this frame
 
     // ---------- camera, on 1s: lateral track at his x + 0.06, the block's push-in in z, locked from the turn

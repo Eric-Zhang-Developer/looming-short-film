@@ -68,7 +68,9 @@ const CUES: [number, string][] = [[-0.1, 'neutral'], [3, 'relief']];
 const heroEyes = (t: number) => (t < 3 ? null : t < 4 ? 'tired' : t < 6 ? 'side' : 'closed');
 const PEN_DOWN = 25 / 12;                               // 2.083
 // the blob: asleep; one slow blink drawing at 4.583, open 4.667, up at him 5.0, asleep again 5.667
-const blobEyes = (t: number) => (t < 55 / 12 ? 'closed' : t < 56 / 12 ? 'tired' : t < 5 ? 'open' : t < 68 / 12 ? 'side' : 'closed');
+// v9 (v9-beats §2): dozing and content. It wakes through `sleepy` (was tired) and drifts off through it again (5.67)
+// before closing: half-lids, not the worry of `tired`.
+const blobEyes = (t: number) => (t < 55 / 12 ? 'closed' : t < 56 / 12 ? 'sleepy' : t < 5 ? 'open' : t < 68 / 12 ? 'side' : t < 70 / 12 ? 'sleepy' : 'closed');
 
 export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   const C = (k: keyof ShotCtx['PALETTE']) => new THREE.Color(PALETTE[k]);

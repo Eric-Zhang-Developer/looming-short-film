@@ -274,10 +274,13 @@ export async function build(ctx: ShotCtx) {
       // The Exam: open on him; side toward the screen at 1.08; back on him for the flinch (5.0). Gulp 1 (5.5, v8; v7 4.5):
       // squash 0.3 eyes closed on 5.417, snap to 1.5× stretched on 5.5, settled by 5.75. Then v7's glance up-right at its
       // own shadow (7.0–8.5, after the gulp now: it leads the eye to the rule), back on him, one held blink at 9.25.
+      // v9 (v9-beats §2): `plead` up at him from 5.67 until the glance; the blink at 9.25 is two drawings (9.25–9.42).
       let eyesB = 'open', look = 1, squash = 0;
       if (f >= 13 && f < 60) { eyesB = 'side'; look = -1; }
+      // v9: after the gulp it pleads up at him while he alt-tabs (5.67–6.92): "please don't".
+      if (f >= GULP + 2 && f < 84) eyesB = 'plead';
       if (f >= 84 && f < 102) eyesB = 'side';
-      if (f === GULP - 1 || f === 111) { squash = f === GULP - 1 ? 0.3 : 0; eyesB = 'closed'; }
+      if (f === GULP - 1 || f === 111 || f === 112) { squash = f === GULP - 1 ? 0.3 : 0; eyesB = 'closed'; }   // v9: the blink is two drawings
       const grown = f >= GULP, tg = F(f) - F(GULP);
       if (grown && f < GULP + 3) squash = -0.2 * Math.exp(-6 * tg) * Math.cos(18 * tg);   // settles by 5.75
       const r = grown ? BLOB_R.gulp1 : BLOB_R.start;

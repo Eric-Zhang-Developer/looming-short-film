@@ -340,8 +340,10 @@ export async function build(ctx: ShotCtx) {
       page.setInk(fl);
 
       // The Exam: dozing, eyes open on him at 3.0, meets his look and stretches on the smile, calm, then the shrink.
+      // v9 (v9-beats §2): calm and `open` from the first frame (not dozing), with one two-drawing blink as the exam
+      // starts on his page (3.25, the first drawing after the cut to the page).
       const solved = tc >= B.testSolved - 1e-6, s = solved ? BLOB_R.testSolved / BLOB_R.start : 1;
-      let eyes = tc < B.testRecognise ? 'closed' : 'open', squash = 0, look1 = -1;
+      let eyes = tc >= 3.25 && tc < 3.25 + 1 / 6 ? 'closed' : 'open', squash = 0, look1 = -1;
       if (inT3 && tc >= 5.333) eyes = 'side';
       if (tc >= B.testSmile && tc < 6.0) squash = -0.1;
       if (solved) squash = 0.3 * Math.exp(-6 * (tc - B.testSolved)) * Math.cos(18 * (tc - B.testSolved));
