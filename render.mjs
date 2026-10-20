@@ -2,7 +2,7 @@
 // render.mjs: renders any Looming page (one that exposes window.renderFrame(t)) in headless Chrome.
 // Port of the KnightHacks render.mjs. Pages: --page=<repo-relative html> (default index.html).
 //
-//   node render.mjs --page=lab/paper.html --sheet=0,0.5,1 [--cols=4] [--w=480] --out=evidence/<id>/sheet.jpg
+//   node render.mjs --page=index.html --sheet=0,0.5,1 [--cols=4] [--w=480] --out=evidence/<id>/sheet.jpg
 //   node render.mjs --page=... --strip=0:0.5 [--cols=6] [--w=320] --out=...        every frame of a stretch
 //   node render.mjs --page=... --stills=0.5,4 --out=evidence/<id>/                 full-res PNG per time
 //   node render.mjs --page=... --crop=x,y,w,h --sheet=... --out=...                full-res crops (canvas px)
