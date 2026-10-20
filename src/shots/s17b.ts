@@ -1,4 +1,3 @@
-// @ts-check
 // s17b · Test day: he recognizes it (docs/shots/s17b.md, v4). 10 s: a 1 s insert on the exam room's wall clock first
 // (Camera K, 0–1, reading 9:00, the film's one clock with the exam face), then G4's shot 1 s later. Three setups after it
 // (README §8): T1 the exam room wide from the back (1–3), T2 his test page from above (3–5, 6.5–10), T3 his profile at
@@ -19,16 +18,22 @@ import { specPose } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { makeClock } from '../clock.ts';
 import { tools } from './s02.ts';
+import type { Tools, Cut } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
+import type { Kit } from '../assets.ts';
+import type { Gator } from '../characters/gator.ts';
+import type { SpecOpts } from '../characters/poses.ts';
+import type { Pose } from '../puppet.ts';
 
 const ID = 's17b', DEG = Math.PI / 180;
-const B = SHOTS.find((s) => s.id === ID).beats;          // examRoom 0, testRecognise 4, testSmile 5.5, testSolved 9.5
+const B = SHOTS.find((s) => s.id === ID)!.beats;          // examRoom 0, testRecognise 4, testSmile 5.5, testSolved 9.5
 const CUT_T1 = 1, CUT_T2 = 3, CUT_T3 = 5, CUT_BACK = 6.5, HOLD_HERO = 1.75;
-const CLOCK = { at: /** @type {Vec3} */ ([0.12, 0.10, 0.0008]), d: 0.014, reads: /** @type {[number, number]} */ ([9, 0]), s0: 12 };   // T1's far wall, upper right (README §13); s0: the second
+const CLOCK = { at: [0.12, 0.10, 0.0008] as Vec3, d: 0.014, reads: [9, 0] as [number, number], s0: 12 };   // T1's far wall, upper right (README §13); s0: the second
 // hand starts at :12, so it isn't hidden under the minute hand at 12 for the whole of K (9:00:12 still reads 9:00)
 // Camera K: face-on to the dial, close enough that it fills ~70% of the frame height (fov 20)
 // fix-payoff: the dial fills 84% of the frame height, easing in to 92% over the hold (it was a flat 70%: "I can't read the clock")
-const KFILL = [0.84, 0.92], kZ = (fill) => 0.0008 + 0.014 / fill / (2 * Math.tan(10 * Math.PI / 180));
-const CAM_K = /** @type {CamKey} */ ({ pos: [0.12, 0.10, kZ(KFILL[0])], look: [0.12, 0.10, 0.0008] });
+const KFILL = [0.84, 0.92], kZ = (fill: number) => 0.0008 + 0.014 / fill / (2 * Math.tan(10 * Math.PI / 180));
+const CAM_K: CamKey = { pos: [0.12, 0.10, kZ(KFILL[0])], look: [0.12, 0.10, 0.0008] };
 
 // ---------- tunables ----------
 const BLOB_R = { start: 0.005, testSolved: 0.004 };      // SHRINK[6] → SHRINK[7] (README §1; exam.js has no SHRINK ladder yet)
@@ -37,16 +42,17 @@ const ROOM = { table: 0.041, rows: [0.25, 0.19, 0.13, 0.07], x: [-0.32, 0.32], d
 const HIP_DROP = -0.0134, SEAT_BACK = 0.024;                                 // the seated figure's hip below the table top (T3's), and the seat backs' height
 const FLUOR_I = 0.8, WIN_I = 0.15, AMB_K = 0.6;          // T1 (window fill ≤ 30% of the fluorescent); v3: the room is dim, he is the lit one
 const CROWD_DIM = 0.45, HERO_I = 3.2;                    // the crowd is tinted toward navy; his spot (cold viewer v2: "a lecture hall of frogs")
-const CAM_HERO = /** @type {CamKey} */ ({ pos: [0.0, 0.115, 0.42], look: [0.004, 0.05, 0.093] });   // the establishing beat: on him, then the room
+const CAM_HERO: CamKey = { pos: [0.0, 0.115, 0.42], look: [0.004, 0.05, 0.093] };   // the establishing beat: on him, then the room
 const SPOT_I = 0.2, AMB_P = 0.45, FILL_T3 = 0.006;        // T2/T3: the overhead spot, ambient, T3 character fill
 const ARM_LEN = 0.020;                                    // the flat near arm in the insert (gator_sheet arm_r at insert scale)
 
 // ---------- the desk unit at the exam table (README §2 coordinates) ----------
 // The page: props_kit test_page, centred on the unit page; its art is 276 × 380 px with the paper at x 7…270, y 5…371.
-export const PAGE = { at: [-0.0205, 0.0003, 0.095], w: 0.0218, px: [276, 380], paper: [7, 5, 270, 371] };
+export const PAGE = { at: [-0.0205, 0.0003, 0.095] as Vec3, w: 0.0218, px: [276, 380], paper: [7, 5, 270, 371] };
 // His working on problem 3, in the page art's pixels: [x, baseline y, runs]; a run is [text, superscript?].
 // One pass, the same method and hand as s16's problem 1 (done/spec-g4.md has the working).
-export const LINES = [
+type Run = [text: string, sup?: number];
+export const LINES: { x: number, y: number, runs: Run[] }[] = [
   { x: 46, y: 321, runs: [['u = x    dv = e'], ['2x', 1], [' dx']] },
   { x: 46, y: 342, runs: [['= (x/2) e'], ['2x', 1], [' − ∫ ½ e'], ['2x', 1], [' dx']] },
   { x: 46, y: 363, runs: [['= (x/2) e'], ['2x', 1], [' − ¼ e'], ['2x', 1], [' + C']] },
@@ -55,18 +61,18 @@ export const WRITE = [[6.5, 7.5], [7.5, 8.5], [8.5, 9.4]];   // local times per 
 // The hand is Caveat (SIL OFL 1.1, assets/fonts/OFL-Caveat.txt), bundled so a render never depends on the machine's fonts.
 // It has no integral sign, so the ∫ is a stroked path (INT) rather than a system fallback glyph.
 const FONT = 22, FONT_FACE = 'LoomingHand', INK = 'rgb(30, 42, 63)';
-let handLoad = null;
+let handLoad: Promise<void> | null = null;
 export const loadHand = () => handLoad ??= new FontFace(FONT_FACE, `url(${new URL('assets/fonts/Caveat.ttf', document.baseURI)})`, { weight: '400 700' })
   .load().then((f) => { document.fonts.add(f); });
-export const handFont = (px) => `500 ${px}px ${FONT_FACE}`;
+export const handFont = (px: number) => `500 ${px}px ${FONT_FACE}`;
 // One text run as drawable parts: text pieces (measured in the hand) and integral signs.
-export function runParts(g, s, px, x0) {
-  const out = []; let x = x0;
+export function runParts(g: CanvasRenderingContext2D, s: string, px: number, x0: number) {
+  const out: { s: string, w: number, x: number }[] = []; let x = x0;
   s.split(/(∫)/).forEach((q) => { if (!q) return; g.font = handFont(px);
     const w = q === '∫' ? px * 0.42 : g.measureText(q).width; out.push({ s: q, w, x }); x += w; });
   return out;
 }
-export function drawInt(g, x, y, px) {   // baseline y; a slanted stem with a hook at each end
+export function drawInt(g: CanvasRenderingContext2D, x: number, y: number, px: number) {   // baseline y; a slanted stem with a hook at each end
   const h = px, w = px * 0.3;
   g.beginPath(); g.moveTo(x + 0.02 * w, y + 0.2 * h); g.quadraticCurveTo(x + 0.35 * w, y + 0.32 * h, x + 0.55 * w, y + 0.02 * h);
   g.lineTo(x + 0.95 * w, y - 0.72 * h); g.quadraticCurveTo(x + 1.2 * w, y - 1.0 * h, x + 1.55 * w, y - 0.8 * h);
@@ -75,24 +81,27 @@ export function drawInt(g, x, y, px) {   // baseline y; a slanted stem with a ho
 export const BLOB_AT = [-0.002, 0.098];                   // the page-corner mark (x, z): 2 mm in from 0.000 so it sits on the exam desk's top
 // Camera P: high over the lower page (problem 3 and the working), tilted 18° off vertical toward camera so the blob,
 // which stands on the page, still shows its face. Cap height 11 px of art ≈ 0.0009 m → ≈ 45 px at 1080p.
-export const CAM_P = /** @type {CamKey} */ ({ pos: [-0.012, 0.0814, 0.1221], look: [-0.012, 0.0003, 0.0965] });
-const CAM_T1 = /** @type {CamKey} */ ({ pos: [0.0, 0.29, 0.70], look: [0.0, 0.045, 0.125] });
-const CAM_T3 = /** @type {CamKey} */ ({ pos: [-0.015, 0.055, 0.400], look: [-0.015, 0.018, 0.086] });
+export const CAM_P: CamKey = { pos: [-0.012, 0.0814, 0.1221], look: [-0.012, 0.0003, 0.0965] };
+const CAM_T1: CamKey = { pos: [0.0, 0.29, 0.70], look: [0.0, 0.045, 0.125] };
+const CAM_T3: CamKey = { pos: [-0.015, 0.055, 0.400], look: [-0.015, 0.018, 0.086] };
 const DESK_K = 1.2;                                       // the exam desk art at 1.2× its scale-table size, so its top holds the page and the blob
-const HIP = /** @type {Vec3} */ ([-0.054, -0.0134, 0.074]);                     // on the chair's seat at DESK_K (seat top −0.0144)
+const HIP: Vec3 = [-0.054, -0.0134, 0.074];                     // on the chair's seat at DESK_K (seat top −0.0144)
 
-const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
+// A crowd figure in T1: its pose angles and eye take are stored on the rig, the angles over the rig's pose() method.
+type CrowdFig = Omit<Gator, 'pose'> & { pose: Pose, eyes: string };
+
+const F = (n: number) => n / 12, fr = (t: number) => Math.floor(t * 12 + 1e-6);
 
 // Draws LINES[0..] onto a canvas in page-art pixels × K, line i revealed left to right to fraction f[i]. Returns the
 // pen tip's art-pixel position for the line being written.
-export function drawLines(g, K, f) {
+export function drawLines(g: CanvasRenderingContext2D, K: number, f: number[]) {
   g.save(); g.scale(K, K); g.fillStyle = INK; g.textBaseline = 'alphabetic';
-  let tip = null;
+  let tip: number[] | null = null;
   LINES.forEach((L, i) => {
     const k = clamp(f[i] ?? 0);
     if (k <= 0) return;
     let x = L.x;
-    const parts = L.runs.flatMap(([s, sup]) => { const px = sup ? FONT * 0.62 : FONT, r = runParts(g, s, px, x).map((p) => ({ ...p, px, sup })); x = r.length ? r.at(-1).x + r.at(-1).w : x; return r; });
+    const parts = L.runs.flatMap(([s, sup]) => { const px = sup ? FONT * 0.62 : FONT, r = runParts(g, s, px, x).map((p) => ({ ...p, px, sup })); x = r.length ? r.at(-1)!.x + r.at(-1)!.w : x; return r; });
     const end = L.x + (x - L.x) * k;
     g.save(); g.beginPath(); g.rect(L.x - 2, L.y - FONT * 1.4, end - L.x + 2, FONT * 2); g.clip();
     g.strokeStyle = INK; g.lineWidth = 0.35; g.lineJoin = 'round';
@@ -108,7 +117,7 @@ export function drawLines(g, K, f) {
 
 // A page lying flat at PAGE.at (top edge toward the wall) with an ink plane over it. setInk(f) redraws the lines when
 // their reveal changes; toWorld(px, py) maps a page-art pixel to the world.
-export function pageWithInk(T, art, piece, key, { parent }) {
+export function pageWithInk(T: Tools, art: Kit, piece: string, key: string, { parent }: { parent: THREE.Object3D }) {
   const page = T.cut(art, piece, [PAGE.w, null], key, { parent });
   page.g.position.set(...PAGE.at); page.g.rotation.set(-Math.PI / 2, 0, 0);
   const [sw, sh] = art.sizes[piece], K = 4, [W, H] = PAGE.px;
@@ -117,30 +126,30 @@ export function pageWithInk(T, art, piece, key, { parent }) {
   const ink = new THREE.Mesh(new THREE.PlaneGeometry(sw, sh), new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false,
     polygonOffset: true, polygonOffsetFactor: -2 }));
   ink.position.z = 0.00003; ink.receiveShadow = true; page.mesh.add(ink);
-  let drawn = null;
-  const setInk = (f, extra) => {
+  let drawn: string | null = null;
+  const setInk = (f: number[], extra?: (g: CanvasRenderingContext2D, K: number) => void) => {
     const id = f.map((x) => clamp(x).toFixed(3)).join() + (extra ? 'x' : '');
     if (id === drawn) return; drawn = id;
-    const g = cv.getContext('2d'); g.clearRect(0, 0, cv.width, cv.height);
+    const g = cv.getContext('2d')!; g.clearRect(0, 0, cv.width, cv.height);
     drawLines(g, K, f); extra?.(g, K); tex.needsUpdate = true;
   };
   const v = new THREE.Vector3();
-  const toWorld = (px, py, out = new THREE.Vector3()) => { page.g.updateMatrixWorld(true);
+  const toWorld = (px: number, py: number, out = new THREE.Vector3()) => { page.g.updateMatrixWorld(true);
     return page.mesh.localToWorld(out.copy(v.set((px / W - 0.5) * sw, (0.5 - py / H) * sh, 0))); };
   // the line's full width in art px (for the pen's travel)
-  const meas = cv.getContext('2d');
+  const meas = cv.getContext('2d')!;
   const widths = LINES.map((L) => L.runs.reduce((a, [s, sup]) => a + runParts(meas, s, sup ? FONT * 0.62 : FONT, 0).reduce((b, p) => b + p.w, 0), 0));
   return { ...page, setInk, toWorld, widths };
 }
 
 // The flat near hand for the page inserts (s17b T2, s17c): gator_sheet's arm_r lying on its side over the page, the
 // sleeve off toward the lower left, and (pen: true) props_kit's pen in the mitt, nib at the group's origin.
-export function flatHand(T, ctx, { gator, props }, key, { parent, pen = true }) {
+export function flatHand(T: Tools, ctx: ShotCtx, { gator, props }: { gator: Kit, props: Kit }, key: string, { parent, pen = true }: { parent: THREE.Object3D, pen?: boolean }) {
   const hand = new THREE.Group(); hand.rotation.x = -Math.PI / 2; parent.add(hand);
   const arm = T.cut(gator, 'arm_r', [ARM_LEN, null], `${key}-arm`, { anchor: [0.88, 0.5], parent: hand });
   arm.g.rotation.z = 40 * DEG; arm.g.position.set(-0.0035, -0.003, 0.0012);
   arm.mesh.castShadow = true;
-  let penO = null;
+  let penO: Cut | null = null;
   if (pen) {
     penO = T.cut(props, 'pen', [0.012, null], `${key}-pen`, { anchor: [0, 0.5], parent: hand });
     penO.g.rotation.z = -128 * DEG; penO.g.position.z = 0.0018; penO.mesh.castShadow = true;
@@ -149,20 +158,20 @@ export function flatHand(T, ctx, { gator, props }, key, { parent, pen = true }) 
 }
 
 // The overhead fixture over his seat (README §2/§3 numbers, no sensor story): sensorLight's spot only.
-export function overheadSpot(intensity) {
+export function overheadSpot(intensity: number) {
   const z = sensorLight({ at: [0, 0.127, 0.040], aimAt: [0, 0, BLOB_AT[1]], intensity });
   z.light.shadow.mapSize.set(2048, 2048);
   return z.light;
 }
 
-export async function build(ctx) {
+export async function build(ctx: ShotCtx) {
   await loadHand();
   const { scene, camera, assets, PALETTE, post } = ctx;
-  const C = (k) => new THREE.Color(PALETTE[k]);
+  const C = (k: keyof ShotCtx['PALETTE']) => new THREE.Color(PALETTE[k]);
   camera.near = 0.002; camera.updateProjectionMatrix();   // the stage's 5 cm near plane clips Camera K, which sits 5 cm from the clock (s00 does the same)
   scene.background = C('navy').lerp(C('cream'), 0.15);
   const T = tools(ctx, ID);
-  const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });
+  const seat = (o: SpecOpts) => specPose({ leg: 60, farLeg: 54, ...o });
   const [room, props, gsheet] = await Promise.all([assets.load('exam_room_kit'), assets.load('props_kit'), assets.load('gator_sheet')]);
   const t1 = new THREE.Group(), unit = new THREE.Group(), t2 = new THREE.Group(), t3 = new THREE.Group();
   scene.add(t1, unit); unit.add(t2, t3);
@@ -175,7 +184,7 @@ export async function build(ctx) {
     const s = room.pieces.wall_strip, [u0, v0, u1, v1] = room.visible.wall_strip;
     const sx0 = u0 * s.width + 6, sx1 = u1 * s.width - 6, sy0 = v0 * s.height + 6, sy1 = v1 * s.height - 4;
     const tw = 0.24 * pxm, th = 0.055 * pxm;
-    const cv = Object.assign(document.createElement('canvas'), { width: W * pxm, height: Hh * pxm }), g = cv.getContext('2d');
+    const cv = Object.assign(document.createElement('canvas'), { width: W * pxm, height: Hh * pxm }), g = cv.getContext('2d')!;
     g.drawImage(s, sx0, sy0, sx1 - sx0, (sy1 - sy0) * 0.25, 0, 0, cv.width, cv.height - th + 2);   // the cream run, stretched
     for (let x = 0; x < cv.width; x += tw) g.drawImage(s, sx0, sy0, sx1 - sx0, sy1 - sy0, x, cv.height - th, tw, th);
     T.group(T.paper('exam_wall', { art: cv, size: [W, Hh], res: 2048 }), [0, Hh / 2, 0], { parent: t1 });
@@ -189,7 +198,7 @@ export async function build(ctx) {
     for (const x of [-0.20, 0.23]) {
       const frame = T.rect(`win${x}`, PALETTE.kraft, [0.062, 0.122], [x, 0.105, 0.0005], { parent: t1 });
       const pane = T.rect(`pane${x}`, '#' + WIN.getHexString(), [0.054, 0.114], [x, 0.105, 0.0009], { parent: t1, weight: 'tissue' });
-      const m = /** @type {THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>} */ (pane.children[0]).material; m.emissive.copy(WIN); m.emissiveIntensity = 0.8;
+      const m = (pane.children[0] as THREE.Mesh<THREE.PlaneGeometry, THREE.MeshLambertMaterial>).material; m.emissive.copy(WIN); m.emissiveIntensity = 0.8;
       T.rect(`mull${x}`, PALETTE.kraft, [0.003, 0.114], [x, 0.105, 0.0012], { parent: t1 });
       T.rect(`mullh${x}`, PALETTE.kraft, [0.054, 0.003], [x, 0.12, 0.0012], { parent: t1 });
       frame.children[0].receiveShadow = false;
@@ -209,12 +218,11 @@ export async function build(ctx) {
   }
   // Rows of long tables, three or four gators a row from behind, each with a test page and their own small blob.
   const rng = mulberry32(seedOf(ID, 'room'));
-  const figures = /** @type {any[] & { hero?: any }} */ ([]), bobbers = [], blobs1 = [];
+  const figures = [] as CrowdFig[] & { hero?: CrowdFig }, bobbers: CrowdFig[] = [], blobs1: { b: ReturnType<typeof createBlob>, eyes: string, look: number }[] = [];
   const tableCol = '#' + C('kraft').lerp(C('cream'), 0.25).getHexString();
   const seatCol = '#' + C('navy').lerp(C('kraft'), 0.15).getHexString();
   // long thin strips: T.rect's tear margin scales with the long side, which ate a 2 cm deep table; this one is fixed
-  /** @param {string} key @param {string} color @param {number[]} wh @param {Vec3} at @param {{ rot?: Vec3, weight?: string }} o */
-  const strip = (key, color, [w, h], at, { rot, weight = 'cardstock' }) => {
+  const strip = (key: string, color: string, [w, h]: number[], at: Vec3, { rot, weight = 'cardstock' }: { rot?: Vec3, weight?: string }) => {
     const m = 0.0015, W = w + 2 * m, H = h + 2 * m;
     return T.group(T.paper(key, { path: [[m / W, m / H], [1 - m / W, m / H], [1 - m / W, 1 - m / H], [m / W, 1 - m / H]], size: [W, H], color, weight, res: 2048 }),
       at, { rot, parent: t1 });
@@ -232,16 +240,16 @@ export async function build(ctx) {
       const x = hero ? 0 : x0 + (rng() - 0.5) * 0.03;
       // fix-payoff: from behind every gator read as a frog (two eye bumps, no snout). They sit in profile now, heads down
       // toward their pages, turned 12–32° so the snout is foreshortened but there; he is the one in the cream hoodie.
-      const hoodie = hero ? undefined : '#' + C('cream').lerp(C(['navy', 'kraft', 'phone', 'ink'][gi % 4]), 0.45 + 0.2 * rng()).lerp(C('navy'), CROWD_DIM * 0.5).getHexString();
+      const hoodie = hero ? undefined : '#' + C('cream').lerp(C((['navy', 'kraft', 'phone', 'ink'] as const)[gi % 4]), 0.45 + 0.2 * rng()).lerp(C('navy'), CROWD_DIM * 0.5).getHexString();
       const fig = await makeGator(ctx, { seed: 30 + gi, res: hero ? 512 : 256, hoodie,
-        green: hero ? undefined : '#' + new THREE.Color(greenVariant(gi)).lerp(C('navy'), CROWD_DIM).getHexString() });
+        green: hero ? undefined : '#' + new THREE.Color(greenVariant(gi)).lerp(C('navy'), CROWD_DIM).getHexString() }) as Omit<Gator, 'pose'> as CrowdFig;
       const sc = hero ? 1.1 : 0.94 + 0.1 * rng();
       fig.group.position.set(x - 0.03 * sc, ROOM.table + HIP_DROP * sc, z + ROOM.depth / 2 + 0.012);
       fig.group.rotation.y = hero ? -10 * DEG : (rng() < 0.5 ? -1 : 1) * (12 + 20 * rng()) * DEG;
       fig.group.scale.setScalar(sc);
       // pose angles, stored over the rig's pose() method (blend() uses its own closure, so the method isn't needed here)
-      /** @type {any} */ (fig).pose = seat({ lean: hero ? 12 : 8 + 8 * rng(), arm: -26, head: hero ? -8 : -4 - 8 * rng() });
-      /** @type {any} */ (fig).eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';   // down at the page
+      fig.pose = seat({ lean: hero ? 12 : 8 + 8 * rng(), arm: -26, head: hero ? -8 : -4 - 8 * rng() });
+      fig.eyes = hero ? 'open' : rng() < 0.3 ? 'side' : 'tired';   // down at the page
       t1.add(fig.group); figures.push(fig);
       if (hero) figures.hero = fig; else if (bobbers.length < 2 && rng() < 0.5) bobbers.push(fig);
       // their page and their blob on the table, to the figure's right
@@ -301,14 +309,13 @@ export async function build(ctx) {
   const fill3 = new THREE.PointLight(C('cream').lerp(C('gator'), 0.15), FILL_T3, 0.08, 2); fill3.position.set(-0.03, 0.045, 0.13);
   t3.add(fill3);
   const P3 = { write: seat({ lean: 12, arm: -26, head: -8 }), breath: seat({ lean: 11, arm: -27, head: -8 }), lean: seat({ lean: 16, arm: -22, head: -10 }) };
-  /** @type {[number, string][]} */ const BODY3 = [[0, 'write'], [5.333, 'write'], [5.334, 'breath'], [5.999, 'breath'], [6.0, 'lean'], [7, 'lean']];
+  const BODY3: [number, string][] = [[0, 'write'], [5.333, 'write'], [5.334, 'breath'], [5.999, 'breath'], [6.0, 'lean'], [7, 'lean']];
   // The acting kit on T3: calm resolve, then pride's wide → smile on testSmile (held small: the preset's own mouth).
-  /** @type {[number, string][]} */
-  const CUES3 = [[-0.1, 'resolve'], [B.testSmile, 'pride']];
+  const CUES3: [number, string][] = [[-0.1, 'resolve'], [B.testSmile, 'pride']];
 
   // ---- the pen's path over the page (T2), in page-art px ----
   const L0 = LINES[0], startPx = [L0.x - 2, L0.y - 3];
-  const tipAt = (t, f) => {   // [px, py, lift (m)]
+  const tipAt = (t: number, f: number[]) => {   // [px, py, lift (m)]
     if (t < 4) { const k = easeOut((t - 3) / 1); return [lerp(startPx[0] - 70, startPx[0] + 4, k), lerp(startPx[1] + 55, startPx[1], k), 0.003]; }
     if (t < WRITE[0][0]) return [startPx[0] + 4, startPx[1], 0.003];
     for (let i = 0; i < 3; i++) if (t < WRITE[i][1] || (i === 2 && t < B.testSolved)) {
@@ -321,7 +328,7 @@ export async function build(ctx) {
   const tip = new THREE.Vector3(), hp = new THREE.Vector3(), look = new THREE.Vector3(), dir = new THREE.Vector3();
 
   return {
-    update(t) {
+    update(t: number) {
       T.boil(t);
       const f = fr(t), tc = F(f);
       const inK = t < CUT_T1, inT1 = t < CUT_T2, inT3 = t >= CUT_T3 && t < CUT_BACK, inT2 = !inT1 && !inT3;
@@ -350,8 +357,8 @@ export async function build(ctx) {
       if (inT1) {
         // 1.0–1.75 held on him; then it eases out to the wide (the room, with him still front and centre). On 1s.
         const k = ease(clamp((t - HOLD_HERO) / (CUT_T2 - HOLD_HERO)));
-        camera.position.set(.../** @type {Vec3} */ (CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k))));
-        camera.lookAt(look.set(.../** @type {Vec3} */ (CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k)))));
+        camera.position.set(...(CAM_HERO.pos.map((v, i) => lerp(v, CAM_T1.pos[i], k)) as Vec3));
+        camera.lookAt(look.set(...(CAM_HERO.look.map((v, i) => lerp(v, CAM_T1.look[i], k)) as Vec3)));
         fx.set({ focus: camera.position.distanceTo(hp.set(0, 0.05, 0.093)), aperture: lerp(0.004, 0.009, k) });
         // he reads: 3 more degrees of head-down at 2.5; two pens bob on 2s
         for (const fig of figures) { fig.boil(t, 10); fig.blend({ s: fig === figures.hero && tc >= 2.5 ? { ...fig.pose, head: fig.pose.head - 3 * DEG } : fig.pose }, [[0, 's']], 0);
@@ -379,7 +386,7 @@ export async function build(ctx) {
       const f3 = act(hero, t, CUES3, { slump: 0, tilt: 0, breath: 6, seed: 172 });
       if (tc >= 5.333 && tc < B.testSmile - 1 / 12 - 1e-6 && f3.eyes !== 'closed') hero.face({ eyes: 'side', mouth: f3.mouth });   // to the blob
       hero.group.updateMatrixWorld(true);
-      hero.hand.getWorldPosition(hp);
+      hero.hand!.getWorldPosition(hp);
       pen3.g.rotation.set(0, 0, 125 * DEG); pen3.g.position.set(hp.x + 0.003, hp.y - 0.003, 0.0868);
     },
   };

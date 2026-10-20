@@ -1,4 +1,3 @@
-// @ts-check
 // s15 · The name (docs/shots/s15.md, v4). 8 s, Camera B′ locked, with one close-up. No sensor (the light has been on
 // since s10), no phone light (it's face-down since s11), no laptop. He picks up the pen, uncaps it (penUncap 1.5),
 // hesitates, writes his name at the top of the practice sheet (nameWritten 4.5), and the blob flinches. He looks at it;
@@ -18,22 +17,25 @@ import { act } from '../characters/acting.ts';
 import { SHOTS } from '../timeline.ts';
 import { kitTools, marstonDesk, MARK, castOnly } from './s11.ts';
 import { closeupRig, HEAD_AT } from './s09b.ts';
-import { loadHand, handFont, runParts, drawInt } from './s17b.js';
+import { loadHand, handFont, runParts, drawInt } from './s17b.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
+import type { ShotCtx } from '../film.ts';
+import type { Kit } from '../assets.ts';
+import type { SpecOpts } from '../characters/poses.ts';
 
 const ID = 's15', D = Math.PI / 180;
-const B = SHOTS.find((s) => s.id === ID).beats;            // penUncap 1.5, nameWritten 4.5, nameSmile 5.5
-const dr = (n) => n / 12;                                    // drawing n (12 fps) → local seconds
-const on2s = (t) => Math.floor(t * 12 + 1e-4) / 12;          // onTwos, but 100.0833 − 100 = 0.08333333333332860 floors to drawing 0 there (evidence/anim-s15/ontwos.txt)
+const B = SHOTS.find((s) => s.id === ID)!.beats;            // penUncap 1.5, nameWritten 4.5, nameSmile 5.5
+const dr = (n: number) => n / 12;                                    // drawing n (12 fps) → local seconds
+const on2s = (t: number) => Math.floor(t * 12 + 1e-4) / 12;          // onTwos, but 100.0833 − 100 = 0.08333333333332860 floors to drawing 0 there (evidence/anim-s15/ontwos.txt)
 
 // ---------- the pre-G4 master numbers (imported by s16; not this shot's staging) ----------
 export const UNIT = {
   hip: [-0.075, -0.012], bodyZ: 0.074,                       // gator root (makeGator puts the near arm at +0.012 → z 0.086)
-  camA: /** @type {CamKey} */ ({ pos: [-0.010, 0.118, 0.392], look: [-0.010, 0.0385, 0.080] }),   // spec look y 0.030, tilted up 1.45° (loom fix)
-  camB: /** @type {CamKey} */ ({ pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] }),
-  focus: /** @type {Vec3} */ ([-0.024, 0.020, 0.086]), aperture: 0.02, maxblur: 0.01,
-  fill: /** @type {Vec3} */ ([-0.046, 0.040, 0.114]),                             // character fill (README §10): before him, just above eye line
-  tube: /** @type {Vec3} */ ([0, 0.127, 0.040]),                                   // the pendant's light (README §3's trough position)
+  camA: { pos: [-0.010, 0.118, 0.392], look: [-0.010, 0.0385, 0.080] } as CamKey,   // spec look y 0.030, tilted up 1.45° (loom fix)
+  camB: { pos: [-0.022, 0.090, 0.292], look: [-0.022, 0.020, 0.084] } as CamKey,
+  focus: [-0.024, 0.020, 0.086] as Vec3, aperture: 0.02, maxblur: 0.01,
+  fill: [-0.046, 0.040, 0.114] as Vec3,                             // character fill (README §10): before him, just above eye line
+  tube: [0, 0.127, 0.040] as Vec3,                                   // the pendant's light (README §3's trough position)
   blob: [0, 0.012, 0.0884], phone: [-0.010, 0.0015, 0.116], phoneLight: [-0.014, 0.006, 0.116],
   press: 0.5,                                                // G4's press drawing (kept for the importers' numbers)
 };
@@ -43,21 +45,21 @@ const BLOB_R = { start: 0.030 };                             // 2.5×, the v4 pe
 // The Marston mark (README §1), moved BLOB_DX along +x: at B′ the 9.3 cm cut gator's snout (cut-gator) reached the
 // 2.5× blob. 0 puts it back on the spec's mark. s11 and s13 use the same spot.
 export const BLOB_DX = 0.016;
-export const BLOB_AT = (r) => { const m = MARK(r); return [m[0] + BLOB_DX, 0, m[2]]; };
-export const PHONE = /** @type {Vec3} */ ([-0.010, 0.0015, 0.114]), PHONE_L = [-0.010, 0.004, 0.114];   // rest spot (and G4's light above it)
-export const CAM_A2 = /** @type {CamKey} */ ({ pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] });    // Camera A′ (README §8; G4's opening)
-export const CAM_B2 = /** @type {CamKey} */ ({ pos: [-0.010, 0.112, 0.358], look: [-0.010, 0.020, 0.084] });  // Camera B′
-export const PAGE = /** @type {Vec3} */ ([-0.0205, 0.0003, 0.095]);                // page centre (x −0.033…−0.008, z 0.080…0.110)
+export const BLOB_AT = (r: number) => { const m = MARK(r); return [m[0] + BLOB_DX, 0, m[2]]; };
+export const PHONE: Vec3 = [-0.010, 0.0015, 0.114], PHONE_L = [-0.010, 0.004, 0.114];   // rest spot (and G4's light above it)
+export const CAM_A2: CamKey = { pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] };    // Camera A′ (README §8; G4's opening)
+export const CAM_B2: CamKey = { pos: [-0.010, 0.112, 0.358], look: [-0.010, 0.020, 0.084] };  // Camera B′
+export const PAGE: Vec3 = [-0.0205, 0.0003, 0.095];                // page centre (x −0.033…−0.008, z 0.080…0.110)
 const CU = [B.nameSmile, 7.5];                               // the close-up's cut in and out
 // CU: level with his head from in front, close enough that the painted head fills the frame's left half and the blob's
 // eyes are in at the right, so "he and the blob look at each other" holds in one frame.
-const CAM_CU = /** @type {CamKey} */ ({ pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] });
+const CAM_CU: CamKey = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };
 const WARM = 0.3;                                            // v4 Marston warm: lerp(lamp, cream, 0.3) (README v4)
 // Intensities, by eye on the sheet: G4's lit zone (the old lamp pool at the blob), its fill and ambient.
 const ZONE_I = 0.25, FLUOR_I = 0.25, AMB_K = 0.6, FILL_I = 0.02, CU_KEY = 0.010;   // ZONE_I: s11's 0.8 blew the desk out from B′'s height
 
 // ---------- the hand: s15's table, to the pen and the name ----------
-const seat = (o) => specPose({ leg: 60, farLeg: 54, ...o });   // poses.js's seated legs
+const seat = (o: SpecOpts) => specPose({ leg: 60, farLeg: 54, ...o });   // poses.js's seated legs
 const P = {
   ...POSES,
   settle: seat({ lean: 6, arm: -30 }),        // 0.0: hands flat on the desk either side of the page (s11's end)
@@ -68,26 +70,24 @@ const P = {
 };
 const WRITE = ['write_a', 'write_b', 'write_c'];
 const NAME = [dr(28), dr(54)];                               // 2.333–4.5: the name, 26 drawings
-const BODY = [
+const BODY: [number, string][] = [
   [0, 'settle'], [dr(5), 'settle'], [dr(6), 'pen_reach'], [dr(8), 'pen_reach'], [dr(9), 'pen_touch'], [dr(11), 'pen_touch'],
   [dr(12), 'uncap'], [dr(13), 'uncap'], [dr(14), 'squeeze'], [dr(17), 'squeeze'], [dr(18), 'uncap_pull'], [dr(19), 'uncap_pull'],
   [dr(22), 'poise'], [dr(27), 'poise'],
-  ...Array.from({ length: 26 }, (_, i) => [dr(28 + i), WRITE[i % 3]]),
+  ...Array.from({ length: 26 }, (_, i): [number, string] => [dr(28 + i), WRITE[i % 3]]),
   [dr(54), 'poise'], [7.5 - dr(1), 'poise'], [7.5, 'line1'],
 ];
 // Head on body (deg, + snout up), added after act(): 4.5–5.0 down 4° at the name; up 3° on the smile (in the CU).
-const HEAD = [[dr(54), 0], [dr(56), -4], [B.nameSmile - dr(1), -4], [B.nameSmile, 3], [7.5 - dr(1), 3], [7.5, -4]];
+const HEAD: [number, number][] = [[dr(54), 0], [dr(56), -4], [B.nameSmile - dr(1), -4], [B.nameSmile, 3], [7.5 - dr(1), 3], [7.5, -4]];
 // The acting kit: quiet resolve; the smile is pride's wide → smile (README §12), played on the painted head in the CU;
 // resolve again for the brace. The 4-drawing flicker of dread (2.00–2.33) is too short for a preset (12-frame hold), so
 // it's the brow alone, set after act(): brows up.
-/** @type {[number, string][]} */
-const CUES = [[-0.1, 'resolve'], [B.nameSmile, 'pride'], [7.5, 'resolve']];
+const CUES: [number, string][] = [[-0.1, 'resolve'], [B.nameSmile, 'pride'], [7.5, 'resolve']];
 const FLICKER = [2.0, NAME[0]], DREAD_BROW = [32, -4];
-/** @type {[number, number, string][]} */
-const EYES = [[5.0, B.nameSmile, 'side']];                  // 5.0: eyes to the blob (it just flinched)
+const EYES: [number, number, string][] = [[5.0, B.nameSmile, 'side']];                  // 5.0: eyes to the blob (it just flinched)
 
 // The blob's startle and flinch: spring()'s own damping (k 6, w 18) in cosine phase, so the kick peaks on the beat frame.
-const kick = (t, t0, a) => (t < t0 ? 0 : a * Math.exp(-6 * (t - t0)) * Math.cos(18 * (t - t0)));
+const kick = (t: number, t0: number, a: number) => (t < t0 ? 0 : a * Math.exp(-6 * (t - t0)) * Math.cos(18 * (t - t0)));
 
 // ---------- the practice sheet (props_kit practice_1 / practice_2), shared with s16 ----------
 // The frozen sheets come with the writing already painted, but at ~300 px a sheet its pen lines blur in the inserts.
@@ -109,8 +109,9 @@ const K = 4, PX = 30 * K, BOLD = 0.035;   // canvas px per sheet px; the hand on
 // What's written, copied from the paintings (done/spec-g4.md has the math; line b is wrong on purpose, a sign error).
 // A token is text (∫ inside is a stroke), [text, 1] a superscript, { sum }, { arrow }, { frac: [num, den] } or
 // { scribble } (the name: the painting's pencil squiggle, not letters).
-const X = /** @type {[string, number]} */ (['x', 1]);
-const WRITING = {
+const X = ['x', 1] as [string, number];
+type Tok = string | [string, number] | { sum?: number, arrow?: number, frac?: Tok[][], scribble?: number };
+const WRITING: Record<string, [box: string, layer: number, toks: Tok[]][]> = {
   practice_1: [
     ['name', 1, [{ scribble: 1 }]],
     ['problem', 0, ['1.  ∫ x e', X, ' dx']],
@@ -127,7 +128,7 @@ const WRITING = {
   ],
 };
 // Draws tokens at baseline y from x on g (work-canvas px, hand size px); returns the advance.
-function typeset(g, toks, px, x, y, col) {
+function typeset(g: CanvasRenderingContext2D, toks: Tok[], px: number, x: number, y: number, col: string): number {
   const x0 = x, lw = px * 0.075;
   g.fillStyle = g.strokeStyle = col; g.lineWidth = BOLD * px; g.lineCap = g.lineJoin = 'round';
   for (const t of toks) {
@@ -151,7 +152,7 @@ function typeset(g, toks, px, x, y, col) {
       g.moveTo(x + w - hd, ay - hd * 0.85); g.lineTo(x + w, ay); g.lineTo(x + w - hd, ay + hd * 0.85); g.stroke();
       x += w + px * 0.1;
     } else if (t.frac) {   // numerator over a bar over the denominator, both centred, at 0.85 size
-      const q = px * 0.85, meas = (tk) => { const c = document.createElement('canvas').getContext('2d'); return typeset(c, tk, q, 0, 0, col); };
+      const q = px * 0.85, meas = (tk: Tok[]) => { const c = document.createElement('canvas').getContext('2d')!; return typeset(c, tk, q, 0, 0, col); };
       const [wn, wd] = t.frac.map(meas), bw = Math.max(wn, wd) + px * 0.25, bar = y - px * 0.3;
       typeset(g, t.frac[0], q, x + (bw - wn) / 2, bar - px * 0.16, col);
       typeset(g, t.frac[1], q, x + (bw - wd) / 2, bar + px * 0.72, col);
@@ -174,8 +175,8 @@ function typeset(g, toks, px, x, y, col) {
   return x - x0;
 }
 // Ink bounds of a canvas (alpha > 8) as [x0, y0, x1, y1].
-function bounds(c) {
-  const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+function bounds(c: HTMLCanvasElement) {
+  const d = c.getContext('2d')!.getImageData(0, 0, c.width, c.height).data;
   let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
   for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 8) {
     if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
@@ -183,21 +184,23 @@ function bounds(c) {
 }
 // The sheet's writing as [navy, grey, navy] canvases at W·K × H·K. Each line at the largest size that fits its painted
 // box (so the sizes are the painting's), left-aligned in it and centred on it vertically.
-function inkLayers(which, W, H) {
+function inkLayers(which: string, W: number, H: number) {
   const out = [0, 1].map(() => Object.assign(document.createElement('canvas'), { width: W * K, height: H * K }));
-  const lines = WRITING[which] ?? [], box = SHEET_INK[which];
+  // which is any props_kit sheet (s16 passes blank_page, which has no writing); the line boxes and the strike are all
+  // [x0, y0, x1, y1] (practice_1's plus/plusY, kept for importers, aren't read here)
+  const lines = WRITING[which] ?? [], box = (SHEET_INK as Record<string, unknown>)[which] as Record<string, number[]>;
   const cut = lines.map(([k, l, toks]) => {
-    const c = Object.assign(document.createElement('canvas'), { width: PX * 14, height: PX * 3 }), g = c.getContext('2d');
+    const c = Object.assign(document.createElement('canvas'), { width: PX * 14, height: PX * 3 }), g = c.getContext('2d')!;
     typeset(g, toks, PX, PX * 0.5, PX * 2, `rgb(${l ? GREY : NAVY})`);
     return { b: box[k], l, c, r: bounds(c) };
   });
-  const fit = ({ b, r }) => Math.min((b[2] - b[0]) * K / (r[2] - r[0]), (b[3] - b[1]) * K / (r[3] - r[1]));
+  const fit = ({ b, r }: { b: number[], r: number[] }) => Math.min((b[2] - b[0]) * K / (r[2] - r[0]), (b[3] - b[1]) * K / (r[3] - r[1]));
   for (const q of cut) {
     const k = fit(q), [x0, y0, x1, y1] = q.r, w = (x1 - x0) * k, h = (y1 - y0) * k;
-    out[q.l].getContext('2d').drawImage(q.c, x0, y0, x1 - x0, y1 - y0, q.b[0] * K, ((q.b[1] + q.b[3]) / 2) * K - h / 2, w, h);
+    out[q.l].getContext('2d')!.drawImage(q.c, x0, y0, x1 - x0, y1 - y0, q.b[0] * K, ((q.b[1] + q.b[3]) / 2) * K - h / 2, w, h);
   }
   if (which === 'practice_1') {   // the strike-through: one fast grey pencil stroke, a little uphill, across line b
-    const g = out[1].getContext('2d'), [x0, , x1] = box.strike, y = 240.5;
+    const g = out[1].getContext('2d')!, [x0, , x1] = box.strike, y = 240.5;
     g.strokeStyle = `rgb(${GREY})`; g.lineCap = 'round'; g.lineWidth = 5 * K; g.beginPath();
     g.moveTo((x0 + 3) * K, (y + 0.8) * K); g.quadraticCurveTo(((x0 + x1) / 2) * K, (y + 0.2) * K, (x1 - 3) * K, (y - 1) * K); g.stroke();
   }
@@ -207,8 +210,7 @@ function inkLayers(which, W, H) {
 // over it whose canvas is redrawn only when the reveal state changes. The hand font must be loaded (s17b's loadHand).
 // draw(spans, extra): spans = [[box, layer (0 navy, 1 grey, 2 navy), fraction revealed left to right]]; extra(g, K)
 // draws code pen strokes in sheet pixels (K = canvas px per sheet px).
-/** @param {{ props: any, sheet: Function, which: string, at: Vec3, key: string, parent: THREE.Object3D }} o */
-export function practiceSheet({ props, sheet, which, at, key, parent }) {
+export function practiceSheet({ props, sheet, which, at, key, parent }: { props: Kit, sheet: ReturnType<typeof kitTools>['sheet'], which: string, at: Vec3, key: string, parent: THREE.Object3D }) {
   const img = props.pieces[which], [w, h] = props.sizes[which], [u0, v0, u1, v1] = props.visible[which];
   const holder = new THREE.Group(); holder.rotation.x = -Math.PI / 2; holder.position.set(...at); parent.add(holder);
   const [bw, bh] = props.sizes.blank_page, [b0, c0, b1, c1] = props.visible.blank_page;
@@ -221,11 +223,11 @@ export function practiceSheet({ props, sheet, which, at, key, parent }) {
     new THREE.MeshLambertMaterial({ map: tex, transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2 }));
   plane.position.set((0.5 - (u0 + u1) / 2) * w, ((v0 + v1) / 2 - 0.5) * h, 0.00005);
   plane.castShadow = false; plane.receiveShadow = true; holder.add(plane);
-  let drawn = null;
-  const draw = (spans, extra, tag = '') => {
+  let drawn: string | null = null;
+  const draw = (spans: [number[], number, number][], extra?: (g: CanvasRenderingContext2D, K: number) => void, tag = '') => {
     const id = tag + JSON.stringify(spans.map(([b, l, fr]) => [b, l, +clamp(fr).toFixed(3)]));
     if (id === drawn) return; drawn = id;
-    const g = ink.getContext('2d'); g.clearRect(0, 0, ink.width, ink.height);
+    const g = ink.getContext('2d')!; g.clearRect(0, 0, ink.width, ink.height);
     if (layers) for (const [[x0, y0, x1, y1], l, fr] of spans) {
       const xe = x0 - 1 + (x1 - x0 + 3) * clamp(fr);
       if (xe <= x0 - 1) continue;
@@ -236,11 +238,11 @@ export function practiceSheet({ props, sheet, which, at, key, parent }) {
     tex.needsUpdate = true;
   };
   // sheet pixel → world point on the page (for the insert's pen tip)
-  const toWorld = (x, y, v = new THREE.Vector3()) => holder.localToWorld(v.set(plane.position.x + (x / img.width - 0.5) * w, plane.position.y + (0.5 - y / img.height) * h, 0));
+  const toWorld = (x: number, y: number, v = new THREE.Vector3()) => holder.localToWorld(v.set(plane.position.x + (x / img.width - 0.5) * w, plane.position.y + (0.5 - y / img.height) * h, 0));
   return { holder, blank, plane, draw, toWorld };
 }
 // A code pen line in sheet pixels, NAVY, drawn up to fraction f of its length (the check, the underline, the '+' bars).
-export function penLine(g, K, pts, f = 1, width = 2.6) {
+export function penLine(g: CanvasRenderingContext2D, K: number, pts: number[][], f = 1, width = 2.6) {
   const seg = pts.slice(1).map((p, i) => Math.hypot(p[0] - pts[i][0], p[1] - pts[i][1])), L = seg.reduce((a, b) => a + b, 0);
   let left = clamp(f) * L;
   if (left <= 0) return;
@@ -252,24 +254,23 @@ export function penLine(g, K, pts, f = 1, width = 2.6) {
   g.stroke();
 }
 
-export async function build({ scene, camera, assets, PALETTE, post }) {
+export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   await loadHand();
-  const C = (k) => new THREE.Color(PALETTE[k]);
+  const C = (k: keyof ShotCtx['PALETTE']) => new THREE.Color(PALETTE[k]);
   scene.background = C('navy').lerp(C('ink'), 0.5);
-  const V = (a) => new THREE.Vector3(...a);
+  const V = (a: Vec3) => new THREE.Vector3(...a);
 
   const tools = kitTools(ID), { sheet, boil } = tools;
   const { pendant } = await marstonDesk({ scene, assets, PALETTE, tools, ID });
   const [props, kitp] = await Promise.all(['study_props_sheet', 'props_kit'].map((n) => assets.load(n)));
   // An asset piece in a holder whose origin is the centre of the piece's visible shape, so the spec's boxes place it.
-  /** @param {import('../assets.ts').Kit} a @param {string} name @param {{ weight?: string, res?: number, parent?: THREE.Object3D, key?: string }} [o] */
-  const cut = (a, name, { weight, res = 512, parent = scene, key = name } = {}) => {
+  const cut = (a: Kit, name: string, { weight, res = 512, parent = scene, key = name }: { weight?: string, res?: number, parent?: THREE.Object3D, key?: string } = {}) => {
     const holder = new THREE.Group(), [w, h] = a.sizes[name], [u0, v0, u1, v1] = a.visible[name];
     const mesh = sheet({ art: a.pieces[name], size: [w, h], key: `${ID}-${key}`, weight, res }, holder);
     mesh.position.set((0.5 - (u0 + u1) / 2) * w, ((v0 + v1) / 2 - 0.5) * h, 0);
     parent.add(holder); return holder;
   };
-  const flat = (g) => { g.rotation.x = -Math.PI / 2; return g; };   // lying on the desk: local +y runs away from camera
+  const flat = (g: THREE.Object3D) => { g.rotation.x = -Math.PI / 2; return g; };   // lying on the desk: local +y runs away from camera
 
   // ---------- set: s11's desk unit, the backpack behind the chair, the phone face-down at the rest spot ----------
   { const b = cut(props, 'backpack_side'); b.position.set(-0.145, -0.034 + 0.02, 0.028); }
@@ -318,7 +319,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const fx = post({ focus: 0.3, aperture: UNIT.aperture, maxblur: UNIT.maxblur, lut: 'amber' });
   const hand = new THREE.Vector3(), far = new THREE.Vector3();
 
-  function update(t) {
+  function update(t: number) {
     const tc = on2s(t), close = t >= CU[0] && t < CU[1];
     boil(t, 10);
 
@@ -331,7 +332,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     hero.group.visible = !close; cu.rig.group.visible = close;
     for (const r of [hero, cu.rig]) {
       r.boil(t, 10);
-      r.blend(P, /** @type {[number, string][]} */ (BODY), tc + 1e-6);
+      r.blend(P, BODY, tc + 1e-6);
     }
     const f = act(hero, t, CUES, { slump: 0, breath: tc >= FLICKER[0] && tc < NAME[0] ? 30 : 6, seed: 15 });
     hero.joints.head.rotation.z += kf(tc, HEAD) * D;
@@ -342,7 +343,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     cu.rig.joints.head.rotation.z += kf(tc, HEAD) * D;
     cu.holder.position.y = HEAD_AT[1] + (tc >= B.nameSmile && tc < B.nameSmile + 0.25 ? 0.0006 : 0);   // the laugh-breath out
     hero.group.updateMatrixWorld(true);
-    hero.hand.getWorldPosition(hand); hero.hands.arm_l.getWorldPosition(far);
+    hero.hand!.getWorldPosition(hand); hero.hands.arm_l.getWorldPosition(far);
 
     // pen and cap. The pen's z is the drawing plane (0.0868, the flat-puppet cheat): the name line is behind it.
     const held = tc >= dr(9), levelPen = tc >= dr(12) && tc < dr(18), writing = tc >= NAME[0] && tc < NAME[1];

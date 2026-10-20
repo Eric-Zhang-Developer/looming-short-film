@@ -1,4 +1,3 @@
-// @ts-check
 // s17c · The grade comes back (docs/shots/s17c.md, v4). 7 s. G4's 0–3 on s17b's Camera P, days later: the paper slides
 // in face-down (gradeSlide 0.5), his hand turns it over, and it lands face-up exactly where he wrote it (gradeReveal
 // 2.0): props_kit's graded_test with its painted red checks and circled 94, carrying his own three lines from s17b (the
@@ -16,28 +15,29 @@ import { tools } from './s02.ts';
 import { kitTools } from './s11.ts';
 import { closeupRig, HEAD_AT } from './s09b.ts';
 import { specPose } from '../characters/poses.ts';
-import { PAGE, CAM_P, BLOB_AT, pageWithInk, flatHand, overheadSpot, loadHand } from './s17b.js';
+import { PAGE, CAM_P, BLOB_AT, pageWithInk, flatHand, overheadSpot, loadHand } from './s17b.ts';
+import type { ShotCtx } from '../film.ts';
 
 const ID = 's17c', DEG = Math.PI / 180;
-const B = SHOTS.find((s) => s.id === ID).beats;          // gradeSlide 0.5, gradeReveal 2.0
+const B = SHOTS.find((s) => s.id === ID)!.beats;          // gradeSlide 0.5, gradeReveal 2.0
 
 // ---------- tunables ----------
 const BLOB_R = { start: 0.004 };                          // SHRINK[7]: no change here (a grade isn't a solved problem)
 const SPOT_I = 0.2, AMB_K = 0.45, WARM = [0.12, 0.32];    // s17b's overhead; the window fill warms 0.12 → 0.32 over the reveal (≤ 30%)
 const PAGE_H = PAGE.w * 366 / 263;                        // the page's paper height (art px 5…371 over 7…270)
 const SLIDE_FROM = 0.045, SKID = 0.001;                   // the slide starts above frame (−z), overshoots 1 mm, settles
-const NINETY_FOUR = [214, 58];                            // the circled 94 on graded_test, art px (measured on the cut PNG)
+const NINETY_FOUR: [number, number] = [214, 58];                            // the circled 94 on graded_test, art px (measured on the cut PNG)
 
 const CU = [3, 6], TAP = 6.25;                             // the close-up's cut in and out; the tap on the 94
-const CU_AT = /** @type {Vec3} */ ([0.6, 0, 0]);                                  // the CU set, off to the side of the page set
-const CU_HIP = /** @type {Vec3} */ ([-0.054, -0.0134, 0.074]);                    // s17b's seat at the exam desk
-const CAM_CU = /** @type {CamKey} */ ({ pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] });   // s15's CU framing
+const CU_AT: Vec3 = [0.6, 0, 0];                                  // the CU set, off to the side of the page set
+const CU_HIP: Vec3 = [-0.054, -0.0134, 0.074];                    // s17b's seat at the exam desk
+const CAM_CU: CamKey = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };   // s15's CU framing
 const CU_KEY = 0.024, CU_AMB = 0.8;
-const F = (n) => n / 12, fr = (t) => Math.floor(t * 12 + 1e-6);
+const F = (n: number) => n / 12, fr = (t: number) => Math.floor(t * 12 + 1e-6);
 
 // The paper per drawing: [z offset from the page position, flip angle about its far edge (deg; 180 = face-down there,
 // 0 = face-up), lift of the near edge]. On 2s. The flip is the flat-puppet cheat of s15's phone: down, on edge, up.
-function paperAt(f) {
+function paperAt(f: number) {
   if (f < 6) return null;                                                  // 0.0–0.5: the empty table
   if (f < 12) { const k = easeOut((f - 6) / 5); return { dz: -SLIDE_FROM * (1 - k) + (f === 11 ? SKID : 0), down: true, ang: 0 }; }
   if (f < 16) return { dz: f === 12 ? SKID : 0, down: true, ang: 0 };    // 1.0 skid, settled by 1.083
@@ -47,10 +47,10 @@ function paperAt(f) {
   return { dz: 0, down: false, ang: 0 };                                    // 1.83: face-up
 }
 
-export async function build(ctx) {
+export async function build(ctx: ShotCtx) {
   await loadHand();
   const { scene, camera, assets, PALETTE, post } = ctx;
-  const C = (k) => new THREE.Color(PALETTE[k]);
+  const C = (k: keyof ShotCtx['PALETTE']) => new THREE.Color(PALETTE[k]);
   scene.background = C('navy').lerp(C('cream'), 0.15);
   const T = tools(ctx, ID);
   const [props, gsheet] = await Promise.all([assets.load('props_kit'), assets.load('gator_sheet')]);
@@ -73,7 +73,7 @@ export async function build(ctx) {
   // red marks through the paper: faint, no number, so the 94 is still the reveal. The paper is turned about its centre line,
   // so the front's marks sit at the mirrored height from here (circle low, checks above it).
   {
-    const [sw, sh] = props.sizes.blank_page, W = 138, H = Math.round(W * sh / sw), cv = Object.assign(document.createElement('canvas'), { width: W * 4, height: H * 4 }), g = cv.getContext('2d');
+    const [sw, sh] = props.sizes.blank_page, W = 138, H = Math.round(W * sh / sw), cv = Object.assign(document.createElement('canvas'), { width: W * 4, height: H * 4 }), g = cv.getContext('2d')!;
     g.scale(4, 4); g.strokeStyle = PALETTE.calendarRed; g.lineWidth = 2.4; g.lineCap = g.lineJoin = 'round';
     g.beginPath(); g.ellipse(0.77 * W, 0.86 * H, 17, 15, 0.2, 0, 7); g.stroke();
     for (const v of [0.72, 0.52, 0.32]) { g.beginPath(); g.moveTo(0.74 * W, (v - 0.01) * H); g.lineTo(0.79 * W, (v + 0.03) * H); g.lineTo(0.88 * W, (v - 0.04) * H); g.stroke(); }
@@ -109,7 +109,7 @@ export async function build(ctx) {
   const nearEdge = new THREE.Vector3(), tap = new THREE.Vector3();
   pivot.position.copy(P0); front.toWorld(...NINETY_FOUR, tap);   // the 94 at rest: face-up, in place
   return {
-    update(t) {
+    update(t: number) {
       T.boil(t); kt.boil(t, 10);
       const f = fr(t), tc = F(f), close = t >= CU[0] && t < CU[1];
       // camera on 1s: P, the CU (3.0–6.0), P again
