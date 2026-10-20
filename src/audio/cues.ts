@@ -210,7 +210,8 @@ export const CUES: Cue[] = [
   { beat: 'exhale', sound: 'exhale', gain: 0.5 },
   // s10b (v6): his steps on the stacks carpet, one per contact (walk step 1/3 s from 110.0), the soft step at -26 dB, under
   // s09c's -20 dB paving; the phone into the hoodie pocket, a short paper rustle (the hoodie is paper; s09a's blanket precedent).
-  ...range(0, 17).map((k) => ({ beat: 'pocketPhone', offset: k / 3 - 1, sound: 'footstepSoft', gain: dB(-26), seed: 300 + k })),
+  // v8-trims: s10b is 4 s, a step every 1/4 s from its first frame (was every 1/3 s over 6 s).
+  ...range(0, 16).map((k) => ({ beat: 'pocketPhone', offset: k / 4 - 0.75, sound: 'footstepSoft', gain: dB(-26), seed: 300 + k })),
   { beat: 'pocketPhone', offset: -0.17, sound: 'paperRustle', dur: 0.3, gain: 0.2, seed: 13 },
   // s11: the backpack down (a soft fabric thump: the runner footstep's buffer), the phone face down on the desk, -6 dB
   // under s09a's (the rhyme with the choice), and the blob's three hops up onto the desk, -20 dB.
@@ -253,7 +254,7 @@ export const CUES: Cue[] = [
   // s17c: the paper slide when the grade comes back, a short flip of the page, one soft finger tap.
   { beat: 'gradeSlide', sound: 'paperSlide', gain: 0.7 },
   { beat: 'gradeSlide', offset: 0.83, dur: 0.5, sound: 'paperRustle', gain: 0.4, seed: 11 },
-  { beat: 'gradeReveal', offset: 1.5, sound: 'cardTap', gain: 0.2, seed: 3 },
+  { beat: 'gradeReveal', offset: 3.25, sound: 'cardTap', gain: 0.2, seed: 3 },   // v8-trims: the tap on the 94 is at s17c 5.25
   // s18: the X, two firm strokes ending on examCrossedOff; the hop and the run's wet taps; the dissolve (inkSoak);
   // v4: he sits back and breathes out (the exhale's buffer, soft); the marker writing "Final" and circling the new date,
   // ending on the beat; the tag's uncap, s15's buffer.
