@@ -1,4 +1,4 @@
-// Cue sheet: sounds placed by beat name (src/timeline.js), never by raw time. Moving a beat moves its sound.
+// Cue sheet: sounds placed by beat name (src/timeline.ts), never by raw time. Moving a beat moves its sound.
 // stem: 'foley' (default) | 'ambience' | 'music'. seed: defaults to seedOf(sound) in tools/mix.ts,
 // so the two lamp clicks share one seed and are sample-identical (doc 05).
 // offset: seconds after the beat (may be negative, default 0); the cue starts at beat(beat) + offset.
@@ -7,7 +7,7 @@
 //
 // A point is [beatName, offsetSeconds]. bed() runs a bed from one point to another, so a bed that stops 0.5 s before a
 // beat is still hung on beats and moves when they move. Sources: doc 05's v4 table and docs/shots/sNN.md §Sound (the v4 cut, 3:15).
-// The music stem (score.js) is not placed here.
+// The music stem (score.ts) is not placed here.
 import { beat, DURATION, S13_DESKS } from '../timeline.ts';
 
 type Point = [string, number?];
@@ -22,7 +22,7 @@ const S01: Point = ['notifyBuzz', 4 - beat('notifyBuzz')];                // 0:0
 const S18: Point = ['examCrossedOff', -2];                                 // 2:55, s18 @ 0
 const END: Point = ['tagPenUncap', DURATION - beat('tagPenUncap')];        // 3:15
 // Doc 05: every lamp click is dry and exposed. Beds stop on it and come back after its window (the music stem does the
-// same in score.js), which is also what keeps the three clicks identical in mix.wav. A lamp click is 0.3 s.
+// same in score.ts), which is also what keeps the three clicks identical in mix.wav. A lamp click is 0.3 s.
 const ON = (b: string): Point => [b, 0.3];
 // snd-foley-2's sounds, in one place so a level pass touches one table.
 const dB = (x: number) => 10 ** (x / 20);
@@ -37,14 +37,14 @@ export const REELS = ([
 
 // snd-v4: the clock. One cue per tick, each on a whole second of global time (the beats it hangs on are whole seconds, or
 // offsets that land on one), so the tick and the walk's pulse share one grid. Every tick is clockTick's one buffer; the
-// variants only filter it for distance (foley.js).
+// variants only filter it for distance (foley.ts).
 const ticks = (sound: string, b: string, offsets: number[], gain: number): Cue[] => offsets.map((o) => ({ beat: b, offset: o, sound, gain, stem: AMB }));
 const range = (a: number, z: number) => Array.from({ length: z - a + 1 }, (_, k) => a + k);
 
 // walk-redo: footsteps follow the picture. s09c's gait is timed: a contact every STEP (0.25 s) on the global pulse grid
 // from 84.0, up to the block, then from stepAround (a contact) to the turn. The side-steps around the blob and the
-// back-view walk after the turn are timed as before, as in s09c.js.
-// ponytail: STEP, DECIDE (blobBlocks + 7/6) and TURN (18.0) mirror s09c.js, which doesn't export them; import them if it ever does.
+// back-view walk after the turn are timed as before, as in s09c.ts.
+// ponytail: STEP, DECIDE (blobBlocks + 7/6) and TURN (18.0) mirror s09c.ts, which doesn't export them; import them if it ever does.
 const STEP = 0.25, S09C = beat('walkStart'), lb = (b: string) => beat(b) - S09C;
 const DECIDE = lb('blobBlocks') + 7 / 6, TURN = 18.0, twos = (t: number) => Math.ceil(t * 12 - 1e-6) / 12;
 function walkSteps() {
@@ -110,7 +110,7 @@ export const CUES: Cue[] = [
   ...ticks('clockTickFar', 'clockThree', range(7, 9), dB(-14)),
   // s09a 70.0-75.0 at -16 dB, -4 dB under the held note from breathIn; none at 74.0: the nightstand lamp's click lands on
   // that second and takes the tick's place (doc 05: "on the tick at 74.0"; the click must sound alone to stay identical).
-  // s09b 76.0-81.0 room-distant through his door; s09c 82.0, 83.0, then the tick becomes the pulse (score.js).
+  // s09b 76.0-81.0 room-distant through his door; s09c 82.0, 83.0, then the tick becomes the pulse (score.ts).
   ...ticks('clockTickMid', 'phoneFaceDown', [-0.5, 0.5], dB(-16)),
   ...ticks('clockTickMid', 'breathIn', [0.5, 1.5, 3.5], dB(-20)),
   ...ticks('clockTickFar', 'doorOpen', range(-1, 4), dB(-16)),
@@ -133,7 +133,7 @@ export const CUES: Cue[] = [
   { beat: 'inkDropForms', offset: 4.83, sound: 'inkDrip', gain: 0.3 },
   // Shadow-growth rustles (the sub is in the score): s03, s04 x3, s05, s06 spring-back, s07's gulp, s09b's hallway shadow.
   { beat: 'laptopUp', sound: 'paperRustle', gain: 0.4 },
-  // v7-fridge: s04's three on the three fridge opens (s04.js OPENS), where the shadow springs up, a little louder each time it's bigger.
+  // v7-fridge: s04's three on the three fridge opens (s04.ts OPENS), where the shadow springs up, a little louder each time it's bigger.
   ...[0.17, 2.5, 4.67].map((o, k) => ({ beat: 'fridge', offset: o, sound: 'paperRustle', gain: 0.4 + 0.05 * k, ...(k ? { seed: k + 1 } : {}) })),
   { beat: 'gameNight', sound: 'paperRustle', gain: 0.5, seed: 4 },
   { beat: 'lampOffHome', offset: 0.17, sound: 'paperRustle', gain: 0.4, seed: 5 },
@@ -262,7 +262,7 @@ export const CUES: Cue[] = [
   { beat: 'tagPenUncap', offset: 1.25, sound: 'inkDrip', gain: 0.3, seed: 32 },               // v6-ending: the drop lands on the nib (s18 17.75), a soft plip
   { beat: 'tagPenUncap', offset: 1.917, sound: 'penStroke', dur: 0.42, gain: 0.45, seed: 6 },  // v6-ending: "1." in its ink (18.42–18.83)
   // ───────── snd-foley-2 ─────────
-  // s04 (v7-fridge): the fridge loop's door, from sounds already here, mirroring s04.js OPENS. Open at 0.17, 2.5, 4.67: the
+  // s04 (v7-fridge): the fridge loop's door, from sounds already here, mirroring s04.ts OPENS. Open at 0.17, 2.5, 4.67: the
   // seal peeling and the door swinging to its stop (paperSlide), the jars in the door ticking together. Shut at 1.58, 3.83:
   // the seal's thud (cardTap), the carton in the door sloshing, a jar clink. One seed for all of them, so every open
   // and every shut is the same sound: nothing changes, that's the joke.

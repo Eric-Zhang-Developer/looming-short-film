@@ -1,4 +1,4 @@
-// s06 · The lamp beat (docs/shots/s06.md, G4). v2 on the real-scale home desk (s02.js's unit), at night.
+// s06 · The lamp beat (docs/shots/s06.md, G4). v2 on the real-scale home desk (s02.ts's unit), at night.
 // He's gaming; the laptop screen throws the 1.25× blob's shadow 4.06× up the wall (S = screenZ / (screenZ − z_B)).
 // He pulls the lamp's chain (lampClickHome 0.5): light from above shrinks the shadow to a small pool and shows the
 // blob as it is, right there. He flinches, stares, pulls it off again (lampOffHome 3.0), the loom springs back, he
@@ -193,7 +193,7 @@ export async function build(ctx: ShotCtx) {
       lamp.update(t);
       shadeGlow.visible = lk > 0;
       halo.material.opacity = HALO * (lit ? 0.15 : 1) * flick;
-      set.game.fire(firing(t, GULP + 0.5, 0));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.js: from gulp2 + 0.5, in 0)
+      set.game.fire(firing(t, GULP + 0.5, 0));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.ts: from gulp2 + 0.5, in 0)
       face.color.copy(lit ? faceCream : faceCyan);
       face.intensity = lit ? FACE_LAMP : FACE_SCREEN;
       phoneLit.visible = phoneHalo.visible = t >= PH_ON - 1e-6 && t < GULP - 1e-6;

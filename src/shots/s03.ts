@@ -1,4 +1,4 @@
-// s03 · The laptop: the shadow climbs (docs/shots/s03.md, G4). v2 on the real-scale home desk (s02.js's unit).
+// s03 · The laptop: the shadow climbs (docs/shots/s03.md, G4). v2 on the real-scale home desk (s02.ts's unit).
 // He shrugs off the blob's look, opens his laptop and plays. The screen is a low, close light (README §4: a spot at
 // the screen centre, aimed screen → blob → wall), so the blob's shadow climbs the wall at 3× (S = screenZ / (screenZ −
 // B.z) = 0.0225 / 0.0075) the moment the screen wakes, and swells to 3.75 units on gulp 1 (4.5), the first meter step.
@@ -233,7 +233,7 @@ export async function build(ctx: ShotCtx) {
       set.screenCentre(L);
       set.glow.visible = on;
       set.glow.material.color.setScalar(f >= 12 ? 1 : 0.35 + 0.5 * k);   // full game on laptopUp
-      set.game.fire(firing(t, 1.25, 0));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.js: from laptopUp + 0.25, in 0)
+      set.game.fire(firing(t, 1.25, 0));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.ts: from laptopUp + 0.25, in 0)
       sun.light.intensity = sunI * (SUN_SCALE_OFF + (SUN_SCALE - SUN_SCALE_OFF) * k);   // before the wake the window is the room; after it the screen is
       amb.intensity = ambI * (AMB_K_OFF + (AMB_K - AMB_K_OFF) * k);
 

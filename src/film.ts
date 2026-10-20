@@ -36,7 +36,7 @@ export function createFilm(stage: Pick<Stage, 'renderer' | 'camera'>) {
     live.delete(id);
     s.shot.dispose?.();
     s.composer?.dispose();
-    // Paper textures stay: they belong to paper.js's cache and other shots may reuse them.
+    // Paper textures stay: they belong to paper.ts's cache and other shots may reuse them.
     s.scene.traverse((o) => {
       (o as Partial<THREE.Mesh>).geometry?.dispose();   // any Object3D: a Group has neither geometry nor material
       for (const m of [(o as Partial<THREE.Mesh>).material, o.customDepthMaterial, o.customDistanceMaterial].flat()) m?.dispose();

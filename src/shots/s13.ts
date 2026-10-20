@@ -1,8 +1,8 @@
 // s13 · Everyone has one (docs/shots/s13.md, v7). One locked top-down shot of the Marston reading room, 8 s: v3's build,
 // then the room turns. He's already under the light (his phone went into his pocket in s10b), so his desk sits in its
 // warm pool with a small shadow from the first frame, in a dark room. He lifts his head (headLift); desk by desk the
-// other gators' phones wake and each one's shadow springs up big from its blob, on a note (S13_DESKS in timeline.js,
-// which score.js reads too): the Sleeper, Drinks, the Freshman a second apart, then the other seven closing round him,
+// other gators' phones wake and each one's shadow springs up big from its blob, on a note (S13_DESKS in timeline.ts,
+// which score.ts reads too): the Sleeper, Drinks, the Freshman a second apart, then the other seven closing round him,
 // until the shadows overlap across the room. From the peak (phonesDown), desk by desk outward from his, each gator turns
 // their phone face down: its glow goes, its shadow collapses to a small pool under the pendant, and they start working.
 // The grade warms from v3's teal to s11's gold as the last phones go down; he goes back to his page.

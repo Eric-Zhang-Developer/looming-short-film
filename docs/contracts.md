@@ -7,34 +7,34 @@ The interfaces every shot is built on. Wave 2 builders implement exactly these. 
 - **Units:** meters. It's a tabletop diorama: a gator is about 8 cm tall and a wall is about 1.6 × 0.9 m.
 - **Axes:** +Y up. The camera looks down −Z. The main wall of a set is usually the plane z = 0, with things in front at z > 0.
 - **Time:** `t` is global seconds from 0 to 195 (3:15 since G4). Shot code gets `tLocal`, seconds since its shot started. Every function that changes over time takes time as an argument and never reads a clock.
-- **Determinism:** randomness comes only from `src/core/rng.js`. The same `t` always draws the same pixels.
-- **Colors:** hex strings from doc 03. They're exported once as `PALETTE` in `src/core/palette.js`, so nobody types a hex code anywhere else.
-- **Modules:** plain ES modules in `src/`. They import three as `import * as THREE from 'three'`, resolved by an import map in each HTML page to `/node_modules/three/build/three.module.js`. Pages that use `post.js` (or any three addon) also map `"three/examples/jsm/": "/node_modules/three/examples/jsm/"`.
+- **Determinism:** randomness comes only from `src/core/rng.ts`. The same `t` always draws the same pixels.
+- **Colors:** hex strings from doc 03. They're exported once as `PALETTE` in `src/core/palette.ts`, so nobody types a hex code anywhere else.
+- **Modules:** strict TypeScript ES modules in `src/` (`tsconfig.json`), compiled to `build/` (`tsconfig.build.json`, run by `tools/lib/page.ts` before every serve), which the pages load. They import three as `import * as THREE from 'three'`, resolved by an import map in each HTML page to `/node_modules/three/build/three.module.js`. Pages that use `post.ts` (or any three addon) also map `"three/examples/jsm/": "/node_modules/three/examples/jsm/"`.
 - **Lab pages (retired 2026-10-19):** in waves 2–4 every module shipped a `lab/<module>.html` that showed it in isolation. The TypeScript pass deleted them (the film never used them; git history keeps them). Evidence is rendered from `index.html`.
 
 ## `src/core/` (task `mod-core`)
 
 ```js
-// rng.js: ported from 1776's rng.ts
+// rng.ts: ported from 1776's rng.ts
 export function hash(n)                  // → float in [0,1), stateless
 export function hash2(a, b)              // → float in [0,1)
 export function mulberry32(seed)         // → () => float in [0,1), sequential stream
 export function seedOf(...parts)         // → uint32 from strings/numbers, e.g. seedOf('gator', 'arm_l', 7)
 
-// ease.js: ported from the KnightHacks core.js
+// ease.ts: ported from the KnightHacks core.js
 export const clamp, lerp, ease, easeIn, easeOut
 export function kf(t, keys, e = ease)    // keys: [[t, value], ...]; value may be a number or an array of numbers
 export function spring(t, t0, k = 6, w = 18)   // damped kick at t0 → offset
 export function onTwos(t, fps = 12)      // → t snapped to 12 fps steps (characters animate "on 2s")
   // onTwos floors with a 1e-4 epsilon, so the film's float-error local t (100.0833 − 100) still lands on its drawing
 
-// palette.js
+// palette.ts
 export const PALETTE                     // { navy, cream, gator, kraft, phone, lamp, ink, calendarRed }
 
-// stage.js: one renderer, scene and camera per page
+// stage.ts: one renderer, scene and camera per page
 export function createStage({ width = 1920, height = 1080, fov = 20 } = {})
   // → { renderer, scene, camera, onFrame(fn), renderFrame(t), setRender(fn), ready: Promise }
-  // setRender(fn) replaces the final draw call (default: renderer.render(scene, camera)); post.js uses it.
+  // setRender(fn) replaces the final draw call (default: renderer.render(scene, camera)); post.ts uses it.
   // renderFrame(t) runs every onFrame(fn) callback with t, renders synchronously, then returns.
   // The renderer uses preserveDrawingBuffer, PCFShadowMap, sRGB output and NoToneMapping (doc 03 grades color in post, not via tone mapping).
 export function exposeForRender(stage, { duration, fps = 24 })
@@ -65,7 +65,7 @@ node tools/gen.ts --asset=<name> [--variants=3]       doc 08 loop: fresh temp di
 node tools/cut.ts --in=assets/frozen/<f>.png --boxes=assets/cut/<name>.boxes.json   → assets/cut/<part>.png
 ```
 
-## `src/timeline.js` (task `mod-timeline`)
+## `src/timeline.ts` (task `mod-timeline`)
 
 ```js
 export const SHOTS   // [{ id: 's01', start, duration, beats: { name: tLocal } }, ...] from doc 06's shot list
@@ -78,7 +78,7 @@ Shot modules are wired into `index.html` later (wave 4). The timeline only holds
 
 Added by `contract-sensor`: three beats were renamed, times unchanged, because Marston's light is a motion-sensor zone, not a lamp: `lampClickMarston` → `sensorWakeMarston` (s15 0.5), `lampClickNeighbor` → `sensorWakeNeighbor` (s16 15), `lampClickFreshman` → `sensorWakeFreshman` (s18 4). `lampClickHome`, `lampOffHome` and `tableLightDies` (a zone timing out) keep their names. No `src/shots/*.js` named the old beats; the cues and the score did. Shot docs `docs/shots/s15`, `s16`, `s18` still use the old names until a doc pass.
 
-## `src/paper.js` (task `mod-paper`)
+## `src/paper.ts` (task `mod-paper`)
 
 ```js
 export const WEIGHTS   // { cardstock, kraft, tissue, vellum } → { tearAmp, tearFreq, rimPx, grain, thickness }
@@ -103,7 +103,7 @@ What it does: it builds the silhouette from the art's alpha (or `path`), tears t
 
 Rim (look-pass-1): no rim is ever a constant-width band around a whole shape. `'broken'` adds a thin near-white fiber rim whose width wanders and which has long, irregular breaks. `'none'` adds no rim; if the art already has a painted pale rim (measured once per asset: an edge clearly lighter than the body), that rim is thinned and broken the same way by resampling the painting from further in. `'auto'` is `'none'` on art with a painted pale rim and `'broken'` otherwise. The cache key includes `rim`. A plain `path` fill also gets large mottling and dry-brush streaks scaled by the weight's grain. The sheet cache is an LRU capped by texels (256 M), sized so a held 10 s shot of 8 sheets at 1024 px fits and a second pass hits.
 
-## `src/material.js` (task `mod-material`)
+## `src/material.ts` (task `mod-material`)
 
 ```js
 export function paperMesh(sheet, { translucency = sheet.thickness < 0.5 ? 0.8 : 0.05, edgeCatch = 0.6 } = {})
@@ -116,7 +116,7 @@ The paper material is Lambert plus a back-light translucency term (doc 04) and a
 
 The edge catch (look-pass-2) is never an even band. Its width wanders along the edge (0.2–0.9 of the full ring), it has long breaks over about two fifths of the edge, and it is brightest where it is thinnest. The pattern is placed by the sheet's `key` and nudged by its boil `seed`, so it boils without reshuffling.
 
-## `src/lights.js` (task `mod-lights`)
+## `src/lights.ts` (task `mod-lights`)
 
 ```js
 export function phoneLight({ color = PALETTE.phone, intensity, angle = 1.2, distance = 0.6, penumbra = 0.45 } = {})  // → SpotLight, shadow on
@@ -161,7 +161,7 @@ A ceiling fluorescent on a motion sensor over a Marston desk. Add `group`, `ligh
 
 The lamp's cone (look-pass-2) draws only its far wall, so anything standing in the light hides the vellum behind it instead of wearing an amber film over it. Its sides fade to nothing by view angle, over a width that wanders, so no side is a ruled line.
 
-## `src/puppet.js` (task `mod-puppet`)
+## `src/puppet.ts` (task `mod-puppet`)
 
 ```js
 export function definePuppet({
@@ -177,7 +177,7 @@ Puppet.face({ eyes, mouth })         // swaps on a single frame
 Puppet.follow(partName, t, { k, w }) // damped secondary motion (tail, pocket), on 2s
 ```
 
-Poses live in the shot or character file as plain objects. A temporary test gator built from `paper.js` paths is fine until frozen art exists.
+Poses live in the shot or character file as plain objects. A temporary test gator built from `paper.ts` paths is fine until frozen art exists.
 
 Added by `contract-puppet` (additive; everything above still holds):
 
@@ -193,11 +193,11 @@ Puppet.name
 ```
 
 - **Face slots** are ordinary parts named `eyes` and `mouth` (a `faces` key), placed by the part list like any other part. `face()` swaps the slot part's textures, so every take in a slot must match the slot part's `size`; a mismatch throws.
-- **`pivot` is v-down:** `[u, v]` in the part's texture space, u right and v down, 0..1, the same as `paper.js` paths and image pixels.
+- **`pivot` is v-down:** `[u, v]` in the part's texture space, u right and v down, 0..1, the same as `paper.ts` paths and image pixels.
 - **`pose()` after `blend()` overrides.** `blend()` sets every joint (joints not in any of its poses go to 0), so a manual angle must come after it in the frame.
 - **`face()` must be called every frame,** and so must `boil()`. Both are stateful: skip one and the take or tear from an earlier `t` stays on. Their order within a frame doesn't matter.
 
-## `src/blob.js` (task `mod-blob`)
+## `src/blob.ts` (task `mod-blob`)
 
 ```js
 export function createBlob({ radius = 0.025, seed = 1 })
@@ -238,7 +238,7 @@ blob.update(tLocal, { ..., left })
 - **Stain.** A blotted ring 3.2 × 2.2 radii, wider than the drop's foot so it shows around it, opacity 0.6. `stain.material.alphaMap` is still the blot's solid outline (s02 stretches it into its calendar trail); the ring is in `stain.material.map`'s alpha. It stays wherever the shot puts it: to leave a stain behind, stop moving the stain and pass `left`. Evidence: `stain_fade.jpg`, `stain_crop.jpg`, `s02_trail.jpg`.
 - **Unchanged:** the field, the shadow (`customDepthMaterial`) and `silhouette()`. Their GLSL wasn't touched; s03's wall shadow and s13's decals are pixel-identical (`s03_diff.txt`, `s13_diff.txt`).
 
-## `src/post.js` (task `mod-post`)
+## `src/post.ts` (task `mod-post`)
 
 ```js
 export function createPost(stage, { focus, aperture = 0.02, maxblur = 0.01, lut = null, grain = 0.04, vignette = 0.25 } = {})
@@ -255,7 +255,7 @@ The `night` grade (look-pass-1) is a bright picture-book night: navy stays a sat
 Offline and deterministic: plain Node, no Web Audio. Mono or stereo `Float32Array` at 48 kHz.
 
 ```js
-// synth.js: voices from doc 05; each returns a Float32Array, seeded where noise is involved
+// synth.ts: voices from doc 05; each returns a Float32Array, seeded where noise is involved
 export function feltPiano(midi, { vel = 0.7, dur = 1.5 } = {})
 export function musicBox(midi, { vel = 0.6, dur = 1.2 } = {})
 export function pad(midis, { dur, attack = 1.5, release = 2 } = {})
@@ -264,11 +264,11 @@ export function noise(seed, dur)                 // white noise, seeded
 export function lowpass(buf, hz), highpass(buf, hz), env(buf, { a, d, s, r })
 export function mixInto(dest, src, atSec, gain = 1)
 
-// foley.js: named sounds from doc 05's foley table
+// foley.ts: named sounds from doc 05's foley table
 export const FOLEY   // { lampClick, sensorWake, penUncap, inkDrip, paperRustle, fluorescentHum, ... } → (seed, dur?) => Float32Array
                      // dur in seconds; beds and sized one-shots honour it, others ignore it; omitted → the sound's default length
 
-// cues.js
+// cues.ts
 export const CUES    // [{ beat: 'lampClickHome', sound: 'lampClick', gain: 0.8 }, ...]: by beat name, never raw time
 // optional per cue: offset (s, may be negative; starts at beat + offset, default 0), dur (s) or until: '<beatName>'
 // (length = beat(until) − start), stem ('foley' default | 'ambience' | 'music'), seed (default seedOf(sound))
@@ -276,7 +276,7 @@ export const CUES    // [{ beat: 'lampClickHome', sound: 'lampClick', gain: 0.8 
 
 ```
 
-Added by `contract-sensor`: `FOLEY.sensorWake(seed)` is the motion sensor's wake, 0.65 s: a relay clack on the beat (lampClick's snap pitched down, with a metallic tail), ticks at +0.042 and +0.167, a glassy ping at +0.292, and the tube's 120 Hz hum rising under it to the bed's level. Its peak is 0.5, under `lampClick`'s 0.57. It is cued once each on `sensorWakeMarston` (s15) and `sensorWakeFreshman` (s18), same seed and gain, so the two are sample-identical; there is none on `sensorWakeNeighbor`. `lampOffHome` now has the `lampClick` too, so the home lamp's two clicks are identical. Beds that stop for a click come back at +0.3 s, or at +0.65 s for a wake (the `ON()` helper in `cues.js`; the off click's window is 0.17 s). `src/audio/selftest.js` checks both pairs in `foley.wav` and `mix.wav`.
+Added by `contract-sensor`: `FOLEY.sensorWake(seed)` is the motion sensor's wake, 0.65 s: a relay clack on the beat (lampClick's snap pitched down, with a metallic tail), ticks at +0.042 and +0.167, a glassy ping at +0.292, and the tube's 120 Hz hum rising under it to the bed's level. Its peak is 0.5, under `lampClick`'s 0.57. It is cued once each on `sensorWakeMarston` (s15) and `sensorWakeFreshman` (s18), same seed and gain, so the two are sample-identical; there is none on `sensorWakeNeighbor`. `lampOffHome` now has the `lampClick` too, so the home lamp's two clicks are identical. Beds that stop for a click come back at +0.3 s, or at +0.65 s for a wake (the `ON()` helper in `cues.ts`; the off click's window is 0.17 s). `src/audio/selftest.ts` checks both pairs in `foley.wav` and `mix.wav`.
 
 ```
 node tools/mix.ts [--range=a:b]   → out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav,
@@ -288,7 +288,7 @@ node tools/mix.ts [--range=a:b]   → out/audio/stems/{music,foley,ambience}.wav
 
 ## `src/shots/` (task `mod-film`)
 
-One file per shot, `src/shots/sNN.js`, ids from `SHOTS` in `src/timeline.js`. A shot builder replaces only its own file (start from `src/shots/_template.js`).
+One file per shot, `src/shots/sNN.js`, ids from `SHOTS` in `src/timeline.ts`. A shot builder replaces only its own file (start from `src/shots/_template.ts`).
 
 ```js
 export async function build(ctx)   // may be async (it usually awaits assets.load)
@@ -298,7 +298,7 @@ export async function build(ctx)   // may be async (it usually awaits assets.loa
 //   scene,     // this shot's own THREE.Scene (= stage.scene)
 //   camera,    // this shot's own PerspectiveCamera (= stage.camera): fov 20, 16:9, near 0.05, far 20 (createStage's defaults)
 //   renderer,  // the one shared WebGLRenderer
-//   assets,    // src/assets.js: await assets.load(name)
+//   assets,    // src/assets.ts: await assets.load(name)
 //   PALETTE,
 //   post,      // (opts) => createPost(stage, opts): installs post on this shot only; film disposes its composer
 // }
@@ -306,9 +306,9 @@ export async function build(ctx)   // may be async (it usually awaits assets.loa
 
 - **Own everything.** A shot builds its own lights, set and camera moves inside its own `scene` and `camera`. It never touches another shot's objects, the renderer's settings (shadow type, tone mapping, color space, size, clear color) or any module-level state. Set `scene.background` on your own scene.
 - **Pure in `tLocal`.** `update(tLocal)` sets every animated value from `tLocal` alone (seconds since the shot's start), every frame. Nothing carries from one call to the next, so frames can come in any order. `ctx.stage.onFrame(fn)` callbacks run after `update` with the **global** `t` (post uses it for grain).
-- **Lifetime.** `film.js` builds a shot on the first frame inside it, keeps at most the current and next shot alive, and disposes the rest: it calls `dispose?.()`, then disposes the post composer and every geometry and material in the shot's scene. Paper textures belong to `paper.js`'s cache and are not disposed. `dispose()` only needs to free what the film can't see (render targets you made, for instance).
+- **Lifetime.** `film.ts` builds a shot on the first frame inside it, keeps at most the current and next shot alive, and disposes the rest: it calls `dispose?.()`, then disposes the post composer and every geometry and material in the shot's scene. Paper textures belong to `paper.ts`'s cache and are not disposed. `dispose()` only needs to free what the film can't see (render targets you made, for instance).
 
-## `src/film.js` and `index.html` (task `mod-film`)
+## `src/film.ts` and `index.html` (task `mod-film`)
 
 ```js
 export function createFilm(stage)  // stage from createStage(); its own scene and camera go unused
@@ -318,7 +318,7 @@ export function createFilm(stage)  // stage from createStage(); its own scene an
 
 `index.html` creates the stage and the film and calls `exposeForRender(film, { duration: DURATION, fps: 24 })`, so `render.ts` (`--sheet`, `--strip`, `--frames`) and `tools/determinism.ts` work on the whole film. Rendering t out of order (t = 170, then 3) gives the same pixels as in order.
 
-## `src/assets.js` (task `mod-film`)
+## `src/assets.ts` (task `mod-film`)
 
 ```js
 export async function load(name)
@@ -349,7 +349,7 @@ load(name)  // → { pieces, sizes, visible, proxy }
 One rig per character, so every shot poses the same gator the same way. Every rig is built from `ctx.assets.load(...)` pieces, so it works on proxies today and on frozen art with no code change. Every builder returns a contract **Puppet** (§puppet): call `boil(t, rate)` and `face(...)` every frame, and `pose()` after `blend()` overrides.
 
 ```js
-// gator.js: the Student (gator_sheet + face_sheet)
+// gator.ts: the Student (gator_sheet + face_sheet)
 export async function makeGator(ctx, { seed = 0, scale = 1, green, res = 512, facing = 'side' } = {})
   // → Puppet + { hand, hands, head34(on), facing, scale }
   // ctx: anything with ctx.assets (the shot ctx). seed salts the paper keys, so two rigs never share a tear.
@@ -358,23 +358,23 @@ export async function makeGator(ctx, { seed = 0, scale = 1, green, res = 512, fa
   // facing 'front' (turn_front) parts: body, arm_l, arm_r, eyes, mouth.   facing 'back' (turn_back) parts: body
 export function greenVariant(i)          // → a CSS colour: the i-th green, mixed from PALETTE (crowds, roommates, custodian)
 
-// freshman.js
+// freshman.ts
 export async function makeFreshman(ctx, { seed = 0, scale = 0.85, green, res = 512 } = {})
   // freshman_sheet, the side rig at 0.85×: body, tail, backpack, arm_l, head, snout, jaw, eyes, mouth, arm_r (no pocket, no head34)
 
-// roommates.js (s05)
+// roommates.ts (s05)
 export async function makeRoommateTall(ctx, { seed = 0, scale = 1, green = greenVariant(2), res = 512 } = {})
   // body (root at the hip), leg_l, leg_r, tail, arm_l, head, eyes, mouth, arm_r. Standing feet are 0.027 × scale below the hip.
 export async function makeRoommateRound(ctx, { seed = 0, scale = 1, green = greenVariant(3), res = 512 } = {})
   // body (one piece, root at its bottom), arm_l, arm_r, eyes, mouth
 
-// custodian.js (s14)
+// custodian.ts (s14)
 export async function makeCustodian(ctx, { seed = 0, scale = 1, green = greenVariant(4), res = 512 } = {})
   // body (root at the feet), tail, arm_l, mop (pivot at the handle top), head, cap, arm_r
 export async function makeCart(ctx, { seed = 0, scale = 1, res = 512 } = {})
   // frame (root at its bottom center), tray, bucket
 
-// crowd.js (s13, s16, s17)
+// crowd.ts (s13, s16, s17)
 export async function makeCrowd(ctx, who, { seed = 0, scale = 1, green, res = 512 } = {})
   // who: 'neighbor' | 'sleeper' (crowd_sheet, side view): body (root at the hip), head, arm_r. green defaults per who.
 export async function makeHeroTop(ctx, { seed = 0, scale = 1, res = 512 } = {})
@@ -382,7 +382,7 @@ export async function makeHeroTop(ctx, { seed = 0, scale = 1, res = 512 } = {})
 export async function makeSeated(ctx, n, { seed = 0, scale = 1, green = greenVariant(n), res = 512 } = {})
   // n 1..6: top_figures_sheet seated_n as a one-part Puppet (part body, pivot at its center)
 
-// exam.js: the hero's blob. Q5 (a): the body stays 0.012 and shrinks only in s16. Change the numbers here and only here.
+// exam.ts: the hero's blob. Q5 (a): the body stays 0.012 and shrinks only in s16. Change the numbers here and only here.
 export const EXAM_R                       // 0.012 (docs/shots/README.md §1)
 export const SHRINK                       // [0.012, 0.0105, 0.009, 0.008, 0.007, 0.006, 0.005]: r after n problems solved
 export const BLOB_R                       // { freshman: 0.012, neighbor: 0.013, custodian: 0.004, sleeper17: 0.006 }
@@ -390,7 +390,7 @@ export function examRadius(shot, solved = 0)   // → r: SHRINK[solved] in s16, 
 export function makeExam({ shot, seed = 1 })   // → createBlob({ radius: examRadius(shot), seed }) + { radius, scaleAt(solved) }
   // scaleAt(n) = examRadius(shot, n) / radius: multiply it into the mesh scale for s16's shrink steps
 
-// poses.js
+// poses.ts
 export const POSES        // { name: { part: radians } }: every named pose below, plain objects for Puppet.blend/pose
 export const POSE_INFO    // { name: { rig, shots: ['s06', ...] } }: which rig takes it and which shots use it
                           // rig: gator | front | back | freshman | tall | round | custodian | neighbor | sleeper | heroTop
@@ -413,7 +413,7 @@ export function walk(t, { set = 'side', step = 1/3, t0 = 0, rise = 0.003 })  // 
 
 **Art conventions for the cutter** (so frozen art drops in): side-view pieces as seen facing +x; arms horizontal, shoulder end left; tails pointing −x, root right; legs and the mop vertical, top end up; `hero_tail` pointing down. `turn_front` is painted **without arms** (the rig adds them).
 
-**Poses.** `name — rig — shots`. Gator side rig unless noted; numbers are in `poses.js`.
+**Poses.** `name — rig — shots`. Gator side rig unless noted; numbers are in `poses.ts`.
 
 | Group | Poses (shots) |
 |---|---|
@@ -437,11 +437,11 @@ export function walk(t, { set = 'side', step = 1/3, t0 = 0, rise = 0.003 })  // 
 Added by `rig-legs` (Q9 (a), additive; where it differs from the text above, this wins):
 
 ```js
-// gator.js
+// gator.ts
 export const HIP              // 0.02944: standing hip height, the root above the soles when the near leg is plumb (× scale)
 export function hipHeight(pose)  // → the root's height above the floor that puts the lower foot on it (scale 1, × scale),
                                  //   from the pose's body + leg_r / leg_l angles (the proxy foot: round heel and toe)
-// poses.js
+// poses.ts
 export function specPose({ ..., leg, farLeg = leg })  // leg / farLeg: the near / far leg's WORLD angle in degrees,
                                                       //   0 = straight down, + = foot forward (toward +x). Unset = not posed.
 walk(t, opts)  // → { keys, lift, hip } for the side set: hip = the root's height above the floor for this drawing
@@ -451,16 +451,16 @@ walk(t, opts)  // → { keys, lift, hip } for the side set: hip = the root's hei
 - **The Student and the Freshman have legs.** `gator_sheet` and `freshman_sheet` gain `leg_l` (far) and `leg_r` (near): short and stubby, a shin with a foot toward +x. Both hang from one pivot at the hip, behind the body (z −0.003 far, −0.001 near). Side rig parts are now: body (root), leg_l, leg_r, tail, arm_l, pocket, head, head34, snout, jaw, eyes, mouth, arm_r; the Freshman's the same with backpack and without pocket and head34.
 - **He stands 8 cm.** The root stays the hip, so s15's numbers (shoulder +0.030, eye +0.042, the K-path) are unchanged; standing, place the root `HIP × scale` above the floor (or `hipHeight(POSES[name]) × scale` for any floor pose). Measured on drawn pixels: 79.8 mm sole to head top (`evidence/rig-legs/height.txt`). The blob ratio (README §1) holds again.
 - **The turnarounds** (`facing: 'front' | 'back'`) are now 0.04 × 0.08, root still at the feet, with shoulders at HIP + 0.030, eyes at HIP + 0.041 and arm reach 0.032, matching the side rig.
-- **Leg angles by stance** (poses.js): seated poses tuck the legs forward (near 60°, far 54°), clear of the floor at s15's seat; kneels fold them back (−90°) with the hip 0.011 above the floor (s04's 0.06 kneeling height); standing poses have the near leg plumb and the far foot 8° ahead; `crouch` puts both feet ahead (hip 2.9 mm down, s07's −3 mm); `prone`, `prone_flick` and `yawn` lay them flat behind.
+- **Leg angles by stance** (poses.ts): seated poses tuck the legs forward (near 60°, far 54°), clear of the floor at s15's seat; kneels fold them back (−90°) with the hip 0.011 above the floor (s04's 0.06 kneeling height); standing poses have the near leg plumb and the far foot 8° ahead; `crouch` puts both feet ahead (hip 2.9 mm down, s07's −3 mm); `prone`, `prone_flick` and `yawn` lay them flat behind.
 - **The side walk has real foot contacts.** Contact: trailing leg −45° on its toe, leading leg +27.7° on its heel, both on the floor and 0.024 apart (s18's step length; move the root 0.024 × scale per step and the planted foot doesn't skate). The swing leg stays back (−36°) through the pass, so the set has a second pass, **`walk_side_pass_b`** (new pose; the walk is a → pass → b → pass_b). Place the root at `walk().hip × scale`. `evidence/rig-legs/feet.txt`: every drawing has the stance foot on the floor (±0.5 mm) and the swing foot above it; both feet down on contact.
 - Art convention for the cutter: legs vertical, hip end up, foot pointing +x. `hipHeight` uses the proxy foot's shape; re-measure it from the cut `leg_l` when art lands.
 
-A shot whose numbers differ from a named pose builds its own with `specPose` (the specs' numbers win). New poses go into `poses.js` through this task's owner or a `contract-characters` task.
+A shot whose numbers differ from a named pose builds its own with `specPose` (the specs' numbers win). New poses go into `poses.ts` through this task's owner or a `contract-characters` task.
 
 ### Acting (task `rig-v4`)
 
 ```js
-// acting.js: expressions and life for any sideParts rig with brow: true (makeGator side, both roommates)
+// acting.ts: expressions and life for any sideParts rig with brow: true (makeGator side, both roommates)
 export const PRESETS      // neutral, numb, guilt, flinch, dread, resolve, relief, pride → { eyes, mouth, brow, tilt, slump, tail, breath, depth }
 export const ANTIC, MIN_HOLD, SETTLE   // 2/24 s, 12/24 s, 4/12 s
 export function act(rig, t, cues, { breath, depth, slump, tilt, tail, blink = true, seed = 0 } = {})  // → { name, eyes, mouth }

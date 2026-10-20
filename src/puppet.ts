@@ -3,7 +3,7 @@
 // Each part is a joint Group at its pivot, holding a paper mesh offset so the pivot lands on the joint.
 // `at` is the pivot's position in the parent's joint frame (m, +Y up); `z` is the gap in front of the parent
 // (default 3 mm; negative tucks a part behind it, e.g. tail and far arm). `pivot` is [u, v] in the part's
-// texture space, as paper.js paths use it: u right, v DOWN, 0..1.
+// texture space, as paper.ts paths use it: u right, v DOWN, 0..1.
 // Face slots are ordinary parts named after a `faces` key ('eyes', 'mouth'); face() swaps their textures.
 // Every take in a slot must share the slot part's size: a swap changes textures, never geometry.
 // Boil: a part's sheet (or a face take) may be a function seed → PaperSheet. boil(t, rate) re-tears every such

@@ -37,7 +37,7 @@ function lampClick(seed = 1) {
 // The ceiling fluorescent's motion sensor waking (docs/05-sound.md, README §3), 0.65 s. The wake's strikes are at +0.042, +0.167
 // and +0.292: a relay clack on the beat (lampClick's snap, pitched down, with a short metallic tail), a faint tick on each of the
 // first two strikes, a glassy ping as the third catches, and the tube's 120 Hz hum rising under it over ~0.3 s to the bed's level
-// (cues.js: fluorescentHum at 0.15 / this cue's 0.8), so it hands over to the bed at +0.65. Both wakes use the one seed.
+// (cues.ts: fluorescentHum at 0.15 / this cue's 0.8), so it hands over to the bed at +0.65. Both wakes use the one seed.
 function sensorWake(seed = 1) {
   const out = new Float32Array(Math.ceil(0.65 * SR));
   const snap = (at: number, g: number, s: number) => {
@@ -528,7 +528,7 @@ function examHush(seed = 1, dur = 4) {
 // on purpose, so no cue can make a second clock. The tick: a dry escapement snap, the paper disc's wooden body answering
 // (420 Hz case knock, 1.15 and 2.65 kHz modes) and a grain of paper on top. The joke is the second hand's overshoot
 // (README §13: one frame of +1.5°, back the next): a small, slightly higher rebound tick one frame later, 1/24 s.
-// Placed one cue per whole second of global time (cues.js), so it shares the pulse's 0.5 s grid. (G4's exam-room clock
+// Placed one cue per whole second of global time (cues.ts), so it shares the pulse's 0.5 s grid. (G4's exam-room clock
 // bed, a 4.5 kHz tick/tock, is replaced: doc 05 v4 makes s17b's clock this buffer.)
 const TICK_SEED = 0x71c4;
 function clockTick() {
@@ -555,7 +555,7 @@ const clockTickExam = () => {
 };
 
 // The walk's pulse (doc 05, s09c): the tick an octave down (played at half speed) on a soft low thump. The dub is the same
-// buffer, lighter (score.js). A heartbeat built from the clock.
+// buffer, lighter (score.ts). A heartbeat built from the clock.
 function pulse() {
   const t2 = clockTick(), out = new Float32Array(Math.ceil(0.3 * SR));
   for (let i = 0; i < 2 * t2.length - 2; i++) { const j = i / 2, k = Math.floor(j); out[i] = 0.6 * (t2[k] + (j - k) * (t2[k + 1] - t2[k])); }

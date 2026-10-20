@@ -1,5 +1,5 @@
 // node tools/mix.ts [--range=a:b]
-// Renders CUES (by beat name) and the score (src/audio/score.js) onto the timeline, writes
+// Renders CUES (by beat name) and the score (src/audio/score.ts) onto the timeline, writes
 // out/audio/stems/{music,foley,ambience}.wav and out/audio/mix.wav normalized to -16 LUFS / -4 dBTP (snd-g4's brief)
 // with ffmpeg loudnorm (two-pass, linear; the full mix throws if loudnorm falls back to dynamic, or if the result
 // misses -16 ±1 LUFS or goes over -4 dBTP), then prints the mix's measured LUFS and true peak (ebur128).
@@ -21,7 +21,7 @@ import { writeWav } from '../src/audio/wav.ts';
 // (7 dB gave 11.55, still over; 7.5 gives 11.24).
 // snd-v4: the v4 cut trades G4's 12 s of full groove (s07-s08) for the quiet climax, and the premix PLR rose to 12.8 dB.
 // The true peak is the lamp click (measured: -4.8 dBTP at 40.5 and 74.0, every other 10 s span lower), so the fix is the
-// click's level against the film, not the music's against the foley: the click's cue gain went 0.8 → 0.6 (cues.js) and this
+// click's level against the film, not the music's against the foley: the click's cue gain went 0.8 → 0.6 (cues.ts) and this
 // ceiling moved down with it, to just under the click's new peak (-7.15 dBFS). The makeup stays 7.5, so music and foley
 // keep G4's balance. Measured: PLR 11.3 dB, linear. (Raising the makeup to 8.5 also passed, at +1 dB of music over foley.)
 const MUSIC_MAKEUP_DB = 7.5, MUSIC_CEIL_DB = -7.6;
@@ -40,7 +40,7 @@ if (!(b > a)) throw new Error(`bad --range: ${arg}`);
 const n = Math.round((b - a) * SR);
 const stems = { music: new Float32Array(n), foley: new Float32Array(n), ambience: new Float32Array(n) };
 
-// v7, third-party audio (s07's reels, the laptop's CS2; cues.js): a window of a clip, decoded mono at SR through a phone speaker's band,
+// v7, third-party audio (s07's reels, the laptop's CS2; cues.ts): a window of a clip, decoded mono at SR through a phone speaker's band,
 // levelled to RMS 1 (the cue's gain sets the level) with 5 ms edges so the hard cuts don't click. The clips are
 // gitignored: without one, its cue stays silent and the mix says so.
 const CLIP_DIR = fileURLToPath(new URL('../assets/raw/reels/', import.meta.url));

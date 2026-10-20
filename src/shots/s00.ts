@@ -1,6 +1,6 @@
 // s00 · The notification (docs/shots/s00.md; v6-canvas-a). Cold open: a phone face-up on the real-scale home desk
-// (s02.js's unit), pre-dawn dark. It buzzes (notifyBuzz 0.5) and the screen wakes on Canvas Student's To-do list, light
-// mode (src/props/canvas.js), its last row "MAC2312 · Calc 2 Exam · Tomorrow 9:00 AM". A slow push toward that row; the
+// (s02.ts's unit), pre-dawn dark. It buzzes (notifyBuzz 0.5) and the screen wakes on Canvas Student's To-do list, light
+// mode (src/props/canvas.ts), its last row "MAC2312 · Calc 2 Exam · Tomorrow 9:00 AM". A slow push toward that row; the
 // second buzz (2.0) drops the reminder banner in and brings the row's red marker up; the screen dims as it times out
 // (3.5) for the cut to s01. No character, no blob. Camera straight down, the phone's top up. Phone, light and camera
 // on 1s (a real vibration), boil 10/s on the paper only: the screen type stays crisp.

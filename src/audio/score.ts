@@ -1,8 +1,8 @@
 // The film's score (doc 05 §Leitmotifs, §Structure by section): a flat list of note events plus one renderer.
-// Every event is { beat, at, voice, midi, ... }: a beat name from src/timeline.js plus an offset in seconds,
+// Every event is { beat, at, voice, midi, ... }: a beat name from src/timeline.ts plus an offset in seconds,
 // never a global time, so retiming a shot moves its music. `motif` tags which leitmotif a note belongs to.
-// Voices are doc 05's four, from synth.js: felt piano, music box, warm pad, sub swell; plus v4's pulse, built from the
-// clock's tick (foley.js). An event may carry until: '<beat>' to stop dead on that beat. Mono, 48 kHz.
+// Voices are doc 05's four, from synth.ts: felt piano, music box, warm pad, sub swell; plus v4's pulse, built from the
+// clock's tick (foley.ts). An event may carry until: '<beat>' to stop dead on that beat. Mono, 48 kHz.
 import { beat, S13_DESKS } from '../timeline.ts';
 import { SR, feltPiano, musicBox, pad, subSwell, mixInto } from './synth.ts';
 import type { PadOpts, SubOpts } from './synth.ts';
@@ -112,12 +112,12 @@ const WALK = [
   ]),
   // Layer 5 (lamp5): the bass swell, 45 Hz, attack 6 s: its crest is the door push; its 0.5 s release ends on lightFlood.
   W('lamp5', 0, 'sub', null, { hz: 45, dur: beat('lightFlood') - beat('lamp5'), attack: 6, gain: 0.2, motif: 'swell' }),
-  // The peak (doorPush): the G chord struck hard under the held A, with the push bar's clunk (cues.js).
+  // The peak (doorPush): the G chord struck hard under the held A, with the push bar's clunk (cues.ts).
   W('doorPush', 0, 'piano', [31, 43, 50, 55, 59, 62], { vel: 0.8, dur: 0.6, gain: 0.2, motif: 'peak' }),
 ];
 
 // ───────── s13 (v7): a note on every shadow event ─────────
-// Every crowd desk in S13_DESKS (timeline.js) wakes on a note and goes face down on a note, read from that one table.
+// Every crowd desk in S13_DESKS (timeline.ts) wakes on a note and goes face down on a note, read from that one table.
 // Build (v3's, the one the director called "timed with the music"): the three featured wakes get v3's three chords, the
 // bass stepping down A, F, E (Am, Fmaj7, E7: everyone stuck, left on the dominant); the room's seven wakes climb E7 one
 // note each on the music box, the blobs' voice (on the piano they sank into the held E7: the stem's first-difference
@@ -167,7 +167,7 @@ export const SCORE: ScoreEvent[] = [
   ev('bedRot', 0, 'piano', [47.85, 51.85], { vel: 0.4, dur: 12, until: 'clockThree', motif: 'thin' }),
   ev('gulp3', 0, 'sub', null, { hz: 56, dur: beat('clockThree') - beat('gulp3') + 0.5, attack: 1, gain: 0.3, until: 'clockThree' }),
 
-  // 1:00–1:10 3 a.m.: music out. Only the tick (cues.js).
+  // 1:00–1:10 3 a.m.: music out. Only the tick (cues.ts).
 
   // 1:10–1:16 The choice (v4). One low held note under the breath: felt piano low C, very soft, with a slow pad swell
   // under it, ringing into s09b and dissolving into the door's swell.

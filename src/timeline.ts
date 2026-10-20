@@ -39,8 +39,8 @@ export const SHOTS: Shot[] = [
 ];
 
 // s13's cascade, the one place its timing lives: for each crowd desk, when its phone wakes (its shadow springs up) and
-// when it goes face down (the shadow collapses to its pool under the pendant), as [beat, offset s]. src/shots/s13.js
-// draws from it and src/audio/score.js puts a note on every event, so moving a desk here moves its shadow and its note.
+// when it goes face down (the shadow collapses to its pool under the pendant), as [beat, offset s]. src/shots/s13.ts
+// draws from it and src/audio/score.ts puts a note on every event, so moving a desk here moves its shadow and its note.
 // Build: the three featured desks a second apart (v3's 1.4 / 2.4 / 3.4, a little earlier, so the last loom is full and
 // held a quarter-second before the turn), then the room's other seven every 1/8 s from the outside in, closing round him.
 // Turn: from his neighbours outward, two desks per chord, a quarter-second apart; the Freshman's is the last phone down,

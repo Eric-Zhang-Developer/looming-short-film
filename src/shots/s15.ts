@@ -59,7 +59,7 @@ const WARM = 0.3;                                            // v4 Marston warm:
 const ZONE_I = 0.25, FLUOR_I = 0.25, AMB_K = 0.6, FILL_I = 0.02, CU_KEY = 0.010;   // ZONE_I: s11's 0.8 blew the desk out from B′'s height
 
 // ---------- the hand: s15's table, to the pen and the name ----------
-const seat = (o: SpecOpts) => specPose({ leg: 60, farLeg: 54, ...o });   // poses.js's seated legs
+const seat = (o: SpecOpts) => specPose({ leg: 60, farLeg: 54, ...o });   // poses.ts's seated legs
 const P = {
   ...POSES,
   settle: seat({ lean: 6, arm: -30 }),        // 0.0: hands flat on the desk either side of the page (s11's end)

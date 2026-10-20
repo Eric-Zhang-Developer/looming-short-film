@@ -269,7 +269,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       tallCtrlHand.visible = handCtrl;
       tallCtrlCouch.visible = !handCtrl;
 
-      game.fire(firing(tLocal, 0.33, 5.75));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.js: from gameNight + 0.33, in 5.75)
+      game.fire(firing(tLocal, 0.33, 5.75));   // v7: the muzzle flashes on the CS2 clip's bursts (cues.ts: from gameNight + 0.33, in 5.75)
 
       // ---- The Exam: eyes up toward the roommates and the TV (side, −x), track the walker (flip as he passes at 4.5),
       // 5.00 squash, 5.08 hop (4 mm up), 5.17 lands and settles on a spring, 5.50 eyes open on the Student.

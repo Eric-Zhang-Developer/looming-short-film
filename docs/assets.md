@@ -4,9 +4,9 @@ The film's single asset list. Every shot spec's **Assets needed** section uses t
 
 ## Budget
 - **Asked for:** the three storyboard passes named **55 distinct painted assets** (sb-act1 27, sb-act2 20 more, sb-act3 8 more), plus the style tile. Doc 08 budgets **25–35 frozen**.
-- **This list:** **19 frozen assets used in shots + the style tile = 20 frozen.** 16 plain shapes became procedural `paper.js` pieces, and the rest were merged into sheets. Nothing in the story was cut.
+- **This list:** **19 frozen assets used in shots + the style tile = 20 frozen.** 16 plain shapes became procedural `paper.ts` pieces, and the rest were merged into sheets. Nothing in the story was cut.
 - **G4:** 22 frozen in shots + the style tile = **23**: four kits added (`home_kit`, `kitchen_kit`, `props_kit`, `exam_room_kit`), `freshman_sheet` retired. 12 slots under the cap.
-- **v4 (spec-v4):** one new frozen asset (`closeup_head_kit`, #24) on top of G4's count. (That count predates the frozen `marston_kit` and `marston_ext_kit`, which `src/assets.js` loads but this table has no rows for; recount when the table is next reconciled.) The clock, the hallway, the campus path and the glass doors are procedural; the walk and the threshold reuse `marston_ext_kit` and `marston_kit` pieces. `roommates_sheet` is retired by rig-v4 (gator roommates from the hero rig); `custodian_sheet` and `marston_stacks` go unused with s14 and old s10.
+- **v4 (spec-v4):** one new frozen asset (`closeup_head_kit`, #24) on top of G4's count. (That count predates the frozen `marston_kit` and `marston_ext_kit`, which `src/assets.ts` loads but this table has no rows for; recount when the table is next reconciled.) The clock, the hallway, the campus path and the glass doors are procedural; the walk and the threshold reuse `marston_ext_kit` and `marston_kit` pieces. `roommates_sheet` is retired by rig-v4 (gator roommates from the hero rig); `custodian_sheet` and `marston_stacks` go unused with s14 and old s10.
 - **Headroom:** 15 slots under the cap. Doc 08 found a 5-piece sheet gives about 400 px per piece. Any piece that screens too soft for its largest use in a shot gets split out into its own generation, and that's what the headroom is for. The likeliest candidates are `ladder` (about half the frame height in s07) and `phone` in s15's Camera B.
 
 ## Frozen assets
@@ -44,7 +44,7 @@ A sheet is one generation with several cut pieces (doc 08), and it counts as one
 **Retired at G4** (no shot uses them now; none was frozen): `freshman_sheet` (#5: the Freshman's s18 scene is cut; `top_figures_sheet` paints their top view without it), and the procedural `apt_desk` (→ `home_kit` desk), `apt_kitchen` (→ `kitchen_kit`) and `blackout_curtains` (→ `home_kit` roller blinds). `apt_furniture_sheet` keeps only the couch and coffee table (s05), and `apt_props_sheet` only the controllers and the drill.
 
 ## Sizes against the gator (G4)
-The director: "that's a fucking massive table … The furniture is weird." Every G4 kit piece gets a real-world size and a film size. **Set scale 1:22** (1 m real = 0.0455 film m), fixed by the desk unit's heights, which are already real: desk top 0.034 above the floor (75 cm), chair seat 0.021 (46 cm). The gator, measured from the rig (`src/characters/gator.js`: hip 0.029, body 0.080; README §2): **head top 0.109 standing, eye ≈ 0.071 standing** (≈ 1.6 m at 1:22, a normal eye height), **eye 0.030 above the desk seated**. He's a cartoon: a big head on short legs. So pieces he sits at or looks at use 1:22 exactly; pieces his whole body must fit (bed, door, ceiling) get the head room his 0.109 needs, marked *cartoon allowance*.
+The director: "that's a fucking massive table … The furniture is weird." Every G4 kit piece gets a real-world size and a film size. **Set scale 1:22** (1 m real = 0.0455 film m), fixed by the desk unit's heights, which are already real: desk top 0.034 above the floor (75 cm), chair seat 0.021 (46 cm). The gator, measured from the rig (`src/characters/gator.ts`: hip 0.029, body 0.080; README §2): **head top 0.109 standing, eye ≈ 0.071 standing** (≈ 1.6 m at 1:22, a normal eye height), **eye 0.030 above the desk seated**. He's a cartoon: a big head on short legs. So pieces he sits at or looks at use 1:22 exactly; pieces his whole body must fit (bed, door, ceiling) get the head room his 0.109 needs, marked *cartoon allowance*.
 
 | Piece | Kit | Real | Film (m) | Against him |
 |---|---|---|---|---|
@@ -105,7 +105,7 @@ Plain shapes are built with `makePaper({ path, color, weight })`, or from a real
 | `glass_door` | Marston's entrance door: a kraft cardstock frame with a tissue pane (`castShadow` off, lets light through) and a push bar; ×2 as a pair, his hinged to open inward | s10 | new (spec-v4) |
 
 ## Code, never painted (doc 08)
-Every blob (`blob.js`), the home lamp's cone and dust (`lampLight`), Marston's zone lights with their wake and timeout (`sensorLight`), the s13 shadow decals, the name and answer squiggles and every glyph line, the fade, the stain and soak (s18).
+Every blob (`blob.ts`), the home lamp's cone and dust (`lampLight`), Marston's zone lights with their wake and timeout (`sensorLight`), the s13 shadow decals, the name and answer squiggles and every glyph line, the fade, the stain and soak (s18).
 
 **Every legible word and number (G4):** the notification ("Calc 2 Exam · Fri"), the calendar's "Calc 2 exam" and "Final" and its X, the printed problems, his handwritten math, the red checks and the circled 94. Drawn in code, hand-lettered in the paper style, on top of the painted paper. Image generation garbles text and math, and this math has to be exactly right (`done/spec-g4.md`). (The calendar tear edge is gone with the old s18.)
 

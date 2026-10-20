@@ -53,7 +53,7 @@ Report states exactly. Never call something "done" when it's "built."
 ## Ownership
 
 - Each task's brief lists `owns`: the exact paths it may create or change.
-- **Contract files** are shared interfaces that many tasks import: `src/paper.js`, `src/material.js`, `src/lights.js`, `src/puppet.js`, `src/blob.js`, `src/post.js`, `src/timeline.js`, `render.ts`, `assets/specs.json`. Each one is built in wave 2 by one builder. After that, it changes only through a `contract-<name>` task, which may add to an interface but not break it. The orchestrator re-runs the verifier on every shot that depends on it.
+- **Contract files** are shared interfaces that many tasks import: `src/paper.ts`, `src/material.ts`, `src/lights.ts`, `src/puppet.ts`, `src/blob.ts`, `src/post.ts`, `src/timeline.ts`, `render.ts`, `assets/specs.json`. Each one is built in wave 2 by one builder. After that, it changes only through a `contract-<name>` task, which may add to an interface but not break it. The orchestrator re-runs the verifier on every shot that depends on it.
 - **Interfaces first.** Before wave 2, the orchestrator writes `docs/contracts.md`: every contract module's exported functions and arguments. Builders implement against it, and shot builders call only what it lists.
 - A builder that needs a contract changed stops, writes the request in its done note under Gaps, and finishes what it can.
 

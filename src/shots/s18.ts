@@ -4,7 +4,7 @@
 // the sheet it ran down in s02 and soaks into the circle it was born from (blobAbsorbed 5.5), leaving a faint trace.
 // Then he writes the next exam, "Final", and circles it in red (newDate 9.5); a new bead of ink forms on the circle and
 // quivers (dropQuivers 11.0); he looks at it and uncaps his pen (tagPenUncap 13.5), and it goes still. Fade to black.
-// The room is s02's: DESK, homeDesk and the calendar come from s02.js, so the ending is the birth's own frame.
+// The room is s02's: DESK, homeDesk and the calendar come from s02.ts, so the ending is the birth's own frame.
 // Characters on 2s; the quiver on 1s; light, camera and fade on 1s; boil 10/s.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.ts';
@@ -38,7 +38,7 @@ const DAY_I = 0.8;                                           // v4: pale window 
 const LAMP_Z = 0.0085;
 const LAMP_AT: Vec3 = [DESK.lampMouth[0] + 0.001, DESK.lampMouth[1] + 0.004, LAMP_Z + 0.0005], LAMP_AIM: Vec3 = [0.036, 0.020, 0.0035];
 const STAIN = [1.0, 0.4];                                  // the soak's trace: opacity at the bloom, and the trace it leaves
-// Cameras: s02's W and I (copied from s02.js, which doesn't export them), and I2 on the lower sheet.
+// Cameras: s02's W and I (copied from s02.ts, which doesn't export them), and I2 on the lower sheet.
 const C = DESK.cal, [FX, FY] = C.friXY;
 const LIP_Y = C.y0 + 0.0005 + 0.012 * 0.4;                   // s02's perch on the curl
 const CAM_W: CamKey = { pos: [0.004, 0.062, 0.40], look: [0.004, 0.030, 0.012] };

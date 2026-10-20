@@ -205,8 +205,8 @@ export const hipHeight = (p: Pose): number => Math.max(drop((p.body ?? 0) + (p.l
 const THROAT = [[208, 222], [209, 186], [215, 160], [229, 140], [250, 126], [278, 118], [320, 116], [362, 120], [362, 148],
   [346, 158], [334, 168], [322, 180], [314, 200], [310, 222]];
 const HEAD_LIFT = 10;
-// The brow (rig-v4, acting.js): one torn strip of dark green paper over the side eye, hidden until act() shows it.
-// BROW_AT is its centre at rest (figure px), BROW its box; acting.js moves it (figure px × FIG_K) and turns it (degrees).
+// The brow (rig-v4, acting.ts): one torn strip of dark green paper over the side eye, hidden until act() shows it.
+// BROW_AT is its centre at rest (figure px), BROW its box; acting.ts moves it (figure px × FIG_K) and turns it (degrees).
 export const BROW_AT = [262, 30], BROW = [58, 17];
 // A polygon in figure px → a paper part: its box (plus a 3 px margin to tear on) as size, pivot at the box's top left.
 function drawn(name: string, poly: number[][], { parent, z, color, like, origin }: { parent: string, z: number, color: string, like: string[], origin: number[] }): PartSpec {

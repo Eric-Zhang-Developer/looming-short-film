@@ -1,4 +1,4 @@
-// paper.js: painted art or a plain shape → a torn sheet of paper (doc 04 §paper.js, contract in docs/contracts.md).
+// paper.ts: painted art or a plain shape → a torn sheet of paper (doc 04 §paper.ts, contract in docs/contracts.md).
 //
 // How the edge is torn: rasterize the silhouette (art alpha or `path`), take its exact signed distance field,
 // then cut the paper where   sdf(p) > cut(q)   with q = p's nearest edge point. Evaluating every edge noise at q

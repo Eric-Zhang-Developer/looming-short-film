@@ -17,7 +17,7 @@ import type { ShotCtx } from '../film.ts';
 import type { Palette, MatOpts } from './s02.ts';
 
 const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
-// A shape that fills its canvas has no edge to tear (paper.js tears where alpha ends), so a visible rectangle is
+// A shape that fills its canvas has no edge to tear (paper.ts tears where alpha ends), so a visible rectangle is
 // inset by a margin of 4% of its long side: { path, size } with the size grown so the inset shape keeps [w, h].
 const PAD = 0.04;
 function torn(w: number, h: number) {

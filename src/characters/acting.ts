@@ -153,7 +153,7 @@ export function act(rig: ActRig, t: number, cues: [number, string][], { breath, 
   return { name, eyes, mouth };
 }
 
-// The self-check the brief's timing rules lean on: node src/characters/acting.js (no browser; a stub rig).
+// The self-check the brief's timing rules lean on: node src/characters/acting.ts (no browser; a stub rig).
 if (typeof process !== 'undefined' && import.meta.url === `file://${process.argv[1]}`) {
   const j = () => ({ rotation: { z: 0 }, scale: { y: 1 }, position: { y: 0 }, userData: {} });
   const rig = ({ scale: 1, joints: { body: j(), head: j(), tail: j(), brow: j() }, meshes: { brow: {}, head: { visible: true } }, face(f: unknown) { this.f = f; } }) as any;   // a stub rig: plain objects standing in for three Groups and meshes

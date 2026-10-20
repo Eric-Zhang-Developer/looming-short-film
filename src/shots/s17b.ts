@@ -36,7 +36,7 @@ const KFILL = [0.84, 0.92], kZ = (fill: number) => 0.0008 + 0.014 / fill / (2 * 
 const CAM_K: CamKey = { pos: [0.12, 0.10, kZ(KFILL[0])], look: [0.12, 0.10, 0.0008] };
 
 // ---------- tunables ----------
-const BLOB_R = { start: 0.005, testSolved: 0.004 };      // SHRINK[6] → SHRINK[7] (README §1; exam.js has no SHRINK ladder yet)
+const BLOB_R = { start: 0.005, testSolved: 0.004 };      // SHRINK[6] → SHRINK[7] (README §1; exam.ts has no SHRINK ladder yet)
 const OTHER_R = [0.004, 0.007];                           // the room's blobs, seeded in this range (never cloned)
 const ROOM = { table: 0.041, rows: [0.25, 0.19, 0.13, 0.07], x: [-0.32, 0.32], depth: 0.022 };   // 75 cm tables at 0.055 m/m
 const HIP_DROP = -0.0134, SEAT_BACK = 0.024;                                 // the seated figure's hip below the table top (T3's), and the seat backs' height
@@ -208,7 +208,7 @@ export async function build(ctx: ShotCtx) {
   const clock = await makeClock(ctx, { seed: 17, diameter: CLOCK.d, face: 'exam' });
   clock.group.position.set(...CLOCK.at); t1.add(clock.group);
   // fix-payoff: the navy second hand was the same weight and colour as the minute hand, so at :12 it read as one of the two
-  // ("roughly 12:10"). Red and thin, it can only be the second hand. (clock.js adds its children in the order face, hour,
+  // ("roughly 12:10"). Red and thin, it can only be the second hand. (clock.ts adds its children in the order face, hour,
   // minute, second, pin; the second hand's group turns with set().)
   {
     const sec = clock.group.children[3], k = CLOCK.d / 0.020;

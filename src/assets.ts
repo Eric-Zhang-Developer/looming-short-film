@@ -9,7 +9,7 @@ import { PALETTE } from './core/palette.ts';
 const G = 'gator', C = 'cream', K = 'kraft', N = 'navy', I = 'ink';
 export type Piece = [w: number, h: number, shape: string, color: keyof typeof PALETTE];
 export const PIECES: Record<string, Record<string, Piece>> = {
-  // gator_sheet and face_sheet: the frozen art's opaque boxes at the side rig's fit (characters/gator.js: K, FACE).
+  // gator_sheet and face_sheet: the frozen art's opaque boxes at the side rig's fit (characters/gator.ts: K, FACE).
   gator_sheet: {
     turn_side: [0.1057, 0.0962, 'gator', G], turn_front: [0.0522, 0.0958, 'torso', G], turn_back: [0.0619, 0.0976, 'torso', G],
     turn_head34: [0.0497, 0.0437, 'head', G], body: [0.0485, 0.0533, 'torso', G], head: [0.0433, 0.0370, 'head', G],
@@ -188,9 +188,9 @@ async function loadUncached(name: string) {
 }
 
 // Codex paints a soft fringe outside each piece (alpha < 128) in the colour it was painted against, a yellow-green,
-// and paper.js resamples every piece, which mixes that fringe into the edge it keeps (alpha >= 128). So each fringe
+// and paper.ts resamples every piece, which mixes that fringe into the edge it keeps (alpha >= 128). So each fringe
 // pixel takes the colour of its nearest kept one (a breadth-first fill outward), and alpha < 16 dust goes. The kept
-// pixels, the painted cream rim among them, and all alpha >= 16 are untouched, so the silhouette paper.js cuts at 0.5
+// pixels, the painted cream rim among them, and all alpha >= 16 are untouched, so the silhouette paper.ts cuts at 0.5
 // doesn't move. evidence/cut-gator/halo.jpg.
 function despill(img: HTMLImageElement) {
   const W = img.width, H = img.height, c = Object.assign(document.createElement('canvas'), { width: W, height: H });
@@ -215,7 +215,7 @@ function despill(img: HTMLImageElement) {
   return c;
 }
 
-// [u0, v0, u1, v1]: the box around pixels with alpha ≥ 128 (paper.js cuts at the same 0.5), in uv, v down.
+// [u0, v0, u1, v1]: the box around pixels with alpha ≥ 128 (paper.ts cuts at the same 0.5), in uv, v down.
 type Box = [u0: number, v0: number, u1: number, v1: number];
 function opaqueBox(bmp: ImageBitmap): Box {
   const W = bmp.width, H = bmp.height, g = Object.assign(document.createElement('canvas'), { width: W, height: H }).getContext('2d')!;

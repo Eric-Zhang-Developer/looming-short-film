@@ -65,7 +65,7 @@ const HOP = 0.5, HOP_H = 0.003;
 // walk-redo: the gait is timed, not phased on distance: a contact every STEP from PULSE0 (global 84.0), so every other
 // footfall lands on the 120 bpm pulse. His legs are short (hip 0.015 m), so at x(t)'s 0.06–0.11 m/s that means four
 // steps a second; each step's leg spread is scaled to the distance x(t) covers in it, so the planted foot barely skates.
-const PULSE0 = B.lamp1, STEP = 0.25, SPREAD0 = 0.024;   // SPREAD0: the side set's contact spacing (poses.js)
+const PULSE0 = B.lamp1, STEP = 0.25, SPREAD0 = 0.024;   // SPREAD0: the side set's contact spacing (poses.ts)
 const SWING = 14 * D, SWAY = 8 * D;                     // extra arm swing and tail sway on top of the poses' ±15° / ±6°
 // walk-redo: the blob trails a further GAP behind HEEL, so it reads as its own shape beside him. LAMP_X (exported) still
 // comes from HEEL alone; on a lamp beat the blob is GAP short of the lamp, which still lights it nearly from overhead.

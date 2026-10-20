@@ -21,7 +21,7 @@ export function createStage({ width = 1920, height = 1080, fov = 20 } = {}) {
     for (const fn of fns) fn(t);
     draw();
   };
-  const setRender = (fn: () => void) => { draw = fn; };  // post.js swaps in its composer here
+  const setRender = (fn: () => void) => { draw = fn; };  // post.ts swaps in its composer here
   return { renderer, scene, camera, onFrame: (fn: (t: number) => void) => { fns.push(fn); }, renderFrame, setRender, ready: Promise.resolve() };
 }
 

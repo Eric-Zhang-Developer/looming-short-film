@@ -32,7 +32,8 @@ Every subagent reads this page first. The docs and your brief are the source of 
 ## Rendering and running
 - Contact sheet: `node render.ts --sheet=<times> --out=evidence/<id>/sheet.jpg`
 - Motion strip: `node render.ts --strip=<a>:<b> --out=evidence/<id>/strip.jpg`
-- Checks: `node tools/check_timeline.ts` and `node tools/determinism.ts --t=<times>`
+- Checks: `npm run typecheck`, `node tools/check_timeline.ts` and `node tools/determinism.ts --t=<times>`
+- Code is strict TypeScript; Node runs `.ts` directly. No `@ts-ignore`, `@ts-expect-error` or `@ts-nocheck`; `any` only with a comment saying why.
 - Never start a full-film render. The orchestrator schedules those.
 
 ## If you are a painter

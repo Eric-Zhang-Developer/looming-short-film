@@ -51,7 +51,7 @@ ok('onTwos(0.09) === 1/12', () => {
 });
 ok('onTwos survives the film\'s global-to-local subtraction', () => {
   assert.equal(onTwos(2402 / 24 - 100), 1 / 12);   // s15 frame 2402: 0.0833333333333286 (the literal 100.0833 − 100 is a rounded 0.0833, below 1/12)
-  for (let n = 0; n <= 4320; n++) {            // exactly film.js: shotAt(n/24).tLocal = t − shot.start
+  for (let n = 0; n <= 4320; n++) {            // exactly film.ts: shotAt(n/24).tLocal = t − shot.start
     const { shot, tLocal } = shotAt(n / 24), want = Math.floor((n - shot.start * 24) / 2);
     assert.equal(Math.round(onTwos(tLocal) * 12), want, `frame ${n} (${shot.id}, tLocal ${tLocal})`);
   }

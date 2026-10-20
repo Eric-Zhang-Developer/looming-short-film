@@ -412,7 +412,7 @@ export const WALL_HUE = 0.3;                                  // how much of a r
 // The key's level and the face fill (s08 and s09a keep them while the phone is on); the moon panes' glow.
 export const SPOT = 0.9, SPOT_ANGLE = 1.05, FACE_FILL = 0.05, SPILL = 0.40, MOON_PANES = 0.10, FACE_LIGHT = 0.0035;
 
-// The thumb flicks (v7): one per reel, on the sound's cuts (cues.js REELS), so each flick changes what the phone plays.
+// The thumb flicks (v7): one per reel, on the sound's cuts (cues.ts REELS), so each flick changes what the phone plays.
 const FLICKS = REELS.map(([, , from]) => F(from));
 
 const ID = 's07';

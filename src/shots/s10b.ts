@@ -1,4 +1,4 @@
-// s10b · The stacks (docs/shots/s10b.md, v6). v3's s10 walk (git 228d5b2^:src/shots/s10.js) brought back after the
+// s10b · The stacks (docs/shots/s10b.md, v6). v3's s10 walk (git 228d5b2^:src/shots/s10.ts) brought back after the
 // threshold, with its meaning flipped by the v4 rule. Same locked camera down a Marston stacks aisle, the same kit bays as
 // wings and coffered ceiling strips as borders; he walks toward the lens with the 2.5× blob waddling behind him. v6-stacks-2: the side rig turned 50° to us, so the snout reads.
 // v3 lit him from the phone, low, and threw the blob's shadow huge on the end wall. Now he looks at the phone once and

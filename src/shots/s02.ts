@@ -267,7 +267,7 @@ export function gameScreen(PALETTE: Palette) {
   return { texture, fire };
 }
 // The CS2 clip's bursts of fire, in the clip's own seconds (v7-laptop: its loudness envelope at 1/24 s, assets/raw/reels/cs2.mp3).
-// cues.js plays it from `inSec` at shot-local `from`; firing(t, from, inSec) is on during a burst, flashing on alternate 2s drawings.
+// cues.ts plays it from `inSec` at shot-local `from`; firing(t, from, inSec) is on during a burst, flashing on alternate 2s drawings.
 const CS2_BURSTS = [[1.38, 1.82], [3.44, 4.70], [9.95, 10.72], [11.38, 12.0]];
 export const firing = (t: number, from: number, inSec: number) => {
   const c = t - from + inSec, f = Math.floor(t * 12 + 1e-6);

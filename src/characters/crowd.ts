@@ -1,6 +1,6 @@
 // Marston extras. Side view (s16, s17): the neighbor and the sleeping extra from crowd_sheet, 3 parts each, laid out
 // like the Student (s15 convention, near arm only). Top view (s13): hero_top and the six seated figures from
-// top_figures_sheet; they face +y (north), and + head angles turn them clockwise as seen from above (poses.js).
+// top_figures_sheet; they face +y (north), and + head angles turn them clockwise as seen from above (poses.ts).
 // Doc 03: never clone a figure. Every call takes its own seed (paper tears) and green.
 import { buildRig, greenVariant } from './gator.ts';
 import type { AssetCtx } from '../assets.ts';

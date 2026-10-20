@@ -25,7 +25,7 @@ const BLOB_R = { start: 0.030 };                         // 2.5× (README §1, Q
 // The set (m). Hall: end wall z 0 (the front door), his door wall at the hall's near end z DOOR_Z; his room beyond.
 const DOOR_Z = 0.50, HALL_X = 0.065, CEIL = 0.145;       // the hall 13 cm wide (spec 10): the 2.5× blob is 6.8 cm
 const DOORWAY = [0.090, 0.110];                          // his doorway, centred x 0 (wide: the 2.5× blob is 0.068 across)
-// PLACEHOLDER: the nightstand lamp's bulb. climax-a1 builds the nightstand in s07.js and will export its position; match
+// PLACEHOLDER: the nightstand lamp's bulb. climax-a1 builds the nightstand in s07.ts and will export its position; match
 // this to it (height above his floor, door side of the bed) when that lands. Here it sits 0.30 inside his room (about
 // 5.5 m real), near the doorway's axis, with the bulb at 0.027 (about 50 cm real: a low nightstand). The distance is what
 // lets the blob stay on his threshold and still throw S 2.7 on the end wall. See done/climax-a2.md, Gaps.

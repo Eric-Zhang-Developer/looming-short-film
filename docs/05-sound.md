@@ -32,9 +32,9 @@ Two sounds carry the story, and they are the most important sounds in the film.
 
 - **The lamp click (home only).** Heard three times: on, then off, in s06, and on again for the nightstand lamp in s09a (Q17). Design it once, carefully: a dry plastic click with a tiny filament "tink" as the light comes up. All three are the identical buffer, and the beds and music stop for each so it sounds alone.
 - **The clock's tick (`clockTick`, v4).** One dry, close, slightly woody tick, the voice of the wall clock (`docs/shots/README.md` §13). Planted faintly in s02 (−30 dB), the film's loudest small sound in s08 where it plays **alone** at 1 Hz, under s09a–s09b, then **doubled into the walk's pulse** at `lamp1` (s09c), and back slow and calm in the exam room (s17b) and faint in s18. Every tick is on a whole second of global time, so it locks to the pulse's 0.5 s grid. Design it once: every appearance is the same buffer, filtered for distance or the room.
-- **Removed in v4: the sensor relay.** The motion-sensor lights are cut (doc 02), so `sensorWake` (s15's relay clack, ticks and ping), the fluorescent timeout crackle (s11, s14) and the stacks' flicker crackles (s10) have no cue. The `FOLEY.sensorWake` voice can stay in `foley.js` unused or go in the sound pass; nothing in the timeline names it.
+- **Removed in v4: the sensor relay.** The motion-sensor lights are cut (doc 02), so `sensorWake` (s15's relay clack, ticks and ping), the fluorescent timeout crackle (s11, s14) and the stacks' flicker crackles (s10) have no cue. The `FOLEY.sensorWake` voice can stay in `foley.ts` unused or go in the sound pass; nothing in the timeline names it.
 
-Cues hang on beat names (`src/timeline.js`); the times are the **v4 cut's** (3:15, `spec-v4`) and move with the beats. **New** marks a cue added since G4; a new sound name is a new `foley.js` voice (or score part) for the sound pass. Global times in seconds.
+Cues hang on beat names (`src/timeline.ts`); the times are the **v4 cut's** (3:15, `spec-v4`) and move with the beats. **New** marks a cue added since G4; a new sound name is a new `foley.ts` voice (or score part) for the sound pass. Global times in seconds.
 
 | Sound | Where (beat, global time) | Notes |
 |---|---|---|
@@ -88,7 +88,7 @@ Cues hang on beat names (`src/timeline.js`); the times are the **v4 cut's** (3:1
 
 **Removed since G4** (no beat names them now): the blind rattle (`blind1`, `blind2`) and the drill (`blindsStart`); the groove's return and fade on `sunriseGame`; s09's lone piano note (`marstonEnter`); the stacks' hum start and flicker crackles (`stacksEnter`, `stacksFlicker1/2`); `laptopOpen`'s rustle, `phoneWake`'s surge, `tableLightDies`'s crackle; gulp 4 and gulp 5; Quiet 1's silence (`quiet1Start`); the Sleeper's chord (`revealSleeper`); the mop and its pre-lap (`custodianPass`, `tinyBlobSeen`); **`sensorWake` on `sensorWakeMarston`**; the silent `sensorWakeNeighbor`; the sixth shrink (`problemSolved6`).
 
-**Beat renames for `src/audio/cues.js` and `score.js`** (v4; G4 name → v4). Until they land, the cues that name a cut beat won't resolve (`beat()` throws):
+**Beat renames for `src/audio/cues.ts` and `score.ts`** (v4; G4 name → v4). Until they land, the cues that name a cut beat won't resolve (`beat()` throws):
 
 | G4 beat | v4 | Note |
 |---|---|---|

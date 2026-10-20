@@ -1,5 +1,5 @@
 // The film's light rigs and the light rule in numbers (doc 02 · The visual rule, doc 04 · Lights).
-// Every update takes time as an argument. Randomness comes only from src/core/rng.js.
+// Every update takes time as an argument. Randomness comes only from src/core/rng.ts.
 // Intensities are physical (candela for spots, lux for directionals) with decay 2, tuned for
 // the stage's NoToneMapping so a lit cream wall lands below white.
 import * as THREE from 'three';

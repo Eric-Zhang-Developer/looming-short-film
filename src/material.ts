@@ -74,7 +74,7 @@ function setMaps(mesh: PaperMesh, sheet: PaperSheet) {
   const m = mesh.material, u = m.userData.paper, img = sheet.alphaMap.image;
   m.map = sheet.map; m.alphaMap = sheet.alphaMap;
   u.uThickness.value = sheet.thickness;
-  const k = Math.max(img.width, img.height) / 1024;  // texels per "1024-px texel", as paper.js counts them
+  const k = Math.max(img.width, img.height) / 1024;  // texels per "1024-px texel", as paper.ts counts them
   u.uTexel.value.set(k / img.width, k / img.height);
   // Rim noise: placed by the key (holds still), nudged by the boil seed (boils).
   const home = mulberry32(seedOf(sheet.key, 'edge-catch')), step = mulberry32(seedOf(sheet.key, 'edge-catch', sheet.seed));
