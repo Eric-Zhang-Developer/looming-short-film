@@ -16,7 +16,7 @@ import { POSES, walk } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { createBlob } from '../blob.ts';
 import { kitTools, mppOf, wallCanvas, carpetCanvas, noCast, glow, castOnly } from './s11.ts';
-import type { ShotCtx } from './s11.ts';
+import type { ShotCtx } from '../film.ts';
 import type { PaperMesh } from '../material.ts';
 
 const ID = 's10b';

@@ -18,7 +18,7 @@ import { screenHalo, reminderInsert, HALO } from './s03.ts';
 import { COUNTDOWN } from '../props/canvas.ts';
 import type { Pose } from '../puppet.ts';
 import type { SpecOpts } from '../characters/poses.ts';
-import type { ShotCtx } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
 
 const ID = 's06', DEG = Math.PI / 180;
 const BLOB_R = { start: 0.018, gulp2: 0.024 };            // METER.gulp1 → METER.gulp2 (README §1, v4: 1.5× → 2×)

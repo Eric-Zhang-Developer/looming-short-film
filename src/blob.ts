@@ -223,7 +223,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
   // The same outline as a flat ink material for a decal (crowd shadows drawn without a light, s13): eyes are holes and
   // the edge fades over ±soft, in radius units of the mesh it's on (set material.userData.soft.value per frame when
   // the decal is scaled). Put it on a mesh built from blob.mesh.geometry; the caller places and scales that mesh.
-  function silhouette({ color = PALETTE.ink, soft = 0.1 } = {}) {
+  function silhouette({ color = PALETTE.ink as string, soft = 0.1 } = {}) {
     const m = new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false,
       polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
     m.userData.soft = { value: soft };

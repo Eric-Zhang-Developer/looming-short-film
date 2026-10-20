@@ -15,7 +15,7 @@ import { createBlob } from '../blob.ts';
 import { kitTools, mppOf, noCast, glow, wallCanvas } from './s11.ts';
 import { lamppost, lampKey, LAMP_COOL, LAMP_H, KEY_I } from './s09c.ts';
 import { closeupRig, HEAD_AT } from './s09b.ts';
-import type { ShotCtx } from './s11.ts';
+import type { ShotCtx } from '../film.ts';
 import type { PaperOptions } from '../paper.ts';
 
 const ID = 's10', D = Math.PI / 180;

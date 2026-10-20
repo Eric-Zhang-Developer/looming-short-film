@@ -21,7 +21,8 @@ import type { PaperOptions, PaperSheet } from '../paper.ts';
 import type { PaperMesh } from '../material.ts';
 import type { Kit } from '../assets.ts';
 import type { Puppet } from '../puppet.ts';
-import type { ShotCtx, MatOpts } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
+import type { MatOpts } from './s02.ts';
 
 const DEG = Math.PI / 180;
 const F = (s: number) => Math.round(s * 12) / 12;  // spec times (2.67, 3.33, 4.83 ...) are 2s drawings: snap them to twelfths

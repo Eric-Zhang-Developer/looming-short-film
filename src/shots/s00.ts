@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import { ambient } from '../lights.ts';
 import { ease } from '../core/ease.ts';
 import { DESK, tools, homeDesk } from './s02.ts';
-import type { ShotCtx } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
 import { todoScreen, banner, COUNTDOWN, EXAM_Y } from '../props/canvas.ts';
 
 const ID = 's00';

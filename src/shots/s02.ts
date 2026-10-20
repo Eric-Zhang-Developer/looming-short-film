@@ -21,15 +21,13 @@ import { act } from '../characters/acting.ts';
 import { makeClock } from '../clock.ts';
 import type { PaperOptions, PaperSheet } from '../paper.ts';
 import type { PaperMesh } from '../material.ts';
-import type { AssetCtx, Kit } from '../assets.ts';
+import type { Kit } from '../assets.ts';
 import type { PALETTE as PALETTE_T } from '../core/palette.ts';
-import type { Post, PostSettings } from '../post.ts';
+import type { ShotCtx } from '../film.ts';
 
 const DEG = Math.PI / 180;
 
-// What film.ts hands every shot's build() (its ctx also carries stage and renderer, which no shot reads). Shared by the shots.
 export type Palette = typeof PALETTE_T;
-export type ShotCtx = AssetCtx & { scene: THREE.Scene, camera: THREE.PerspectiveCamera, PALETTE: Palette, post: (opts?: PostSettings) => Post };
 // paperMesh's options (translucency, edgeCatch).
 export type MatOpts = NonNullable<Parameters<typeof paperMesh>[1]>;
 // DESK, with the fields computed after the literal (lampMouth, bead, cal.h, cal.friXY).

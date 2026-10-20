@@ -16,7 +16,8 @@ import { DIM, AMB_DIM } from './s08.ts';
 import { bedroom, closeHeads, ROOM, CAM, LOOK, LIE, LIE_HEAD, KNEE, HIP, PHONE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT } from './s07.ts';
 import { reminderInsert } from './s03.ts';
 import { COUNTDOWN } from '../props/canvas.ts';
-import type { ShotCtx, Palette } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
+import type { Palette } from './s02.ts';
 
 const ID = 's09a', DEG = Math.PI / 180;
 export const BLOB_R = { start: 0.030 };                       // 2.5× (README §1, Q16)

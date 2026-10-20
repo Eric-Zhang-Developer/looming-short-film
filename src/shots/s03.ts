@@ -15,7 +15,8 @@ import { DESK, B, LAPTOP, tools, homeDesk, seatReach, firing } from './s02.ts';
 import { banner, todoScreen, COUNTDOWN } from '../props/canvas.ts';
 import type { Pose } from '../puppet.ts';
 import type { SpecOpts } from '../characters/poses.ts';
-import type { ShotCtx, Palette } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
+import type { Palette } from './s02.ts';
 
 const ID = 's03', DEG = Math.PI / 180;
 

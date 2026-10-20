@@ -16,7 +16,7 @@ import { act } from '../characters/acting.ts';
 import { createBlob } from '../blob.ts';
 import { kitTools, mppOf, noCast, glow } from './s11.ts';
 import { closeupRig, HEAD_AT } from './s09b.ts';
-import type { ShotCtx } from './s11.ts';
+import type { ShotCtx } from '../film.ts';
 import type { Kit } from '../assets.ts';
 import type { PaperMesh } from '../material.ts';
 import type { Gator } from '../characters/gator.ts';

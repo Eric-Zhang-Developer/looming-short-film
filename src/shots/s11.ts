@@ -17,20 +17,12 @@ import { makeGator } from '../characters/gator.ts';
 import { POSES, specPose, walk } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { createBlob } from '../blob.ts';
-import type { Post, createPost } from '../post.ts';
+import type { ShotCtx } from '../film.ts';
 import type { PaperOptions } from '../paper.ts';
 import type { PaperMesh } from '../material.ts';
-import type { AssetCtx, Kit } from '../assets.ts';
-import type { PALETTE as PaletteT } from '../core/palette.ts';
-import type { Stage } from '../core/stage.ts';
+import type { Kit } from '../assets.ts';
 import type { Puppet } from '../puppet.ts';
 import type { SpecOpts } from '../characters/poses.ts';
-
-// What film.ts hands a shot's build() (docs/contracts.md §shots).
-export type ShotCtx = {
-  stage: Pick<Stage, 'renderer' | 'scene' | 'camera' | 'onFrame' | 'setRender'>, scene: THREE.Scene, camera: THREE.PerspectiveCamera,
-  renderer: THREE.WebGLRenderer, assets: AssetCtx['assets'], PALETTE: typeof PaletteT, post: (opts?: Parameters<typeof createPost>[1]) => Post,
-};
 
 const ID = 's11', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID)!.beats;          // deskSit 0.5, blobClimbs 3, blobSettles 5

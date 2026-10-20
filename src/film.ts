@@ -6,10 +6,16 @@ import { PALETTE } from './core/palette.ts';
 import { createPost } from './post.ts';
 import type { Post } from './post.ts';
 import type { Stage } from './core/stage.ts';
+import type { AssetCtx } from './assets.ts';
 import * as assets from './assets.ts';
 
 // What a shot module's build() returns (docs/contracts.md §shots). The modules are imported by a template, so untyped.
 type ShotInstance = { update(tLocal: number): void, dispose?(): void };
+// What every shot's build() gets (docs/contracts.md §shots). The shots import it from here.
+export type ShotCtx = {
+  stage: Pick<Stage, 'renderer' | 'scene' | 'camera' | 'onFrame' | 'setRender'>, scene: THREE.Scene, camera: THREE.PerspectiveCamera,
+  renderer: THREE.WebGLRenderer, assets: AssetCtx['assets'], PALETTE: typeof PALETTE, post: (opts?: Parameters<typeof createPost>[1]) => Post,
+};
 
 export function createFilm(stage: Pick<Stage, 'renderer' | 'camera'>) {
   const { renderer } = stage;
@@ -21,7 +27,7 @@ export function createFilm(stage: Pick<Stage, 'renderer' | 'camera'>) {
     const sstage = { renderer, scene, camera, onFrame: (fn: (t: number) => void) => fns.push(fn), setRender: (fn: () => void) => { s.draw = fn; } };
     const post = (opts?: Parameters<typeof createPost>[1]) => { const p = createPost(sstage, opts); s.composer = p.composer; return p; };
     return import(`./shots/${id}.js`)
-      .then((m) => m.build({ stage: sstage, scene, camera, renderer, assets, PALETTE, post }))
+      .then((m) => m.build({ stage: sstage, scene, camera, renderer, assets, PALETTE, post } satisfies ShotCtx))
       .then((shot: ShotInstance) => Object.assign(s, { shot }));
   }
 

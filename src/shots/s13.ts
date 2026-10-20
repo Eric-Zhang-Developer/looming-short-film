@@ -23,7 +23,7 @@ import { mulberry32, seedOf } from '../core/rng.ts';
 import { SHOTS, S13_DESKS } from '../timeline.ts';
 import { loadLUT } from '../post.ts';
 import { carpetCanvas } from './s11.ts';
-import type { ShotCtx } from './s11.ts';
+import type { ShotCtx } from '../film.ts';
 import type { PaperOptions } from '../paper.ts';
 import type { PaperMesh } from '../material.ts';
 import type { Kit } from '../assets.ts';

@@ -16,7 +16,7 @@ import { BLOB_R as OTHER_R } from '../characters/exam.ts';
 import { createBlob } from '../blob.ts';
 import { POSES, specPose } from '../characters/poses.ts';
 import { kitTools, marstonDesk, crop, mppOf, noCast, glow, castOnly } from './s11.ts';
-import type { ShotCtx } from './s11.ts';
+import type { ShotCtx } from '../film.ts';
 import type { Kit } from '../assets.ts';
 import type { SpecOpts } from '../characters/poses.ts';
 

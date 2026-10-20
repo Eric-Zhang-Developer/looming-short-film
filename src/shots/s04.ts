@@ -21,7 +21,8 @@ import type { PaperOptions, PaperSheet } from '../paper.ts';
 import type { PaperMesh } from '../material.ts';
 import type { Kit } from '../assets.ts';
 import type { SpecOpts } from '../characters/poses.ts';
-import type { ShotCtx, Palette, MatOpts } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
+import type { Palette, MatOpts } from './s02.ts';
 
 const ID = 's04', DEG = Math.PI / 180;
 const BLOB_R = { start: 0.018 };                               // METER.gulp1 (README §1, v4): 1.5× all shot

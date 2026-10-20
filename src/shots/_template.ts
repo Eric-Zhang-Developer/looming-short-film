@@ -8,7 +8,7 @@ import { paperMesh, updatePaperMesh } from '../material.ts';
 import { ambient } from '../lights.ts';
 import type { PaperOptions } from '../paper.ts';
 import type { PaperMesh } from '../material.ts';
-import type { ShotCtx } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
 
 const ID = 's00', ASSET = 'gator_sheet', PIECE = 'turn_side';
 

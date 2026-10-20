@@ -14,7 +14,7 @@ import { makeGator, HIP } from '../characters/gator.ts';
 import { POSES, specPose, walk } from '../characters/poses.ts';
 import { createBlob } from '../blob.ts';
 import { kitTools, mppOf, noCast, glow } from './s11.ts';
-import type { ShotCtx } from './s11.ts';
+import type { ShotCtx } from '../film.ts';
 import type { AssetCtx, Kit } from '../assets.ts';
 import type { PaperOptions } from '../paper.ts';
 

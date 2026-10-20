@@ -12,7 +12,8 @@ import { mulberry32, seedOf } from '../core/rng.ts';
 import type { PaperOptions, PaperSheet } from '../paper.ts';
 import type { PaperMesh } from '../material.ts';
 import type { Kit } from '../assets.ts';
-import type { ShotCtx, Palette, MatOpts } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
+import type { Palette, MatOpts } from './s02.ts';
 
 const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
 // A shape that fills its canvas has no edge to tear (paper.js tears where alpha ends), so a visible rectangle is

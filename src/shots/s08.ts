@@ -13,7 +13,7 @@ import * as THREE from 'three';
 import { onTwos } from '../core/ease.ts';
 import { act } from '../characters/acting.ts';
 import { bedroom, closeHeads, headOn, ROOM, LIE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT, H_CAM, H_FOCUS } from './s07.ts';
-import type { ShotCtx } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
 
 const ID = 's08', DEG = Math.PI / 180;
 export const BLOB_R = { start: 0.030 };                       // 2.5× all shot (README §1, Q16)

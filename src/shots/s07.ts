@@ -23,7 +23,8 @@ import { COUNTDOWN } from '../props/canvas.ts';
 import { REELS } from '../audio/cues.ts';
 import type { PaperMesh } from '../material.ts';
 import type { Gator } from '../characters/gator.ts';
-import type { ShotCtx, Palette, Tools } from './s02.ts';
+import type { ShotCtx } from '../film.ts';
+import type { Palette, Tools } from './s02.ts';
 
 const DEG = Math.PI / 180;
 const F = (s: number) => Math.round(s * 12) / 12;                    // spec times are 2s drawings
@@ -376,8 +377,7 @@ export async function headOn(ctx: ShotCtx, ID: string) {
   exam.mesh.onBeforeRender = (...a) => { ob(...a); U.uLightKind.value = 0; U.uAmb.value.setRGB(0, 0, 0); for (const e of U.uEye.value) e.y = 99; U.uHiR.value = 99; };
   // The rim: the blob's own outline a touch bigger, just behind it, in the phone's colour, nudged toward the phone (up and
   // left), so the light catches the edge on his side.
-  // blob.ts infers silhouette()'s color as PALETTE.ink's literal type (its default); it takes any colour string.
-  const rimMat = exam.silhouette({ color: PALETTE.phone as string as Palette['ink'], soft: 0.04 });
+  const rimMat = exam.silhouette({ color: PALETTE.phone, soft: 0.04 });
   const rim = new THREE.Mesh(exam.mesh.geometry, rimMat);
   rim.castShadow = false;
   scene.add(rim);
