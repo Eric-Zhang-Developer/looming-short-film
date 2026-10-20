@@ -1,4 +1,3 @@
-// @ts-check
 // s09c · The walk (docs/shots/s09c.md, v4; climax-a2). Campus at night, side on: a straight paver path under five
 // low street lamps, Century Tower ahead, the oaks and the campus roofs behind. He walks to Marston on the pulse. Every
 // lamp is a heartbeat: under a lamp the light is overhead and the blob's shadow is a puddle; between lamps the light is
@@ -15,20 +14,24 @@ import { makeGator, hipHeight } from '../characters/gator.ts';
 import { POSES, specPose, walk } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { createBlob } from '../blob.ts';
-import { kitTools, mppOf, noCast, glow } from './s11.js';
-import { closeupRig, HEAD_AT } from './s09b.js';
+import { kitTools, mppOf, noCast, glow } from './s11.ts';
+import { closeupRig, HEAD_AT } from './s09b.ts';
+import type { ShotCtx } from './s11.ts';
+import type { Kit } from '../assets.ts';
+import type { PaperMesh } from '../material.ts';
+import type { Gator } from '../characters/gator.ts';
 
 const ID = 's09c', D = Math.PI / 180;
-const B = SHOTS.find((s) => s.id === ID).beats;
+const B = SHOTS.find((s) => s.id === ID)!.beats;
 export const BLOB_R = { start: 0.030 };                 // 2.5× (README §1, Q16)
-const lin = (x) => x;
+const lin = (x: number) => x;
 
 // His root x(t): the spec's table, keyed on the timeline's beats (never hard-coded beat times). The resolve lands at
 // DECIDE, not 11.0: act() needs 12 frames of flinch and 12 of dread after the block (see done note), so he stands until it.
 const DECIDE = B.blobBlocks + 7 / 6;                    // 11.167
-const XT = [[B.walkStart, -0.120], [B.lamp1, 0.000], [B.lamp2, 0.238], [B.lamp3, 0.478], [9.5, 0.558], [B.blobBlocks, 0.590],
+const XT: [number, number][] = [[B.walkStart, -0.120], [B.lamp1, 0.000], [B.lamp2, 0.238], [B.lamp3, 0.478], [9.5, 0.558], [B.blobBlocks, 0.590],
   [DECIDE, 0.590], [B.stepAround, 0.690], [B.lamp4, 0.825], [B.lamp5, 0.975], [18.0, 1.305]];
-export const X = (t) => kf(t, XT, lin);
+export const X = (t: number) => kf(t, XT, lin);
 const WALK_Z = 0.10, AROUND_Z = 0.13, HEEL = [-0.045, 0.015];   // blob contact from his root: behind him, camera side
 const TURN = 18.0, END = [1.36, -0.115];                // the turn into depth, and where he is at the cut
 const BLOCK = [0.650, 0.104];                           // the block: in his path, a hair in front of his plane
@@ -45,19 +48,19 @@ const LAMP_BEATS = ['lamp1', 'lamp2', 'lamp3', 'lamp4', 'lamp5'];
 export const LAMP_X = LAMP_BEATS.map((b) => X(B[b]) + HEEL[0]);   // −0.045, 0.193, 0.433, 0.780, 0.930
 // Key hand-overs (1 → 2, 2 → 3, 3 → 4 on the blob's landing, 4 → 5), each a 0.25 s crossfade centred on a pulse beat.
 const HANDOVER = [4.0, 7.0, B.blobBlocks, 14.5], FADE = 0.25;
-export const LAMP_COOL = (PALETTE) => new THREE.Color(PALETTE.cream).lerp(new THREE.Color(PALETTE.phone), 0.3);
+export const LAMP_COOL = (PALETTE: ShotCtx['PALETTE']) => new THREE.Color(PALETTE.cream).lerp(new THREE.Color(PALETTE.phone), 0.3);
 export const KEY_I = 1.6;                                // cd, decay 0 (stylized: the long shadow stays as dark as the puddle)
 const POOL_I = 0.002, POOL_D = 0.22;                    // each lamp's own non-casting pool light, decay 2
 const AMB_K = 0.3, FILL_I = 0.010, WARM_I = 0.25;
 // fix-walk: the wide is pushed in (0.71 → 0.59 m) and looks down 11° (was 9°), so his slump reads at 400 px and the
 // paving, the shadow's receiver, is a band; steeper lost the sky and the tower. It centres on the blob, so the key lamp and the shadow's tip
 // both stay in frame either side of each lamp.
-const CAM_Y = 0.160, CAM_Z = [[B.blobBlocks, 0.70], [B.stepAround, 0.62]], LOOK_Y = 0.050, LOOK_Z = 0.12;
+const CAM_Y = 0.160, CAM_Z: [number, number][] = [[B.blobBlocks, 0.70], [B.stepAround, 0.62]], LOOK_Y = 0.050, LOOK_Z = 0.12;
 // The block's close-up (fix-walk): cut in after the stop and the flinch, the painted dread head (sweat) held, resolve on
 // DECIDE, and cut back to the wide as he side-steps past it.
 const CU = [B.blobBlocks + 1 / 3, DECIDE + 0.5], CU_I = 0.007;
 // At the block the wide slides 8.5 cm ahead, so lamp 4, beyond the blob, is in frame with the shadow it throws back at him.
-const BLOCK_PAN = [[9.0, 0], [B.blobBlocks, 0.085], [B.stepAround + 0.5, 0.085], [B.lamp4, 0]];
+const BLOCK_PAN: [number, number][] = [[9.0, 0], [B.blobBlocks, 0.085], [B.stepAround + 0.5, 0.085], [B.lamp4, 0]];
 const HOP = 0.5, HOP_H = 0.003;
 // walk-redo: the gait is timed, not phased on distance: a contact every STEP from PULSE0 (global 84.0), so every other
 // footfall lands on the 120 bpm pulse. His legs are short (hip 0.015 m), so at x(t)'s 0.06–0.11 m/s that means four
@@ -72,15 +75,8 @@ const GAP = 0.035;
 const SELF = 0.45, THROUGH = 0.1;
 
 // A lamppost from marston_ext_kit, globe centre at the light point. Returns its glowing material.
-/**
- * @param {import('../assets.ts').Kit} ext marston_ext_kit
- * @param {Function} art kitTools' art
- * @param {THREE.Object3D} parent
- * @param {string} key
- * @param {number[]} xz [x, z]
- * @param {THREE.ColorRepresentation} color
- */
-export function lamppost(ext, art, parent, key, [x, z], color) {
+// ext: marston_ext_kit; art: kitTools' art; [x, z]: where it stands.
+export function lamppost(ext: Kit, art: ReturnType<typeof kitTools>['art'], parent: THREE.Object3D, key: string, [x, z]: number[], color: THREE.Color) {
   const img = ext.pieces.lamppost_black, k = mppOf(ext, 'lamppost_black');
   const GLOBE = [22, 13];                                // the globe's centre in the 44 × 163 cut (px)
   const s = LAMP_H / ((img.height - 3 - GLOBE[1]) * k);   // foot (row 160) on the ground, globe at LAMP_H
@@ -91,24 +87,24 @@ export function lamppost(ext, art, parent, key, [x, z], color) {
 }
 
 // The key light at a lamp: straight down, wide, decay 0, only the blob casts into it.
-export function lampKey(color) {
+export function lampKey(color: THREE.ColorRepresentation) {
   const s = new THREE.SpotLight(color, 0, 0, 1.45, 0.2, 0);   // 83°: the spec's 1.2 cut the long shadow's tip off in the dark
   s.castShadow = true; s.shadow.mapSize.set(2048, 2048); s.shadow.bias = -0.0004; s.shadow.radius = 1;
   s.shadow.camera.near = 0.004; s.shadow.camera.far = 1.0;
   return s;
 }
 
-export async function build({ scene, camera, assets, PALETTE, post }) {
-  const C = (k) => new THREE.Color(PALETTE[k]), hex = (c) => '#' + c.getHexString();
+export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
+  const C = (k: keyof ShotCtx['PALETTE']) => new THREE.Color(PALETTE[k]), hex = (c: THREE.Color) => '#' + c.getHexString();
   const COOL = LAMP_COOL(PALETTE), WARM = C('lamp').lerp(C('cream'), 0.3);
   scene.background = C('navy').lerp(C('ink'), 0.35);
   const tools = kitTools(ID), { sheet, art, boil } = tools;
   const [ext, props] = await Promise.all([assets.load('marston_ext_kit'), assets.load('props_kit')]);
   const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
-  const flat = (m) => { m.rotation.x = -Math.PI / 2; return m; };
+  const flat = <T extends THREE.Object3D>(m: T): T => { m.rotation.x = -Math.PI / 2; return m; };
   const rnd = mulberry32(seedOf(ID, 'set'));
   // Long strips are laid as overlapping short sheets: a tear's wobble scales with a sheet's long edge.
-  const strip = (x0, x1, piece, place) => { for (let x = x0, i = 0; x < x1; x += piece * 0.92, i++) place(x + piece / 2, i); };
+  const strip = (x0: number, x1: number, piece: number, place: (x: number, i: number) => void) => { for (let x = x0, i = 0; x < x1; x += piece * 0.92, i++) place(x + piece / 2, i); };
 
   // ---- Distance layers. The track runs 1.5 m; true parallax would sweep the tower across the whole frame, so the far
   // layers ride with the camera at a fraction (a multiplane rig, README §8): sky 1, tower 0.85.
@@ -134,19 +130,19 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   [[0.0, 0.62, 1], [0.6, 0.55, -1], [1.1, 0.5, 1]].forEach(([x, k, sx], i) => {
     const o = noCast(art(ext.pieces.oak_canopy, `oak-${i}`, { mpp: ok * k, sx, anchor: [326, 200], parent: scene, res: 1024 }));
     o.position.set(x, 0.13 + 0.02 * i, -0.60);
-    o.children[0].material.color.setScalar(0.5 + 0.1 * rnd());
+    (o.children[0] as PaperMesh).material.color.setScalar(0.5 + 0.1 * rnd());
   });
 
   // ---- Marston at z −0.35: the breezeway (its entrance) at x 1.42, the ribbon facade running right of it, and a warm
   // lit strip behind each row of the facade's openings. Brick at night: its paint mixed toward navy.
   const MZ = -0.35, BK = 0.4;
   const night = C('navy').lerp(new THREE.Color(1, 1, 1), 0.55);
-  const brick = (h) => { h.children[0].material.color.copy(night); return h; };
+  const brick = (h: THREE.Group) => { (h.children[0] as PaperMesh).material.color.copy(night); return h; };
   const wm = BK * mppOf(ext, 'breezeway_frame'), fm = BK * mppOf(ext, 'facade_block');
   brick(noCast(art(ext.pieces.breezeway_frame, 'breezeway', { mpp: wm, anchor: [156.5, 247], parent: scene, res: 1024 }))).position.set(1.42, 0, MZ);
   const FX = 1.42 - 140 * wm - 680 * fm;                   // the facade runs LEFT of the breezeway, so its windows come in first
   brick(noCast(art(ext.pieces.facade_block, 'facade', { mpp: fm, anchor: [8, 171], parent: scene, res: 2048 }))).position.set(FX, 0, MZ + 0.002);
-  const winMats = [];
+  const winMats: THREE.MeshLambertMaterial[] = [];
   for (const [y0, y1] of [[45, 79], [112, 146]]) {        // the facade's two window rows (px)
     const ls = ext.pieces.lit_window_strip, lk = (680 * fm) / ls.width;
     const h = noCast(art(ls, `lit_strip-${y0}`, { mpp: lk, sy: ((y1 - y0 + 10) * fm) / (ls.height * lk), anchor: [0, ls.height / 2], parent: scene, res: 1024 }));
@@ -154,7 +150,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     const m = glow(h); m.emissive.copy(WARM); winMats.push(m);
   }
   { // the entrance: a warm lit lobby plate behind the breezeway's opening, brightest of all
-    const c = Object.assign(document.createElement('canvas'), { width: 280, height: 340 }), g = c.getContext('2d');
+    const c = Object.assign(document.createElement('canvas'), { width: 280, height: 340 }), g = c.getContext('2d')!;
     g.fillStyle = hex(WARM); g.fillRect(0, 0, 280, 340);                 // the glass doors, lit from inside
     g.strokeStyle = hex(C('navy').multiplyScalar(0.6)); g.lineWidth = 16;
     g.strokeRect(30, 40, 110, 300); g.strokeRect(140, 40, 110, 300);
@@ -168,7 +164,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // Wider than the spec's 0.07…0.14: the 2.5× blob's puddle reaches z 0.15, and a broader band reads as the receiver.
   const PZ = [0.03, 0.26];   // fix-walk: to 0.26, the lamps behind the hedge throw the shadow forward to z 0.21
   const paver = (() => {
-    const c = Object.assign(document.createElement('canvas'), { width: 1000, height: 400 }), g = c.getContext('2d');
+    const c = Object.assign(document.createElement('canvas'), { width: 1000, height: 400 }), g = c.getContext('2d')!;
     g.fillStyle = hex(C('cream').lerp(C('navy'), 0.12)); g.fillRect(0, 0, 1000, 400);
     g.strokeStyle = hex(C('cream').lerp(C('navy'), 0.3)); g.lineWidth = 4;
     for (let x = 0; x <= 1000; x += 125) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, 400); g.stroke(); }
@@ -200,9 +196,9 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // to where the long shadow's tip lands (the 0.2 penumbra faded it from 66°). It did not change the probe's lengths.
   for (const k of [keyA, keyB]) { k.penumbra = 0; k.angle = 1.5; scene.add(k, k.target); }
   // Lamp i's share of the key: 1 − u(h0) for lamp 1, u(h_{i−1}) − u(h_i) after; u ramps over FADE centred on hand-over h.
-  const u = (h, t) => clamp((t - (h - FADE / 2)) / FADE);
-  const share = (i, t) => (i ? u(HANDOVER[i - 1], t) : 1) - (i < 4 ? u(HANDOVER[i], t) : 0);
-  const keyMix = (t) => [[0, 2, 4], [1, 3]].map((set) => set.reduce((best, i) => (share(i, t) > best[1] ? [i, share(i, t)] : best), [-1, 0]));
+  const u = (h: number, t: number) => clamp((t - (h - FADE / 2)) / FADE);
+  const share = (i: number, t: number) => (i ? u(HANDOVER[i - 1], t) : 1) - (i < 4 ? u(HANDOVER[i], t) : 0);
+  const keyMix = (t: number) => [[0, 2, 4], [1, 3]].map((set) => set.reduce((best, i) => (share(i, t) > best[1] ? [i, share(i, t)] : best), [-1, 0]));
   const warm = new THREE.DirectionalLight(WARM, 0); warm.position.set(1.42, 0.3, -1.0); scene.add(warm, warm.target);
   const fill = new THREE.PointLight(COOL.clone().lerp(C('navy'), 0.3), 0, 0.05, 2); scene.add(fill);
   const amb = ambient(); amb.intensity *= AMB_K; scene.add(amb);
@@ -210,7 +206,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // ---- The Student: side rig, and the back turnaround swapped in on one frame at TURN. Both wear the backpack.
   const side = await makeGator({ assets }, { seed: 91, res: 1024 }), back = await makeGator({ assets }, { seed: 91, facing: 'back' });
   scene.add(side.group, back.group); noCast(side.group); noCast(back.group);   // only the blob casts
-  const pack = (rig, [x, y, z], sx = 1) => {
+  const pack = (rig: Gator, [x, y, z]: number[], sx = 1) => {
     const h = noCast(art(props.pieces.backpack, `pack-${rig.facing}`, { mpp: 0.034 / props.pieces.backpack.height, sx, parent: rig.joints.body }));
     h.position.set(x, y, z);
   };
@@ -231,31 +227,29 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const fx = post({ focus: 0.7, aperture: 0.012, maxblur: 0.008, lut: 'night' });
   const P = POSES, STAND = specPose({ lean: 0, arm: -92, far: -92, head: 0, leg: 0, farLeg: 8 });
   const RECOIL = specPose({ lean: -2, arm: -98, far: -98, head: 2, leg: 0, farLeg: 8 });
-  /** @type {[number, string][]} */
-  const CUES = [[0, 'dread'], [B.blobBlocks, 'flinch'], [B.blobBlocks + 7 / 12, 'dread'], [DECIDE, 'resolve']];
-  const camX = (t) => {                                   // the blob's x + 0.02, smoothed: a 1 s box average of x(t). Before
+  const CUES: [number, string][] = [[0, 'dread'], [B.blobBlocks, 'flinch'], [B.blobBlocks + 7 / 12, 'dread'], [DECIDE, 'resolve']];
+  const camX = (t: number) => {                                   // the blob's x + 0.02, smoothed: a 1 s box average of x(t). Before
     let s = 0; for (let i = -5; i <= 5; i++) s += X(Math.min(t, TURN) + i * 0.1);   // lamp 1 it sits 3 cm further back, so the
     return s / 11 + HEEL[0] - GAP / 2 + 0.02 - 0.03 * (1 - ease(t / B.lamp1))                // long shadow behind them is in frame
       + kf(t, BLOCK_PAN, ease);
   };
   const bc = new THREE.Vector3();
   // every frame, after the rigs' boil / face / mouth-bar swaps (each replaces a map); act() adds the mouth bar late
-  const selfLit = (g) => g.traverse((o) => {
-    const m = /** @type {any} */ (o).material, u = m?.userData?.paper;
+  const selfLit = (g: THREE.Object3D) => g.traverse((o) => {
+    const m = (o as PaperMesh).material, u = m?.userData?.paper;   // any Object3D: a Group's material is undefined, m?. skips it
     if (!u) return;
     m.emissive.setScalar(1); m.emissiveMap = m.map; m.emissiveIntensity = SELF;
     u.uEdgeCatch.value = 0; u.uTranslucency.value = THROUGH;
   });
 
-  function update(t) {
+  function update(t: number) {
     const T = onTwos(t);
     boil(t, 10);
 
     // ---------- the Student, on 2s
     const turned = T >= TURN;
     side.group.visible = !turned; back.group.visible = turned;
-    /** @type {Vec3} */
-    let root;
+    let root: Vec3;
     const close = t >= CU[0] && t < CU[1];
     if (!turned) {
       side.boil(t, 10);
@@ -323,7 +317,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     // ---------- the Exam, on 2s: one hop per pulse at his heels; the block; the hop after him
     const ph = ((T + 1e-6) % HOP) / HOP, landing = ph < 1 / 6;
     let bx, by = 0, bz, sq = landing ? 0.2 : 0, mirror = false, eyes = 'open', look = 1;
-    const heel = (tt) => [X(tt) + HEEL[0] - GAP, WALK_Z + HEEL[1]];
+    const heel = (tt: number) => [X(tt) + HEEL[0] - GAP, WALK_Z + HEEL[1]];
     if (T < 9.5) { [bx, bz] = heel(T); by = HOP_H * Math.sin(Math.PI * ph); }
     else if (T < B.blobBlocks) {                          // one big hop past him on the camera side: crouch, two drawings up
       const [x0, z0] = heel(9.5);
@@ -349,7 +343,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
     // ---------- light, on 1s
     const mix = keyMix(t);
-    /** @type {[THREE.SpotLight, number[]][]} */ ([[keyA, mix[0]], [keyB, mix[1]]]).forEach(([k, [i, w]]) => {
+    ([[keyA, mix[0]], [keyB, mix[1]]] as [THREE.SpotLight, number[]][]).forEach(([k, [i, w]]) => {
       if (i < 0) { k.intensity = 0; return; }
       k.position.set(LAMP_X[i], LAMP_H, LAMP_Z);
       k.target.position.set(LAMP_X[i], 0, LAMP_Z); k.target.updateMatrixWorld();

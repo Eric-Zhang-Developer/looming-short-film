@@ -16,8 +16,8 @@ import { createBlob } from '../blob.ts';
 import { POSES, specPose } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { SHOTS } from '../timeline.ts';
-import { kitTools, marstonDesk, MARK, castOnly } from './s11.js';
-import { closeupRig, HEAD_AT } from './s09b.js';
+import { kitTools, marstonDesk, MARK, castOnly } from './s11.ts';
+import { closeupRig, HEAD_AT } from './s09b.ts';
 import { loadHand, handFont, runParts, drawInt } from './s17b.js';
 import { mulberry32, seedOf } from '../core/rng.ts';
 

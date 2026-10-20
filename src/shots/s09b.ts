@@ -1,4 +1,3 @@
-// @ts-check
 // s09b · The door (docs/shots/s09b.md, v4 + the director's 2026-10-18 block; climax-a2). The poster image.
 // Restaged for Q17: there is no night-light. The light is his own nightstand lamp, clicked on in s09a and left on. His
 // door is at the hall's NEAR end, so lamp → doorway → blob → hall → the front door on the end wall lie on one line, and
@@ -14,10 +13,13 @@ import { SHOTS } from '../timeline.ts';
 import { makeGator, HIP } from '../characters/gator.ts';
 import { POSES, specPose, walk } from '../characters/poses.ts';
 import { createBlob } from '../blob.ts';
-import { kitTools, mppOf, noCast, glow } from './s11.js';
+import { kitTools, mppOf, noCast, glow } from './s11.ts';
+import type { ShotCtx } from './s11.ts';
+import type { AssetCtx, Kit } from '../assets.ts';
+import type { PaperOptions } from '../paper.ts';
 
 const ID = 's09b', D = Math.PI / 180;
-const B = SHOTS.find((s) => s.id === ID).beats;         // doorOpen 1, shadowAhead 2.5, stepIntoShadow 4.5
+const B = SHOTS.find((s) => s.id === ID)!.beats;         // doorOpen 1, shadowAhead 2.5, stepIntoShadow 4.5
 const BLOB_R = { start: 0.030 };                         // 2.5× (README §1, Q16)
 
 // The set (m). Hall: end wall z 0 (the front door), his door wall at the hall's near end z DOOR_Z; his room beyond.
@@ -36,7 +38,7 @@ const BLOB_AT = [NIGHTSTAND_LAMP[0] * (1 - 1 / S), BLOB_Z];   // (−0.0076, 0.5
 const BLOB_ROOM = [-0.070, 0.62];                        // before: in his room, left of the door, its loom on the wall
 // Him: in his room right of his door (clear of its swing), then out through the doorway to the hall's right side, where
 // he faces the shadow without standing in front of its eyes; the step into the shadow at stepIntoShadow.
-const HIM = [[0, [0.035, 0.600]], [1.25, [0.035, 0.600]], [1.583, [0.020, 0.500]], [2.0, [0.045, 0.400]],
+const HIM: [number, number[]][] = [[0, [0.035, 0.600]], [1.25, [0.035, 0.600]], [1.583, [0.020, 0.500]], [2.0, [0.045, 0.400]],
   [B.stepIntoShadow, [0.045, 0.400]], [B.stepIntoShadow + 0.5, [0.032, 0.360]], [B.stepIntoShadow + 1.0, [0.022, 0.320]], [6.0, [0.018, 0.300]]];
 const C5 = [3.5, B.stepIntoShadow];                      // the close-up's cut in and out
 // A camera near a light can't see that light's shadow: the caster hides it. Looking through the doorway from behind the
@@ -48,7 +50,7 @@ const C5 = [3.5, B.stepIntoShadow];                      // the close-up's cut i
 // mirror or a poster". The camera now stands square to his door wall, in his room behind the lamp, a few cm right of the
 // lamp → front-door line and high enough to see the eye holes over the blob: his door frame is the frame, the hall runs
 // straight away through it, and the front door at its end gets a lit gap under it and a transom (the night outside).
-const CAM = { pos: [0.040, 0.112, 1.02], look: [0.000, 0.058, 0.0] };
+const CAM: CamKey = { pos: [0.040, 0.112, 1.02], look: [0.000, 0.058, 0.0] };
 const LAMP_I = 0.45, AMB_K = 0.25, SHADE_GLOW = 0.9, FILL_I = 0.006;
 
 // ---------- the close-up rig (README §12): the side Student with a painted closeup_heads head on the hood ----------
@@ -56,34 +58,34 @@ const LAMP_I = 0.45, AMB_K = 0.25, SHADE_GLOW = 0.9, FILL_I = 0.006;
 // (a 2° dip and a 3% squash, the kit's "push the other way"). The painted heads drift from the rig's head (taller eye
 // bump, greener), so they're only ever used on their own framing.
 export const HEAD_AT = [-0.0015, -0.0072], HEAD_K = 1.0;   // the head's neck anchor from the head joint (m), and its scale
-export async function closeupRig(ctx, tools, names, { seed = 0 } = {}) {
+export async function closeupRig(ctx: AssetCtx, tools: ReturnType<typeof kitTools>, names: string[], { seed = 0 } = {}) {
   const rig = await makeGator(ctx, { seed, res: 1024 }), a = await ctx.assets.load('closeup_heads');
   for (const p of ['head', 'snout', 'jaw', 'eyes', 'mouth', 'throat', 'brow', 'head34']) if (rig.meshes[p]) rig.meshes[p].visible = false;
   const holder = new THREE.Group(); holder.position.set(HEAD_AT[0], HEAD_AT[1], 0); rig.joints.head.add(holder);
-  const heads = Object.fromEntries(names.map((n) => {
+  const heads = Object.fromEntries(names.map((n): [string, THREE.Group] => {
     const img = a.pieces[n];
     const h = tools.art(img, `closeup-${n}-${seed}`, { mpp: mppOf(a, n) * HEAD_K, anchor: [0.27 * img.width, img.height - 2], parent: holder, res: 1024 });
     noCast(h); return [n, h];
   }));
-  const show = (name, { antic = false } = {}) => {
+  const show = (name: string, { antic = false } = {}) => {
     for (const [n, h] of Object.entries(heads)) h.visible = n === name;
     holder.rotation.z = antic ? -2 * D : 0; holder.scale.set(1, antic ? 0.97 : 1, 1);
   };
   return { rig, heads, holder, show };
 }
 
-export async function build({ scene, camera, assets, PALETTE, post }) {
-  const C = (k) => new THREE.Color(PALETTE[k]), hex = (c) => '#' + c.getHexString();
+export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
+  const C = (k: keyof ShotCtx['PALETTE']) => new THREE.Color(PALETTE[k]), hex = (c: THREE.Color) => '#' + c.getHexString();
   const WARM = C('lamp').lerp(C('cream'), 0.45);
   scene.background = C('ink');
   const tools = kitTools(ID), { sheet, art, boil } = tools;
   const [home, props] = await Promise.all([assets.load('home_kit'), assets.load('props_kit')]);
   const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
-  const canvas = (w, h) => Object.assign(document.createElement('canvas'), { width: w, height: h });
-  const plain = (color, size, key, parent = scene, opts = {}) => { const m = sheet({ path: RECT, color, size, key: `${ID}-${key}`, res: 1024, rim: 'none', ...opts }, parent); m.castShadow = false; return m; };
-  const flat = (m) => { m.rotation.x = -Math.PI / 2; return m; };
-  const planks = (W, H, pxm = 2000) => {                  // home_kit floor_strip tiled at its scale
-    const img = home.pieces.floor_strip, k = mppOf(home, 'floor_strip') * pxm, c = canvas(W * pxm, H * pxm), g = c.getContext('2d');
+  const canvas = (w: number, h: number) => Object.assign(document.createElement('canvas'), { width: w, height: h });
+  const plain = (color: string, size: number[], key: string, parent: THREE.Object3D = scene, opts: PaperOptions = {}) => { const m = sheet({ path: RECT, color, size, key: `${ID}-${key}`, res: 1024, rim: 'none', ...opts }, parent); m.castShadow = false; return m; };
+  const flat = <T extends THREE.Object3D>(m: T): T => { m.rotation.x = -Math.PI / 2; return m; };
+  const planks = (W: number, H: number, pxm = 2000) => {                  // home_kit floor_strip tiled at its scale
+    const img = home.pieces.floor_strip, k = mppOf(home, 'floor_strip') * pxm, c = canvas(W * pxm, H * pxm), g = c.getContext('2d')!;
     g.fillStyle = PALETTE.kraft; g.fillRect(0, 0, c.width, c.height);   // the strip's torn margins would show as gaps
     for (let y = 0; y < c.height; y += img.height * k) for (let x = 0; x < c.width; x += img.width * k) g.drawImage(img, x, y, img.width * k, img.height * k);
     return c;
@@ -111,7 +113,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
 
   // ---- His room: the door wall (room side) with the doorway cut through it, his floor, his ceiling.
   {
-    const W = 0.68, WH = 0.22, pxm = 3000, c = canvas(W * pxm, WH * pxm), g = c.getContext('2d');   // taller than the
+    const W = 0.68, WH = 0.22, pxm = 3000, c = canvas(W * pxm, WH * pxm), g = c.getContext('2d')!;   // taller than the
     // ceiling: the camera looks down over the room's (unseen, hidden) ceiling line
     // his room's wall is home_kit's navy wall strip (cream baseboard), so the lit hall in the doorway is the bright shape
     const ws = home.pieces.wall_strip, wk = mppOf(home, 'wall_strip') * pxm, NAVY = [8, 30, ws.width - 8, 80], BASE = [8, 86, ws.width - 8, 102];
@@ -169,7 +171,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const BC = new THREE.Vector3();
   const STAND_C5 = specPose({ lean: 0, arm: -92, far: -92, head: 0, leg: 0, farLeg: 8 });
 
-  function update(t) {
+  function update(t: number) {
     const T = onTwos(t);
     boil(t, 10);
     const close = t >= C5[0] && t < C5[1];

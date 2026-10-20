@@ -20,7 +20,7 @@ import { act } from '../characters/acting.ts';
 import { SHOTS } from '../timeline.ts';
 import { UNIT, BLOB_AT, PHONE, PAGE, CAM_B2, practiceSheet, SHEET_INK, penLine } from './s15.js';
 import { loadHand } from './s17b.js';
-import { kitTools, marstonDesk, mppOf, idle, castOnly } from './s11.js';
+import { kitTools, marstonDesk, mppOf, idle, castOnly } from './s11.ts';
 
 const ID = 's16', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;

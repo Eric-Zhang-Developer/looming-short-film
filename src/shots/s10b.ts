@@ -1,4 +1,3 @@
-// @ts-check
 // s10b · The stacks (docs/shots/s10b.md, v6). v3's s10 walk (git 228d5b2^:src/shots/s10.js) brought back after the
 // threshold, with its meaning flipped by the v4 rule. Same locked camera down a Marston stacks aisle, the same kit bays as
 // wings and coffered ceiling strips as borders; he walks toward the lens with the 2.5× blob waddling behind him. v6-stacks-2: the side rig turned 50° to us, so the snout reads.
@@ -16,38 +15,40 @@ import { makeGator, hipHeight } from '../characters/gator.ts';
 import { POSES, walk } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { createBlob } from '../blob.ts';
-import { kitTools, mppOf, wallCanvas, carpetCanvas, noCast, glow, castOnly } from './s11.js';
+import { kitTools, mppOf, wallCanvas, carpetCanvas, noCast, glow, castOnly } from './s11.ts';
+import type { ShotCtx } from './s11.ts';
+import type { PaperMesh } from '../material.ts';
 
 const ID = 's10b';
-const B = SHOTS.find((s) => s.id === ID).beats;          // pocketPhone 1, underLight1 2, underLight2 4.5
+const B = SHOTS.find((s) => s.id === ID)!.beats;          // pocketPhone 1, underLight1 2, underLight2 4.5
 const BLOB_R = { start: 0.030 };                         // 2.5×, its size in s10 and s11 (README §1, Q16)
 const STEP = 1 / 3, HOP = 2 / 3, HOP_H = 0.004;          // calmer than v3's 0.25: a footfall every 1/3 s; a hop per two steps
 // v6-stacks-2: he comes on to z 0.45 (was 0.30), so his height on screen grows 0.89/0.50 ≈ 1.8× (was 1.37×), drifting
 // 3 cm left to right across the aisle along the way he faces.
 const V = 0.065, Z0 = 0.06, X0 = -0.03, VX = 0.01;
-const zG = (t) => Z0 + V * t;                            // his walk line toward the camera: z 0.06 → 0.45
-const xG = (t) => X0 + VX * t;
+const zG = (t: number) => Z0 + V * t;                            // his walk line toward the camera: z 0.06 → 0.45
+const xG = (t: number) => X0 + VX * t;
 const D = Math.PI / 180;
 const TURN_Y = -50;   // v6-stacks-2: the side rig turned 50° toward the lens (s10's fix for "front-on reads as a frog"): the snout shows
-const CAM = [0, 0.125, 0.95], PITCH = -6;                // v6-stacks-2: 4 cm higher and tipped 6° down, so the pools open up
+const CAM: Vec3 = [0, 0.125, 0.95], PITCH = -6;                // v6-stacks-2: 4 cm higher and tipped 6° down, so the pools open up
 const BLOB = [-0.052, 0, -0.015];                        // behind him on screen left (he faces right), v3's offset widened for 2.5×
 const WING_Z = [0.09, 0.19, 0.29, 0.39, 0.49], AISLE = 0.09;   // wings at these depths, inner edge ±0.09
 // One strip light per bay. On underLight1 and underLight2 the blob has just passed under tube 1 and tube 2 (3 cm ahead
 // of it; v6-stacks had 1.5, a sliver): a light straight over a cutout casts a line, so the pool shows once the blob is
 // ahead of the tube, laid forward on the carpet where the camera sees it.
-const UNDER = (b) => zG(b) + BLOB[2] - 0.03;
+const UNDER = (b: number) => zG(b) + BLOB[2] - 0.03;
 const TUBE_Z = [UNDER(B.underLight1) - 0.1, UNDER(B.underLight1), UNDER(B.underLight2), UNDER(B.underLight2) + 0.1], HEADER_Y = 0.16;
 const CEILING_K = 0.45, TUBE_GLOW = 0.75;                // coffers dimmed under the lit tubes; the tube's painted glow
 const KEY_I = 0.6, SET_I = 0.75, AMB_K = 0.4, FILL_I = 0.006;   // by eye on the sheet
 
-export async function build({ scene, camera, assets, PALETTE, post }) {
-  const col = (k) => new THREE.Color(PALETTE[k]);
+export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
+  const col = (k: keyof ShotCtx['PALETTE']) => new THREE.Color(PALETTE[k]);
   const WARM = col('lamp').lerp(col('cream'), 0.3);      // v4 Marston warm (s10, s11)
   scene.background = col('navy').lerp(col('ink'), 0.5);
 
   const tools = kitTools(ID), { sheet, art, boil } = tools;
   const kit = await assets.load('marston_kit');
-  const flat = (m) => { m.rotation.x = -Math.PI / 2; return m; };
+  const flat = <T extends THREE.Object3D>(m: T): T => { m.rotation.x = -Math.PI / 2; return m; };
 
   // ---- z 0: the end wall, the kit's navy wall with its baseboard. The exit sign over the aisle end, faint.
   const wall = sheet({ art: wallCanvas(kit, [0.6, 0.35]), size: [0.6, 0.35], key: `${ID}-wall`, res: 2048 }, scene);
@@ -66,7 +67,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
       const flip = (w + i + (side > 0 ? 1 : 0)) % 2 ? -1 : 1;
       const bay = art(kit.pieces.bookshelf_bay, `bay-${w}-${side}-${i}`, { mpp: bk, sx: flip, anchor: [123, 286], parent: scene, weight: 'kraft' });
       bay.position.set(side * (AISLE + bayW * (i + 0.5)), 0, z + 0.0005 * i);
-      (/** @type {any} */ (bay.children[0])).material.color.setScalar(0.85 + 0.15 * rnd());
+      (bay.children[0] as PaperMesh).material.color.setScalar(0.85 + 0.15 * rnd());
     }
   }));
 
@@ -75,7 +76,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   TUBE_Z.forEach((z, n) => {
     for (let i = -1; i <= 1; i++) {
       const c = art(kit.pieces.ceiling_strip, `ceiling-${n}-${i}`, { mpp: ck, sx: i ? -1 : 1, anchor: [214.5, 106], parent: scene });
-      c.position.set(i * stripW, HEADER_Y, z); (/** @type {any} */ (c.children[0])).material.color.setScalar(CEILING_K);
+      c.position.set(i * stripW, HEADER_Y, z); (c.children[0] as PaperMesh).material.color.setScalar(CEILING_K);
     }
     const strip = art(kit.pieces.strip_light, `strip-${n}`, { mpp: sk, anchor: [259, 62], parent: scene });
     strip.position.set(0, HEADER_Y - 0.006, z + 0.002);
@@ -87,7 +88,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const gator = await makeGator({ assets }, { seed: 10, res: 1024 });
   scene.add(gator.group);
   const props = await assets.load('study_props_sheet');
-  const prop = (name) => {
+  const prop = (name: string) => {
     const [w, h] = props.sizes[name], [u0, v0, u1, v1] = props.visible[name], g = new THREE.Group();
     const m = sheet({ art: props.pieces[name], size: [w, h], key: `${ID}-${name}`, res: 512 }, g);
     m.position.set(-((u0 + u1) / 2 - 0.5) * w, ((v0 + v1) / 2 - 0.5) * h, 0);
@@ -101,7 +102,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     screen.position.z = 0.0006;
     phone.add(prop('phone_face'), screen);
     phone.scale.setScalar(0.8);
-    gator.hand.add(phone);                               // in his near hand
+    gator.hand!.add(phone);                               // in his near hand
   }
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
   scene.add(exam.mesh);
@@ -125,16 +126,15 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   const root = new THREE.Vector3(), P = new THREE.Vector3();
   // The near arm on 2s (absolute degrees, 0 = forward, −95 hanging): the phone held up before him and looked at, a beat,
   // then down to the hoodie pocket by 0.917; from pocketPhone the walk takes the arm back over 0.25 s.
-  const ARM = [[0, -35], [0.5, -35], [0.75, -60], [0.917, -88]];
+  const ARM: [number, number][] = [[0, -35], [0.5, -35], [0.75, -60], [0.917, -88]];
   // Face: resolve on the phone (from s10's close-up), relief on the first light (eyes closed, the slow breath), then eyes
   // open on relief's small smile for the rest of the walk.
-  /** @type {[number, string][]} */
-  const CUES = [[-0.1, 'resolve'], [B.underLight1, 'relief']];
+  const CUES: [number, string][] = [[-0.1, 'resolve'], [B.underLight1, 'relief']];
   const OPEN = B.underLight1 + 1.0;
 
   return {
     parts: { exam, gator, phone, tubes, wall, zG },
-    update(tLocal) {
+    update(tLocal: number) {
       camera.position.set(...CAM);   // locked
       camera.rotation.set(PITCH * D, 0, 0);
       fx.set({ focus: CAM[2] - zG(tLocal) });

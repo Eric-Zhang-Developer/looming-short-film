@@ -13,8 +13,8 @@ import { ambient } from '../lights.ts';
 import { easeOut, ease, clamp, lerp } from '../core/ease.ts';
 import { createBlob } from '../blob.ts';
 import { tools } from './s02.js';
-import { kitTools } from './s11.js';
-import { closeupRig, HEAD_AT } from './s09b.js';
+import { kitTools } from './s11.ts';
+import { closeupRig, HEAD_AT } from './s09b.ts';
 import { specPose } from '../characters/poses.ts';
 import { PAGE, CAM_P, BLOB_AT, pageWithInk, flatHand, overheadSpot, loadHand } from './s17b.js';
 

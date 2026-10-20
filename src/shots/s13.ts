@@ -1,4 +1,3 @@
-// @ts-check
 // s13 · Everyone has one (docs/shots/s13.md, v7). One locked top-down shot of the Marston reading room, 8 s: v3's build,
 // then the room turns. He's already under the light (his phone went into his pocket in s10b), so his desk sits in its
 // warm pool with a small shadow from the first frame, in a dark room. He lifts his head (headLift); desk by desk the
@@ -23,18 +22,28 @@ import { kf, clamp, ease, easeOut, onTwos } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
 import { SHOTS, S13_DESKS } from '../timeline.ts';
 import { loadLUT } from '../post.ts';
-import { carpetCanvas } from './s11.js';
+import { carpetCanvas } from './s11.ts';
+import type { ShotCtx } from './s11.ts';
+import type { PaperOptions } from '../paper.ts';
+import type { PaperMesh } from '../material.ts';
+import type { Kit } from '../assets.ts';
 
 const ID = 's13', DEG = Math.PI / 180;
-const B = SHOTS.find((s) => s.id === ID).beats;
-const at = ([b, o]) => B[b] + o;                           // an S13_DESKS point → s13 local seconds
+const B = SHOTS.find((s) => s.id === ID)!.beats;
+const at = ([b, o]: [string, number]) => B[b] + o;                           // an S13_DESKS point → s13 local seconds
 const XS = [-0.32, -0.16, 0, 0.16, 0.32], YS = [0.13, 0, -0.13];   // desk centers; d1 is top-left, row-major
 
 // Crowd desks: pose piece, mirrored, faces (+1 N, −1 S), figure scale, blob r, loom scale S (v3's: the decal's width ÷ the
 // blob's), phone side (ph −1: on the occupant's left, so Drinks' shadow falls toward him, not over the Freshman's), props,
 // and the working read once their phone is down: 'pen' wiggles the pen on 2s, a number is a page turn that many seconds
 // after it, 'scribble' moves the Freshman's pen along the page. The sheet has 6 poses for 10 figures, so 4 are mirrored.
-export const CROWD = {
+type Desk = { who: string, pose: string, mir: number, f: number, ph?: number, sc: number, r: number, S: number, props: string[], work?: string | number };
+// deskRig()'s result: every desk's pool and blob; a crowd desk (with a phone) also has the phone rig, the loom and its times.
+type Glow = THREE.Mesh<THREE.PlaneGeometry, THREE.MeshBasicMaterial>;
+type BaseRig = { key: string, who: string, blob: ReturnType<typeof createBlob>, pool: Glow, r: number };
+type DeskRig = (BaseRig & { loom?: undefined }) | (BaseRig & { up: PaperMesh, down: PaperMesh, screen: Glow, glow: Glow,
+  loom: Glow, fill: THREE.PointLight, S: number, wake: number, off: number });
+export const CROWD: Record<string, Desk> = {
   d1:  { who: 'G1', pose: 'seated_3', mir: 0, f: 1, sc: 0.95, r: 0.010, S: 4, props: ['page', 'pen'], work: 'pen' },
   d2:  { who: 'sleeper', pose: 'seated_1', mir: 0, f: 1, sc: 1.05, r: 0.012, S: 5, props: ['textbook'] },   // head down over the book
   d4:  { who: 'drinks', pose: 'seated_2', mir: 0, f: -1, ph: -1, sc: 1.00, r: 0.013, S: 7, props: ['page', 'pen', 'can', 'can', 'can'], work: 'pen' },
@@ -47,11 +56,11 @@ export const CROWD = {
   d15: { who: 'freshman', pose: 'seated_6', mir: 0, f: 1, sc: 0.80, r: 0.010, S: 9, props: ['page', 'pen', 'backpack'], work: 'scribble' },
 };
 // Where props sit, in the occupant's frame (x to their right, y away from them), and their turn (deg).
-const PROP_AT = { page: [0.026, 0.010, 8], pen: [0.016, -0.004, -30], textbook: [-0.024, -0.008, -6], backpack: [0, -0.088, 12] };
+const PROP_AT: Record<string, number[]> = { page: [0.026, 0.010, 8], pen: [0.016, -0.004, -30], textbook: [-0.024, -0.008, -6], backpack: [0, -0.088, 12] };
 const PHONE_AT = [0.030, -0.020], BLOB_AT = [0, 0.005], SEAT_AT = [0, -0.050];
 const HERO = { r: 0.030, at: [0.030, -0.028] };      // 2.5× (README §1, Q16), on the desk's right beside his page (s11's side)
 // Pool scale: the pendant 0.127 above the desk, the blob's height ≈ its radius above it (README §3: 0.127 / (0.127 − r)).
-const POOL = (r) => 0.127 / (0.127 - r);
+const POOL = (r: number) => 0.127 / (0.127 - r);
 const SOUTH = 0.002, SOFT = 0.004;                     // pool shadows 2 mm south of the blob (the pendants hang north); soft edge
 // The drop's silhouette is ~0.91 as tall as it is wide (evidence/anim-s13/measure.txt), so the loom is 1.5 × as long as wide.
 const LONG = 1.5 / 0.91;
@@ -62,18 +71,18 @@ const FROZEN_PROPS = new Set(['page', 'pen', 'backpack']);   // drawn from props
 // a quarter-second after its phone wakes (v3's order and angles: the Sleeper −42°, Drinks +42°, the Freshman over his
 // shoulder, 105° in all) and holds on the Freshman while the room fills. Turn: back to centre for the first phones down,
 // a glance left as the Sleeper's goes and right as Drinks' goes, then back to his page on the home chord.
-const look = (b, d = 0.25) => B[b] + d;
-const HEAD_ROT = [[look('revealSleeper'), 0], [look('revealSleeper', 0.5), -42], [look('revealDrinks'), -42], [look('revealDrinks', 0.5), 42],
+const look = (b: string, d = 0.25) => B[b] + d;
+const HEAD_ROT: [number, number][] = [[look('revealSleeper'), 0], [look('revealSleeper', 0.5), -42], [look('revealDrinks'), -42], [look('revealDrinks', 0.5), 42],
   [look('revealFreshman'), 42], [look('revealFreshman', 0.5), 65], [B.phonesDown - 0.25, 65], [B.phonesDown, 0],
   [at(S13_DESKS.d2.down) + 0.167, 0], [at(S13_DESKS.d2.down) + 0.333, -42], [at(S13_DESKS.d4.down) + 0.167, -42], [at(S13_DESKS.d4.down) + 0.333, 42],
   [B.homeChord - 0.25, 42], [B.homeChord, 0]];
-const BODY_ROT = [[look('revealFreshman'), 0], [look('revealFreshman', 0.5), 40], [B.phonesDown - 0.25, 40], [B.phonesDown, 0]];
+const BODY_ROT: [number, number][] = [[look('revealFreshman'), 0], [look('revealFreshman', 0.5), 40], [B.phonesDown - 0.25, 40], [B.phonesDown, 0]];
 const DOWN = B.homeChord + 0.333;                      // head down to the page
-const HEAD_Z = [[0.3, 0.036], [B.headLift, 0.034], [B.headLift + 0.167, 0.075], [B.homeChord, 0.075], [DOWN, 0.040]];   // the sink, the lift, down to work
-const HEAD_Y = [[B.headLift, 0.030], [B.headLift + 0.167, 0.012], [B.homeChord, 0.012], [DOWN, 0.028]];
-const ARMS_Y = [[DOWN + 0.167 - 1 / 12, 0.024], [DOWN + 0.167, 0.030]];   // his pen hand comes forward onto the page
+const HEAD_Z: [number, number][] = [[0.3, 0.036], [B.headLift, 0.034], [B.headLift + 0.167, 0.075], [B.homeChord, 0.075], [DOWN, 0.040]];   // the sink, the lift, down to work
+const HEAD_Y: [number, number][] = [[B.headLift, 0.030], [B.headLift + 0.167, 0.012], [B.homeChord, 0.012], [DOWN, 0.028]];
+const ARMS_Y: [number, number][] = [[DOWN + 0.167 - 1 / 12, 0.024], [DOWN + 0.167, 0.030]];   // his pen hand comes forward onto the page
 // His blob looks where he looks: side eyes toward each glance, open between.
-const blobLook = (t) => kf(t, HEAD_ROT, () => 0) < -20 ? -1 : kf(t, HEAD_ROT, () => 0) > 20 ? 1 : null;
+const blobLook = (t: number) => kf(t, HEAD_ROT, () => 0) < -20 ? -1 : kf(t, HEAD_ROT, () => 0) > 20 ? 1 : null;
 
 const POOL_I = 0.55, POOL_DIM = 0.15;                // light-pool decal opacity (additive); crowd pools at 0.15 of it while their phone is up
 // The room, v3 → v6 as the phones go down: v3's dim cool light from straight above (no shadows) and ambient ×0.3 under the
@@ -82,26 +91,26 @@ const ROOM_I = [0.9, 0.55], AMB_K = [0.3, 0.6];
 const FILL = 0.14, FILL_Z = 0.2, GLOW = 0.35;         // v3's crowd phone: fill (cd), its height, glow strength
 const HOODIE_K = 0.8;                                 // v3: the hero's hoodie (green[0]), as a multiplier
 const BREATH = 0.012;                                 // v3 seated breath, as a scale
-const tone = (a, b, k) => new THREE.Color(a).lerp(new THREE.Color(b), k);
-const warmAt = (t) => ease((t - B.phonesDown) / (B.homeChord + 0.5 - B.phonesDown));
+const tone = (a: THREE.ColorRepresentation, b: THREE.ColorRepresentation, k: number) => new THREE.Color(a).lerp(new THREE.Color(b), k);
+const warmAt = (t: number) => ease((t - B.phonesDown) / (B.homeChord + 0.5 - B.phonesDown));
 
-export async function build({ scene, camera, assets, PALETTE, post }) {
+export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   scene.background = tone(PALETTE.navy, PALETTE.ink, 0.5);
   camera.up.set(0, 1, 0);
   camera.position.set(0, 0, 1.60);
   camera.lookAt(0, 0, 0);
 
   // The grade: one 3D LUT re-mixed between v3's 'marston' and v6's 'amber' in 1/24 steps (a pure function of t).
-  const [lutA, lutB] = [loadLUT('marston'), loadLUT('amber')], N = lutA.image.width;
-  const lut = new THREE.Data3DTexture(new Uint8Array(lutA.image.data.length), N, N, N);
+  const [lutA, lutB] = [loadLUT('marston')!, loadLUT('amber')!], N = lutA.image.width;
+  const lut = new THREE.Data3DTexture(new Uint8Array(lutA.image.data!.length), N, N, N);
   Object.assign(lut, { format: THREE.RGBAFormat, type: THREE.UnsignedByteType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter,
     wrapS: THREE.ClampToEdgeWrapping, wrapT: THREE.ClampToEdgeWrapping, wrapR: THREE.ClampToEdgeWrapping, unpackAlignment: 1 });
   let lutK = -1;
-  const grade = (w) => {
+  const grade = (w: number) => {
     const k = Math.round(w * 24) / 24;
     if (k === lutK) return;
     lutK = k;
-    const a = lutA.image.data, b = lutB.image.data, d = lut.image.data;
+    const a = lutA.image.data!, b = lutB.image.data!, d = lut.image.data!;
     for (let i = 0; i < d.length; i++) d[i] = Math.round(a[i] + (b[i] - a[i]) * k);
     lut.needsUpdate = true;
   };
@@ -118,23 +127,23 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   scene.add(ROOM, ROOM.target);
 
   const [figs, props, kitp, mkit] = await Promise.all(['top_figures_sheet', 'top_props_sheet', 'props_kit', 'marston_kit'].map((n) => assets.load(n)));
-  const KP = { page: 'blank_page', pen: 'pen', backpack: 'backpack' };
-  const prop = (p, key) => (FROZEN_PROPS.has(p) ? art(kitp, KP[p], key) : art(props, p, key));
-  const boiling = [];
-  const piece = (opts, parent = scene) => {
+  const KP: Record<string, string> = { page: 'blank_page', pen: 'pen', backpack: 'backpack' };
+  const prop = (p: string, key: string) => (FROZEN_PROPS.has(p) ? art(kitp, KP[p], key) : art(props, p, key));
+  const boiling: { mesh: PaperMesh, opts: PaperOptions }[] = [];
+  const piece = (opts: PaperOptions, parent: THREE.Object3D = scene) => {
     const mesh = paperMesh(makePaper({ ...opts, seed: 0 }));
     boiling.push({ mesh, opts }); parent.add(mesh); return mesh;
   };
-  const art = (sheet, name, key, extra = {}) => ({ art: sheet.pieces[name], size: sheet.sizes[name], key, res: 128, ...extra });
-  const place = (m, x, y, z, rot = 0) => { m.position.set(x, y, z); m.rotation.z = rot; return m; };
-  const flat = (w, h, mat) => new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+  const art = (sheet: Kit, name: string, key: string, extra: PaperOptions = {}): PaperOptions => ({ art: sheet.pieces[name], size: sheet.sizes[name], key, res: 128, ...extra });
+  const place = <T extends THREE.Object3D>(m: T, x: number, y: number, z: number, rot = 0): T => { m.position.set(x, y, z); m.rotation.z = rot; return m; };
+  const flat = <M extends THREE.Material>(w: number, h: number, mat: M) => new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
 
   // ---------- floor: marston_kit's carpet, laid tile by tile, seen from above; darkened so the lit desks are islands ----------
   const rng = mulberry32(seedOf(ID, 'set'));
   // On a backing of the tile's own colour: the tiles' rounded corners leave pinholes that read as rows of dots from above.
   const floorArt = (() => {
     const tiles = carpetCanvas(mkit, [1.2, 0.7]), c = Object.assign(document.createElement('canvas'), { width: tiles.width, height: tiles.height });
-    const g = c.getContext('2d'), t = mkit.pieces.carpet_tile;
+    const g = c.getContext('2d')!, t = mkit.pieces.carpet_tile;
     g.drawImage(t, t.width / 2 - 8, t.height / 2 - 8, 16, 16, 0, 0, c.width, c.height);   // the tile's middle, stretched: its colour
     g.drawImage(tiles, 0, 0);
     g.fillStyle = 'rgba(20, 24, 40, 0.35)'; g.fillRect(0, 0, c.width, c.height);         // a little darker between the desks
@@ -149,16 +158,17 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   }
 
   // ---------- shared desk rig: the pendant's pool, a blob and its pool shadow; a crowd desk adds v3's phone and loom ----------
-  const glowTex = (inner) => {
-    const c = Object.assign(document.createElement('canvas'), { width: 128, height: 128 }), g = c.getContext('2d');
+  const glowTex = (inner: number) => {
+    const c = Object.assign(document.createElement('canvas'), { width: 128, height: 128 }), g = c.getContext('2d')!;
     const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
     grad.addColorStop(0, 'rgba(255,255,255,1)'); grad.addColorStop(inner, `rgba(255,255,255,${inner === 0.5 ? 0.55 : 0.45})`); grad.addColorStop(1, 'rgba(255,255,255,0)');
     g.fillStyle = grad; g.fillRect(0, 0, 128, 128);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
   };
   const poolTex = glowTex(0.5), phoneTex = glowTex(0.35);   // v6's pool falloff, v3's phone glow
-  const rigs = [];
-  function deskRig({ key, who, cx, cy, f, r, bx = cx + f * BLOB_AT[0], by = cy + f * BLOB_AT[1], d = null }) {
+  const rigs: DeskRig[] = [];
+  function deskRig({ key, who, cx, cy, f, r, bx = cx + f * BLOB_AT[0], by = cy + f * BLOB_AT[1], d = null }:
+    { key: string, who: string, cx: number, cy: number, f: number, r: number, bx?: number, by?: number, d?: Desk | null }): DeskRig {
     // The pool: falls to 0 at r 0.05 round the desk centre, additive, on the desk top under every prop.
     const pool = place(flat(0.10, 0.10, new THREE.MeshBasicMaterial({ color: WARM, map: poolTex, transparent: true, opacity: POOL_I,
       blending: THREE.AdditiveBlending, depthWrite: false })), cx, cy, 0.0322);
@@ -172,14 +182,14 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
     small.material.opacity = 0.85;
     small.material.userData.soft.value = (SOFT / 2) / (P * r);   // half the soft edge, in blob-radius units
     scene.add(pool, blob.mesh, small);
-    const rig = { key, who, blob, pool, r };
+    const rig: DeskRig = { key, who, blob, pool, r };
     rigs.push(rig);
     if (!d) return rig;
 
     // v3's phone rig. The phone at the desk's front corner on the occupant's side, face up; its screen and cyan glow light
     // on the wake over 2 frames, and an unshadowed cyan fill above lights this desk and the floor round it, so the room
     // appears desk by desk. Face down: the phone flips over 2 drawings and all three go out.
-    const loc = ([x, y]) => [cx + f * x, cy + f * y];
+    const loc = ([x, y]: number[]) => [cx + f * x, cy + f * y];
     const [px, py] = loc([(d.ph ?? 1) * PHONE_AT[0], PHONE_AT[1]]), phoneRot = (f < 0 ? Math.PI : 0) + Math.PI / 2;   // painted landscape
     const up = place(piece(art(kitp, 'phone_face_up', `${ID}-${key}-phone`)), px, py, 0.033, phoneRot);
     const down = place(piece(art(kitp, 'phone_face_down', `${ID}-${key}-phone-down`)), px, py, 0.033, phoneRot);
@@ -200,24 +210,24 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   // ---------- the crowd ----------
   const figRng = mulberry32(seedOf(ID, 'crowd'));
   let n = 0;
-  const breathers = [], workers = [];
-  const cast = [];   // (who, pose, mirror, turn, scale): read by evidence/anim-s13/measure.html
+  const breathers: { m: PaperMesh, sx: number, sy: number, ph: number, slow: boolean }[] = [],
+    workers: { d: Desk, f: number, ph: number, from: number, pen?: PaperMesh, page?: PaperMesh, base?: THREE.Vector3 }[] = [];
+  const cast: { who: string, pose: string, mirror: boolean, turnDeg: number, scale: number }[] = [];   // (who, pose, mirror, turn, scale): read by evidence/anim-s13/measure.html
   for (const [key, d] of Object.entries(CROWD)) {
     const i = Number(key.slice(1)) - 1, cx = XS[i % 5], cy = YS[Math.floor(i / 5)], f = d.f;
-    /** @param {number[]} xy */
-    const loc = ([x, y]) => [cx + f * x, cy + f * y], facing = f < 0 ? Math.PI : 0;
+    const loc = ([x, y]: number[]) => [cx + f * x, cy + f * y], facing = f < 0 ? Math.PI : 0;
     const [sx, sy] = loc(SEAT_AT), rot = facing + (figRng() * 16 - 8) * DEG;
     const fig = place(piece(art(figs, d.pose, `${ID}-${key}-${d.pose}`)), sx, sy, 0.048 + 0.002 * n++, rot);
     fig.scale.set(d.mir ? -d.sc : d.sc, d.sc, 1);
     breathers.push({ m: fig, sx: d.mir ? -d.sc : d.sc, sy: d.sc, ph: figRng(), slow: d.who === 'sleeper' });   // v3: a breath each, none in step
-    const placed = {};
+    const placed: Partial<Record<string, PaperMesh>> = {};
     d.props.forEach((p, j) => {
       if (p === 'can') { const [x, y] = loc([0.006 + 0.0085 * (j - 2), 0.016]); return place(piece(art(props, 'can', `${ID}-${key}-can${j}`)), x, y, 0.033); }
       const [ox, oy, deg] = PROP_AT[p], [x, y] = loc([ox, oy]);
       placed[p] = place(piece(prop(p, `${ID}-${key}-${p}`)), x, y, p === 'backpack' ? 0.045 : p === 'pen' ? 0.0335 : 0.033, facing + deg * DEG);
     });
-    const rig = deskRig({ key, who: d.who, cx, cy, f, r: d.r, d });
-    if (d.work !== undefined) workers.push({ d, f, ph: figRng(), from: rig.off + 1 / 12, ...placed, base: placed.pen?.position.clone() });
+    const rig = deskRig({ key, who: d.who, cx, cy, f, r: d.r, d });   // a crowd desk: deskRig adds the phone rig (and off)
+    if (d.work !== undefined) workers.push({ d, f, ph: figRng(), from: (rig as Extract<DeskRig, { off: number }>).off + 1 / 12, ...placed, base: placed.pen?.position.clone() });
     cast.push({ who: d.who, pose: d.pose, mirror: !!d.mir, turnDeg: +(rot / DEG).toFixed(1), scale: d.sc });
   }
 
@@ -241,7 +251,7 @@ export async function build({ scene, camera, assets, PALETTE, post }) {
   return {
     rigs, cast,   // read by evidence/anim-s13/measure.html
     parts: { exam: heroRig.blob, camera },
-    update(tLocal) {
+    update(tLocal: number) {
       const seed = boilSeed(tLocal, 10);
       for (const p of boiling) updatePaperMesh(p.mesh, makePaper({ ...p.opts, seed }));
 
