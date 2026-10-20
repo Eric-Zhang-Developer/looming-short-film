@@ -10,3 +10,5 @@ assets/cut/*.png
 .claude/worktrees/
 # Previews muxed with third-party clips (assets/raw/reels) stay local
 evidence/*/preview.mp4
+# Compiled src/ (tsconfig.build.json); every serve rebuilds it
+build/

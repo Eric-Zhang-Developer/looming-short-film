@@ -3,6 +3,7 @@
 // headless Chrome via puppeteer-core, and in-page frame grabbing. Every grab happens in the same task as
 // renderFrame(t), so it works whether or not the page uses preserveDrawingBuffer.
 import http from 'node:http';
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -22,7 +23,10 @@ const TYPES = {
   '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml',
   '.wav': 'audio/wav', '.mp3': 'audio/mpeg', '.woff2': 'font/woff2', '.glb': 'model/gltf-binary',
 };
+// The page loads build/, compiled from src/ (tsconfig.build.json), so every serve compiles first: a render can never
+// run against a stale build. A few seconds; it throws (and so stops the render) if tsc fails.
 export async function serve() {
+  execFileSync(path.join(ROOT, 'node_modules/.bin/tsc'), ['-p', path.join(ROOT, 'tsconfig.build.json')], { stdio: 'inherit' });
   const server = http.createServer((req, res) => {
     const p = path.join(ROOT, decodeURIComponent(new URL(req.url, 'http://x').pathname));
     if (p === path.join(ROOT, 'favicon.ico')) { res.writeHead(204); return res.end(); }

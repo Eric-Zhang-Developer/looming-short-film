@@ -5,8 +5,8 @@
 <script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/examples/jsm/": "/node_modules/three/examples/jsm/" } }</script>
 <script type="module">
   // The film: one stage, every shot played by time (docs/contracts.md §film).
-  import { createStage, exposeForRender } from './src/core/stage.js';
-  import { DURATION } from './src/timeline.js';
-  import { createFilm } from './src/film.js';
+  import { createStage, exposeForRender } from './build/core/stage.js';
+  import { DURATION } from './build/timeline.js';
+  import { createFilm } from './build/film.js';
   exposeForRender(createFilm(createStage()), { duration: DURATION, fps: 24 });
 </script>
