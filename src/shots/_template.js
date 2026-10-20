@@ -3,7 +3,7 @@
 // What a stub shows: navy wall, kraft desk strip, one proxy (or real art) for the shot, the shot number as cream dots
 // (rows of 6) and tLocal as a cream bar filling left to right. No text: frames never carry legible text.
 import * as THREE from 'three';
-import { SHOTS } from '../timeline.js';
+import { SHOTS } from '../timeline.ts';
 import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
 import { ambient } from '../lights.js';

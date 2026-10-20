@@ -10,7 +10,7 @@
 # The old master is concat'd closed-GOP x264, cut exactly at its IDR packets by the segment muxer (see splice.sh).
 set -e
 OLD=${1:?old master}; NEW=${2:?new master}; SPEC=${3:?spec}; cd ${0:A:h}/..
-DUR=$(node -e "import('./src/timeline.js').then(m=>console.log(m.DURATION))")
+DUR=$(node -e "import('./src/timeline.ts').then(m=>console.log(m.DURATION))")
 OLD_DUR=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 $OLD | awk '{printf "%d", $1+0.5}')
 KEYS=$(ffprobe -v error -select_streams v -skip_frame nokey -show_entries frame=pts_time -of default=nw=1:nk=1 $OLD)
 mkdir -p out/parts; rm -rf out/assemble; mkdir -p out/assemble

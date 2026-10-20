@@ -8,7 +8,7 @@ set -e
 NAME=${1:?name}; CRF=${2:-18}; cd ${0:A:h}/..
 for f in assets/cut/*.boxes.json; do k=$(basename $f .boxes.json); [ -f assets/frozen/$k.png ] && node tools/cut.mjs --in=assets/frozen/$k.png --boxes=$f >/dev/null; done
 node tools/mix.mjs | tail -1
-DUR=$(node -e "import('./src/timeline.js').then(m=>console.log(m.DURATION))")
+DUR=$(node -e "import('./src/timeline.ts').then(m=>console.log(m.DURATION))")
 [ -n "$RESUME" ] || rm -rf out/frames out/chunks; mkdir -p out/chunks out/frames; : > out/chunks/list.txt
 a=0
 while [ $a -lt $DUR ]; do

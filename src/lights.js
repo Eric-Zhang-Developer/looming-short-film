@@ -4,9 +4,9 @@
 // Intensities are physical (candela for spots, lux for directionals) with decay 2, tuned for
 // the stage's NoToneMapping so a lit cream wall lands below white.
 import * as THREE from 'three';
-import { PALETTE } from './core/palette.js';
-import { clamp } from './core/ease.js';
-import { hash2, mulberry32, seedOf } from './core/rng.js';
+import { PALETTE } from './core/palette.ts';
+import { clamp } from './core/ease.ts';
+import { hash2, mulberry32, seedOf } from './core/rng.ts';
 
 const color = (k) => new THREE.Color(PALETTE[k]);
 const mix = (a, b, x) => color(a).lerp(color(b), x);

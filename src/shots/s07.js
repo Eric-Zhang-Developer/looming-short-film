@@ -11,8 +11,8 @@
 // builds H for s07 and s08.
 import * as THREE from 'three';
 import { phoneLight, ambient, aim } from '../lights.js';
-import { onTwos } from '../core/ease.js';
-import { hash2, seedOf } from '../core/rng.js';
+import { onTwos } from '../core/ease.ts';
+import { hash2, seedOf } from '../core/rng.ts';
 import { createBlob } from '../blob.js';
 import { makeGator, FIG_K } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';

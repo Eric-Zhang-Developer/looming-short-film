@@ -13,8 +13,8 @@
 // else 'broken'. A few hairs poke out past the cut either way. Only the band near the edge is recomputed per boil
 // seed; the SDF, fill, grain and painted-rim measurement are built once per (key, res).
 import * as THREE from 'three';
-import { hash, mulberry32, seedOf } from './core/rng.js';
-import { PALETTE } from './core/palette.js';
+import { hash, mulberry32, seedOf } from './core/rng.ts';
+import { PALETTE } from './core/palette.ts';
 
 // Pixel values are at 1024 px on the long edge and scale with `res`.
 // tearAmp [wobble, jag]: peak px (layered value noise sits mostly within a third of it) · tearFreq [wobble, jag] features per 1024 px · rimPx [min, max] · grain 0..1 · thickness 0..1

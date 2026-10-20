@@ -19,10 +19,10 @@ import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
 import { ambient } from '../lights.js';
 import { createBlob } from '../blob.js';
-import { kf, clamp, ease, easeOut, onTwos } from '../core/ease.js';
-import { mulberry32, seedOf } from '../core/rng.js';
-import { SHOTS, S13_DESKS } from '../timeline.js';
-import { loadLUT } from '../post.js';
+import { kf, clamp, ease, easeOut, onTwos } from '../core/ease.ts';
+import { mulberry32, seedOf } from '../core/rng.ts';
+import { SHOTS, S13_DESKS } from '../timeline.ts';
+import { loadLUT } from '../post.ts';
 import { carpetCanvas } from './s11.js';
 
 const ID = 's13', DEG = Math.PI / 180;

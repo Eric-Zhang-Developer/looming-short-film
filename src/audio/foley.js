@@ -3,7 +3,7 @@
 // Beds and sized one-shots take a length: (seed, dur), dur in seconds; omit it for the sound's default length.
 // Each sound's output peak is its intended loudness relative to the others at cue gain 1.
 // The same seed always gives the same samples, so a cue repeated with one seed is sample-identical.
-import { mulberry32 } from '../core/rng.js';
+import { mulberry32 } from '../core/rng.ts';
 import { SR, noise, lowpass, highpass, bandpass, mixInto, subSwell } from './synth.js';
 
 const TAU = Math.PI * 2;

@@ -5,9 +5,9 @@
 // The shadow pass runs the same field (eyes cut out as holes), so the shadow is exactly this shape.
 // All motion comes from update(tLocal, ...); nothing reads a clock.
 import * as THREE from 'three';
-import { mulberry32, seedOf } from './core/rng.js';
-import { onTwos, ease } from './core/ease.js';
-import { PALETTE } from './core/palette.js';
+import { mulberry32, seedOf } from './core/rng.ts';
+import { onTwos, ease } from './core/ease.ts';
+import { PALETTE } from './core/palette.ts';
 
 const N = 5;          // ball slots in the shader; unused slots get weight 0
 const T = 0.5625;     // threshold: the body ball (support 2) crosses it at distance 1, so the blob is ~1 radius wide

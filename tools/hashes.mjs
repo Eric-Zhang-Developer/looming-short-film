@@ -6,7 +6,7 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs';
 import { args, die, serve, launch, openPage, grab, toBuf } from './lib/page.mjs';
-import { SHOTS, DURATION } from '../src/timeline.js';
+import { SHOTS, DURATION } from '../src/timeline.ts';
 
 const out = typeof args.out === 'string' ? args.out : null, check = typeof args.check === 'string' ? args.check : null;
 if (!out === !check) die('usage: node tools/hashes.mjs --out=<file.json> | --check=<file.json>');

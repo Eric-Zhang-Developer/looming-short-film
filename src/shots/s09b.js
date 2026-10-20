@@ -9,8 +9,8 @@
 // Characters on 2s, light and camera on 1s, boil 10/s. s10 imports closeupRig() from here.
 import * as THREE from 'three';
 import { ambient, aim } from '../lights.js';
-import { kf, ease, clamp, onTwos } from '../core/ease.js';
-import { SHOTS } from '../timeline.js';
+import { kf, ease, clamp, onTwos } from '../core/ease.ts';
+import { SHOTS } from '../timeline.ts';
 import { makeGator, HIP } from '../characters/gator.js';
 import { POSES, specPose, walk } from '../characters/poses.js';
 import { createBlob } from '../blob.js';

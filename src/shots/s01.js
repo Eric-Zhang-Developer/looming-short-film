@@ -8,8 +8,8 @@ import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
 import { dawnLight, ambient } from '../lights.js';
 import { definePuppet } from '../puppet.js';
-import { kf, ease } from '../core/ease.js';
-import { mulberry32, seedOf } from '../core/rng.js';
+import { kf, ease } from '../core/ease.ts';
+import { mulberry32, seedOf } from '../core/rng.ts';
 
 const RECT = [[0, 0], [1, 0], [1, 1], [0, 1]];
 // A shape that fills its canvas has no edge to tear (paper.js tears where alpha ends), so a visible rectangle is

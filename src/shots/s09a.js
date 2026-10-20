@@ -9,7 +9,7 @@
 // backpack and takes the first step toward the door. Setups (v6): the phone insert 0–1.5, C4 (his face, close) 1.5–2.5 and 3.0–4.25, C3 (s07's camera) 2.5–3.0,
 // C5 (C3 panned left) 4.25–6. Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
-import { onTwos, lerp } from '../core/ease.js';
+import { onTwos, lerp } from '../core/ease.ts';
 import { act } from '../characters/acting.js';
 import { hipHeight } from '../characters/gator.js';
 import { specPose, POSES } from '../characters/poses.js';

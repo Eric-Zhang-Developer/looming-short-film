@@ -1,0 +1,18 @@
+{
+  // The TypeScript pass: every .ts file, fully strict. Files still .js are tsconfig.json's (legacy JSDoc, non-strict).
+  // A .ts file may import only .ts files (convert bottom-up), so this program never reaches a legacy file.
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "nodenext",
+    "lib": ["es2023", "dom", "dom.iterable"],
+    "types": ["node"],
+    "strict": true,
+    "noEmit": true,
+    "allowJs": false,
+    "rewriteRelativeImportExtensions": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts", "tools/**/*.ts", "*.ts"]
+}

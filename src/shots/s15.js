@@ -10,16 +10,16 @@
 // PAGE, CAM_B2 and the practice-sheet helpers from here.
 import * as THREE from 'three';
 import { sensorLight, fluorescent, ambient } from '../lights.js';
-import { kf, clamp } from '../core/ease.js';
+import { kf, clamp } from '../core/ease.ts';
 import { makeGator } from '../characters/gator.js';
 import { createBlob } from '../blob.js';
 import { POSES, specPose } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
-import { SHOTS } from '../timeline.js';
+import { SHOTS } from '../timeline.ts';
 import { kitTools, marstonDesk, MARK, castOnly } from './s11.js';
 import { closeupRig, HEAD_AT } from './s09b.js';
 import { loadHand, handFont, runParts, drawInt } from './s17b.js';
-import { mulberry32, seedOf } from '../core/rng.js';
+import { mulberry32, seedOf } from '../core/rng.ts';
 
 const ID = 's15', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID).beats;            // penUncap 1.5, nameWritten 4.5, nameSmile 5.5

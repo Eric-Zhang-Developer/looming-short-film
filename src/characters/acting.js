@@ -22,9 +22,9 @@
 //   mouth open for its first 0.5 s, then the smile.
 //   e.g. act(hero, tLocal, [[0, 'numb'], [2.5, 'dread'], [6, 'resolve']], { slump: 0 })
 import * as THREE from 'three';
-import { onTwos, kf, lerp, ease } from '../core/ease.js';
-import { hash2 } from '../core/rng.js';
-import { PALETTE } from '../core/palette.js';
+import { onTwos, kf, lerp, ease } from '../core/ease.ts';
+import { hash2 } from '../core/rng.ts';
+import { PALETTE } from '../core/palette.ts';
 import { makePaper, boilSeed } from '../paper.js';
 import { paperMesh, updatePaperMesh } from '../material.js';
 import { FIG_K } from './gator.js';

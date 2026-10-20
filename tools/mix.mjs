@@ -7,8 +7,8 @@
 import { existsSync, mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { beat, DURATION } from '../src/timeline.js';
-import { seedOf } from '../src/core/rng.js';
+import { beat, DURATION } from '../src/timeline.ts';
+import { seedOf } from '../src/core/rng.ts';
 import { SR, mixInto } from '../src/audio/synth.js';
 import { renderScore } from '../src/audio/score.js';
 import { FOLEY } from '../src/audio/foley.js';

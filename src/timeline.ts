@@ -1,4 +1,3 @@
-// @ts-check
 // Single source of timing truth (contracts.md). Data only: no clocks, no rendering.
 // The v4 cut (spec-v4, story approved by the director 2026-10-17): 3:15; v6 adds s10b (the stacks, 6 s): 3:21; v7 grows s13
 // from 5 s to 8 s (v3's music-timed shadows, then the turn): 3:24. Shots and beats from docs/02-story.md's beat
@@ -10,7 +9,9 @@
 // Durations are written out (not derived) so tools/check_timeline.mjs can catch gaps and overlaps.
 export const DURATION = 204;
 
-export const SHOTS = [
+export type Shot = { id: string; start: number; duration: number; beats: Record<string, number> };
+
+export const SHOTS: Shot[] = [
   { id: 's00',  start: 0,   duration: 4,  beats: { notifyBuzz: 0.5 } },                                   // 0:00 cold open
   { id: 's01',  start: 4,   duration: 5,  beats: {} },
   { id: 's02',  start: 9,   duration: 10, beats: { calendarZoom: 1.5, inkDropForms: 5 } },               // 0:09; clock at ~9:00
@@ -44,8 +45,7 @@ export const SHOTS = [
 // held a quarter-second before the turn), then the room's other seven every 1/8 s from the outside in, closing round him.
 // Turn: from his neighbours outward, two desks per chord, a quarter-second apart; the Freshman's is the last phone down,
 // on the home chord's top note.
-/** @type {Record<string, { wake: [string, number], down: [string, number] }>} */
-export const S13_DESKS = {
+export const S13_DESKS: Record<string, { wake: [string, number], down: [string, number] }> = {
   d2:  { wake: ['revealSleeper', 0],  down: ['phonesDown', 0.5] },
   d4:  { wake: ['revealDrinks', 0],   down: ['phonesDown', 1.0] },
   d15: { wake: ['revealFreshman', 0], down: ['homeChord', 0.25] },
@@ -58,12 +58,12 @@ export const S13_DESKS = {
   d9:  { wake: ['roomWakes', 0.75],   down: ['phonesDown', 0.25] },
 };
 
-export function shotAt(t) {
+export function shotAt(t: number): { shot: Shot; tLocal: number } {
   const shot = SHOTS.findLast((s) => t >= s.start) ?? SHOTS[0];
   return { shot, tLocal: t - shot.start };
 }
 
-export function beat(name) {
+export function beat(name: string): number {
   for (const s of SHOTS) if (name in s.beats) return s.start + s.beats[name];
   throw new Error(`unknown beat: ${name}`);
 }

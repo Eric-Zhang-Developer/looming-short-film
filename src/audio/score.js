@@ -4,7 +4,7 @@
 // never a global time, so retiming a shot moves its music. `motif` tags which leitmotif a note belongs to.
 // Voices are doc 05's four, from synth.js: felt piano, music box, warm pad, sub swell; plus v4's pulse, built from the
 // clock's tick (foley.js). An event may carry until: '<beat>' to stop dead on that beat. Mono, 48 kHz.
-import { beat, S13_DESKS } from '../timeline.js';
+import { beat, S13_DESKS } from '../timeline.ts';
 import { SR, feltPiano, musicBox, pad, subSwell, mixInto } from './synth.js';
 import { FOLEY } from './foley.js';
 
@@ -41,6 +41,7 @@ const BAR = 2, BAR0 = -0.5;
 /** @type {[string, number][]} */
 const DODGES = [['fridge', -8], ['gameNight', -4], ['lampClickHome', 0], ['bedRot', 4]];
 const dodge = (n) => DODGES.findLast(([, k]) => n >= k);
+/** @returns {[string, number]} */
 const bar = (n, sec = 0) => { // → [beat, offset] of second `sec` in bar n
   const [b, n0] = dodge(n);
   return [b, (b === 'lampClickHome' ? BAR0 : 0) + (n - n0) * BAR + sec];
@@ -248,7 +249,9 @@ const LEVEL = 0.5;
 // Notes and their room tails ring through it (the groove's bar −1 stabs reach the home click; s09a's held note runs
 // under the nightstand lamp's click), so the gate fades the stem out over 40 ms before the click and back in 20 ms after
 // the window. Beat-relative, like the notes. [beat, window]: a lamp click is 0.3 s, the off click's 0.17 s (the spring-back follows it).
-const CLICKS = [['lampClickHome', 0.3], ['lampOffHome', 0.17], ['lampOn', 0.3]], FADE_OUT = 0.04, FADE_IN = 0.02;
+/** @type {[string, number][]} */
+const CLICKS = [['lampClickHome', 0.3], ['lampOffHome', 0.17], ['lampOn', 0.3]];
+const FADE_OUT = 0.04, FADE_IN = 0.02;
 function gateClicks(out) {
   const at = (s) => Math.round(s * SR);
   for (const [b, len] of CLICKS) {

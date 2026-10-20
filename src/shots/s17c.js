@@ -8,9 +8,9 @@
 // back to P, and his fingertip taps the 94 once at 6.25.
 // Characters and the paper on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
-import { SHOTS } from '../timeline.js';
+import { SHOTS } from '../timeline.ts';
 import { ambient } from '../lights.js';
-import { easeOut, ease, clamp, lerp } from '../core/ease.js';
+import { easeOut, ease, clamp, lerp } from '../core/ease.ts';
 import { createBlob } from '../blob.js';
 import { tools } from './s02.js';
 import { kitTools } from './s11.js';

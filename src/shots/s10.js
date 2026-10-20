@@ -7,8 +7,8 @@
 // exhale. Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
 import { ambient, aim } from '../lights.js';
-import { kf, ease, onTwos } from '../core/ease.js';
-import { SHOTS } from '../timeline.js';
+import { kf, ease, onTwos } from '../core/ease.ts';
+import { SHOTS } from '../timeline.ts';
 import { makeGator, HIP, hipHeight } from '../characters/gator.js';
 import { POSES, specPose, walk } from '../characters/poses.js';
 import { act } from '../characters/acting.js';

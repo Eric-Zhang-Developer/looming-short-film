@@ -9,10 +9,10 @@
 // desk unit (page, its ink, the blob, the overhead light). This file exports the page and Camera P for s17c, so the
 // graded paper lands where he wrote and carries his own three lines. Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
-import { SHOTS } from '../timeline.js';
+import { SHOTS } from '../timeline.ts';
 import { sensorLight, fluorescent, ambient } from '../lights.js';
-import { kf, ease, easeOut, spring, clamp, lerp } from '../core/ease.js';
-import { mulberry32, seedOf } from '../core/rng.js';
+import { kf, ease, easeOut, spring, clamp, lerp } from '../core/ease.ts';
+import { mulberry32, seedOf } from '../core/rng.ts';
 import { createBlob } from '../blob.js';
 import { makeGator, greenVariant } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';

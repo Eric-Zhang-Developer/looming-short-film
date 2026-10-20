@@ -7,7 +7,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const arg = process.argv.find((a) => a.startsWith('--file='));
-const file = arg ? resolve(arg.slice(7)) : new URL('../src/timeline.js', import.meta.url).pathname;
+const file = arg ? resolve(arg.slice(7)) : new URL('../src/timeline.ts', import.meta.url).pathname;
 // @ts-expect-error import() stringifies its specifier, so a file URL object works (spec and Node)
 const { SHOTS, DURATION } = await import(pathToFileURL(file));
 

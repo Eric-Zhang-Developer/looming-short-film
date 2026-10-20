@@ -9,15 +9,15 @@
 // camera at 24.
 import * as THREE from 'three';
 import { sensorLight, fluorescent, ambient } from '../lights.js';
-import { kf, clamp } from '../core/ease.js';
-import { mulberry32, seedOf } from '../core/rng.js';
+import { kf, clamp } from '../core/ease.ts';
+import { mulberry32, seedOf } from '../core/rng.ts';
 import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { makeCrowd } from '../characters/crowd.js';
 import { BLOB_R as OTHER_R } from '../characters/exam.js';
 import { POSES, specPose } from '../characters/poses.js';
 import { act } from '../characters/acting.js';
-import { SHOTS } from '../timeline.js';
+import { SHOTS } from '../timeline.ts';
 import { UNIT, BLOB_AT, PHONE, PAGE, CAM_B2, practiceSheet, SHEET_INK, penLine } from './s15.js';
 import { loadHand } from './s17b.js';
 import { kitTools, marstonDesk, mppOf, idle, castOnly } from './s11.js';

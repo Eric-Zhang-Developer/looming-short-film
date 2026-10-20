@@ -5,7 +5,7 @@
 // fingertip, near arm 12 mm in front of the body, far arm 4 mm behind, pocket 3 mm in front. Everything × scale.
 import * as THREE from 'three';
 import { PIECES } from '../assets.js';
-import { PALETTE } from '../core/palette.js';
+import { PALETTE } from '../core/palette.ts';
 import { makePaper } from '../paper.js';
 import { definePuppet } from '../puppet.js';
 

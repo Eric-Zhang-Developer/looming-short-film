@@ -2,9 +2,9 @@
 // The whole film by time (contract: docs/contracts.md §film, §shots). Each shot gets its own scene and camera on the
 // one shared renderer, so nothing a shot does can leak into another, and any t renders the same in any order.
 import * as THREE from 'three';
-import { SHOTS, shotAt } from './timeline.js';
-import { PALETTE } from './core/palette.js';
-import { createPost } from './post.js';
+import { SHOTS, shotAt } from './timeline.ts';
+import { PALETTE } from './core/palette.ts';
+import { createPost } from './post.ts';
 import * as assets from './assets.js';
 
 export function createFilm(stage) {

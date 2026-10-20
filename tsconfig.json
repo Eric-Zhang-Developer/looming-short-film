@@ -1,13 +1,23 @@
 {
   "compilerOptions": {
     "target": "es2023",
-    "lib": ["es2023", "dom", "dom.iterable"],
+    "lib": [
+      "es2023",
+      "dom",
+      "dom.iterable"
+    ],
     "module": "nodenext",
     "allowJs": true,
     "checkJs": true,
     "noEmit": true,
     "skipLibCheck": true,
-    "strict": false
+    "strict": false,
+    "rewriteRelativeImportExtensions": true
   },
-  "include": ["src/**/*.js", "src/globals.d.ts", "render.mjs", "tools/**/*.mjs"]
+  "include": [
+    "src/**/*.js",
+    "src/globals.d.ts",
+    "render.mjs",
+    "tools/**/*.mjs"
+  ]
 }

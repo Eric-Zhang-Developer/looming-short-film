@@ -1,13 +1,12 @@
-// @ts-check
-// node src/core/selftest.js — invariants of the core module. Exits non-zero on the first failure.
+// node src/core/selftest.ts — invariants of the core module. Exits non-zero on the first failure.
 // Expected rng values were produced by 1776's original src/rng.ts, so these also pin the port as bit-identical.
 import assert from 'node:assert/strict';
-import { hash, hash2, mulberry32, seedOf } from './rng.js';
-import { ease, easeIn, easeOut, kf, spring, onTwos } from './ease.js';
-import { PALETTE } from './palette.js';
-import { shotAt } from '../timeline.js';
+import { hash, hash2, mulberry32, seedOf } from './rng.ts';
+import { ease, easeIn, easeOut, kf, spring, onTwos } from './ease.ts';
+import { PALETTE } from './palette.ts';
+import { shotAt } from '../timeline.ts';
 
-const ok = (name, fn) => { fn(); console.log(`ok  ${name}`); };
+const ok = (name: string, fn: () => void) => { fn(); console.log(`ok  ${name}`); };
 
 ok('hash fixed outputs', () => {
   assert.equal(hash(0), 0.11478774505667388);
@@ -29,11 +28,11 @@ ok('seedOf is a stable uint32 and separates parts', () => {
   assert.ok(Number.isInteger(seedOf('x')) && seedOf('x') >= 0 && seedOf('x') < 2 ** 32);
 });
 ok('kf hits its keys exactly', () => {
-  const keys = [[0, -0.3], [1, 0.25], [2.5, 0.1], [3, 7]];
+  const keys: [number, number][] = [[0, -0.3], [1, 0.25], [2.5, 0.1], [3, 7]];
   for (const [t, v] of keys) assert.equal(kf(t, keys), v);
   assert.equal(kf(-5, keys), -0.3);
   assert.equal(kf(99, keys), 7);
-  const arr = [[0, [0, 1]], [1, [2, 3]], [2, [4, 5]]];
+  const arr: [number, number[]][] = [[0, [0, 1]], [1, [2, 3]], [2, [4, 5]]];
   for (const [t, v] of arr) assert.deepEqual(kf(t, arr), v);
   assert.equal(kf(0.5, [[0, 0], [1, 1]]), 0.5); // smoothstep midpoint
 });

@@ -12,7 +12,7 @@
 //   ('1:45'); omitted → no time drawn.
 //   uiPoint(scr, x, y) → [u, v] in 0..1 of the texture (v from the bottom), for aiming a camera at a row.
 import * as THREE from 'three';
-import { PALETTE } from '../core/palette.js';
+import { PALETTE } from '../core/palette.ts';
 
 // Countdown bodies: hours to the exam at 9:00 the next morning, from each shot's clock (docs/02-story.md, "The clock"),
 // to the nearest hour. s03 follows s02 (9:00) in one continuous morning → 24; s07 1:45 → 7 h 15 → 7; s09a 3:00:10 →

@@ -2,7 +2,7 @@
 // Offline voices and DSP (doc 05, contracts §src/audio). Plain Node, mono Float32Array at 48 kHz.
 // Ideas ported from 1776's audio.ts (oscillator + envelope voices, polyBLEP saw, biquads); code is new.
 // Deterministic: noise comes only from src/core/rng.js, seeded per call.
-import { mulberry32, seedOf } from '../core/rng.js';
+import { mulberry32, seedOf } from '../core/rng.ts';
 
 export const SR = 48000;
 const TAU = Math.PI * 2;

@@ -16,7 +16,7 @@
 import * as THREE from 'three';
 import { makePaper, boilSeed } from './paper.js';
 import { paperMesh, updatePaperMesh } from './material.js';
-import { PALETTE } from './core/palette.js';
+import { PALETTE } from './core/palette.ts';
 
 const KIT_D = 0.020;           // the PIECES sizes are for a Ø 0.020 dial; everything scales with diameter / KIT_D
 const STEP_FRAME = 1 / 24, OVERSHOOT = 1.5 * Math.PI / 180;

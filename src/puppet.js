@@ -14,7 +14,7 @@
 // follow() lags a part behind its ancestors' blended rotation with a damped spring, the same response as
 // core's spring(): impulse e^(-k·s)·sin(w·s)/w. It integrates from the first blend key every call, so it is a
 // pure function of t and of the last blend() call's poses and keys.
-import { kf, onTwos } from './core/ease.js';
+import { kf, onTwos } from './core/ease.ts';
 import { paperMesh, updatePaperMesh } from './material.js';
 import { boilSeed } from './paper.js';
 import * as THREE from 'three';

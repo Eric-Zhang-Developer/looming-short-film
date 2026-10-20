@@ -14,7 +14,7 @@
 // N is the side facing the camera (three flips it on back faces), so "behind" always means behind as seen.
 // The light's shadow is already in directLight.color, so anything between the light and the sheet shadows the glow.
 import * as THREE from 'three';
-import { mulberry32, seedOf } from './core/rng.js';
+import { mulberry32, seedOf } from './core/rng.ts';
 
 const EDGE_TEXELS = 12;    // rim catch width in texels at 1024 px (scaled by the alphaMap's size)
 const EDGE_SCREEN_PX = 6;  // ...but never thinner than this on screen (before the wandering width scales it down)

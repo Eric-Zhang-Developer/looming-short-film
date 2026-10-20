@@ -6,8 +6,8 @@
 // Characters on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { phoneLight, dawnLight, ambient, aim } from '../lights.js';
-import { kf, ease } from '../core/ease.js';
-import { hash2 } from '../core/rng.js';
+import { kf, ease } from '../core/ease.ts';
+import { hash2 } from '../core/rng.ts';
 import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';

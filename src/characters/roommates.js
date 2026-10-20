@@ -8,7 +8,7 @@
 // Root at the hip, as the Student. s05's numbers are kept: HERON_STAND_Y is the tall one's standing hip height, and the
 // round one's root sits ROUND_DROP below its hip so s05's `SEAT − 0.03` placement still puts him on the couch.
 import * as THREE from 'three';
-import { PALETTE } from '../core/palette.js';
+import { PALETTE } from '../core/palette.ts';
 import { buildRig, sideParts, greenVariant, HIP } from './gator.js';
 
 const FACES = { eyes: 'open', mouth: 'neutral' };

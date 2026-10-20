@@ -1,7 +1,7 @@
-// @ts-check
 // Post chain (doc 04 §Camera and post): Render -> Bokeh (miniature DOF) -> sRGB output -> per-act LUT -> grain + vignette.
 // No bloom. Everything is a pure function of the frame: grain is hashed from (pixel, frame), never a clock.
 import * as THREE from 'three';
+import type { Stage } from './core/stage.ts';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
@@ -10,16 +10,17 @@ import { LUTPass } from 'three/examples/jsm/postprocessing/LUTPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 
 // Doc 03 color script as grades on display-referred (sRGB) color. gain tints the highlights, lift tints the shadows.
-const GRADES = {
+type Grade = { gain: number[]; lift: number[]; sat: number; contrast: number; gamma: number };
+const GRADES: Record<string, Grade> = {
   night:   { gain: [0.86, 0.94, 1.08], lift: [0.03, 0.045, 0.11], sat: 1.06, contrast: 1.0, gamma: 0.86 }, // picture-book night: navy reads as a colour, cool not grey
   marston: { gain: [0.86, 1.02, 0.90], lift: [0.00, 0.035, 0.018], sat: 0.55, contrast: 1.14, gamma: 1.18 }, // fluorescent green-white, drained and heavy
   amber:   { gain: [1.14, 0.98, 0.72], lift: [0.045, 0.015, 0.00], sat: 1.08, contrast: 1.05, gamma: 0.95 }, // act 3: lamp amber takes the frame
   dawn:    { gain: [1.08, 1.00, 0.84], lift: [0.015, 0.03, 0.06], sat: 0.95, contrast: 0.90, gamma: 0.92 },  // gold highlights, cold shadows, soft
 };
 const SIZE = 32;
-const cache = {};
+const cache: Record<string, THREE.Data3DTexture> = {};
 
-function grade(rgb, g) {
+function grade(rgb: number[], g: Grade): number[] {
   const l = 0.2126 * rgb[0] + 0.7152 * rgb[1] + 0.0722 * rgb[2];
   return rgb.map((v, i) => {
     v = l + (v - l) * g.sat;
@@ -32,7 +33,7 @@ function grade(rgb, g) {
 }
 
 // Procedural 3D LUT (no files, no downloads). Returns null for an unknown/empty name.
-export function loadLUT(name) {
+export function loadLUT(name: string | null | undefined): THREE.Data3DTexture | null {
   if (!name || !GRADES[name]) return null;
   if (cache[name]) return cache[name];
   const data = new Uint8Array(SIZE ** 3 * 4);
@@ -69,7 +70,10 @@ const GrainVignette = {
 };
 
 // focus: distance (m) from the camera along its look direction. Animate it per shot with post.set({ focus }) in onFrame.
-export function createPost(stage, { focus = 2, aperture = 0.02, maxblur = 0.01, lut = null, grain = 0.04, vignette = 0.25 } = {}) {
+export type PostSettings = { focus?: number, aperture?: number, maxblur?: number, grain?: number, vignette?: number, lut?: string | THREE.Texture | null };
+export type Post = ReturnType<typeof createPost>;
+
+export function createPost(stage: Pick<Stage, 'renderer' | 'scene' | 'camera' | 'onFrame' | 'setRender'>, { focus = 2, aperture = 0.02, maxblur = 0.01, lut = null as PostSettings['lut'], grain = 0.04, vignette = 0.25 } = {}) {
   const { renderer, scene, camera } = stage;
   const size = renderer.getSize(new THREE.Vector2());
   const rt = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: 4 }); // MSAA keeps torn edges clean
@@ -77,11 +81,11 @@ export function createPost(stage, { focus = 2, aperture = 0.02, maxblur = 0.01, 
   composer.setPixelRatio(1); composer.setSize(size.x, size.y);
 
   // @types/three types BokehPass.uniforms as `object`; it holds IUniforms like any ShaderPass.
-  const bokeh = /** @type {BokehPass & { uniforms: Record<string, THREE.IUniform> }} */ (new BokehPass(scene, camera, { focus, aperture, maxblur }));
+  const bokeh = new BokehPass(scene, camera, { focus, aperture, maxblur }) as BokehPass & { uniforms: Record<string, THREE.IUniform> };
   // Bokeh's depth pass clears to scene.background's color, which would be read as depth. Hide it for that pass only.
   const bokehRender = bokeh.render.bind(bokeh);
-  bokeh.render = (...a) => { const bg = scene.background; scene.background = null; bokehRender(...a); scene.background = bg; };
-  const lutPass = new LUTPass({ lut: null });
+  bokeh.render = (...a: Parameters<BokehPass['render']>) => { const bg = scene.background; scene.background = null; bokehRender(...a); scene.background = bg; };
+  const lutPass = new LUTPass({ lut: null as unknown as THREE.Data3DTexture });   // @types/three won't take null; LUTPass does
   const gv = new ShaderPass(GrainVignette);
   gv.uniforms.aspect.value = size.x / size.y;
   composer.addPass(new RenderPass(scene, camera));
@@ -90,8 +94,7 @@ export function createPost(stage, { focus = 2, aperture = 0.02, maxblur = 0.01, 
   composer.addPass(lutPass);
   composer.addPass(gv);
 
-  /** @param {{ focus?: number, aperture?: number, maxblur?: number, grain?: number, vignette?: number, lut?: string | THREE.Texture | null }} [o] */
-  const set = (o = {}) => {
+  const set = (o: PostSettings = {}) => {
     if ('focus' in o) bokeh.uniforms.focus.value = o.focus;
     if ('aperture' in o) bokeh.uniforms.aperture.value = o.aperture;
     if ('maxblur' in o) bokeh.uniforms.maxblur.value = o.maxblur;
@@ -99,7 +102,7 @@ export function createPost(stage, { focus = 2, aperture = 0.02, maxblur = 0.01, 
     if ('vignette' in o) gv.uniforms.vignette.value = o.vignette;
     if ('lut' in o) {
       const tex = typeof o.lut === 'string' ? loadLUT(o.lut) : o.lut;
-      lutPass.lut = tex; lutPass.enabled = !!tex;
+      lutPass.lut = tex as THREE.Data3DTexture; lutPass.enabled = !!tex;
     }
   };
   set({ lut, grain, vignette });

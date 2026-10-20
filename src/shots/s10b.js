@@ -9,9 +9,9 @@
 // Characters on 2s, light and camera on 1s, boil 10/s.
 import * as THREE from 'three';
 import { ambient } from '../lights.js';
-import { kf, ease, onTwos, clamp } from '../core/ease.js';
-import { mulberry32, seedOf } from '../core/rng.js';
-import { SHOTS } from '../timeline.js';
+import { kf, ease, onTwos, clamp } from '../core/ease.ts';
+import { mulberry32, seedOf } from '../core/rng.ts';
+import { SHOTS } from '../timeline.ts';
 import { makeGator, hipHeight } from '../characters/gator.js';
 import { POSES, walk } from '../characters/poses.js';
 import { act } from '../characters/acting.js';

@@ -6,7 +6,7 @@
 # The span is encoded with render_film.sh's settings; the mix is remuxed so the audio is untouched.
 set -e
 A=${1:?a}; B=${2:?b}; M=${3:-out/looming_v5.mp4}; O=${4:-$M}; cd ${0:A:h}/..
-DUR=$(node -e "import('./src/timeline.js').then(m=>console.log(m.DURATION))")
+DUR=$(node -e "import('./src/timeline.ts').then(m=>console.log(m.DURATION))")
 KEYS=$(ffprobe -v error -select_streams v -skip_frame nokey -show_entries frame=pts_time -of default=nw=1:nk=1 $M)
 for t in $A $([ $B = $DUR ] || echo $B); do echo "$KEYS" | grep -qx "$t.000000" || { echo "$t s is not a keyframe in $M"; exit 1; }; done
 rm -rf out/frames out/splice; mkdir -p out/frames out/splice

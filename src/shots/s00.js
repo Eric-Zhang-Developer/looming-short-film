@@ -7,7 +7,7 @@
 // on 1s (a real vibration), boil 10/s on the paper only: the screen type stays crisp.
 import * as THREE from 'three';
 import { ambient } from '../lights.js';
-import { ease } from '../core/ease.js';
+import { ease } from '../core/ease.ts';
 import { DESK, tools, homeDesk } from './s02.js';
 import { todoScreen, banner, COUNTDOWN, EXAM_Y } from '../props/canvas.js';
 

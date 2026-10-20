@@ -9,7 +9,7 @@
 // Characters on 2s, boil 4/s (quiet rate), light, grade at 24.
 import * as THREE from 'three';
 import { sensorLight, dawnLight, fluorescent, ambient } from '../lights.js';
-import { clamp, onTwos } from '../core/ease.js';
+import { clamp, onTwos } from '../core/ease.ts';
 import { act } from '../characters/acting.js';
 import { makeGator } from '../characters/gator.js';
 import { makeCrowd } from '../characters/crowd.js';

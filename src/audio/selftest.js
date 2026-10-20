@@ -11,8 +11,8 @@ import { FOLEY } from './foley.js';
 import { CUES } from './cues.js';
 import { SCORE } from './score.js';
 import { writeWav } from './wav.js';
-import { beat, DURATION } from '../timeline.js';
-import { seedOf } from '../core/rng.js';
+import { beat, DURATION } from '../timeline.ts';
+import { seedOf } from '../core/rng.ts';
 
 const out = fileURLToPath(new URL('../../out/audio', import.meta.url));
 const ok = (name, fn) => { fn(); console.log(`ok  ${name}`); };

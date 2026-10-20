@@ -8,9 +8,9 @@
 // The 2.5× blob (Q16, director 2026-10-18). s10 imports the lamp constants: lamp 5 is the light behind him at the door.
 import * as THREE from 'three';
 import { ambient } from '../lights.js';
-import { kf, ease, clamp, onTwos } from '../core/ease.js';
-import { mulberry32, seedOf } from '../core/rng.js';
-import { SHOTS } from '../timeline.js';
+import { kf, ease, clamp, onTwos } from '../core/ease.ts';
+import { mulberry32, seedOf } from '../core/rng.ts';
+import { SHOTS } from '../timeline.ts';
 import { makeGator, hipHeight } from '../characters/gator.js';
 import { POSES, specPose, walk } from '../characters/poses.js';
 import { act } from '../characters/acting.js';

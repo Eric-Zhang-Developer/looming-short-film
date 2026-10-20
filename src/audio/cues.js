@@ -9,7 +9,7 @@
 // A point is [beatName, offsetSeconds]. bed() runs a bed from one point to another, so a bed that stops 0.5 s before a
 // beat is still hung on beats and moves when they move. Sources: doc 05's v4 table and docs/shots/sNN.md §Sound (the v4 cut, 3:15).
 // The music stem (score.js) is not placed here.
-import { beat, DURATION, S13_DESKS } from '../timeline.js';
+import { beat, DURATION, S13_DESKS } from '../timeline.ts';
 
 const at = ([b, o = 0]) => beat(b) + o;
 const bed = (sound, stem, from, to, gain, extra) => ({ beat: from[0], offset: from[1] ?? 0, dur: at(to) - at(from), sound, stem, gain, ...extra });

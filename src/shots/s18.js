@@ -8,10 +8,10 @@
 // The room is s02's: DESK, homeDesk and the calendar come from s02.js, so the ending is the birth's own frame.
 // Characters on 2s; the quiver on 1s; light, camera and fade on 1s; boil 10/s.
 import * as THREE from 'three';
-import { SHOTS } from '../timeline.js';
+import { SHOTS } from '../timeline.ts';
 import { lampLight, ambient } from '../lights.js';
-import { loadLUT } from '../post.js';
-import { ease, easeOut, clamp, lerp } from '../core/ease.js';
+import { loadLUT } from '../post.ts';
+import { ease, easeOut, clamp, lerp } from '../core/ease.ts';
 import { createBlob } from '../blob.js';
 import { makeGator } from '../characters/gator.js';
 import { specPose } from '../characters/poses.js';

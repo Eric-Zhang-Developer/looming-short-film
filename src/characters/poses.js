@@ -4,7 +4,7 @@
 // lean = body about the hip, + forward (toward +x); arm / far = the near / far arm's WORLD angle, 0 = +x, − = down;
 // head = head on body, + snout up; jaw + open; tail + tip up; leg / farLeg = the near / far leg's WORLD angle, 0 = straight
 // down, + = foot forward (toward +x). All in degrees. Numbers come from the shot specs; leg angles are mine (Q9).
-import { kf, onTwos } from '../core/ease.js';
+import { kf, onTwos } from '../core/ease.ts';
 import { hipHeight } from './gator.js';
 
 const D = Math.PI / 180;

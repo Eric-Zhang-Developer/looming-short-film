@@ -2,7 +2,7 @@
 // Asset loader (contract: docs/contracts.md §assets). Frozen art when it has been cut, flat proxies until then.
 // Proxies are a palette-coloured silhouette on transparent canvas, so they go through makePaper exactly like real
 // art and blocking reads. The `proxy` flag is the label: frames never carry text.
-import { PALETTE } from './core/palette.js';
+import { PALETTE } from './core/palette.ts';
 
 // name → piece → [w, h (m), shape, PALETTE key]. Names from docs/assets.md; rough sizes from the shot specs
 // (desk unit README §2, s01, s05, s09, s10, s13, s14, s15, s18). Shot specs win over these numbers.
