@@ -1,4 +1,4 @@
-// s17 · Quiet 2: the dawn reading room (docs/shots/s17.md, v4). 12 s (G4's 18 × 2/3), locked but for one two-shot.
+// s17 · Quiet 2: the dawn reading room (docs/shots/s17.md, v8). 8 s (v4's 12; G4's 18), locked but for one two-shot.
 // Morning comes, the morning of the exam. He puts the pen down and sits back (3.0), looks once at the blob (small now,
 // asleep on his page's corner), and closes his eyes (6.0); it opens its eyes once, looks up at him, and sleeps again.
 // After 6.0 only the light, the boil and his slow breath move: dawn crawls in through the ribbon windows from the
@@ -38,9 +38,11 @@ const NB_BLOB = [NB, 0.098], NB_PHONE: Vec3 = [NB + 0.010, 0.0015, 0.114], NB_HI
 // v4: E's window is G4's × 2/3 like every other time here.
 const CAM = ({ pos: [0.100, 0.250, 0.950], look: [0.100, 0.058, 0.062] }) as CamKey, FOCUS = ([0.000, 0.010, 0.098]) as Vec3;
 const CAM_E = ({ pos: [-0.030, 0.028, 0.338], look: [-0.030, 0.028, 0.098], focus: [0.000, 0.010, 0.098] }) as CamKey, E_WINDOW = [4.5, 5.833];
-const GOLD_AT = 10.667;                                 // elevation, k, panes and grade ramps end here (G4's 16 × 2/3), then hold
+// v8: 8 s. Every action time is v4's (the sit-back 3.0, the glance, the eyes closing 6.0); only the dawn crawl is
+// compressed, so the gold is in by 7.5 and holds half a second before the cut (v4: 10.667 of 12).
+const GOLD_AT = 7.5;                                    // elevation, k, panes and grade ramps end here, then hold
 const WARM = 0.3;                                       // v4 Marston warm: lerp(lamp, cream, 0.3) (README v4)
-const ZONE_I = 0.35, FLUOR_I = 0.35, AMB_K = 0.45, FILL_I = 0.02, DAWN_K = 9;   // DAWN_K: dawn overtakes the pendants by ~9 s (by eye)
+const ZONE_I = 0.35, FLUOR_I = 0.35, AMB_K = 0.45, FILL_I = 0.02, DAWN_K = 9;   // DAWN_K: dawn overtakes the pendants about 85% of the way up the ramp (by eye; ~6.3 s in v8)
 // v3-readability: the cold viewer saw 18 s of near-identical wides, "the ceiling strip blown out to white", and an
 // unexplained brown foreground object. The panes went to 0.9 glow and the grade crossfaded amber → dawn, which cooled and
 // washed the room, so the dawn read as the lights going grey. Now the panes start as night (navy, barely lit) and warm to

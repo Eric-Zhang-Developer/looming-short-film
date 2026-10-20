@@ -1,10 +1,10 @@
-// s17c · The grade comes back (docs/shots/s17c.md, v4). 7 s. G4's 0–3 on s17b's Camera P, days later: the paper slides
+// s17c · The grade comes back (docs/shots/s17c.md, v8). 6 s (v4: 7). G4's 0–3 on s17b's Camera P, days later: the paper slides
 // in face-down (gradeSlide 0.5), his hand turns it over, and it lands face-up exactly where he wrote it (gradeReveal
 // 2.0): props_kit's graded_test with its painted red checks and circled 94, carrying his own three lines from s17b (the
 // same lettering code), so the 94 is earned on screen. The blob, 0.33× now, startles at the slide, looks down at the
 // grade and closes its eyes, content. v4: 3.0 cuts to a close-up on the painted heads (README §12), his profile in the
-// exam room's top light: the still beat, eyes wide (surprised_smile), then the grin (pride) on gradeGrin 4.0. 6.0 cuts
-// back to P, and his fingertip taps the 94 once at 6.25.
+// exam room's top light: the still beat, eyes wide (surprised_smile), then the grin (pride) on gradeGrin 4.0. v8: the
+// grin holds 1 s (was 2); 5.0 cuts back to P, and his fingertip taps the 94 once at 5.25.
 // Characters and the paper on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.ts';
@@ -28,7 +28,7 @@ const PAGE_H = PAGE.w * 366 / 263;                        // the page's paper he
 const SLIDE_FROM = 0.045, SKID = 0.001;                   // the slide starts above frame (−z), overshoots 1 mm, settles
 const NINETY_FOUR: [number, number] = [214, 58];                            // the circled 94 on graded_test, art px (measured on the cut PNG)
 
-const CU = [3, 6], TAP = 6.25;                             // the close-up's cut in and out; the tap on the 94
+const CU = [3, 5], TAP = 5.25;                             // the close-up's cut in and out; the tap on the 94 (v8: the grin's hold ends a second sooner)
 const CU_AT: Vec3 = [0.6, 0, 0];                                  // the CU set, off to the side of the page set
 const CU_HIP: Vec3 = [-0.054, -0.0134, 0.074];                    // s17b's seat at the exam desk
 const CAM_CU: CamKey = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };   // s15's CU framing

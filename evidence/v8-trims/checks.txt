@@ -1,0 +1,25 @@
+$ node tools/determinism.ts --t=114.5,172.0,189.5,205.0
+t=114.5  7d7c83d7cc702850 7d7c83d7cc702850 7d7c83d7cc702850  PASS
+t=172  58df1724ff5f1097 58df1724ff5f1097 58df1724ff5f1097  PASS
+t=189.5  9e7895fbe4d51d8a 9e7895fbe4d51d8a 9e7895fbe4d51d8a  PASS
+t=205  5f3c42ce78f000ea 5f3c42ce78f000ea 5f3c42ce78f000ea  PASS
+determinism: PASS
+
+$ node tools/check_timeline.ts
+ok (22 shots, 81 beats, 210.0s)
+
+$ npm run typecheck
+> tsc -p tsconfig.json
+
+
+# orchestrator fix pass (s18: laptop on the desk, v7 tag restored after the uncap)
+$ node tools/determinism.ts --t=191.0,205.0,207.75
+t=191  78a4aedb105867ac 78a4aedb105867ac 78a4aedb105867ac  PASS
+t=205  b84694fb29384f05 b84694fb29384f05 b84694fb29384f05  PASS
+t=207.75  c62c38bab2830192 c62c38bab2830192 c62c38bab2830192  PASS
+determinism: PASS
+$ node tools/check_timeline.ts
+ok (22 shots, 81 beats, 210.0s)
+$ npm run typecheck
+> tsc -p tsconfig.json
+

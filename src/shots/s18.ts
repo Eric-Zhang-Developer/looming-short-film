@@ -4,6 +4,9 @@
 // the sheet it ran down in s02 and soaks into the circle it was born from (blobAbsorbed 5.5), leaving a faint trace.
 // Then he writes the next exam, "Final", and circles it in red (newDate 9.5); a new bead of ink forms on the circle and
 // quivers (dropQuivers 11.0); he looks at it and uncaps his pen (tagPenUncap 13.5), and it goes still. Fade to black.
+// v8 (the tag shows the change, docs/notes/v8-beats.md): at 14.75 his head and eyes go to the closed laptop on the desk
+// for half a second (s03's flinch), then back to the drop. From the uncap (16.5) on it is v7's tag unchanged: the drop
+// hops onto the nib and he writes "1." in its ink. Same desk as s03, same flinch, the other answer.
 // The room is s02's: DESK, homeDesk and the calendar come from s02.ts, so the ending is the birth's own frame.
 // Characters on 2s; the quiver on 1s; light, camera and fade on 1s; boil 10/s.
 import * as THREE from 'three';
@@ -56,6 +59,13 @@ const HOME_MIX = 0.8;                                        // grade: amber (ac
 const T_REACH = F(205), T_BLINK = F(207), T_HOP = F(209), T_LAND = F(213), T_IN = F(216), T_TOUCH = F(221), T_MARK = F(226);
 const REACH_UP = 0.5;                                        // how far up out of the chair he comes (0 seated … 1 STAND): the drop is beyond a seated reach
 const DROP_INK = 'rgb(12, 10, 20)';                          // the blob's ink (near-black), not the pen's navy
+// v8: the flinch, head and eyes to the closed laptop and back to the drop (half a second inside 14.5–15.5).
+const FLINCH = [F(177), F(183)];
+// v8: the closed laptop on the desk's front right, beside the practice page and toward the camera, so W and the tag's push
+// see it plainly (v7 had it flat at the back corner, a sliver from W). LAP_SCALE: s03's laptop is 1.8×; that much
+// would cover the lamp's base and the blob's landing spot, so 1.6× of the same laptop. Square to the camera (no yaw): the
+// shell below has no side faces.
+const LAP_AT: Vec3 = [0.019, 0.0004, 0.021], LAP_SCALE = 1.6;   // front edge 2.4 mm behind the desk's painted lip, which hid the seam
 const PAD = { x: -0.0155, zf: 0.028, w: 0.016, tilt: 50 };  // the new sheet, propped at 50° so the camera can read a mark on it
 const PH = PAD.w * 366 / 263, PH_RAD = PAD.tilt * DEG;      // the sheet's height and tilt
 // A point on the propped sheet: u from its left edge, v up from its lower edge (both 0–1), in the world.
@@ -78,7 +88,7 @@ export async function build(ctx: ShotCtx) {
   const Cc = (k: keyof ShotCtx['PALETTE']) => new THREE.Color(PALETTE[k]);
   scene.background = Cc('navy').lerp(Cc('ink'), 0.5);
   const T = tools(ctx, ID);
-  const set = await homeDesk(ctx, T, { pen: false });
+  const set = await homeDesk(ctx, T, { pen: false, laptopScale: LAP_SCALE });
   const { props } = set;
   const gsheet = await ctx.assets.load('gator_sheet');
   const fx = post({ focus: 0.39, aperture: 0.01, lut: 'dawn' });
@@ -94,7 +104,20 @@ export async function build(ctx: ShotCtx) {
   const MARKER = [-0.004, 0.029];
   T.rect('marker', PALETTE.calendarRed, [0.0055, 0.0009], [MARKER[0], 0.0005, MARKER[1]], { rot: [-Math.PI / 2, 0, 0.12] });
   T.rect('marker_cap', PALETTE.cream, [0.0018, 0.0010], [MARKER[0] + 0.0035, 0.0006, MARKER[1] - 0.0004], { rot: [-Math.PI / 2, 0, 0.12] });
-  set.laptop.position.set(0.016, 0.0004, 0.008); set.laptop.rotation.y = 0; set.setLid(0);
+  set.laptop.position.set(...LAP_AT); set.laptop.rotation.y = 0; set.setLid(0);   // v8: shut, on the desk's front right
+  { // v8: shut, the face-down lid showed its screen art from above and read as a dark slab (or a hole in the desk). So: the
+    // lid's back on top, and a front edge in two layers, base under lid with a dark seam between, so it reads as a laptop.
+    // The lid's edge is the pale one, catching the lamp. H: drawn chunky, the cartoon idiom (a real one would be ~1 mm
+    // here, a sliver from W). One small sleep light on the base's edge, in the screen's cyan: electronics, asleep.
+    const LW = 0.018 * LAP_SCALE, LD = 0.012 * LAP_SCALE, H = 0.0028, hex = (a: keyof ShotCtx['PALETTE'], b: keyof ShotCtx['PALETTE'], k: number) => '#' + Cc(a).lerp(Cc(b), k).getHexString();
+    set.lid.g.visible = false;
+    T.rect('lap_top', hex('cream', 'navy', 0.3), [LW, LD], [0, H, 0], { rot: [-Math.PI / 2, 0, 0], parent: set.laptop });
+    T.rect('lap_base_edge', hex('cream', 'navy', 0.55), [LW, H * 0.45], [0, H * 0.225, LD / 2], { parent: set.laptop });
+    T.rect('lap_seam', PALETTE.ink, [LW * 0.98, H * 0.12], [0, H * 0.5, LD / 2 + 0.00005], { parent: set.laptop });
+    T.rect('lap_lid_edge', hex('cream', 'lamp', 0.2), [LW, H * 0.45], [0, H * 0.775, LD / 2], { parent: set.laptop });
+    const led = new THREE.Mesh(new THREE.CircleGeometry(0.00028, 12), new THREE.MeshBasicMaterial({ color: PALETTE.phone, toneMapped: false }));
+    led.position.set(LW * 0.36, H * 0.225, LD / 2 + 0.0001); set.laptop.add(led);
+  }
   // The pen (mirrored so its nib points +x, origin at the nib) and its cap (open end on the nib).
   const pen = T.cut(props, 'pen', [0.0075, null], 'pen', { anchor: [1, 0.5], flip: true });
   const cap = T.cut(props, 'pen_cap', [0.0034, null], 'pen_cap', { anchor: [0.75, 0.5], flip: true });
@@ -160,6 +183,7 @@ export async function build(ctx: ShotCtx) {
     breath: seat({ lean: -1, arm: -62, head: 8 }),
     sitback: seat({ lean: -8, arm: -62, head: 4 }),                   // v4 lampSitBack: leans back in the chair, head up 4°
     glance: seat({ lean: -8, arm: -62, head: 9 }),                    // …and lifts it a little toward the clock
+    flinch: seat({ lean: 0, arm: -60, head: -20 }),                   // v8: head down to the laptop on the desk
     pick: (() => { const r = seatReach(camW, new THREE.Vector3(DESK.pen[0] + 0.003, 0.001, DESK.pen[1]), [0, 30]); return seat({ lean: r.lean, arm: r.arm, head: 0 }); })(),
     level: seat({ lean: 6, arm: -35, far: -32, head: 4 }),
     uncap: seat({ lean: 6, arm: -35, far: -24, head: 4 }),
@@ -175,7 +199,8 @@ export async function build(ctx: ShotCtx) {
   const KEYS: [number, string, number][] = [[0, 'look', 0], [0.5, 'look', 0], [F(8), 'up', 0.5], [F(16), 'x1a', 1], [F(17), 'x1a', 1], [F(18), 'x1b', 1], [F(19), 'x1b', 1],
     [F(21), 'x2a', 1], [F(22), 'x2b', 1], [F(23), 'x2b', 1], [F(26), 'down', 0], [CUT_I, 'down', 0], [CUT_SIT, 'down', 0],
     [B.lampSitBack, 'sitback', 0], [8.5, 'sitback', 0], [F(104), 'glance', 0], [F(110), 'glance', 0], [F(112), 'sitback', 0], [CUT_I2, 'sitback', 0],   // 7.5 sits back; 8.5–9.25 the clock; back to the circle
-    [CUT_W, 'gaze', 0], [15.5, 'gaze', 0], [F(186), 'breath', 0], [F(188), 'pick', 0], [F(190), 'pick', 0], [F(192), 'level', 0],
+    [CUT_W, 'gaze', 0], [FLINCH[0] - F(1), 'gaze', 0], [FLINCH[0], 'flinch', 0], [FLINCH[1] - F(1), 'flinch', 0], [FLINCH[1] + F(1), 'gaze', 0],   // v8: the flick, out and back
+    [15.5, 'gaze', 0], [F(186), 'breath', 0], [F(188), 'pick', 0], [F(190), 'pick', 0], [F(192), 'level', 0],
     [F(197), 'level', 0], [F(198), 'uncap', 0], [F(200), 'uncap', 0], [T_REACH, 'offer', REACH_UP], [T_IN, 'offer', REACH_UP],
     [T_TOUCH, 'mark', 0], [T_MARK, 'mark', 0], [T_MARK + 0.33, 'lift', 0], [20, 'lift', 0]];
   const poseAt = (tc: number) => {
@@ -185,8 +210,12 @@ export async function build(ctx: ShotCtx) {
   };
   // Eyes: on the pen, down at the blob (2.17), half-lidded under the lamp (7.5), the glance up-right at the clock (8.5–9.25), back
   // on the calendar's circle; the tag's look up at the new drop (14.5), then level. Mouth: the small relief smile at the sit-back.
-  const eyesAt = (tc: number) => (tc < F(26) ? 'open' : tc < B.lampSitBack ? 'side' : tc < 8.5 ? 'tired' : tc < 9.25 ? 'side' : 'open');   // v6-ending: from 14.5 a straight, held look at the drop (no glance away)
-  const mouthAt = (tc: number) => (tc >= CUT_W || (tc >= B.lampSitBack && tc < CUT_I2) ? 'smile' : 'line');   // fix-payoff: the small smile from the sit-back, again from the tag's first frame to the end
+  // v8: from 14.5 a look at the drop, broken once by the flinch: the look lands on the laptop on 'open' (its pupil aims
+  // down the desk; 'side' looks back over his shoulder) and the flinch is 'worried'. The mouth is a line from the tag's
+  // first frame to the uncap, then v7's smile.
+  const eyesAt = (tc: number) => (tc < F(26) ? 'open' : tc < B.lampSitBack ? 'side' : tc < 8.5 ? 'tired' : tc < 9.25 ? 'side'
+    : tc >= FLINCH[0] + F(2) && tc < FLINCH[1] - F(1) ? 'worried' : 'open');
+  const mouthAt = (tc: number) => ((tc >= B.lampSitBack && tc < CUT_I2) || tc >= B.tagPenUncap - 1e-6 ? 'smile' : 'line');   // fix-payoff: the small smile from the sit-back
 
   // ---------- the Exam, the dot, its trace, and the new drop ----------
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });

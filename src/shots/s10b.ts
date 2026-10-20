@@ -2,7 +2,7 @@
 // threshold, with its meaning flipped by the v4 rule. Same locked camera down a Marston stacks aisle, the same kit bays as
 // wings and coffered ceiling strips as borders; he walks toward the lens with the 2.5× blob waddling behind him. v6-stacks-2: the side rig turned 50° to us, so the snout reads.
 // v3 lit him from the phone, low, and threw the blob's shadow huge on the end wall. Now he looks at the phone once and
-// slides it into the hoodie pocket (pocketPhone 1.0), and the light comes from above: one warm strip light per bay, each a
+// slides it into the hoodie pocket (pocketPhone 0.75), and the light comes from above: one warm strip light per bay, each a
 // downward spot, so as the blob passes under one its shadow is a small pool on the carpet just ahead of it (underLight1,
 // underLight2). No faltering tubes. Face: resolve, then relief under the first light, then eyes open on a small smile.
 // Characters on 2s, light and camera on 1s, boil 10/s.
@@ -20,13 +20,15 @@ import type { ShotCtx } from '../film.ts';
 import type { PaperMesh } from '../material.ts';
 
 const ID = 's10b';
-const B = SHOTS.find((s) => s.id === ID)!.beats;          // pocketPhone 1, underLight1 2, underLight2 4.5
+const B = SHOTS.find((s) => s.id === ID)!.beats;          // v8: pocketPhone 0.75, underLight1 1.5, underLight2 3.0 (4 s, was 6)
 const BLOB_R = { start: 0.030 };                         // 2.5×, its size in s10 and s11 (README §1, Q16)
-const STEP = 1 / 3, HOP = 2 / 3, HOP_H = 0.004;          // calmer than v3's 0.25: a footfall every 1/3 s; a hop per two steps
-// v6-stacks-2: he comes on to z 0.45 (was 0.30), so his height on screen grows 0.89/0.50 ≈ 1.8× (was 1.37×), drifting
-// 3 cm left to right across the aisle along the way he faces.
-const V = 0.065, Z0 = 0.06, X0 = -0.03, VX = 0.01;
-const zG = (t: number) => Z0 + V * t;                            // his walk line toward the camera: z 0.06 → 0.45
+// v8: 4 s (was 6). A brisker walk, not a shorter one: v3's 0.25 s step and 0.085 m/s keep the stride v6 had
+// (0.065 × 1/3 ≈ 0.085 × 0.25 ≈ 0.021 m a step, so the feet don't skate), and he still comes on most of the way.
+const STEP = 0.25, HOP = 0.5, HOP_H = 0.004;             // a footfall every 0.25 s; a hop per two steps
+// v8: he comes on to z 0.40 (v6-stacks-2: 0.45), so his height on screen grows 0.89/0.55 ≈ 1.6× (v6: 1.8×), drifting
+// 6 cm left to right across the aisle along the way he faces.
+const V = 0.085, Z0 = 0.06, X0 = -0.03, VX = 0.015;
+const zG = (t: number) => Z0 + V * t;                            // his walk line toward the camera: z 0.06 → 0.40
 const xG = (t: number) => X0 + VX * t;
 const D = Math.PI / 180;
 const TURN_Y = -50;   // v6-stacks-2: the side rig turned 50° toward the lens (s10's fix for "front-on reads as a frog"): the snout shows
@@ -125,8 +127,9 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   const fx = post({ focus: CAM[2] - zG(0), aperture: 0.02, maxblur: 0.01, lut: 'amber' });
   const root = new THREE.Vector3(), P = new THREE.Vector3();
   // The near arm on 2s (absolute degrees, 0 = forward, −95 hanging): the phone held up before him and looked at, a beat,
-  // then down to the hoodie pocket by 0.917; from pocketPhone the walk takes the arm back over 0.25 s.
-  const ARM: [number, number][] = [[0, -35], [0.5, -35], [0.75, -60], [0.917, -88]];
+  // then down to the hoodie pocket by 0.667; from pocketPhone the walk takes the arm back over 0.25 s. v8: v6's keys a
+  // third sooner on the 2s grid (0.5, 0.75, 0.917 → 0.333, 0.583, 0.667).
+  const ARM: [number, number][] = [[0, -35], [4 / 12, -35], [7 / 12, -60], [8 / 12, -88]];
   // Face: resolve on the phone (from s10's close-up), relief on the first light (eyes closed, the slow breath), then eyes
   // open on relief's small smile for the rest of the walk.
   const CUES: [number, string][] = [[-0.1, 'resolve'], [B.underLight1, 'relief']];
@@ -161,7 +164,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       phone.getWorldPosition(P);
       fill.position.copy(P); fill.intensity = held ? FILL_I : 0;
       // Head: down at the phone, level after.
-      j.head.rotation.z += kf(T, [[0, -12], [0.5, -12], [0.583, 0]], ease) * D;
+      j.head.rotation.z += kf(T, [[0, -12], [4 / 12, -12], [5 / 12, 0]], ease) * D;
 
       // The blob rides his root behind him, one hop per two of his steps, squashing on landing.
       const ph = (T % HOP) / HOP, land = ph < 1 / 8 + 1e-6;
