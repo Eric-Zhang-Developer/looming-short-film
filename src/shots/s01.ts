@@ -8,6 +8,7 @@ import { paperMesh, updatePaperMesh } from '../material.ts';
 import { dawnLight, ambient } from '../lights.ts';
 import { definePuppet } from '../puppet.ts';
 import { kf, ease } from '../core/ease.ts';
+import type { Key } from '../core/ease.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
 import type { PaperOptions, PaperSheet } from '../paper.ts';
 import type { PaperMesh } from '../material.ts';
@@ -32,7 +33,7 @@ function tornArt(art: HTMLCanvasElement | ImageBitmap, [w, h]: number[]) {
 }
 const DEG = Math.PI / 180;
 const LEN = 5;   // v4: the shot is 5 s (was 6): the same push on the same path, every local time × 5/6 (docs/shots/s01.md)
-const CAM = { pos: [[0, [0, 0.42, 2.5]], [LEN, [0.17, 0.33, 1.0]]], look: [[0, [0, 0.42, 0]], [LEN, [0.18, 0.32, 0.6]]] };
+const CAM: { pos: Key<number[]>[], look: Key<number[]>[] } = { pos: [[0, [0, 0.42, 2.5]], [LEN, [0.17, 0.33, 1.0]]], look: [[0, [0, 0.42, 0]], [LEN, [0.18, 0.32, 0.6]]] };
 const FACADE_Z = 0.6;
 const ROOM_I = 0.05, BOUNCE_I = 0.35;   // his room light behind the pane (cd), the street bounce on the facade
 

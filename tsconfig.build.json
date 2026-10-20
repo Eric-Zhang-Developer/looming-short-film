@@ -1,12 +1,9 @@
 {
-  // Emit only: src/ (TypeScript and the JavaScript not yet converted) → build/, which index.html loads.
-  // Type checking is tsconfig.json's (legacy JSDoc files) and tsconfig.strict.json's (every .ts file).
+  // Emit only: src/ → build/, which index.html loads. Type checking is tsconfig.json's (npm run typecheck).
   "compilerOptions": {
     "target": "esnext",
     "module": "nodenext",
     "lib": ["es2023", "dom", "dom.iterable"],
-    "allowJs": true,
-    "checkJs": false,
     "rewriteRelativeImportExtensions": true,
     "erasableSyntaxOnly": true,
     "verbatimModuleSyntax": true,
@@ -16,5 +13,5 @@
     "rootDir": "src",
     "outDir": "build"
   },
-  "include": ["src/**/*.js", "src/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

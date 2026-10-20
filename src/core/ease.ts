@@ -10,9 +10,7 @@ export type Key<V> = readonly [number, V];
 export function kf(t: number, keys: readonly Key<number>[], e?: (x: number) => number): number;
 export function kf(t: number, keys: readonly Key<readonly number[]>[], e?: (x: number) => number): number[];
 export function kf(t: number, keys: readonly Key<number | readonly number[]>[], e?: (x: number) => number): number | readonly number[];
-// Legacy JSDoc callers pass number[][] (JS infers arrays, not tuples). ponytail: delete this overload once no .js file calls kf.
-export function kf(t: number, keys: readonly (readonly any[])[], e?: (x: number) => number): any;
-export function kf(t: number, keys: readonly (readonly any[])[], e: (x: number) => number = ease): any {
+export function kf(t: number, keys: readonly Key<number | readonly number[]>[], e: (x: number) => number = ease): number | readonly number[] {
   if (t <= keys[0][0]) return keys[0][1];
   for (let i = 1; i < keys.length; i++) {
     if (t < keys[i][0]) {

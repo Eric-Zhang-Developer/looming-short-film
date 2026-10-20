@@ -8,6 +8,7 @@
 import * as THREE from 'three';
 import { phoneLight, lampLight, ambient, aim } from '../lights.ts';
 import { kf, onTwos } from '../core/ease.ts';
+import type { Key } from '../core/ease.ts';
 import { hash2 } from '../core/rng.ts';
 import { createBlob } from '../blob.ts';
 import { makeGator } from '../characters/gator.ts';
@@ -40,7 +41,7 @@ const LAMP = { x: 0.020, h: 0.064 };
 const LAMP_MOUTH = [LAMP.x, LAMP.h * 0.646, DESK.lamp.z], LAMP_BEAD = [LAMP.x - LAMP.h * 21 / 212, LAMP.h * 0.505, DESK.lamp.z];
 // OUTSHONE: v3 left a ghost loom (eye holes) on the lit wall at 0.05. LAMP_I: the mouth is 1.45× higher.
 const SPOT_I = 0.03, OUTSHONE = 0.004, LAMP_I = 0.12, AMB = 0.45, FACE_SCREEN = 0.006, FACE_LAMP = 0.004;
-const LAMP_KEYS = [[ON, 0], [ON + 1 / 24, 1.15], [ON + 3 / 24, 0.95], [ON + 5 / 24, 1.0]];
+const LAMP_KEYS: Key<number>[] = [[ON, 0], [ON + 1 / 24, 1.15], [ON + 3 / 24, 0.95], [ON + 5 / 24, 1.0]];
 const BREATHE = 0.7 * DEG;                                  // v3 secondary motion: a 2.8 s breath, on 2s
 const F = (n: number) => n / 12, fr = (t: number) => Math.floor(t * 12 + 1e-6);
 const TAPS = [48, 54, 60, 66, 72, 78, 84, 90];               // every 0.5 s from 4.0

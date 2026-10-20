@@ -6,6 +6,7 @@
 import * as THREE from 'three';
 import { phoneLight, dawnLight, ambient, aim } from '../lights.ts';
 import { kf, ease } from '../core/ease.ts';
+import type { Key } from '../core/ease.ts';
 import { hash2 } from '../core/rng.ts';
 import { createBlob } from '../blob.ts';
 import { makeGator } from '../characters/gator.ts';
@@ -117,7 +118,7 @@ const BLOB_R = { start: 0.012, gulp1: 0.018 };            // METER.birth → MET
 // v3-readability: the light now sits at the *open* screen's centre (v3 lit from the closed lid's, S ≈ 2.5 in practice),
 // so the shadow is the 4.33× the v3 note asked for; pulled back again so the gulp's 5.4 units stay in frame.
 const CAM: CamKey = { pos: [0.068, 0.088, 0.47], look: [0.068, 0.056, 0.012] };
-const FOCUS = [[2.0, 0.455], [3.0, 0.47]];                 // blob → wall over 2–3, eased, on 1s
+const FOCUS: Key<number>[] = [[2.0, 0.455], [3.0, 0.47]];                 // blob → wall over 2–3, eased, on 1s
 // v4: the gulp is now 1 → 1.5×, so at v3's S 4.33 the swollen shadow (6.5 units) ran out of the top and right of frame. The light is re-solved to keep
 // v3's 5.4 units after the gulp, which fit: S = 5.4 · 0.012 / 0.018 = 3.6, so SCREEN_Z = S · B.z / (S − 1) = 0.0208. Before the gulp it is 3.6 units.
 const SCREEN_Z = 3.6 * B[2] / (3.6 - 1);
