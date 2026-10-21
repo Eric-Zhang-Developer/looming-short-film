@@ -1,5 +1,5 @@
 // s13 · Everyone has one (docs/shots/s13.md, v7). One locked top-down shot of the Marston reading room, 8 s: v3's build,
-// then the room turns. He's already under the light (his phone went into his pocket in s10b), so his desk sits in its
+// then the room turns. He's already under the light (his phone is face down on his desk since s11), so his desk sits in its
 // warm pool with a small shadow from the first frame, in a dark room. He lifts his head (headLift); desk by desk the
 // other gators' phones wake and each one's shadow springs up big from its blob, on a note (S13_DESKS in timeline.ts,
 // which score.ts reads too): the Sleeper, Drinks, the Freshman a second apart, then the other seven closing round him,
@@ -234,7 +234,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     cast.push({ who: d.who, pose: d.pose, mirror: !!d.mir, turnDeg: +(rot / DEG).toFixed(1), scale: d.sc });
   }
 
-  // ---------- the hero (d8, centre), from hero_top parts; already lit, no phone (it's in his pocket since s10b) ----------
+  // ---------- the hero (d8, centre), from hero_top parts; already lit, no phone in hand (face down on the desk since s11) ----------
   const hero = place(new THREE.Group(), SEAT_AT[0], SEAT_AT[1], 0);
   scene.add(hero);
   const arms = place(piece(art(figs, 'hero_arms', `${ID}-hero-arms`), hero), 0, 0.024, 0.034);

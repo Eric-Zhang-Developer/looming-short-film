@@ -222,11 +222,7 @@ export const CUES: Cue[] = [
   { beat: 'doorPush', sound: 'doorPush', gain: 0.8 },
   { beat: 'doorPush', offset: 0.25, sound: 'footstepSoft', gain: dB(-20), seed: 3 },
   { beat: 'exhale', sound: 'exhale', gain: 0.5 },
-  // s10b (v6): his steps on the stacks carpet, one per contact (walk step 1/3 s from 110.0), the soft step at -26 dB, under
-  // s09c's -20 dB paving; the phone into the hoodie pocket, a short paper rustle (the hoodie is paper; s09a's blanket precedent).
-  // v8-trims: s10b is 4 s, a step every 1/4 s from its first frame (was every 1/3 s over 6 s).
-  ...range(0, 16).map((k) => ({ beat: 'pocketPhone', offset: k / 4 - 0.75, sound: 'footstepSoft', gain: dB(-26), seed: 300 + k })),
-  { beat: 'pocketPhone', offset: -0.17, sound: 'paperRustle', dur: 0.3, gain: 0.2, seed: 13 },
+  // v12: s10b (the stacks walk) is cut, and its steps and pocket rustle with it.
   // s11: the backpack down (a soft fabric thump: the runner footstep's buffer), the phone face down on the desk, -6 dB
   // under s09a's (the rhyme with the choice), and the blob's three hops up onto the desk, -20 dB.
   { beat: 'deskSit', offset: 0.25, sound: 'footstepSoft', gain: 0.25, seed: 4 },

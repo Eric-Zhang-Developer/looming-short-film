@@ -486,7 +486,7 @@ export async function build(ctx: ShotCtx) {
       if (flick) rig.joints.arm_r.rotation.z += FLICK * DEG;
       act(rig, t, [[0, 'numb']], { slump: 0, tilt: 0, tail: 0, depth: 0, blink: false });
       rig.joints.body.scale.x = 1 + 0.010 * Math.sin(2 * Math.PI * T / 7.5);   // 8/min; lying, the chest rises along the body's x
-      // v9 (v9-beats §2): after gulp3 it is weather. `blank`, no blink, no wobble, from here through s10b (bar s10's
+      // v9 (v9-beats §2): after gulp3 it is weather. `blank`, no blink, no wobble, from here through s10 (bar s10's
       // confused beat at the threshold). The gulp's snap-back squash stays: that's the swallow, not the wobble.
       const eyes = G.swallow ? 'closed' : blank ? 'blank' : 'side';
       R.placeBlob(G.r);
