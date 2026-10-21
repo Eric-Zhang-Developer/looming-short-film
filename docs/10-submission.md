@@ -24,15 +24,15 @@ Alternatives, if a subtitle helps: *Looming: a paper film about the first step*,
 ## Project Synopsis
 > Provide a brief description of the project and its goals.
 
-*Looming* is a 3:15 wordless animated short about a UF student, a small gator, and the exam he keeps avoiding. The exam is a drop of ink that rolls off his calendar and becomes a little blob with eyes. Every time he looks away from it, it grows half a size, up to two and a half times. Its shadow grows far more: under the low glow of his laptop or phone it fills the wall and the ceiling, and under light from above it shrinks to a puddle. [now: all 21 shots built; final master rendered 2026-10-18, `out/looming_v5.mp4`]
+*Looming* is a 3:45 wordless animated short about a UF student, a small gator, and the exam he keeps avoiding. The exam is a drop of ink that rolls off his calendar and becomes a little blob with eyes. Every time he looks away from it (the practice problem he alt-tabs from, the fridge, a game, one more Reel) it gulps and grows, from a drop smaller than his hand to taller than he is. Its shadow grows further still: under the low glow of his laptop or phone it fills the wall, and under light from above it shrinks to a puddle. [now: final cut v12, `out/looming_v12.mp4`, 2026-10-21]
 
 The film runs on one physical rule: **light held low and close makes the shadow loom; light from above makes it small.** The shadows are not drawn. They are real light computed in code, so the film's metaphor is literally the algorithm.
 
-The turn is a decision he makes, not something that happens to him. At 3 a.m., in bed on his phone, with the wall clock reading three, he turns the phone face down, clicks his nightstand lamp on, and walks out to the library. The campus path is lit by street lamps, and on each one his shadow stretches long ahead of him and shrinks under his feet. At Marston's door the light from above floods him and the shadow collapses to a puddle. From there the blob is big but nothing like its shadow, and he picks up the pen and writes his name. [now: built to the approved v4 story, `docs/02-story.md`; not yet seen in a full render]
+The turn is a decision he makes, not something that happens to him. At 3 a.m., in bed on his phone, with the wall clock reading three, he turns the phone face down, clicks his nightstand lamp on, and walks out to the library, the blob towering beside him the whole way. At Marston's door the light from above floods him, and the blob, too big to follow him in, catches up with him at his desk. There he flinches once more and reaches for his phone; he sees the shadow spring up the wall and turns the phone face down himself. Every problem he solves shrinks the blob, the first one most of all: it was never as big as it felt. He gets an 85, a relief rather than a triumph, and the next time a date goes on the calendar, he starts right away. The film closes on Seneca: "We suffer more often in imagination than in reality." [now: v12]
 
 A plain analog wall clock, with no numbers, keeps the film's pulse. It reads 9:00 at the start, about 1:45 while he rots in bed, and 3:00 at the bottom, and its tick becomes the heartbeat of the walk. [now]
 
-It is made entirely in code with AI collaborators. Eric directs: story, look, timing and every accept or reject call. Claude writes the code that cuts, lights, rigs and times every frame, and image generation paints the paper surfaces. [now]
+It is made entirely in code with AI collaborators. Eric directs: story, look, timing and every accept or reject call. Claude writes the code that cuts, lights, rigs and times every frame, Codex image generation paints the paper surfaces, and the score and sound are synthesized in code. The closing credits say the same, word for word. [now: card B, s22]
 
 Goal: one honest, gentle film about starting, made in a way anyone can open up and read.
 
@@ -45,11 +45,11 @@ Goal: one honest, gentle film about starting, made in a way anyone can open up a
 ## Project Context
 > Share details of how the project is ideally to be deployed, published, exhibited, distributed, interacted with, used and or maintained.
 
-*Looming* is a 3:15 film for screens: a single MP4 that plays anywhere. The master is 1080p (director, Oct 17), with a compressed backup copy cut from it. [now: master 1920×1080, 3:15, −15.9 LUFS / −4.8 dBTP; backup 720p, 8.65 MB, rendered 2026-10-18]
+*Looming* is a 3:45 film for screens: a single MP4 that plays anywhere. The master is 1080p (director, Oct 17), with a compressed backup copy cut from it. [now: master 1920×1080, 3:45, −16.0 LUFS / −5.0 dBFS peak, `out/looming_v12.mp4`; backup 720p, 9.58 MB (9,583,645 bytes), `out/looming_v12_backup.mp4`, 2026-10-21]
 
 - **Where it's meant to be seen.** Finals week, on screens in Marston Science Library, where the climax ends and the film's second half takes place, and in first-year orientation and counselling outreach, where the "first step" message is useful. Online, it's short enough to share in a group chat. [planned: venues not arranged]
 - **Open and re-renderable.** The whole film is a public GitHub repository: https://github.com/Eric-Zhang-Developer/looming-short-film. Every frame is a pure function of time, so anyone can re-render it bit for bit on a laptop. The repo includes the shot specs, the asset manifest, every image prompt (rejects included) and a process log of every creative decision. [now]
-- **Maintained like software.** Each cut is a tagged release with the MP4 attached (animatic, rough cut, final), so any version can be watched or rebuilt. [planned: no tags yet]
+- **Maintained like software.** Each cut is a tagged release with the MP4 attached (animatic, rough cut, final), so any version can be watched or rebuilt. [now: the final cut is tagged `final` on main]
 - **Nearly wordless,** so it needs little translation: the only text is a handful of hand-lettered words (the exam, the math, the grade). Captions describe the key sounds. [planned: no captions exist yet]
 
 ---
@@ -96,7 +96,7 @@ It also contributes a working example of AI used transparently in art. Nothing h
 ## Accessibility & Pluralism
 > Please share speculations, designs, and insights on the potential, or if not why, of enabling technologies or other opportunities for expanded use.
 
-- **No dialogue:** the story is told in pictures and sound. A handful of on-screen words (the exam, the math, the grade) are the only text, so it travels across languages almost unchanged. [now: director 2026-10-15 allowed sparse text]
+- **No dialogue:** the story is told in pictures and sound. A handful of on-screen words (the exam, the math, the grade), the title, one quote and the credits are the only text, so it travels across languages almost unchanged. [now: director 2026-10-15 allowed sparse text]
 - **Captions for sound:** the key sounds (the lamp click, the clock's tick, the held chord at Marston's door) carry story, so a captioned version describes them for Deaf and hard-of-hearing viewers. [planned]
 - **Contrast and safety:** key story moments are held in high contrast, and the film is designed without strobing. The sharpest light changes are the lamp clicks, the shadow's stretch and shrink at each street lamp and the flood of light at Marston's door. [planned: the flash-analysis check has not been run]
 - **Open and reproducible:** anyone with a laptop can re-render it, change it or translate its look. No paid software or GPU farm is needed. [now]
@@ -133,14 +133,14 @@ It also contributes a working example of AI used transparently in art. Nothing h
 
 **Organisers (by phone, 2026-10-15): today needs only an incomplete draft. The final is due Sunday, Oct 18, at 11:59 PM, and a YouTube link and the GitHub repo can be submitted.** Director: the film is published on YouTube at full quality, and the ProposalSpace upload is a compressed backup copy. Put the YouTube link in Project Context (and Synopsis if there's room). The director uploads it to YouTube himself.
 
-**The 10 MB cap now only applies to the backup copy.** For a 3:15 film that's a budget of about **410 kbit/s for video and audio together.** For reference, the Act 1 preview (0:44) encoded at 720p H.264 CRF 24 came to 3.5 MB, which scales to about 15 MB for the full film: **over the limit.** Plan:
+**The 10 MB cap now only applies to the backup copy.** [now, v12: `tools/backup.sh` two-pass 720p at 270k video + 64k AAC (`VB=270k`; 300k fit 3:15 but not 3:45), 9.58 MB (9,583,645 bytes); stills in `out/stills/v12/`] For a 3:15 film that's a budget of about **410 kbit/s for video and audio together.** For reference, the Act 1 preview (0:44) encoded at 720p H.264 CRF 24 came to 3.5 MB, which scales to about 15 MB for the full film: **over the limit.** Plan:
 1. Test encodes at 720p and 1080p: H.264 at a two-pass target bitrate, and HEVC (`hvc1` in `.mp4`, which plays in Safari and macOS and in most modern players). Paper grain and boil are the hardest content to compress, so judge on a phone and a laptop, not by bitrate alone.
 2. Submit the best version under 10 MB as the main file, and link the full-quality release (GitHub Release) in Project Context.
 3. **Captions:** `.srt` and `.vtt` aren't allowed types, so add a burned-in captioned version as a second MP4 (also ≤ 10 MB), or a PDF caption sheet.
 4. Possibly also: a one-page PDF process sheet (the frozen paintings next to the lit, cut result, plus the shadow formula) and 2–3 stills as `.png`.
 
 ## Open items
-- **The deadline** was settled by phone on Oct 15: Sunday, Oct 18, 11:59 PM (see Submission files). [director: confirm on the form]
+- **The deadline** was settled by phone on Oct 15: Sunday, Oct 18, 11:59 PM (see Submission files). [director: confirm on the form; v12 is dated Oct 21, so whether it can replace what was submitted is the organisers' call]
 - **Department and associates:** form fields that aren't in these screenshots (doc 01 items 1–5). [director]
 - **The irony line** in the synopsis. [director]
 - **Motion sensors at Marston:** moot. The sensors were cut in v4, so nothing in the film depends on how Marston's lights behave.
