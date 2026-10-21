@@ -3,6 +3,9 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-18
 
+## v11 (2026-10-20, 23:39): `out/looming_v11.mp4` (3:48, −16.0 LUFS, −5.1 dBFS peak, 5472 frames) and `out/looming_v11_720p.mp4` · director: "agreed alright now lets get v11 out"
+The blob's size tells the story (`docs/notes/v11-beats.md`): born a 1 cm drop (0.4×), a gulp on every act of avoidance (new: `gulpFridge`, `gulpGame`, `gulpReel1`–`3`), taller than him (4.5×) from bed rot through the walk and the library, 5× at the relapse, five solves back to a drop. Four builders by act, merged; every new gulp has the swallow and the score's falling pair. s10's doorway got a moonlit sky so the blob filling it reads. Assembled from v10 with `evidence/v11/assemble_spec.txt` (159 s re-rendered); joins in `evidence/v11/joins_sheet.jpg`. **Not verified:** gulp snaps frame by frame (stills only), the new gulps' sound by ear; s07's third Reel gulp lands after gulp3 (only two flicks precede it).
+
 ## v10 (2026-10-20, 17:28): `out/looming_v10.mp4` (3:48, −16.0 LUFS, −5.0 dBFS peak, 5472 frames) and `out/looming_v10_720p.mp4` · director: "small v10 changes … I think we're ready to publish"
 s18 only (`docs/shots/s18.md`, v10 block): "Final" on the month's last Friday, two weeks below the exam (the overlay now bends with the calendar's curled lip); the tag cuts to the propped sheet, where he writes ∫ x² eˣ dx under the "1.", then the 2 s fade (s18 21 → 22 s). Assembled from v9 with `evidence/v10/assemble_spec.txt` (23 s re-rendered); joins in `evidence/v10/joins_sheet.jpg`. Minecraft re-recorded by the director without the water (`minecraft-audio-3`, 10 s): the window is its busiest 6.5 s, 3.2–9.7, and s05 measures −14.7 LUFS against v10's −14.6; re-muxed, no frames touched.
 
