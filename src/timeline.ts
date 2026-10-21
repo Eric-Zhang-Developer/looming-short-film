@@ -22,7 +22,7 @@ export const SHOTS: Shot[] = [
   { id: 's04',  start: 29,  duration: 7,  beats: { fridge: 0, gulpFridge: 5.5 } },   // v11: the fridge feeds it
   { id: 's05',  start: 36,  duration: 7,  beats: { gameNight: 0, gulpGame: 6 } },   // v11: game night feeds it (1 s clear of lampClickHome)
   { id: 's06',  start: 43,  duration: 8,  beats: { lampClickHome: 0.5, lampOffHome: 3, gulp2: 4 } },     // 0:43
-  { id: 's07',  start: 51,  duration: 12, beats: { bedRot: 0, clockGlance: 6, gulp3: 7.5 } },            // 0:51 bed rot; clock ~1:45
+  { id: 's07',  start: 51,  duration: 12, beats: { bedRot: 0, gulpReel1: 0.5, gulpReel2: 3.25, clockGlance: 6, gulp3: 7.5, gulpReel3: 10 } }, // 0:51 bed rot; clock ~1:45. v11: a gulp on three Reel flicks (cues.ts REELS: reels 1, 2 and 4; reel 3's flick is 7.75, a quarter-second after gulp3)
   { id: 's08',  start: 63,  duration: 10, beats: { clockThree: 0, circleGlance: 4, sweatDrop: 6.5 } },   // 1:03 3 a.m.: music out, tick alone
   { id: 's09a', start: 73,  duration: 6,  beats: { phoneFaceDown: 0.5, breathIn: 1.5, resolveFace: 3, sitUp: 3.5, lampOn: 4, backpackGrab: 5 } }, // 1:13 the choice
   { id: 's09b', start: 79,  duration: 6,  beats: { doorOpen: 1, shadowAhead: 2.5, stepIntoShadow: 4.5 } }, // 1:19 the door

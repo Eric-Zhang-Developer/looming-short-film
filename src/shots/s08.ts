@@ -1,5 +1,5 @@
 // s08 · 3:00 a.m., rock bottom (docs/shots/s08.md, v4; brief climax-a1). s07's bedroom, unchanged: him on his back with
-// the phone on under his chin, the Exam at 2.5× on his knees and its shadow over the ceiling. The music is out; the clock
+// the phone on under his chin, the Exam at 4.5× (v11) at the bed's foot and its shadow over the ceiling. The music is out; the clock
 // ticks alone. Four setups, cut on ticks:
 //   C1 0–2   the clock insert, 3:00:00, the second hand stepping
 //   C2 2–4   his face, the painted `numb` head lying on the pillow; on the 3.0 tick his head rolls back toward the clock
@@ -16,7 +16,7 @@ import { bedroom, closeHeads, headOn, ROOM, LIE, at2, SPOT, FACE_FILL, SPILL, MO
 import type { ShotCtx } from '../film.ts';
 
 const ID = 's08', DEG = Math.PI / 180;
-export const BLOB_R = { start: 0.030 };                       // 2.5× all shot (README §1, Q16)
+export const BLOB_R = { start: 0.054 };                       // v11: 4.5× all shot, s07's last gulp (docs/notes/v11-beats.md)
 // Cameras (re-solved at build). C1: face-on to the clock, the dial 60% of the frame height (Ø 0.020 / 0.6 = 0.0333 m of
 // frame at fov 20 → 0.0945 away), nudged right so the calendar's edge is just in at frame left.
 const C1: CamKey = { pos: [0.047, 0.099, 0.0960], look: [0.047, 0.099, 0] };
@@ -94,7 +94,7 @@ export async function build(ctx: ShotCtx) {
         drop.position.set(...DROP_AT).addScaledVector(down, 0.0015 * k);
       }
 
-      // ---- the Exam: 2.5× on his knees. v9 (v9-beats §2): weather, not a creature. `blank` throughout, no wobble; it no
+      // ---- the Exam: 4.5× at the bed's foot, behind his knees (v11; s07's FOOT). v9 (v9-beats §2): weather, not a creature. `blank` throughout, no wobble; it no
       // longer follows his look to the circle (v8's side glance at 4.0–5.0) ----
       R.placeBlob(BLOB_R.start);
       exam.update(t, { wobble: 0, eyes: 'blank', look: -1, key: spot });

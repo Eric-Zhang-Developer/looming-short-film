@@ -21,6 +21,7 @@ import { tools } from './s02.ts';
 import { reminderInsert } from './s03.ts';
 import { COUNTDOWN } from '../props/canvas.ts';
 import { REELS } from '../audio/cues.ts';
+import { SHOTS } from '../timeline.ts';
 import type { PaperMesh } from '../material.ts';
 import type { Gator } from '../characters/gator.ts';
 import type { ShotCtx } from '../film.ts';
@@ -64,9 +65,29 @@ export const HIP = [0.195, MT + 0.011, ROOM.BODY_Z] as Vec3;
 export const LIE_HEAD = -50;
 export const LIE = specPose({ lean: -90, arm: 0, far: 10, head: LIE_HEAD, leg: 80, farLeg: 84, tail: -88 });
 const FLICK = 1.8;                                            // thumb flick: 1 mm at the near arm's tip (0.032)
-// ---------- the Exam on his knees ----------
-export const BLOB_R = { start: 0.024, gulp3: 0.030 };         // 2× → 2.5× (README §1, Q16 answered 2.5×)
-export const KNEE = [0.230, MT + 0.037, ROOM.BLOB_Z] as Vec3;         // the blob's contact point on the blanket's top over his knees
+// ---------- the Exam ----------
+// v11 (docs/notes/v11-beats.md): 2.5× → 4.5×, one gulp per act of avoidance. Three Reel flicks and the gulp after the
+// clock glance, in the order they happen: 0.030 → 0.036 → 0.042 → 0.048 → 0.054. The beat sheet hangs gulp3 last, but
+// the only Reel flicks before 7.5 are 0.5 and 3.25 (cues.ts REELS), so the third Reel gulp is reel 4's flick (10.0) and
+// the sizes follow the clock: the blob only ever grows.
+export const BLOB_R = { start: 0.030, gulpReel1: 0.036, gulpReel2: 0.042, gulp3: 0.048, gulpReel3: 0.054 };
+const SB = SHOTS.find((s) => s.id === 's07')!.beats;
+const GULPS = (['gulpReel1', 'gulpReel2', 'gulp3', 'gulpReel3'] as const).map((k) => [SB[k], BLOB_R[k]] as [number, number]);
+/** The blob at s07 drawing T: its radius, and the gulp's squash as s03/s06 draw it (t₀ − 1/12 squash 0.3, eyes closed;
+ * t₀ snaps to the new size stretched, settling over three drawings). */
+export function gulpAt(T: number) {
+  let r = BLOB_R.start, squash = 0, swallow = false;
+  for (const [t0, r1] of GULPS) {
+    if (T >= t0 - 1e-6) { r = r1; const tg = T - t0; squash = tg < 0.25 - 1e-6 ? -0.2 * Math.exp(-6 * tg) * Math.cos(18 * tg) : 0; }
+    else if (T >= t0 - 1 / 12 - 1e-6) { squash = 0.3; swallow = true; }
+  }
+  return { r, squash, swallow };
+}
+export const KNEE = [0.230, MT + 0.037, ROOM.BLOB_Z] as Vec3;         // the blanket's top over his knees (the phone rests here in s09a)
+// v11: at 4.5× it is 12 cm wide and 11 cm tall; on his knees it would stand in front of him to the ceiling. It sits at the
+// bed's foot instead, on the mattress just behind his body plane, so it rises from behind his knees and he draws in front
+// of it (s09a's old FOOT mark, where it used to slide to when he sat up).
+export const FOOT = [0.232, MT + 0.001, 0.300] as Vec3;
 // ---------- the phone (the key) ----------
 export const PHONE = { at: [0.193, MT + 0.023, 0.326] as Vec3, long: 0.0083 };   // screen centre P: in his hands on his chest, under the blob
 
@@ -214,7 +235,7 @@ export async function bedroom(ctx: ShotCtx, ID: string) {
 
   // Blob placement and the lights' aim, every frame: r is its current radius, at its contact point.
   const C = new THREE.Vector3(), nrm = new THREE.Vector3(), ax = new THREE.Vector3(), ay = new THREE.Vector3(), az = new THREE.Vector3(), basis = new THREE.Matrix4();
-  const placeBlob = (r: number, contact = KNEE) => {
+  const placeBlob = (r: number, contact = FOOT) => {
     exam.mesh.position.set(...contact);
     exam.mesh.scale.setScalar(r / BLOB_R.start);
     // The caster faces the phone with its width along world x (its top toward the wall), so on the ceiling the shadow
@@ -295,12 +316,14 @@ export const HUES = (P: Palette) => HUE_TURNS.map(([h, s, l]) => new THREE.Color
 /** Which reel's colour is on the phone at s07 local drawing T: each flick (REELS' cuts) turns it; before the first flick
  * the feed is on the last reel's, so the loop reads as one feed. */
 export const hueAt = (T: number) => (FLICKS.filter((f) => T >= f - 1e-6).length + 3) % 4;
-export const H_CAM = { pos: [HX - 0.004, 0.066, 0.263] as Vec3, look: [HX - 0.004, 0.071, 0.03] as Vec3 };
+// v11: pulled back from 0.263 to 0.56 and over to frame the 4.5× blob whole beside him (its top 0.144, his head ~0.09):
+// "taller than him" has to read in one frame, and at the old distance a 2× blob already ran off the frame's edge.
+export const H_CAM = { pos: [HX + 0.025, 0.080, 0.56] as Vec3, look: [HX + 0.025, 0.074, 0.03] as Vec3 };
 const H_BED = 0.036;                                                // the blanket's top over his legs
 const H_ROOT = [HX - 0.022, 0.0, 0.030] as Vec3;       // his feet (front rig root); the blanket hides everything below the chest
 const H_PHONE = [HX - 0.022, 0.048, 0.051] as Vec3;   // on his chest, over the blanket's fold, in his hands
 export const H_FOCUS = H_CAM.pos[2] - H_ROOT[2];                     // his face
-export const H_BLOB = [HX + 0.047, H_BED, 0.100] as Vec3;   // contact on the blanket near the lens, frame right
+export const H_BLOB = [HX + 0.090, H_BED, 0.075] as Vec3;   // contact on the bed, frame right (v11: further back and right, clear of him and the red circle at 4.5×)
 export async function headOn(ctx: ShotCtx, ID: string) {
   const { scene, assets, PALETTE } = ctx;
   const T = tools(ctx, `${ID}-h`), { cut, rect, paper, group, col } = T;
@@ -310,7 +333,9 @@ export async function headOn(ctx: ShotCtx, ID: string) {
   rect('wall', PALETTE.cream, [0.5, 0.22], [HX, 0.11, 0], { res: 1024, mat: dull });
   rect('floor', col('kraft', 'navy', 0.5), [0.5, 0.45], [HX, 0, 0.22], { rot: [-Math.PI / 2, 0, 0], weight: 'kraft', mat: dull });
   const BX = [HX - 0.058, HX + 0.085];                                 // the bed's sides (a cheat: wide enough for the blob)
-  rect('bed-top', col('navy', 'cream', 0.08), [BX[1] - BX[0], 0.30], [(BX[0] + BX[1]) / 2, H_BED, 0.19], { rot: [-Math.PI / 2, 0, 0], weight: 'tissue', res: 1024, mat: dull });
+  // v11: the bed's top runs out under the pulled-back lens and wider on the blob's side (a cheat: room for 4.5×).
+  const BR = HX + 0.165;
+  rect('bed-top', col('navy', 'cream', 0.08), [BR - BX[0], 0.58], [(BX[0] + BR) / 2, H_BED, 0.30], { rot: [-Math.PI / 2, 0, 0], weight: 'tissue', res: 1024, mat: dull });
   // The headboard: a kraft panel with two round-topped posts, seen face-on.
   const HB = [BX[0] + 0.01, BX[1] - 0.025];
   group(paper('headboard', { path: [[0, 1], [0, 0.06], [0.03, 0], [0.07, 0.06], [0.07, 0.2], [0.93, 0.2], [0.93, 0.06], [0.97, 0], [1, 0.06], [1, 1]],
@@ -453,21 +478,19 @@ export async function build(ctx: ShotCtx) {
       act(Hs.rig, t, [[0, 'numb']], { slump: 0, tilt: 0, tail: 0 });
       const glancing = at2(T, ...GLANCE);
       Hs.glance.visible = glancing; Hs.rig.meshes.eyes.visible = !glancing;
-      Hs.set(t, { r: t >= 7.5 - 1e-6 ? BLOB_R.gulp3 : BLOB_R.start, colour, wobble: t >= 7.5 - 1e-6 ? 0 : 1 });   // v9: still after gulp3
+      const G = gulpAt(T), blank = T >= SB.gulp3 - 1e-6;
+      Hs.set(t, { r: G.r, colour, squash: G.squash, wobble: blank ? 0 : 1 });   // v9: still after gulp3; v11: a gulp on each Reel flick
 
       // ---- W: lie_phone, the thumb, numb; the Exam gulps at 7.5 (README §1) ----
       rig.blend({ lie: LIE }, [[0, 'lie']], 0);
       if (flick) rig.joints.arm_r.rotation.z += FLICK * DEG;
       act(rig, t, [[0, 'numb']], { slump: 0, tilt: 0, tail: 0, depth: 0, blink: false });
       rig.joints.body.scale.x = 1 + 0.010 * Math.sin(2 * Math.PI * T / 7.5);   // 8/min; lying, the chest rises along the body's x
-      const g = t >= 7.5 - 1e-6, r = g ? BLOB_R.gulp3 : BLOB_R.start;
-      let squash = 0, eyes = 'side', wobble = 1;
-      if (at2(T, 7.417, 7.5)) { squash = 0.3; eyes = 'closed'; }
       // v9 (v9-beats §2): after gulp3 it is weather. `blank`, no blink, no wobble, from here through s10b (bar s10's
       // confused beat at the threshold). The gulp's snap-back squash stays: that's the swallow, not the wobble.
-      else if (g) { eyes = 'blank'; wobble = 0; if (T < 7.75) squash = -0.2 * Math.exp(-10 * (T - 7.5)); }
-      R.placeBlob(r);
-      exam.update(t, { squash, wobble, eyes, look: -1, key: spot });
+      const eyes = G.swallow ? 'closed' : blank ? 'blank' : 'side';
+      R.placeBlob(G.r);
+      exam.update(t, { squash: G.squash, wobble: blank ? 0 : 1, eyes, look: -1, key: spot });
 
       // ---- light: the phone, constant with a ±3% seeded flicker per drawing (the feed scrolling), in the reel's colour ----
       spot.intensity = SPOT * (1 + 0.03 * (2 * hash2(seedOf(ID, 'feed') % 65536, Math.round(T * 12)) - 1));

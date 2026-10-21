@@ -20,7 +20,7 @@ import type { PaperOptions } from '../paper.ts';
 
 const ID = 's09b', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID)!.beats;         // doorOpen 1, shadowAhead 2.5, stepIntoShadow 4.5
-const BLOB_R = { start: 0.030 };                         // 2.5× (README §1, Q16)
+const BLOB_R = { start: 0.054 };                         // v11: 4.5× (docs/notes/v11-beats.md): 12.3 cm wide, 10.8 cm tall
 
 // The set (m). Hall: end wall z 0 (the front door), his door wall at the hall's near end z DOOR_Z; his room beyond.
 const DOOR_Z = 0.50, HALL_X = 0.065, CEIL = 0.145;       // the hall 13 cm wide (spec 10): the 2.5× blob is 6.8 cm
@@ -29,17 +29,27 @@ const DOORWAY = [0.090, 0.110];                          // his doorway, centred
 // this to it (height above his floor, door side of the bed) when that lands. Here it sits 0.30 inside his room (about
 // 5.5 m real), near the doorway's axis, with the bulb at 0.027 (about 50 cm real: a low nightstand). The distance is what
 // lets the blob stay on his threshold and still throw S 2.7 on the end wall. See done/climax-a2.md, Gaps.
-export const NIGHTSTAND_LAMP = [-0.012, 0.027, 0.80];
+// v11: the 4.5× blob is as wide as the hall and as tall as his doorway, so on the old line (lamp, blob and front door
+// all on the camera's axis) it hid the hall, him and its own shadow. The lamp now stands at s07's height (ROOM.LAMP y
+// 0.054), nearer the door and 4 cm left of the axis; the blob, squeezed into the hall, sits on the lamp → front door line
+// on the hall's left, and the camera (v10's) looks down the hall's right half past it, at the front door and him.
+export const NIGHTSTAND_LAMP = [-0.040, 0.054, 0.65];
 // The blob at the poster frame: on his threshold (just inside his room), on the lamp → front-door line. Its shadow scale
 // on the end wall is S = z_L / (z_L − z_B) = 2.71: both eye holes land on the front door (±0.034) and the shadow's top
 // reaches 0.116 of the wall's 0.145. Staying on the threshold also keeps it low in the frame, so the eye holes show above it.
-const BLOB_Z = DOOR_Z + 0.005, S = NIGHTSTAND_LAMP[2] / (NIGHTSTAND_LAMP[2] - BLOB_Z);
-const BLOB_AT = [NIGHTSTAND_LAMP[0] * (1 - 1 / S), BLOB_Z];   // (−0.0076, 0.505)
-const BLOB_ROOM = [-0.070, 0.62];                        // before: in his room, left of the door, its loom on the wall
+// v11: through the door and into the hall (z 0.44), squeezed to SQUEEZE: 6.8 cm wide (the hall is 13) and 12.4 cm tall,
+// its top cut by his doorway's lintel from the camera's side. S = 0.65 / 0.21 = 3.1: the shadow (21 cm wide) fills the end
+// wall to the ceiling, and its eye holes land at y ≈ 0.09 on the front door, x ≈ ±0.03.
+const BLOB_Z = 0.44, S = NIGHTSTAND_LAMP[2] / (NIGHTSTAND_LAMP[2] - BLOB_Z);
+const BLOB_AT = [NIGHTSTAND_LAMP[0] * (1 - 1 / S), BLOB_Z];   // (−0.027, 0.44)
+const SQUEEZE = [0.55, 1.15];                            // mesh x, y scale from the doorway on: a 12 cm blob in a 9 cm door
+const BLOB_ROOM = [0.000, 0.60];                         // before: in his room in front of the door (past its swing), its loom on the door wall
 // Him: in his room right of his door (clear of its swing), then out through the doorway to the hall's right side, where
 // he faces the shadow without standing in front of its eyes; the step into the shadow at stepIntoShadow.
-const HIM: [number, number[]][] = [[0, [0.035, 0.600]], [1.25, [0.035, 0.600]], [1.583, [0.020, 0.500]], [2.0, [0.045, 0.400]],
-  [B.stepIntoShadow, [0.045, 0.400]], [B.stepIntoShadow + 0.5, [0.032, 0.360]], [B.stepIntoShadow + 1.0, [0.022, 0.320]], [6.0, [0.018, 0.300]]];
+// v11: he waits right of the 4.5× blob (it fills the room's middle), and in the hall stands at the doorway's right edge,
+// right of the blob and of the camera's line to the front door; his steps into the shadow bend across that line.
+const HIM: [number, number[]][] = [[0, [0.085, 0.600]], [1.25, [0.085, 0.600]], [1.583, [0.045, 0.520]], [2.0, [0.040, 0.400]],
+  [B.stepIntoShadow, [0.040, 0.400]], [B.stepIntoShadow + 0.5, [0.030, 0.360]], [B.stepIntoShadow + 1.0, [0.020, 0.320]], [6.0, [0.015, 0.300]]];
 const C5 = [3.5, B.stepIntoShadow];                      // the close-up's cut in and out
 // A camera near a light can't see that light's shadow: the caster hides it. Looking through the doorway from behind the
 // lamp, the 2.5× blob on the threshold covered its own eye holes. So the set is a paper-theatre cutaway: the hall's right
@@ -50,7 +60,9 @@ const C5 = [3.5, B.stepIntoShadow];                      // the close-up's cut i
 // mirror or a poster". The camera now stands square to his door wall, in his room behind the lamp, a few cm right of the
 // lamp → front-door line and high enough to see the eye holes over the blob: his door frame is the frame, the hall runs
 // straight away through it, and the front door at its end gets a lit gap under it and a transom (the night outside).
-const CAM: CamKey = { pos: [0.040, 0.112, 1.02], look: [0.000, 0.058, 0.0] };
+// v11: aimed lower (y 0.02, was 0.058), so the room's floor is in frame and the blob in his room stands whole beside him
+// before the door opens.
+const CAM: CamKey = { pos: [0.040, 0.112, 1.02], look: [0.000, 0.020, 0.0] };
 const LAMP_I = 0.45, AMB_K = 0.25, SHADE_GLOW = 0.9, FILL_I = 0.006;
 
 // ---------- the close-up rig (README §12): the side Student with a painted closeup_heads head on the hood ----------
@@ -177,7 +189,9 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     const close = t >= C5[0] && t < C5[1];
 
     // ---------- his door, on 2s: three drawings to 80° on doorOpen
-    hinge.rotation.y = -kf(T, [[B.doorOpen - 1e-3, 0], [B.doorOpen, 30], [B.doorOpen + 1 / 12, 62], [B.doorOpen + 2 / 12, 80]], (x) => x) * D;
+    // v11: three drawings to 150° (was 80°): at 80° the open door stood edge-on between the lens and the doorway, over
+    // the squeezed blob's left half; swung back toward the wall it frames the doorway instead.
+    hinge.rotation.y = -kf(T, [[B.doorOpen - 1e-3, 0], [B.doorOpen, 45], [B.doorOpen + 1 / 12, 100], [B.doorOpen + 2 / 12, 150]], (x) => x) * D;
 
     // ---------- the Student, on 2s
     const [hx, hz] = kf(T, HIM, ease);
@@ -209,23 +223,24 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     }
 
     // ---------- the Exam, on 2s
-    let p, y = 0, sx = 1, sq = 0;
+    let p, y = 0, sx = 1, sy = 1, sq = 0;
     const HOP0 = 1.75, LAND = 2.0 + 1 / 6;
     if (T < HOP0) p = BLOB_ROOM;
-    else if (T < LAND) {                                 // one hop after him, onto his threshold
+    else if (T < LAND) {                                 // v11: through his door after him, squeezing to fit, into the hall
       const k = (T - HOP0) / (LAND - HOP0);
       p = [BLOB_ROOM[0] + (BLOB_AT[0] - BLOB_ROOM[0]) * k, BLOB_ROOM[1] + (BLOB_AT[1] - BLOB_ROOM[1]) * k];
-      y = 0.015 * Math.sin(Math.PI * k); sx = 0.9; sq = k < 0.2 ? 0.25 : -0.15;
-    } else { p = BLOB_AT; sq = T < LAND + 1 / 12 ? 0.2 : 0; }
+      y = 0.004 * Math.sin(Math.PI * k);                 // a low hop, under the lintel
+      [sx, sy] = k < 0.2 ? [0.9, 1] : SQUEEZE; sq = k < 0.2 ? 0.25 : 0;
+    } else { p = BLOB_AT; [sx, sy] = SQUEEZE; sq = T < LAND + 1 / 12 ? 0.2 : 0; }
     // v9 (v9-beats §2): `blank` throughout and no wobble (v8 glanced, looked up and went worried here). It still hops
     // after him: it moves, it doesn't feel. Blank eyes are full discs, so the poster frame's eye holes stay round.
     exam.mesh.visible = !close;
     exam.mesh.position.set(p[0], y, p[1]);
-    exam.mesh.scale.set(sx, 1, 1);
+    exam.mesh.scale.set(sx, sy, 1);
     exam.update(t, { squash: sq, wobble: 0, eyes: 'blank', key: lamp });
 
     // ---------- light, on 1s
-    BC.set(p[0], 0.03, p[1]);
+    BC.set(p[0], 0.054 * sy, p[1]);                    // its centre (v11: 4.5×)
     aim(lamp, BC);
     lamp.shadow.camera.near = 0.004; lamp.shadow.camera.updateProjectionMatrix();
 
