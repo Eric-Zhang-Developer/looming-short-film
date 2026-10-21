@@ -3,6 +3,9 @@
 **Wave:** 3 · Assets, with wave 4 (animatic) under way · branch `wave/3-assets` (cut from main after wave 2 merged in #2)
 **Updated:** 2026-10-18
 
+## v12 (2026-10-21, 18:55): `out/looming_v12.mp4` (3:45, −16.0 LUFS, −5.0 dBFS peak, 5400 frames) and `out/looming_v12_720p.mp4` · director: "cut it and add one second somewhere else that's deserved"
+s10b (the stacks walk) is cut: v11's blob stops at the library doors and is next seen looming at his desk, which reads as "it caught up", and s10b's pocketed phone led nowhere. Its 4 s: 1 s to the Seneca card (3.5 → 4.5 s, so the thesis can be read and land), 3 s off the runtime. Its steps, rustle and the stacks' two theme notes are gone; the desk states the theme first. Assembled from v11 with `evidence/v12/assemble_spec.txt` (8 s re-rendered); joins in `evidence/v12/joins_sheet.jpg`.
+
 ## v11 (2026-10-20, 23:39): `out/looming_v11.mp4` (3:48, −16.0 LUFS, −5.1 dBFS peak, 5472 frames) and `out/looming_v11_720p.mp4` · director: "agreed alright now lets get v11 out"
 The blob's size tells the story (`docs/notes/v11-beats.md`): born a 1 cm drop (0.4×), a gulp on every act of avoidance (new: `gulpFridge`, `gulpGame`, `gulpReel1`–`3`), taller than him (4.5×) from bed rot through the walk and the library, 5× at the relapse, five solves back to a drop. Four builders by act, merged; every new gulp has the swallow and the score's falling pair. s10's doorway got a moonlit sky so the blob filling it reads. Assembled from v10 with `evidence/v11/assemble_spec.txt` (159 s re-rendered); joins in `evidence/v11/joins_sheet.jpg`. **Not verified:** gulp snaps frame by frame (stills only), the new gulps' sound by ear; s07's third Reel gulp lands after gulp3 (only two flicks precede it).
 

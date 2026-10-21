@@ -189,14 +189,7 @@ export const SCORE: ScoreEvent[] = [
   ev('lightFlood', 0, 'pad', [48, 55, 64, 72], { dur: 0.3, attack: 0.15, release: 2.2, gain: 0.3, motif: 'chord' }),
   // The blob blinks: one music-box note at its birth pitch, very soft. Confused, not gone.
   ev('blobBlinks', 0, 'box', EXAM[0][0], { vel: 0.2, dur: 1.2, motif: 'exam' }),
-  // 1:52–1:56.5 The stacks (v6): the chord's near-silence keeps its breath, then Act 4's theme arrives with the library,
-  // before the desk: its first two notes on felt piano, softer than the desk's statement, one per strip light, over a low
-  // C-major pad that carries him to the desk, where the phrase is stated in full.
-  ev('underLight1', 0, 'pad', [36, 48, 55, 64], { dur: beat('deskSit') - beat('underLight1'), attack: 2, release: 1.5, gain: 0.2 }),
-  ...([['underLight1', 0, 2.4], ['underLight2', 1, 2]] as [string, number, number][]).flatMap(([b, k, dur]) => [
-    ev(b, 0, 'piano', THEME[k], { vel: 0.24, dur, motif: 'theme' }),
-    ev(b, 0, 'piano', HARM[k], { vel: 0.19, dur }),
-  ]),
+  // v12: s10b (the stacks) is cut; the theme's first statement is the desk's, below.
 
   // 1:50–2:02 Under the light (v4): Act 4's theme in major, softly: its first phrase on felt piano, one note every two
   // seconds over major chords, and the music box answering with the motif's first note when the blob settles.
