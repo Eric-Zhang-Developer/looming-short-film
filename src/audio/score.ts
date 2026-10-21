@@ -4,6 +4,7 @@
 // Voices are doc 05's four, from synth.ts: felt piano, music box, warm pad, sub swell; plus v4's pulse, built from the
 // clock's tick (foley.ts). An event may carry until: '<beat>' to stop dead on that beat. Mono, 48 kHz.
 import { beat, S13_DESKS } from '../timeline.ts';
+import { EXTRA_GULPS } from './cues.ts';
 import { SR, feltPiano, musicBox, pad, subSwell, mixInto } from './synth.ts';
 import type { PadOpts, SubOpts } from './synth.ts';
 import { FOLEY } from './foley.ts';
@@ -33,8 +34,8 @@ const ev = (beatName: string, at: number, voice: Voice, midi: ScoreEvent['midi']
 const exam = (beatName: string, at: number, o: EvOpts) => EXAM.map(([m, dt]) => ev(beatName, at + dt, 'box', m, { motif: 'exam', ...o }));
 // The gulp (doc 05): the motif's first two notes (its rising third), k semitones down for gulp k, the second 0.275 s later
 // (half the motif's spacing, a swallow) and 4k cents flatter (the drift growing); velocity 0.30 rising to 0.42 over v4's three.
-const gulp = (k: number) => [[0, 0, 0.5], [1, 0.275, 0.8]].map(([j, at, dur]) =>
-  ev(`gulp${k}`, at, 'box', EXAM[j][0] - k - (j ? 0.04 * k : 0), { vel: (24 + 6 * k) / 100, dur, motif: 'gulp' }));
+const gulp = (k: number, beatName = `gulp${k}`) => [[0, 0, 0.5], [1, 0.275, 0.8]].map(([j, at, dur]) =>
+  ev(beatName, at, 'box', EXAM[j][0] - k - (j ? 0.04 * k : 0), { vel: (24 + 6 * k) / 100, dur, motif: 'gulp' }));
 // The shrink answer (doc 05 v4): the same two notes falling (second note first), 0.25 s after the solve's theme note, at
 // about -6 dB under it. Five solves from the 2.5x peak: #1 -2 (one above the deepest gulp), #2 0 (birth size at birth
 // pitch), #3 +1, #4 +2, #5 +3; then the test +4 and the cross-off +5.
@@ -152,7 +153,8 @@ export const SCORE: ScoreEvent[] = [
   ...exam('inkDropForms', 0.3, { vel: 0.55, dur: 1.4 }),
   ev('laptopUp', 0, 'sub', null, { hz: 42, dur: 5, attack: 3, gain: 0.2 }),           // shadow climbs the wall
   // The gulps: 0:24.5 (s03), 0:47 (s06), 0:58.5 (s07, bed rot); v8's fourth, 2:29.1 (s16, the relapse), the deepest.
-  ...[1, 2, 3, 4].flatMap(gulp),
+  ...[1, 2, 3, 4].flatMap((k) => gulp(k)),
+  ...EXTRA_GULPS.flatMap(([b, k]) => gulp(k, b)),
   // Its sub under the shadow springing up the library wall, cut dead when the phone goes face down.
   ev('gulp4', 0, 'sub', null, { hz: 56, dur: beat('phoneDownLib') - beat('gulp4'), attack: 0.3, gain: 0.3, until: 'phoneDownLib' }),
 

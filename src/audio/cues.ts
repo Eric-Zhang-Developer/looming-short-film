@@ -9,6 +9,10 @@
 // beat is still hung on beats and moves when they move. Sources: doc 05's v4 table and docs/shots/sNN.md §Sound (the v4 cut, 3:15).
 // The music stem (score.ts) is not placed here.
 import { beat, DURATION, S13_DESKS } from '../timeline.ts';
+// v11: every act of avoidance gulps (docs/notes/v11-beats.md). Each gets the swallow here and score.ts's two
+// falling notes; the new ones borrow a neighbour's step (k), so the
+// four numbered gulps keep their pitches and the fall still runs 1 → 4 across the film.
+export const EXTRA_GULPS: [string, number][] = [['gulpFridge', 1], ['gulpGame', 2], ['gulpReel1', 2], ['gulpReel2', 2], ['gulpReel3', 3]];
 
 type Point = [string, number?];
 type Stem = 'foley' | 'ambience' | 'music';
@@ -162,6 +166,7 @@ export const CUES: Cue[] = [
   // The blob's gulps (doc 05): a soft inkDrip swallow at -18 dB under the score's two notes, one per gulp (v8: four, the
   // fourth s16's relapse).
   ...[1, 2, 3, 4].map((k) => ({ beat: `gulp${k}`, sound: 'inkDrip', gain: 0.126, seed: 20 + k })),
+  ...EXTRA_GULPS.map(([b], i) => ({ beat: b, sound: 'inkDrip', gain: 0.126, seed: 40 + i })),   // v11's new gulps
   // s07: the thumb's scroll ticks, -22 dB, seeded per flick. v7: one per reel, on its cut (REELS), where the picture's
   // flicks are too (was every 0.75 s). No clock tick under s07, though its second hand moves from 48.0: the tick's first
   // close appearance is s08's, on the frame the music goes out.
