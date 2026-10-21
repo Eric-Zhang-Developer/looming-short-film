@@ -54,12 +54,15 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   const plain = (color: string, size: number[], key: string, opts: PaperOptions = {}) => { const m = sheet({ path: RECT, color, size, key: `${ID}-${key}`, res: 1024, rim: 'none', ...opts }, scene); m.castShadow = false; return m; };
 
   // ---- Outside: the night sky, an oak, the plaza to the sill, lamp 5.
-  plain(hex(C('navy').multiplyScalar(0.85)), [2.0, 1.0], 'night_sky').position.set(0, 0.2, -1.5);
+  // v11: the ink blob fills the doorway now, and against v10's ink-dark sky and plaza only its eyes read. A paler, moonlit
+  // sky and a cool, non-casting wash on the plaza behind it put its silhouette against something.
+  plain(hex(C('navy').lerp(C('cream'), 0.35)), [2.0, 1.0], 'night_sky').position.set(0, 0.2, -1.5);
   noCast(art(ext.pieces.oak_canopy, 'oak', { mpp: 0.5 * mppOf(ext, 'oak_canopy'), anchor: [326, 200], parent: scene, res: 1024 })).position.set(0.1, 0.21, -0.9);
   // fix-threshold: up 5 cm. At 0.16 its moss hung into the top of the door opening as torn tongues: the cold viewer's icicles.
   flat(plain(hex(C('navy').multiplyScalar(0.75)), [1.2, 0.8], 'plaza')).position.set(0, 0, DOOR_Z - 0.4);
   const lantern = lamppost(ext, art, scene, 'lamp5', LAMP5, COOL);
   const pool5 = new THREE.PointLight(COOL, 0.002, 0.22, 2); pool5.position.set(LAMP5[0], LAMP_H, LAMP5[1]); scene.add(pool5);
+  const backWash = new THREE.PointLight(COOL, 0.02, 0.35, 2); backWash.position.set(BLOB_DOOR[0], 0.04, DOOR_Z - 0.14); scene.add(backWash);   // v11, see the sky
 
   // ---- The door wall: marston_kit's navy-grey wall with the door pair's opening; the glass doors in it.
   // fix-threshold: glass, not ice (cold-v4 1:42, "a frosted, iced-over glass door"). The ice was the wall's own torn hole:
