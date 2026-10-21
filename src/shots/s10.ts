@@ -20,7 +20,7 @@ import type { PaperOptions } from '../paper.ts';
 
 const ID = 's10', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID)!.beats;          // doorPush 1, lightFlood 1.5, blobBlinks 2.5, exhale 5
-const BLOB_R = { start: 0.030 };                         // 2.5× (README §1, Q16)
+const BLOB_R = { start: 0.054 };                         // v11: 4.5×, 10.8 cm tall: as wide as the door pair, nearly as tall
 
 // The doors at z 0.10, not the spec's table's 0.20: the spec's own panel (z 0.13, "just inside the door"), its pool
 // (0.07…0.19) and his stop (z 0.13) are all inside only if the sill is nearer the plaza. Everything else as specced.
@@ -29,8 +29,12 @@ const LAMP5 = [-0.03, -0.25];                            // s09c's lamp 5 (its l
 const PANEL = [0.0, 0.145, 0.13], SPOT_Y = 0.142;        // the recessed panel over the threshold
 const STOP = [-0.040, 0.13];   // him under the panel at lightFlood. fix-threshold: 1.8 cm left of climax-a2's −0.022, so
                                // his snout, now in profile toward the blob, ends at its edge instead of behind it
-const BLOB_IN = [0.032, 0.16];   // at his feet, in the pool, 3 cm in front of the panel: a cutout lit from straight above casts a
-                                 // line; this lays its puddle forward on the floor where the camera sees it (README §3's 6 mm, more)
+// v11: it no longer follows him in. It stops at the door, huge, before the light: standing in the doorway 8 mm outside the
+// glass, behind him. The door pair is 12 cm wide and 12 cm tall and it is 12.3 cm by 10.8, so it fills the doorway; set
+// 3 cm right of centre so his snout clears its eyes, the wall cuts off its right flank (too big for the door).
+// The panel is in front of it and above, so from lightFlood its shadow falls back out onto the plaza, behind its own body:
+// lamp 5's tongue across his floor is the only shadow it has in here, and the flood takes that.
+const BLOB_DOOR = [0.030, DOOR_Z - 0.008];
 // Him on 2s: [t, [x, z]]. A step from the glass, the hand to the bar, the push, one step across the sill, the stop.
 const HIM: [number, number[]][] = [[0, [-0.02, 0.060]], [0.5, [-0.02, 0.080]], [B.doorPush, [-0.02, 0.082]], [B.lightFlood, STOP]];
 const CU_I = 0.010, WARM_I = 0.020, ROOM_I = 0.15, ROOM_FLOOD = 0.30, AMB_K = 0.35, FILL_I = 0.006, PANEL_GLOW = 0.9;
@@ -50,12 +54,15 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   const plain = (color: string, size: number[], key: string, opts: PaperOptions = {}) => { const m = sheet({ path: RECT, color, size, key: `${ID}-${key}`, res: 1024, rim: 'none', ...opts }, scene); m.castShadow = false; return m; };
 
   // ---- Outside: the night sky, an oak, the plaza to the sill, lamp 5.
-  plain(hex(C('navy').multiplyScalar(0.85)), [2.0, 1.0], 'night_sky').position.set(0, 0.2, -1.5);
+  // v11: the ink blob fills the doorway now, and against v10's ink-dark sky and plaza only its eyes read. A paler, moonlit
+  // sky and a cool, non-casting wash on the plaza behind it put its silhouette against something.
+  plain(hex(C('navy').lerp(C('cream'), 0.35)), [2.0, 1.0], 'night_sky').position.set(0, 0.2, -1.5);
   noCast(art(ext.pieces.oak_canopy, 'oak', { mpp: 0.5 * mppOf(ext, 'oak_canopy'), anchor: [326, 200], parent: scene, res: 1024 })).position.set(0.1, 0.21, -0.9);
   // fix-threshold: up 5 cm. At 0.16 its moss hung into the top of the door opening as torn tongues: the cold viewer's icicles.
   flat(plain(hex(C('navy').multiplyScalar(0.75)), [1.2, 0.8], 'plaza')).position.set(0, 0, DOOR_Z - 0.4);
   const lantern = lamppost(ext, art, scene, 'lamp5', LAMP5, COOL);
   const pool5 = new THREE.PointLight(COOL, 0.002, 0.22, 2); pool5.position.set(LAMP5[0], LAMP_H, LAMP5[1]); scene.add(pool5);
+  const backWash = new THREE.PointLight(COOL, 0.02, 0.35, 2); backWash.position.set(BLOB_DOOR[0], 0.04, DOOR_Z - 0.14); scene.add(backWash);   // v11, see the sky
 
   // ---- The door wall: marston_kit's navy-grey wall with the door pair's opening; the glass doors in it.
   // fix-threshold: glass, not ice (cold-v4 1:42, "a frosted, iced-over glass door"). The ice was the wall's own torn hole:
@@ -207,22 +214,24 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
 
     // ---------- the Exam, on 2s: at his heels; one hop in after him (1.25 → 1.5); the blink; looks down, then up
     const HOP = [B.doorPush + 0.25, B.lightFlood];
-    let p, y = 0, sq = 0, eyes = 'open', look = 1;
+    let p, y = 0, sq = 0, eyes = 'blank', look = 1;
     if (T < HOP[0]) {
       const h = kf(T, HIM, (x) => x); p = [h[0] + 0.03, h[1] - 0.03];
       const ph = ((T + 1e-6) % 0.5) / 0.5; if (T < 0.5) { y = 0.003 * Math.sin(Math.PI * ph); sq = ph < 1 / 6 ? 0.2 : 0; }
-    } else if (T < HOP[1]) {                              // through his door's opening (squeezed: it's wider than the gap)
+    } else if (T < HOP[1]) {                              // v11: one hop up to the doorway after him, and no further
       const k = (T - HOP[0]) / (HOP[1] - HOP[0]), h0 = kf(HOP[0], HIM, (x) => x);
-      p = [kf(k, [[0, h0[0] + 0.03], [0.5, -0.022], [1, BLOB_IN[0]]], (x) => x), kf(k, [[0, h0[1] - 0.03], [0.5, DOOR_Z], [1, BLOB_IN[1]]], (x) => x)];
-      y = 0.012 * Math.sin(Math.PI * k); sq = -0.15;
-    } else { p = BLOB_IN; sq = T < B.lightFlood + 1 / 12 ? 0.2 : T >= 3.25 ? 0.15 : 0; }
-    if (T >= B.doorPush && T < B.lightFlood) { eyes = 'side'; look = -1; }   // following him in
-    if (T >= B.blobBlinks && T < B.blobBlinks + 1 / 12) eyes = 'closed';
+      p = [h0[0] + 0.03 + (BLOB_DOOR[0] - h0[0] - 0.03) * k, h0[1] - 0.03 + (BLOB_DOOR[1] - h0[1] + 0.03) * k];
+      y = 0.008 * Math.sin(Math.PI * k); sq = -0.15;
+    } else { p = BLOB_DOOR; sq = T < B.lightFlood + 1 / 12 ? 0.2 : T >= 3.25 ? 0.15 : 0; }
+    // v9 (v9-beats §2): `blank` and still, as it has been since s07's gulp, until the light floods. Then the one confused
+    // beat: wobble back on for the first time since s07, eyes side-glancing one way then the other (look flicks every
+    // 1/3 s), the blink on blobBlinks (two drawings), down at its puddle (tired); then blank again from 3.25.
+    const confused = T >= B.lightFlood && T < 3.25;
+    if (confused) { eyes = 'side'; look = Math.floor((T - B.lightFlood + 1e-6) * 3) % 2 ? 1 : -1; }
+    if (T >= B.blobBlinks && T < B.blobBlinks + 1 / 6) eyes = 'closed';
     else if (T >= 2.75 && T < 3.25) eyes = 'tired';      // down at its puddle
-    else if (T >= 3.25) eyes = 'worried';                // up at him
-    const sx = T >= HOP[0] && T < HOP[1] && Math.abs(p[1] - DOOR_Z) < 0.03 ? 0.75 : 1;
     exam.mesh.visible = !close;
-    exam.mesh.position.set(p[0], y, p[1]); exam.mesh.scale.set(sx, 1, 1);
+    exam.mesh.position.set(p[0], y, p[1]);
 
     // ---------- light, on 1s. The snap: lamp 5 at 0.2 from the lightFlood frame, no fade.
     const flooded = t >= B.lightFlood - 1e-6;
@@ -231,7 +240,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     // both eye holes still legible at 960; under the doubled fill it falls to ~9% and only the puddle reads.
     room.intensity = flooded ? ROOM_FLOOD : ROOM_I;
     BC.set(p[0], 0.03, p[1]); aim(key5, BC); key5.shadow.camera.near = 0.004; key5.shadow.camera.updateProjectionMatrix();
-    exam.update(t, { squash: sq, wobble: flooded ? 0.6 : 1, eyes, look, key: flooded ? over : key5 });
+    exam.update(t, { squash: sq, wobble: confused ? 0.6 : 0, eyes, look, key: flooded ? over : key5 });
     lantern.emissiveIntensity = 0.9;
 
     // ---------- camera, on 1s: locked wide; locked CU from his left (he faces screen right)

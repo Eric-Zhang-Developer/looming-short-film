@@ -56,13 +56,13 @@ ok('the clock is one buffer: clockTick ignores its seed, and every tick cue sits
   assert.ok(!ts.some((t) => Math.abs(t - beat('lampOn')) < 1e-9), 'no tick under the nightstand click');
   console.log(`    ${ts.length} ticks, ${Math.min(...ts)}…${Math.max(...ts)} s`);
 });
-// Doc 05's other "one buffer, identical both times" pairs: s15's uncap and the tag's, s00's two buzzes.
-for (const sound of ['penUncap', 'phoneBuzz']) ok(`the two ${sound}s are one seed and gain, sample-identical in foley.wav`, () => {
+// Doc 05's other "one buffer, identical every time" sets: s15's uncap and the tag's; s00's two buzzes and (v9) the sting's.
+for (const [sound, count] of [['penUncap', 2], ['phoneBuzz', 3]] as [string, number][]) ok(`the ${count} ${sound}s are one seed and gain, sample-identical in foley.wav`, () => {
   const L = stemL(), cs = cuesOf(sound), n = FOLEY[sound](seedOf(sound)).length;
-  assert.equal(cs.length, 2);
+  assert.equal(cs.length, count);
   assert.ok(cs.every((c) => c.seed === cs[0].seed && c.gain === cs[0].gain), 'one seed, one gain');
-  const [a, b] = cs.map((c) => Math.round((beat(c.beat) + (c.offset ?? 0)) * SR)), A = L.slice(a, a + n);
-  assert.deepEqual(L.slice(b, b + n), A);
+  const [a, ...rest] = cs.map((c) => Math.round((beat(c.beat) + (c.offset ?? 0)) * SR)), A = L.slice(a, a + n);
+  for (const b of rest) assert.deepEqual(L.slice(b, b + n), A);
   console.log(`    ${cs.map((c) => `${c.beat}${c.offset ? (c.offset > 0 ? '+' : '') + c.offset : ''}@${(beat(c.beat) + (c.offset ?? 0)).toFixed(2)}s`).join(', ')}; ${n} samples each, peak ${peakOf(A).toFixed(4)}`);
 });
 ok('every bed cue with a length sounds at both ends of its own span', () => {

@@ -122,13 +122,14 @@ export function reminderInsert({ PALETTE }: Pick<ShotCtx, 'PALETTE'>, { body, ki
     },
   };
 }
-const BLOB_R = { start: 0.012, gulp1: 0.018 };            // METER.birth → METER.gulp1 (README §1, v4: 1.5×)
+const BLOB_R = { start: 0.005, gulp1: 0.010 };            // v11 (docs/notes/v11-beats.md): the drop → 0.8× v10's birth on the alt-tab
 // v3-readability: the light now sits at the *open* screen's centre (v3 lit from the closed lid's, S ≈ 2.5 in practice),
 // so the shadow is the 4.33× the v3 note asked for; pulled back again so the gulp's 5.4 units stay in frame.
 const CAM: CamKey = { pos: [0.068, 0.088, 0.47], look: [0.068, 0.056, 0.012] };
 const FOCUS: Key<number>[] = [[6.0, 0.455], [7.0, 0.47]];                 // blob → wall over 6–7 (v8: after the gulp, with its glance up), eased, on 1s
 // v4: the gulp is now 1 → 1.5×, so at v3's S 4.33 the swollen shadow (6.5 units) ran out of the top and right of frame. The light is re-solved to keep
 // v3's 5.4 units after the gulp, which fit: S = 5.4 · 0.012 / 0.018 = 3.6, so SCREEN_Z = S · B.z / (S − 1) = 0.0208. Before the gulp it is 3.6 units.
+// v11: the light stays where v10 put it (S 3.6); the shadow follows the smaller body, 1.5 units before the gulp and 3.0 after.
 const SCREEN_Z = 3.6 * B[2] / (3.6 - 1);
 const SPOT_I = 0.022, FILL_K = 0.15, SUN_K = 0.35, SUN_SCALE = 0.8 * 0.03, SUN_SCALE_OFF = 0.8 * 0.3;   // v3: after the wake the window drops from 30% to 3% so the shadow goes dark, not pink
 const AMB_K = 0.2, AMB_K_OFF = 0.55;                                        // v3: ambient trimmed so the shadow is the darkest thing on the wall
@@ -274,10 +275,13 @@ export async function build(ctx: ShotCtx) {
       // The Exam: open on him; side toward the screen at 1.08; back on him for the flinch (5.0). Gulp 1 (5.5, v8; v7 4.5):
       // squash 0.3 eyes closed on 5.417, snap to 1.5× stretched on 5.5, settled by 5.75. Then v7's glance up-right at its
       // own shadow (7.0–8.5, after the gulp now: it leads the eye to the rule), back on him, one held blink at 9.25.
+      // v9 (v9-beats §2): `plead` up at him from 5.67 until the glance; the blink at 9.25 is two drawings (9.25–9.42).
       let eyesB = 'open', look = 1, squash = 0;
       if (f >= 13 && f < 60) { eyesB = 'side'; look = -1; }
+      // v9: after the gulp it pleads up at him while he alt-tabs (5.67–6.92): "please don't".
+      if (f >= GULP + 2 && f < 84) eyesB = 'plead';
       if (f >= 84 && f < 102) eyesB = 'side';
-      if (f === GULP - 1 || f === 111) { squash = f === GULP - 1 ? 0.3 : 0; eyesB = 'closed'; }
+      if (f === GULP - 1 || f === 111 || f === 112) { squash = f === GULP - 1 ? 0.3 : 0; eyesB = 'closed'; }   // v9: the blink is two drawings
       const grown = f >= GULP, tg = F(f) - F(GULP);
       if (grown && f < GULP + 3) squash = -0.2 * Math.exp(-6 * tg) * Math.cos(18 * tg);   // settles by 5.75
       const r = grown ? BLOB_R.gulp1 : BLOB_R.start;

@@ -72,11 +72,11 @@ export function runParts(g: CanvasRenderingContext2D, s: string, px: number, x0:
     const w = q === '∫' ? px * 0.42 : g.measureText(q).width; out.push({ s: q, w, x }); x += w; });
   return out;
 }
-export function drawInt(g: CanvasRenderingContext2D, x: number, y: number, px: number) {   // baseline y; a slanted stem with a hook at each end
+export function drawInt(g: CanvasRenderingContext2D, x: number, y: number, px: number, ink = INK) {   // baseline y; a slanted stem with a hook at each end
   const h = px, w = px * 0.3;
   g.beginPath(); g.moveTo(x + 0.02 * w, y + 0.2 * h); g.quadraticCurveTo(x + 0.35 * w, y + 0.32 * h, x + 0.55 * w, y + 0.02 * h);
   g.lineTo(x + 0.95 * w, y - 0.72 * h); g.quadraticCurveTo(x + 1.2 * w, y - 1.0 * h, x + 1.55 * w, y - 0.8 * h);
-  g.lineWidth = px * 0.075; g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = INK; g.stroke();
+  g.lineWidth = px * 0.075; g.lineCap = 'round'; g.lineJoin = 'round'; g.strokeStyle = ink; g.stroke();
 }
 export const BLOB_AT = [-0.002, 0.098];                   // the page-corner mark (x, z): 2 mm in from 0.000 so it sits on the exam desk's top
 // Camera P: high over the lower page (problem 3 and the working), tilted 18° off vertical toward camera so the blob,
@@ -340,8 +340,10 @@ export async function build(ctx: ShotCtx) {
       page.setInk(fl);
 
       // The Exam: dozing, eyes open on him at 3.0, meets his look and stretches on the smile, calm, then the shrink.
+      // v9 (v9-beats §2): calm and `open` from the first frame (not dozing), with one two-drawing blink as the exam
+      // starts on his page (3.25, the first drawing after the cut to the page).
       const solved = tc >= B.testSolved - 1e-6, s = solved ? BLOB_R.testSolved / BLOB_R.start : 1;
-      let eyes = tc < B.testRecognise ? 'closed' : 'open', squash = 0, look1 = -1;
+      let eyes = tc >= 3.25 && tc < 3.25 + 1 / 6 ? 'closed' : 'open', squash = 0, look1 = -1;
       if (inT3 && tc >= 5.333) eyes = 'side';
       if (tc >= B.testSmile && tc < 6.0) squash = -0.1;
       if (solved) squash = 0.3 * Math.exp(-6 * (tc - B.testSolved)) * Math.cos(18 * (tc - B.testSolved));

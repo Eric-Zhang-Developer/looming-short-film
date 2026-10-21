@@ -15,8 +15,15 @@ const EYE_X = 0.42, EYE_DROP = 0.92, EYE_R = 0.2;   // in radius units, measured
 // outward (tired), −2 disc under a level lid, slid toward `look` (side-glance). The lidded shapes are negative so the
 // catchlight test (shape < 0.5) keeps them, and their GLSL compiles only while one is showing (EYE_LIDS): any extra
 // live code in the field shader moves a few pixels by 1/255 on this GPU, and s13's frames must stay bit-identical.
-const EYES: Record<string, number[]> = { open: [0, 1, 0], closed: [1, 1, 0], worried: [0, 0.68, 0.15], tired: [-1, 1, -0.04], gasp: [0, 1.35, 0.08], side: [-2, 1, 0] };
+// v9 (docs/notes/v9-beats.md §2), the moods: −3 blank (a full disc whose catchlight ignores the light: a force, not a
+// creature; the caller sets wobble 0), −4 plead (bigger, gaze up, lids high at the inner corners and tilted down to the
+// outer), −5 sad (heavy lids, a deeper outer droop than tired, gaze down), −6 shy (a lower lid up a third, gaze down
+// and slid toward `look`, which the caller points away from him), −7 sleepy (a level lid two-thirds down). Their GLSL
+// sits behind a second gate (EYE_MOODS) inside the first, so a shot showing only tired or side compiles what v8 did.
+const EYES: Record<string, number[]> = { open: [0, 1, 0], closed: [1, 1, 0], worried: [0, 0.68, 0.15], tired: [-1, 1, -0.04], gasp: [0, 1.35, 0.08], side: [-2, 1, 0],
+  blank: [-3, 1, 0], plead: [-4, 1.15, 0.06], sad: [-5, 1, -0.05], shy: [-6, 1, -0.06], sleepy: [-7, 1, 0] };
 const SIDE_SHIFT = 0.2;    // how far `side` slides both eyes toward `look`, radius units
+const SHY_SHIFT = 0.12;    // how far `shy` slides them (a glance away, smaller than side's)
 // Painted highlight: one tapered brush stroke along the upper-left shoulder, an arc about the body ball's centre
 // HI_IN inside the outline (radius units), centred on the ray at HI_A and HI_SPAN radians either side, HI_W at its
 // thickest. Tied to the outline, not the eyes, so it sits up and left of them in every eye state and can't land
@@ -47,6 +54,16 @@ float eyeDist(vec2 p, vec4 e) {
   vec2 q = p - e.xy;
 #ifdef EYE_LIDS
   if (e.w < -0.5) {
+#ifdef EYE_MOODS
+    if (e.w < -2.5) {
+      float disc = length(q) - e.z;
+      if (e.w > -3.5) return disc;                                                                   // blank
+      if (e.w > -4.5) return max(disc, dot(q, normalize(vec2(0.8 * sign(e.x), 1.0))) - 0.5 * e.z);  // plead: outer corners down
+      if (e.w > -5.5) return max(disc, dot(q, normalize(vec2(0.6 * sign(e.x), 1.0))) + 0.3 * e.z);   // sad: heavier than tired
+      if (e.w > -6.5) return max(disc, -q.y - 0.3 * e.z);                                            // shy: the lower lid up a third
+      return max(disc, q.y + 0.33 * e.z);                                                            // sleepy: level, two-thirds down
+    }
+#endif
     // tired: the lid is down to just above the middle and droops toward the outer corner; side: a level lid a third down
     float lid = e.w > -1.5 ? dot(q, normalize(vec2(0.35 * sign(e.x), 1.0))) - 0.15 * e.z : q.y - 0.4 * e.z;
     return max(length(q) - e.z, lid);
@@ -118,7 +135,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
 
   const mat = new THREE.ShaderMaterial({
     uniforms,
-    defines: { EYE_LIDS: false },
+    defines: { EYE_LIDS: false, EYE_MOODS: false },
     side: THREE.DoubleSide,     // the shadow pass renders the flipped side; double keeps the plane in the light's view
     alphaToCoverage: true,      // soft edge without transparency sorting (the stage renders with MSAA)
     vertexShader: /* glsl */`
@@ -192,6 +209,9 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
         vec3 eyeCol = paint;
         // A catchlight on the light's side of each open eye, so it reads as an eye and not a hole.
         vec4 ce = p.x < 0.5 * (uEye[0].x + uEye[1].x) ? uEye[0] : uEye[1];
+#ifdef EYE_MOODS
+        if (abs(ce.w + 3.0) < 0.5) lp = normalize(vec2(-0.6, 0.8));   // blank: the catchlight stays put whatever the light does
+#endif
         float cd = length(p - ce.xy - lp * 0.45 * ce.z) - 0.22 * ce.z;
         eyeCol += (1.0 - step(0.5, ce.w)) * clamp(-cd / fwidth(cd) + 0.5, 0.0, 1.0) * (vec3(0.6) + lit);
         gl_FragColor = vec4(mix(ink, eyeCol, eye), alpha);
@@ -215,7 +235,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
 
   // Shadow: the stock depth material with the same field discarding outside the outline and inside the eyes.
   const depth = new THREE.MeshDepthMaterial();
-  depth.defines = { EYE_LIDS: false };
+  depth.defines = { EYE_LIDS: false, EYE_MOODS: false };
   depth.onBeforeCompile = (shader) => withField(shader, ` if (bp.y < uFloor || field(bp) < ${T} || eyesDist(bp) < 0.0) discard;`);
   depth.customProgramCacheKey = () => 'looming-blob';
   mesh.customDepthMaterial = depth;
@@ -227,7 +247,7 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     const m = new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false,
       polygonOffset: true, polygonOffsetFactor: -1, polygonOffsetUnits: -1 });
     m.userData.soft = { value: soft };
-    m.defines = { EYE_LIDS: lidded };
+    m.defines = { EYE_LIDS: lidded, EYE_MOODS: moods };
     shaders.push(m);
     m.onBeforeCompile = (sh) => {
       withField(sh, `const float hh = 0.01;
@@ -296,9 +316,9 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     uniforms.uFalloff.value.set(key.distance || 0, key.decay ?? 2);
   };
 
-  // Every material running the field; update() flips EYE_LIDS on all of them when a lidded eye comes or goes.
+  // Every material running the field; update() flips EYE_LIDS (and EYE_MOODS) on all of them when a lidded eye comes or goes.
   const shaders: THREE.Material[] = [mat, depth];
-  let lidded = false;
+  let lidded = false, moods = false;
 
   function update(tLocal: number, { squash = 0, wobble = 1, eyes = 'open', look = 1, key = null, left }: { squash?: number, wobble?: number, eyes?: string, look?: number, key?: THREE.Light | null, left?: number } = {}) {
     keyOverride = key;
@@ -318,10 +338,10 @@ export function createBlob({ radius = 0.025, seed = 1 } = {}) {
     uniforms.uScale.value.set(sx, sy);
 
     if (!Object.hasOwn(EYES, eyes)) throw new Error(`blob: unknown eyes '${eyes}' (${Object.keys(EYES).join(', ')})`);
-    const [shape, size, lift] = EYES[eyes], er = EYE_R * size, dx = shape === -2 ? SIDE_SHIFT * look : 0;
-    if (lidded !== shape < 0) {
-      lidded = shape < 0;
-      for (const m of shaders) { m.defines!.EYE_LIDS = lidded; m.needsUpdate = true; }
+    const [shape, size, lift] = EYES[eyes], er = EYE_R * size, dx = shape === -2 ? SIDE_SHIFT * look : shape === -6 ? SHY_SHIFT * look : 0;
+    if (lidded !== shape < 0 || moods !== shape < -2.5) {
+      lidded = shape < 0; moods = shape < -2.5;
+      for (const m of shaders) { Object.assign(m.defines!, { EYE_LIDS: lidded, EYE_MOODS: moods }); m.needsUpdate = true; }
     }
     [-1, 1].forEach((side, i) => {
       const x = side * EYE_X * sx;   // height from the unshifted spot, so a side glance keeps the eyes level

@@ -276,13 +276,16 @@ export const firing = (t: number, from: number, inSec: number) => {
 
 // ---------- s02 ----------
 const ID = 's02';
-const BLOB_R = { start: 0.012 };                  // METER.birth (README §1); the bead and perch are mesh scales on it
+// v11 (docs/notes/v11-beats.md): born a drop, r 0.005 (0.4× v10's birth, about 1 cm). The bead, run and perch stay mesh
+// scales on it, so the whole birth is v10's at 0.42 scale: same character, eyes and all.
+const BLOB_R = { start: 0.005 };
 const BEAD = 0.17, RUN = 0.36, PERCH = 0.4;   // mesh scales: the real-size planner is smaller than the spec's, so the run gathers less
 const C = DESK.cal, [FX, FY] = C.friXY;
 const BEAD_AT = FY - 0.0054;                      // on the circle's bottom line, under the words
-const LIP_Y = C.y0 + 0.0005 + 0.012 * PERCH;        // the perched drop's centre: sitting on the curl
+const LIP_Y = C.y0 + 0.0005 + BLOB_R.start * PERCH;        // the perched drop's centre: sitting on the curl
 const LAND = [FX, 0, 0.008];                      // contact point under the lip
 const HOP1 = [0.036, 0, 0.0115];
+const HOP_H = 0.008 * BLOB_R.start / 0.012;          // v11: v10's 8 mm arc, scaled with the drop
 export const B = [0.030, 0, 0.015];                // s03's mark: S = screenZ / (screenZ − 0.015) = 3.0
 // Cameras: W (the desk wide), I (face-on insert on Friday). Push W → I over 1.5–3.5, cut back to W at 7.083.
 const CAM_W = { pos: [0.004, 0.062, 0.40], look: [0.004, 0.030, 0.012] };
@@ -312,6 +315,10 @@ export function examAt(t: number): ExamState | null {
     const s = f < 74 ? lerp(RUN, PERCH, (f - 72) / 2) : PERCH;
     let squash = f < 74 ? 0.3 : 0.3 * spring(tc, 6.0), eyes = f < 74 ? 'closed' : 'open', look = 1;
     if (f >= 76 && f < 81) squash = -0.15;                                             // 6.33: stretches up at the words
+    // v9: newborn and curious. It glances along the calendar (6.33), then the first slow blink: half down (6.42), shut
+    // for two drawings, half up (6.67); then to him as v8 (6.75).
+    if (f === 76) eyes = 'side';
+    if (f >= 77 && f < 81) eyes = f === 77 || f === 80 ? 'sleepy' : 'closed';
     if (f >= 81) { eyes = 'side'; look = -1; squash = 0; }                             // 6.75: looks toward him
     if (f >= 84) squash = 0.2;                                                         // 7.00: lets go
     return { space: 'page', y: LIP_Y, s, squash, eyes, look };
@@ -319,14 +326,15 @@ export function examAt(t: number): ExamState | null {
   if (f < 89) return { space: 'fall', k: easeIn((tc - F(85)) / F(4)), s: PERCH, squash: -0.35, eyes: 'open' };   // 7.083–7.42
   const land = { space: 'desk' as const, x: LAND[0], z: LAND[2], lift: 0, eyes: 'open', look: -1 };
   if (f < 93) return { ...land, s: PERCH, squash: f === 89 ? 0.6 : 0.6 * spring(tc, F(88)) };
-  if (f < 99) return { ...land, s: kf(tc, [[F(93), PERCH], [F(97), 1.08], [F(99), 1]], easeOut), squash: 0 };   // 7.75–8.25
+  // v9: the second slow blink as it swells on the desk, looking at him (7.83–8.17)
+  if (f < 99) return { ...land, s: kf(tc, [[F(93), PERCH], [F(97), 1.08], [F(99), 1]], easeOut), squash: 0, eyes: f === 94 || f === 97 ? 'sleepy' : f === 95 || f === 96 ? 'closed' : 'open' };   // 7.75–8.25
   // 8.25–9.83: two hops (0.79 s each): antic squash 0.25 (2 drawings), airborne on an 8 mm arc with stretch −0.15,
   // land squash 0.3, settle. Targets reached at 9.04 and 9.83.
   const hop = f < 109 ? 0 : 1, k = f - (hop ? 109 : 99), done = f >= 118;
   const [x0, , z0] = hop ? HOP1 : LAND, [x1, , z1] = hop ? B : HOP1;
   const p = done ? 1 : k < 2 ? 0 : Math.min(1, (k - 1) / 5);
   const squash = done ? 0 : k < 2 ? 0.25 : k < 6 ? -0.15 : k === 6 ? 0.3 : k === 7 ? -0.08 : 0.03;
-  return { space: 'desk', x: lerp(x0, x1, p), z: lerp(z0, z1, p), lift: p > 0 && p < 1 ? 0.008 * Math.sin(Math.PI * p) : 0,
+  return { space: 'desk', x: lerp(x0, x1, p), z: lerp(z0, z1, p), lift: p > 0 && p < 1 ? HOP_H * Math.sin(Math.PI * p) : 0,
     s: 1, squash, eyes: 'open', look: -1 };
 }
 
@@ -408,7 +416,8 @@ export async function build(ctx: ShotCtx) {
   const trail = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ color: PALETTE.ink,
     alphaMap: exam.stain.material.alphaMap, transparent: true, depthWrite: false }));
   scene.add(trail);
-  const glint = new THREE.Mesh(new THREE.CircleGeometry(0.0003, 12), new THREE.MeshBasicMaterial({ color: PALETTE.cream }));
+  const GK = R / 0.012;   // v11: the glint scales with the drop
+  const glint = new THREE.Mesh(new THREE.CircleGeometry(0.0003 * GK, 12), new THREE.MeshBasicMaterial({ color: PALETTE.cream }));
   scene.add(glint);
 
   // Key: the morning window, off right (dawnLight, k 0.35). Fill: ambient, plus a dim face fill for him.
@@ -474,7 +483,7 @@ export async function build(ctx: ShotCtx) {
 
       // One-frame glint on the bead at 5.0 (the 24 fps frame on the beat).
       glint.visible = !!at && Math.round(t * 24) === 120;
-      if (glint.visible) glint.position.set(at!.x - 0.0005, at!.y + 0.0006, at!.z + 0.0025);
+      if (glint.visible) glint.position.set(at!.x - 0.0005 * GK, at!.y + 0.0006 * GK, at!.z + 0.0025);
     },
   };
 }

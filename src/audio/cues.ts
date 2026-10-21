@@ -9,6 +9,10 @@
 // beat is still hung on beats and moves when they move. Sources: doc 05's v4 table and docs/shots/sNN.md §Sound (the v4 cut, 3:15).
 // The music stem (score.ts) is not placed here.
 import { beat, DURATION, S13_DESKS } from '../timeline.ts';
+// v11: every act of avoidance gulps (docs/notes/v11-beats.md). Each gets the swallow here and score.ts's two
+// falling notes; the new ones borrow a neighbour's step (k), so the
+// four numbered gulps keep their pitches and the fall still runs 1 → 4 across the film.
+export const EXTRA_GULPS: [string, number][] = [['gulpFridge', 1], ['gulpGame', 2], ['gulpReel1', 2], ['gulpReel2', 2], ['gulpReel3', 3]];
 
 type Point = [string, number?];
 type Stem = 'foley' | 'ambience' | 'music';
@@ -20,7 +24,12 @@ const AMB = 'ambience';
 const START: Point = ['notifyBuzz', -beat('notifyBuzz')];                // 0:00. s00's only beat
 const S01: Point = ['notifyBuzz', 4 - beat('notifyBuzz')];                // 0:04, s01 has no beat of its own
 const S18: Point = ['examCrossedOff', -2];                                 // 2:55, s18 @ 0
-const END: Point = ['tagPenUncap', DURATION - beat('tagPenUncap')];        // 3:15
+const END: Point = ['stingBuzz', DURATION - beat('stingBuzz')];            // 3:47, the film's last sample
+// v8's end, 3:30. s18's beds still stop here, as in v8, and not at the cards (3:31): a bed is synthesized for its length,
+// so moving its end would change every sample of it back to its start (paperBoil's runs from 1:17). The second of black
+// before the title is silent, which the fade wants anyway.
+const V8_END: Point = ['tagPenUncap', 210 - beat('tagPenUncap')];
+const S23: Point = ['stingBuzz', -0.3];                                   // 3:44, the sting: his room again
 // Doc 05: every lamp click is dry and exposed. Beds stop on it and come back after its window (the music stem does the
 // same in score.ts), which is also what keeps the three clicks identical in mix.wav. A lamp click is 0.3 s.
 const ON = (b: string): Point => [b, 0.3];
@@ -64,7 +73,8 @@ export const CUES: Cue[] = [
   bed('paperBoil', AMB, START, ['lampClickHome'], 1),
   bed('paperBoil', AMB, ON('lampClickHome'), ['lampOffHome'], 1),
   bed('paperBoil', AMB, ['lampOffHome', 0.17], ['lampOn'], 1),
-  bed('paperBoil', AMB, ON('lampOn'), END, 1),
+  bed('paperBoil', AMB, ON('lampOn'), V8_END, 1),
+  bed('paperBoil', AMB, S23, END, 1, { seed: 2 }),
   // Room tone: s00 at its lowest, s01-s03 morning, then 3 dB down from laptopUp; the lobby's warm hush from lightFlood
   // (very faint) to Quiet 2; Quiet 2; s18's home.
   bed('roomTone', AMB, START, S01, 0.4),
@@ -72,7 +82,9 @@ export const CUES: Cue[] = [
   bed('roomTone', AMB, ['laptopUp'], ['fridge'], 0.7),
   bed('roomTone', AMB, ['lightFlood'], ['quiet2Start'], 0.5),
   bed('roomTone', AMB, ['quiet2Start'], ['examRoom'], 1),
-  bed('roomTone', AMB, S18, END, 1),
+  bed('roomTone', AMB, S18, V8_END, 1),
+  // v9: the cards play over the piano alone (s20 is read in silence but for its last chord); the sting is his room at night.
+  bed('roomTone', AMB, S23, END, 1, { seed: 2 }),
   // v4, new: the night room (nightHum, a darker room tone) in bed (s07), very low at 3 a.m. (s08) and through the choice
   // (s09a), out for the nightstand lamp's click, to the door. Then the hall (hallHum: +6 dB over 0.5 s on doorOpen) to the
   // walk, the campus night air to the light, and the lobby's distant fluorescent hum at -24 dB from the light to the exam room.
@@ -154,6 +166,7 @@ export const CUES: Cue[] = [
   // The blob's gulps (doc 05): a soft inkDrip swallow at -18 dB under the score's two notes, one per gulp (v8: four, the
   // fourth s16's relapse).
   ...[1, 2, 3, 4].map((k) => ({ beat: `gulp${k}`, sound: 'inkDrip', gain: 0.126, seed: 20 + k })),
+  ...EXTRA_GULPS.map(([b], i) => ({ beat: b, sound: 'inkDrip', gain: 0.126, seed: 40 + i })),   // v11's new gulps
   // s07: the thumb's scroll ticks, -22 dB, seeded per flick. v7: one per reel, on its cut (REELS), where the picture's
   // flicks are too (was every 0.75 s). No clock tick under s07, though its second hand moves from 48.0: the tick's first
   // close appearance is s08's, on the frame the music goes out.
@@ -252,6 +265,7 @@ export const CUES: Cue[] = [
   // s17b: one soft cough across the room before he recognises the test; the pen on the test, steady.
   { beat: 'examRoom', offset: 1.6, sound: 'cough', gain: 0.5 },
   bed('penScratch', 'foley', ['testSolved', -3.0], ['testSolved', -0.1], 0.4, { seed: 9 }),
+  bed('penScratch', 'foley', ['tagPenUncap', 230 / 12 - 16.5], ['tagPenUncap', 3.5], 0.5, { seed: 12 }),   // v10: the problem under the "1." (s18 19.17–20.0)
   // s17c: the paper slide when the grade comes back, a short flip of the page, one soft finger tap.
   { beat: 'gradeSlide', sound: 'paperSlide', gain: 0.7 },
   { beat: 'gradeSlide', offset: 0.83, dur: 0.5, sound: 'paperRustle', gain: 0.4, seed: 11 },
@@ -269,6 +283,15 @@ export const CUES: Cue[] = [
   { beat: 'tagPenUncap', sound: 'penUncap', gain: 0.7 },
   { beat: 'tagPenUncap', offset: 1.25, sound: 'inkDrip', gain: 0.3, seed: 32 },               // v6-ending: the drop lands on the nib (s18 17.75), a soft plip
   { beat: 'tagPenUncap', offset: 1.917, sound: 'penStroke', dur: 0.42, gain: 0.45, seed: 6 },  // v6-ending: "1." in its ink (18.42–18.83)
+  // ───────── v9-ending (docs/notes/v9-beats.md §1) ─────────
+  // A card tap on each card's hard cut (s19-s22): the film's cardstock thud, s09a's level, its own seed per card.
+  ...['titleCard', 'senecaCard', 'creditCardA', 'creditCardB'].map((b, k) => ({ beat: b, sound: 'cardTap', gain: GAIN.cardTap, seed: 60 + k })),
+  // s23, the sting: s00's buzz (the same buffer, so the film's first sound is its last joke), then s16's Reel from its
+  // build (the same clip and in-point, through the phone band), cut dead on the face-down flip, which is s16's card tap
+  // (phoneDownLib's seed). The clip starts as the buzz's 0.33 s ends, so the buzz stays sample-identical to s00's.
+  { beat: 'stingBuzz', sound: 'phoneBuzz', gain: 0.7 },
+  { beat: 'stingBuzz', offset: 0.35, dur: beat('stingFlip') - beat('stingBuzz') - 0.35, sound: 'clip', file: 'DepVdpeJdCN', in: 1.05, gain: dB(-24) },
+  { beat: 'stingFlip', sound: 'cardTap', gain: GAIN.cardTap, seed: 2 },
   // ───────── snd-foley-2 ─────────
   // s04 (v7-fridge): the fridge loop's door, from sounds already here, mirroring s04.ts OPENS. Open at 0.17, 2.5, 4.67: the
   // seal peeling and the door swinging to its stop (paperSlide), the jars in the door ticking together. Shut at 1.58, 3.83:
@@ -290,7 +313,7 @@ export const CUES: Cue[] = [
   // taps (0.3 s in) carry the gaming to the cut; s06 resumes the taps half a second after gulp2, as v7. s05's TV is Minecraft
   // (re-recorded with the music off): its dense run of hits (8.3-12 s in) mid-shot; it replaces the TV's bloops and win
   // jingle, and stops 1 s before s06's lamp click (closer, the master limiter's release reaches the click and the three clicks stop matching). In-points by spectrogram and onsets; nobody has listened yet. The +6 dB as v7: s05's groove and s06's run hotter.
-  ...([['cs2_ak', 8.7, 'gulp1', 0, 2, 0], ['cs2_ak', 0.25, 'gulp1', 2, 4.5, 0], ['minecraft', 3.4, 'gameNight', 0, 6.5, 6],
+  ...([['cs2_ak', 8.7, 'gulp1', 0, 2, 0], ['cs2_ak', 0.25, 'gulp1', 2, 4.5, 0], ['minecraft', 3.2, 'gameNight', 0, 6.5, 6],
     ['cs2_ak', 1.6, 'gulp2', 0.5, 4.0, 6]] as [string, number, string, number, number, number][])
     .map(([file, inSec, b, from, to, up]) => ({ beat: b, offset: from, dur: to - from, sound: 'clip', file, in: inSec, gain: GAIN.cs2 * dB(up) })),
 ];

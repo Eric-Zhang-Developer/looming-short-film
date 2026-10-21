@@ -25,7 +25,9 @@ import type { ShotCtx } from '../film.ts';
 import type { Palette, MatOpts } from './s02.ts';
 
 const ID = 's04', DEG = Math.PI / 180;
-const BLOB_R = { start: 0.018 };                               // METER.gulp1 (README §1, v4): 1.5× all shot
+// v11 (docs/notes/v11-beats.md): the fridge feeds it too. 0.8× of v10's birth, one gulp on the third open (gulpFridge 5.5) → 1.25×.
+const BLOB_R = { start: 0.010, gulpFridge: 0.015 };
+const GULP = 66;                                              // gulpFridge, 5.5 (drawing): the light's been on 0.83 s, he leans in at 6.0
 const CAM = new THREE.Vector3(-0.092, 0.068, 0.86), LOOK = new THREE.Vector3(-0.092, 0.072, 0);   // below the ceiling, pitched up ~0.3°: sink at the left edge, fridge at the right
 const CEIL = 0.13;
 const COUNTER_Y = 0.0495;                                     // 91 cm: the counter_run's painted top
@@ -46,8 +48,10 @@ const HAND_DZ = 0.013;                                        // near arm +0.012
 // v4: the blob is 1.5× (r 0.018) but the wall shadow keeps the spec's 4.0 → 4.5 → 5.2 units (README §1: units = S · r / 0.012). The light
 // stays at the fridge mouth, so each mark's depth is solved from its units: S = units · 0.012 / r, z = L.z · (1 − 1 / S).
 // (G4/v3 had z 0.19 → 0.20 → 0.21 for the 1.25× blob.) x is unchanged, so the shadow sits a little further right than before.
-const UNITS = [4.0, 4.5, 5.2];
-const MARK_Z = UNITS.map((u) => L.z * (1 - BLOB_R.start / (u * 0.012)));
+// v11: the marks stay where v10 solved them for its r 0.018 (S 2.67 → 3.0 → 3.47); the shadow now follows the body by the light
+// alone: 2.2 → 2.5 → 2.9 units, and 4.3 after the gulp.
+const UNITS = [4.0, 4.5, 5.2], V10_R = 0.018;
+const MARK_Z = UNITS.map((u) => L.z * (1 - V10_R / (u * 0.012)));
 const STOOL_Z = MARK_Z[0] - 0.001;                              // stool cut 1 mm behind the blob's first mark (v3: 0.189 for 0.19), so the blob is never behind it
 // v7 timing (local s, on 2s). OPENS: [door starts to open, door shut]. The door takes two drawings each way; the light is
 // on whenever the door is off its seal. The shot opens on two dark drawings so the first open shows the rule; the third holds to the cut.
@@ -330,15 +334,24 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       rig.face({ eyes: 'open', mouth: 'neutral' });
       rig.boil(t, 10);
 
-      // Exam: scoots on 2s while the door is shut, squash 0.2 for the drawing it lands on; eyes on him throughout.
+      // Exam: scoots on 2s while the door is shut, squash 0.2 for the drawing it lands on. v9: worried, growing; a side
+      // glance at him on each scoot and the second after it lands, and one blink (5.5, two drawings): fewer than s02's.
       const [bx, bz] = kf(T, BLOB);
       exam.mesh.position.set(bx, SEAT_Y, bz);
-      const squash = LANDS.some((l) => F === fr(l)) ? 0.2 : 0;
-      exam.update(t, { squash, wobble: 1, eyes: 'side', look: 1, key: spot });
+      // v11: gulpFridge (5.5) replaces v9's blink there: squash 0.3 eyes closed on 5.417, snap to 1.25× stretched on 5.5, settled by
+      // 5.75 (s03's gulp1), wobble down for a second, `plead` at him 5.67–6.17 (v9's map: after each gulp), then worried again.
+      const grown = F >= GULP, tg = (F - GULP) / 12, r = grown ? BLOB_R.gulpFridge : BLOB_R.start;
+      let squash = LANDS.some((l) => F === fr(l)) ? 0.2 : 0;
+      if (F === GULP - 1) squash = 0.3;
+      if (grown && F < GULP + 3) squash = -0.2 * Math.exp(-6 * tg) * Math.cos(18 * tg);
+      const glance = BLOB.some(([k], i) => i % 2 === 1 && F >= fr(k) && F < fr(k) + 14);
+      const eyes = F === GULP - 1 ? 'closed' : F >= GULP + 2 && F < GULP + 8 ? 'plead' : glance ? 'side' : 'worried';
+      exam.mesh.scale.setScalar(r / BLOB_R.start);
+      exam.update(t, { squash, wobble: grown && F < GULP + 12 ? 0.8 : 1, eyes, look: 1, key: spot });
       exam.mesh.updateMatrixWorld();
 
       // Key aimed along L → blob centre to its wall hit (aim() at the blob first so its frustum holds it).
-      B.set(bx, SEAT_Y + BLOB_R.start, bz);
+      B.set(bx, SEAT_Y + r, bz);
       hitW.copy(B).sub(L).multiplyScalar(L.z / (L.z - B.z)).add(L);
       aim(spot, exam.mesh);
       spot.shadow.camera.near = 0.004;

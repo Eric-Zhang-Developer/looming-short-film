@@ -5,6 +5,11 @@
 // grade and closes its eyes, content. v4: 3.0 cuts to a close-up on the painted heads (README §12), his profile in the
 // exam room's top light: the still beat, eyes wide (surprised_smile), then the grin (pride) on gradeGrin 4.0. v8: the
 // grin holds 1 s (was 2); 5.0 cuts back to P, and his fingertip taps the 94 once at 5.25.
+// v9 (docs/notes/v9-beats.md §3): the grade is 85. The painted 94 is covered with a patch of the page's own paper (sampled
+// from its blank lower margin) and a red 85 is hand-lettered and circled over it in the film's hand (Caveat), with two
+// more red marks on his lines (a minus, a slash) so the lost points show. The CU is relief, not pride: the painted
+// `relief` head (a smile and a breath out) on gradeGrin, his shoulders dropping. The blob looks down at the 85 and closes
+// its eyes on a long exhale squash. The tap lands on the 85.
 // Characters and the paper on 2s, light on 1s, boil 10/s.
 import * as THREE from 'three';
 import { SHOTS } from '../timeline.ts';
@@ -15,7 +20,7 @@ import { tools } from './s02.ts';
 import { kitTools } from './s11.ts';
 import { closeupRig, HEAD_AT } from './s09b.ts';
 import { specPose } from '../characters/poses.ts';
-import { PAGE, CAM_P, BLOB_AT, pageWithInk, flatHand, overheadSpot, loadHand } from './s17b.ts';
+import { PAGE, CAM_P, BLOB_AT, LINES, pageWithInk, flatHand, overheadSpot, loadHand, handFont } from './s17b.ts';
 import type { ShotCtx } from '../film.ts';
 
 const ID = 's17c', DEG = Math.PI / 180;
@@ -26,9 +31,14 @@ const BLOB_R = { start: 0.004 };                          // SHRINK[7]: no chang
 const SPOT_I = 0.2, AMB_K = 0.45, WARM = [0.12, 0.32];    // s17b's overhead; the window fill warms 0.12 → 0.32 over the reveal (≤ 30%)
 const PAGE_H = PAGE.w * 366 / 263;                        // the page's paper height (art px 5…371 over 7…270)
 const SLIDE_FROM = 0.045, SKID = 0.001;                   // the slide starts above frame (−z), overshoots 1 mm, settles
-const NINETY_FOUR: [number, number] = [214, 58];                            // the circled 94 on graded_test, art px (measured on the cut PNG)
+// The circled grade on graded_test, art px (measured on the cut PNG): where the art paints a 94 and v9 letters the 85.
+const GRADE: [number, number] = [214, 58];
+// v9: the paper patch over the painted 94 (an ellipse with a soft edge, art px, solid to PATCH_CORE of its radii) and
+// where its paper comes from: a blank stretch of the same page's lower margin, below the art's problem 3 (his own lines
+// there are on the ink overlay, not in the art), mirrored once vertically so it fills the patch without stretching.
+const PATCH = { rx: 50, ry: 48 }, PATCH_CORE = 0.9, PAPER_SRC = [140, 298, 110, 68];
 
-const CU = [3, 5], TAP = 5.25;                             // the close-up's cut in and out; the tap on the 94 (v8: the grin's hold ends a second sooner)
+const CU = [3, 5], TAP = 5.25;                             // the close-up's cut in and out; the tap on the 85 (v8: the grin's hold ends a second sooner)
 const CU_AT: Vec3 = [0.6, 0, 0];                                  // the CU set, off to the side of the page set
 const CU_HIP: Vec3 = [-0.054, -0.0134, 0.074];                    // s17b's seat at the exam desk
 const CAM_CU: CamKey = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };   // s15's CU framing
@@ -65,7 +75,34 @@ export async function build(ctx: ShotCtx) {
   const flip = new THREE.Group(); pivot.add(flip);
   const front = pageWithInk(T, props, 'graded_test', 'graded_test', { parent: flip });
   front.g.position.set(0, 0, PAGE_H / 2);
-  front.setInk([1, 1, 1]);
+  // v9: the 85, drawn on the ink overlay over his lines (art px × K; the overlay is PAGE.px, the art its own size).
+  // The red: calendarRed drawn on the overlay rendered salmon beside the art's painted checks (the overlay's Lambert plane
+  // lifts it), so the marker is calendarRed taken down to sit with them.
+  const art = props.pieces.graded_test, [PW, PH] = PAGE.px, red = '#' + new THREE.Color(PALETTE.calendarRed).multiplyScalar(0.72).getHexString();
+  front.setInk([1, 1, 1], (g, K) => {
+    // the patch: the margin's paper, mirrored below itself, cut to a soft ellipse, over the 94 and its circle
+    const [sx, sy, sw, sh] = PAPER_SRC, kx = PW / art.width, ky = PH / art.height;
+    const w = 2 * PATCH.rx * K, h = 2 * PATCH.ry * K, pc = Object.assign(document.createElement('canvas'), { width: w, height: h }), q = pc.getContext('2d')!;
+    q.drawImage(art, sx, sy, sw, sh, 0, 0, sw * kx * K, sh * ky * K);
+    q.save(); q.translate(0, 2 * sh * ky * K); q.scale(1, -1); q.drawImage(art, sx, sy, sw, sh, 0, 0, sw * kx * K, sh * ky * K); q.restore();
+    q.globalCompositeOperation = 'destination-in';
+    q.setTransform(1, 0, 0, h / w, 0, 0);
+    const fade = q.createRadialGradient(w / 2, w / 2, 0, w / 2, w / 2, w / 2);
+    fade.addColorStop(0, '#000'); fade.addColorStop(PATCH_CORE, '#000'); fade.addColorStop(1, 'rgba(0,0,0,0)');
+    q.fillStyle = fade; q.fillRect(0, 0, w, w);
+    g.drawImage(pc, (GRADE[0] - PATCH.rx) * K, (GRADE[1] - PATCH.ry) * K);
+    // the 85 and its circle, in red marker, the hand's font; the loop overshoots its start as a hand-drawn circle does
+    g.save(); g.scale(K, K);
+    g.fillStyle = g.strokeStyle = red; g.lineCap = g.lineJoin = 'round';
+    g.font = handFont(48); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.lineWidth = 2.2; g.fillText('85', GRADE[0] + 1, GRADE[1] + 3); g.strokeText('85', GRADE[0] + 1, GRADE[1] + 3);
+    g.lineWidth = 3.2; g.beginPath(); g.ellipse(GRADE[0], GRADE[1] + 1, 34, 30, -0.12, -2.0, -2.0 + 2 * Math.PI + 0.45); g.stroke();
+    // two marks on his working: a minus after line 2, a short slash through line 3's last term
+    g.lineWidth = 2.6; g.beginPath();
+    g.moveTo(LINES[1].x + front.widths[1] + 8, LINES[1].y - 6); g.lineTo(LINES[1].x + front.widths[1] + 19, LINES[1].y - 6);
+    const xs = LINES[2].x + 0.72 * front.widths[2]; g.moveTo(xs - 4, LINES[2].y + 3); g.lineTo(xs + 5, LINES[2].y - 15);
+    g.stroke(); g.restore();
+  });
   front.mesh.receiveShadow = true;   // the paper casts nothing: on edge, its shadow printed a black slab across the table
   const back = T.cut(props, 'blank_page', [PAGE.w, null], 'graded_back', { parent: flip });
   back.g.position.set(0, -0.00006, PAGE_H / 2); back.g.rotation.set(Math.PI / 2, 0, 0);   // faces down
@@ -97,7 +134,7 @@ export async function build(ctx: ShotCtx) {
   const kt = kitTools(ID), cuSet = new THREE.Group(); cuSet.position.set(...CU_AT); scene.add(cuSet);
   T.rect('cu_wall', '#' + C('cream').lerp(C('kraft'), 0.2).getHexString(), [0.6, 0.3], [0, 0.10, -0.02], { parent: cuSet });
   T.rect('cu_desk', '#' + C('kraft').lerp(C('cream'), 0.25).getHexString(), [0.06, 0.05], [0.0, 0, 0.092], { rot: [-Math.PI / 2, 0, 0], weight: 'kraft', parent: cuSet });
-  const cu = await closeupRig(ctx, kt, ['surprised_smile', 'pride'], { seed: 173 });
+  const cu = await closeupRig(ctx, kt, ['surprised_smile', 'relief'], { seed: 173 });
   cu.rig.group.position.set(...CU_HIP); cuSet.add(cu.rig.group);
   cu.rig.group.traverse((o) => { o.castShadow = false; });
   const CU_POSE = specPose({ lean: 12, arm: -26, head: -8, leg: 60, farLeg: 54 });   // s17b's T3 'write': looking down at the page
@@ -107,7 +144,7 @@ export async function build(ctx: ShotCtx) {
   const camLook = new THREE.Vector3();
 
   const nearEdge = new THREE.Vector3(), tap = new THREE.Vector3();
-  pivot.position.copy(P0); front.toWorld(...NINETY_FOUR, tap);   // the 94 at rest: face-up, in place
+  pivot.position.copy(P0); front.toWorld(...GRADE, tap);   // the 85 at rest: face-up, in place
   return {
     update(t: number) {
       T.boil(t); kt.boil(t, 10);
@@ -117,14 +154,15 @@ export async function build(ctx: ShotCtx) {
       else { camera.position.set(...CAM_P.pos); camera.lookAt(...CAM_P.look); }
       fx.set({ focus: close ? CAM_CU.pos[2] - CAM_CU.look[2] : new THREE.Vector3(...CAM_P.pos).distanceTo(new THREE.Vector3(...CAM_P.look)), aperture: close ? 0.008 : 0.002 });
       cuSet.visible = close; cuKey.intensity = close ? CU_KEY : 0; cuAmb.visible = close;
-      // the CU: the still beat, eyes wide, 3.0–4.0 (nothing moves); the grin on gradeGrin with one anticipation drawing
-      // on the outgoing head (3.917); a laugh-breath out and the head up 3° on the grin
+      // the CU: the still beat, eyes wide, 3.0–4.0 (nothing moves); on gradeGrin (the beat keeps v8's name) v9's relief,
+      // not the grin: the painted `relief` head (eyes shut, a small smile, the breath puffing out) after one anticipation
+      // drawing on the outgoing head (3.917), the head dipping 2° and the shoulders dropping 0.5 mm as the breath goes out
       cu.rig.boil(t, 10);
       cu.rig.blend({ s: CU_POSE }, [[0, 's']], tc);
-      const grin = tc >= B.gradeGrin - 1e-6;
-      cu.show(grin ? 'pride' : 'surprised_smile', { antic: !grin && tc >= B.gradeGrin - 1 / 12 - 1e-6 });
-      cu.rig.joints.head.rotation.z += (grin ? 3 : 0) * DEG;
-      cu.holder.position.y = HEAD_AT[1] + (grin && tc < B.gradeGrin + 0.25 ? 0.0006 : 0);
+      const relief = tc >= B.gradeGrin - 1e-6;
+      cu.show(relief ? 'relief' : 'surprised_smile', { antic: !relief && tc >= B.gradeGrin - 1 / 12 - 1e-6 });
+      cu.rig.joints.head.rotation.z -= (relief ? 2 : 0) * DEG;
+      cu.rig.group.position.y = CU_HIP[1] - (relief ? 0.0005 * ease(clamp((tc - B.gradeGrin) / 0.5)) : 0);
 
       const p = paperAt(f);
       pivot.visible = !!p;
@@ -138,7 +176,7 @@ export async function build(ctx: ShotCtx) {
       }
 
       // His hand: it draws the paper in by the near edge from 0.58 (it comes down with the slide), turns it over (1.33–2.33)
-      // and is out by 2.33; back at 3.33 for one tap on the 94. fix-payoff: it used to appear only at the flip, so the paper
+      // and is out by 2.33; back at 3.33 for one tap on the 85. fix-payoff: it used to appear only at the flip, so the paper
       // arrived by itself and read as "handed in?".
       let hv = false;
       if (tc >= 0.5 + 1 / 12 && tc < 2.333) {
@@ -157,12 +195,13 @@ export async function build(ctx: ShotCtx) {
       }
       hand.hand.visible = hv;
 
-      // The Exam (G4's): waiting; startles as the paper slides past; looks down at the 94 (2.0); closes its eyes,
-      // content, and settles lower (2.75), held to the end. The wide eyes and the grin are his now, in the CU.
+      // The Exam (G4's): waiting; startles as the paper slides past; looks down at the 85 (2.0); closes its eyes and
+      // settles lower (2.75), held to the end. v9: relief, not pride: the settle is one long exhale, the squash easing
+      // down over 1.25 s with no bounce (v8 sprang into it).
       let squash = 0, eyes = 'open', look = -1, wobble = 0.6;
       if (tc >= B.gradeSlide && tc < 1.0) squash = 0.2 * Math.exp(-6 * (tc - B.gradeSlide)) * Math.cos(18 * (tc - B.gradeSlide));
       if (tc >= B.gradeReveal) eyes = 'side';
-      if (tc >= 2.75) { eyes = 'closed'; squash = 0.15 + 0.25 * Math.exp(-7 * (tc - 2.75)) * Math.cos(16 * (tc - 2.75)); }
+      if (tc >= 2.75) { eyes = 'closed'; squash = 0.2 * ease(clamp((tc - 2.75) / 1.25)); }
       exam.update(t, { squash, wobble, eyes, look, key: spot });
 
       // Light on 1s: the window fill warms over the reveal (the theme enters resolved here).

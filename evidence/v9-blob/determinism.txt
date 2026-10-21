@@ -1,0 +1,43 @@
+# node tools/determinism.ts --t=<one time per changed shot>, one Chrome each, e15fefb
+t=15.5  b6f0f257f22b85c6 b6f0f257f22b85c6 b6f0f257f22b85c6  PASS
+determinism: PASS
+t=25.25  189b59f41955522c 189b59f41955522c 189b59f41955522c  PASS
+determinism: PASS
+t=34.5  ffe3a626f6fe69c8 ffe3a626f6fe69c8 ffe3a626f6fe69c8  PASS
+determinism: PASS
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=41.5  64dd71695a61959e 64dd71695a61959e 64dd71695a61959e  PASS
+determinism: PASS
+t=47.5  14b0409222c671bc 14b0409222c671bc 14b0409222c671bc  PASS
+determinism: PASS
+t=59  b13fd62d15fbd25d b13fd62d15fbd25d b13fd62d15fbd25d  PASS
+determinism: PASS
+t=66  231b112477d5d254 231b112477d5d254 231b112477d5d254  PASS
+determinism: PASS
+t=77.5  1a87b00f14b53b39 1a87b00f14b53b39 1a87b00f14b53b39  PASS
+determinism: PASS
+t=82  64d9d88ebf101e3d 64d9d88ebf101e3d 64d9d88ebf101e3d  PASS
+determinism: PASS
+t=95  c436875bfe764723 c436875bfe764723 c436875bfe764723  PASS
+determinism: PASS
+t=107  50304f726934fdfb 50304f726934fdfb 50304f726934fdfb  PASS
+determinism: PASS
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=115  bc81cff42f8d3701 bc81cff42f8d3701 bc81cff42f8d3701  PASS
+determinism: PASS
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=156.75  2ee4ae6b9da134b6 2ee4ae6b9da134b6 2ee4ae6b9da134b6  PASS
+determinism: PASS
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+[page] Failed to load resource: the server responded with a status of 404 (Not Found)
+t=171.75  70cd16ffc89d9fe4 70cd16ffc89d9fe4 70cd16ffc89d9fe4  PASS
+determinism: PASS
+t=177.25  e00e8e0ea06e9cb3 e00e8e0ea06e9cb3 e00e8e0ea06e9cb3  PASS
+determinism: PASS
+t=186.5  e57753de6ed7ae08 e57753de6ed7ae08 e57753de6ed7ae08  PASS
+determinism: PASS

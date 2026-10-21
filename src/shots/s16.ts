@@ -4,12 +4,12 @@
 // v8, the relapse (4.75–14.75): after the cross-out he freezes, reaches for the phone (face-down on the desk since s11),
 // turns it up and the Reel plays, hunched over it low at the desk, its cyan on his face from below. The phone is a low,
 // close light, so the blob's shadow is on the wall from the moment it wakes (the rule); gulp4 (9.1) takes the blob
-// 2.5× → 3× on the Reel's bass hit and the cut to the wide W shows the shadow up the wall, huge. He looks up at it, turns
+// (v11: 4.5× → 5×) on the Reel's bass hit and the cut to the wide W shows the shadow up the wall, huge. He looks up at it, turns
 // the phone face down himself (phoneDownLib 10.5), the light and the wall shadow go on that frame, a slow breath, the pen.
 // v4's 4.75–16.0 then plays at 14.75–26.0 (V7() below): the right answer, the check, "That was it?", the montage.
 // Cuts: B′ (0–0.5) · P (0.5–4.75) · B′ (4.75–9.1) · W (9.1–9.75) · B′ (9.75–10.333) · W (10.333–11.0) · B′ (11.0–14.75) ·
 // P (14.75–16.5) · B′ (16.5–19.0) · D (19.0–19.5) · P2 (19.5–21.5) · D (21.5–26). The blob shrinks one step per solved problem, on the solve's drawing:
-// 3 → 1.5 → 1 → 0.75 → 0.58 → 0.42. Both pendants are constant warm spots. Only the blob casts. Characters on 2s; light
+// (v11) 5 → 1.5 → 1 → 0.71 → 0.54 → 0.42. Both pendants are constant warm spots. Only the blob casts. Characters on 2s; light
 // and camera at 24.
 import * as THREE from 'three';
 import { sensorLight, fluorescent, ambient } from '../lights.ts';
@@ -22,7 +22,7 @@ import { BLOB_R as OTHER_R } from '../characters/exam.ts';
 import { POSES, specPose } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { SHOTS } from '../timeline.ts';
-import { UNIT, BLOB_AT, PHONE, PAGE, CAM_B2, practiceSheet, SHEET_INK, penLine } from './s15.ts';
+import { UNIT, BLOB_AT, PHONE, PAGE, practiceSheet, SHEET_INK, penLine } from './s15.ts';
 import { screenHalo } from './s03.ts';
 import { phoneLight, aim } from '../lights.ts';
 import { loadHand } from './s17b.ts';
@@ -40,14 +40,17 @@ const on2s = (t: number) => Math.floor(t * 12 + 1e-4) / 12;   // core onTwos can
 // v8: everything after the relapse is v4's staging on its own clock (V7), ten seconds later.
 const SHIFT = 10, RELAPSE = [4.75, B.rewrite];         // 4.75–14.75
 const V7 = (t: number) => (t >= RELAPSE[1] - 1e-6 ? t - SHIFT : Math.min(t, RELAPSE[0]));   // v4's clock; held at 4.75 in the relapse
-// The meter (README §1). v8: s15 hands over 2.5× (r 0.030, the v4 peak, Q16), so the relapse gulp is the next half step,
-// 3× (r 0.036); the first solve takes it to 1.5×, the film's biggest single drop; then v4's ladder from 1×.
-const BLOB_R = { start: 0.030, gulp4: 0.036, problemOneSolved: 0.018, problemSolved2: 0.012, problemSolved3: 0.009,
-  problemSolved4: 0.007, problemSolved5: 0.005 };
+// The meter (v11, docs/notes/v11-beats.md): s15 hands over 4.5× (r 0.054, taller than him), gulp4 takes it to 5×
+// (0.060), the biggest it ever is; the first solve takes it to 1.5×, the film's biggest single drop; then down to 0.42×.
+const BLOB_R = { start: 0.054, gulp4: 0.060, problemOneSolved: 0.018, problemSolved2: 0.012, problemSolved3: 0.0085,
+  problemSolved4: 0.0065, problemSolved5: 0.005 };
 const STEPS: (keyof typeof BLOB_R)[] = ['problemOneSolved', 'problemSolved2', 'problemSolved3', 'problemSolved4', 'problemSolved5'];
 const SOLVES = STEPS.map((k) => B[k] - SHIFT);         // on v4's clock: 6.5, 11.5, 13, 14, 15
-// Marston mark (s15's, BLOB_DX included) while bigger than 1×; the old page-corner mark from 1× (#2) on (README §1)
-const markOf = (r: number) => (r > 0.012 + 1e-9 ? BLOB_AT(r) : [0, 0, 0.098]);
+// Marston mark (s15's, BLOB_DX included) while bigger than 1×; the old page-corner mark from 1× (#2) on (README §1).
+// v11: while it towers (above 3×) its contact steps back to z BIG_Z, behind every layer of him (0.067–0.086), so his
+// snout and the phone hand pass in front of it instead of through it; the snap at the first solve brings it forward.
+const BIG_Z = 0.060;
+const markOf = (r: number) => (r > 0.036 ? [BLOB_AT(r)[0], 0, BIG_Z] : r > 0.012 + 1e-9 ? BLOB_AT(r) : [0, 0, 0.098]);
 const FLIPS = [9, 14.5];                               // page to the stack (v4's clock)
 const CUTS = { P: [0.5, 6.5], P2: [9.5, 11.5], D: 9 };   // v4's clock
 // v8 (real time): W for the gulp and the shadow, B′ for his face as he sees it, W again as the phone goes down and the
@@ -57,11 +60,18 @@ const W_CUTS = [[B.gulp4, 9.75], [10.25 + dr(1), 11.0]];
 // cubicle panel to the right of it (the phone is left of the blob, so the shadow is thrown right and up).
 const CAM_W: CamKey = { pos: [0.150, 0.150, 1.020], look: [0.150, 0.138, 0.040], focus: [0.040, 0.030, 0.074] };
 // The phone in his hand: its screen centre's z sets the shadow scale on the wall, S = z / (z − 0.074) (README §1), so
-// 0.0987 gives S ≈ 4: 12 units at 3× (s03 5.4, s09b 6.8, Marston's resting phone 7.1). Held low over the desk, so the
+// 0.0987 gives S ≈ 4 at v8's contact (12 units at 3×); v11, with the towering contact at BIG_Z: S 2.54, 12.7 units at 5×
+// (evidence/v11-relapse/shadows.txt). Held low over the desk, so the
 // eye holes land above the window band.
 const PHONE_Z = 0.0987, PHONE_OFF = [0.004, -0.004];  // screen centre: z, and its x, y off the fingertip (2 mm over the desk)
 const SPOT_I = 2.0, FACE_I = 0.05, HALO_K = 0.45, FLICK = 0.03;   // the phone: key (cd), the cyan under his face, the glow, ±3% per drawing
 const ZONE_W = 0.4;                                    // the pendant's exposure in W
+// v11 Camera B″: s15's B′ (−0.010, 0.112, 0.358) pulled back and down along the same line of sight, so him and the
+// 5× blob (12 cm tall, x 0.003…0.139) are both whole in frame and its top stands clear above his head.
+const CAM_B3: CamKey = { pos: [0.000, 0.125, 0.620], look: [0.000, 0.054, 0.074] };
+// v11: the pendant is aimed at the page; at 5× the blob's far eye (x ≈ 0.10) sits outside its cone and went dark brown.
+// While it towers the pendant leans toward the blob so both eyes read, and the page stays inside the pool.
+const ZONE_AIM = { page: new THREE.Vector3(0, 0, 0.098), big: new THREE.Vector3(0.045, 0, 0.074) };
 const CAM_D: CamKey = { pos: [0.168, 0.230, 1.010], look: [0.168, 0.040, 0.080], focus: [0.168, 0.020, 0.086] };
 // Camera P: straight down on the page from 0.075 (README §8), centred on the written lines (sheet rows 38–298)
 const CAM_P: CamKey = { pos: [-0.0205, 0.0753, 0.0934], look: [-0.0205, 0.0003, 0.0934] };
@@ -298,8 +308,8 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   // v8: the phone in his hand (README §4's screen spot, as s03's laptop): a low, close cyan spot at the screen, aimed
   // screen → blob → wall, so the blob's shadow is thrown up the wall at S = z / (z − 0.074); and the screen's cyan on his
   // face from below (s07's `under`), no shadow, short reach.
-  const spot = phoneLight({ angle: 0.9, penumbra: 0.4, distance: 0.6, intensity: 0 });
-  spot.shadow.mapSize.set(2048, 2048); scene.add(spot, spot.target);
+  const spot = phoneLight({ angle: 1.1, penumbra: 0.4, distance: 0.6, intensity: 0 });
+  spot.shadow.mapSize.set(2048, 2048); scene.add(spot, spot.target);   // v11: angle 1.1 (was 0.9), so the 5× blob is inside the cone
   const under = new THREE.PointLight(PALETTE.phone, 0, 0.05, 2); scene.add(under);
   const fill = new THREE.PointLight(warm, FILL_I, 0.07, 2); scene.add(fill);   // README §10
   const nFill = new THREE.PointLight(warm, FILL_I, 0.07, 2);  // the hero's fill, mirrored
@@ -322,7 +332,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     const camD = to >= CUTS.D && !inP2, camW = W_CUTS.some(([a, b]) => t >= a - 1e-6 && t < b - 1e-6);
 
     // camera: B′ / P / B′ / W / B′ / P / B′ / D / P2 / D, each locked
-    const cam = insert ? { ...CAM_P, focus: CAM_P.look } : camW ? CAM_W : camD ? CAM_D : { ...CAM_B2, focus: UNIT.focus };
+    const cam = insert ? { ...CAM_P, focus: CAM_P.look } : camW ? CAM_W : camD ? CAM_D : { ...CAM_B3, focus: UNIT.focus };
     camera.up.set(0, insert ? 0 : 1, insert ? -1 : 0);
     camera.position.set(...cam.pos); camera.lookAt(look.set(...cam.look)); camera.getWorldDirection(dir);
     fx.set({ focus: dir.dot(focus.set(...cam.focus!).sub(camera.position)) });   // every camera here has a focus (CAM_D's own, the others' set just above)
@@ -395,34 +405,41 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     screenMat.color.setScalar(tr < THUMBS[1] - 1e-6 ? 0.6 : 1);   // the lock screen, then the Reel
 
     // the hero's blob: braces with him, shrinks one step per solve with its contact on the mark for its size, watches him.
-    // v8: gulp4 (real 9.1) takes it 2.5× → 3× in the relapse (README §1's gulp: swallow, snap, settle, wobble down 0.2).
+    // v8: gulp4 (real 9.1) takes it 4.5× → 5× (v11) in the relapse (README §1's gulp: swallow, snap, settle, wobble down 0.2).
     // gulp4 (9.1) is off the 2s grid (the bass hit's time): the snap lands on the first frame at or after it, the swallow
     // on the drawing before; the cut to W is on the same frame.
     const solved = SOLVES.filter((s) => tc >= s - 1e-6).length, grown = t >= B.gulp4 - 1e-6;
     const r = solved ? BLOB_R[STEPS[solved - 1]] : grown ? BLOB_R.gulp4 : BLOB_R.start, M = markOf(r);
     const s = r / BLOB_R.start, t0 = SOLVES[solved - 1];
+    aim(zone.light, r > 0.036 && !insert ? ZONE_AIM.big : ZONE_AIM.page);
     exam.mesh.visible = exam.stain.visible = !insert;
     exam.mesh.scale.setScalar(s); exam.stain.scale.setScalar(s);
     exam.mesh.position.set(M[0], 0, M[2]); exam.stain.position.set(M[0], 0.0004, M[2]);
     if (relapse) {
       const swallow = t >= B.gulp4 - dr(1) - 1e-6 && !grown, settle = grown && t < B.gulp4 + 1;
+      // v9 (v9-beats §2): at the phone (phoneOut 6.0) `sad`, "here we go again"; after the gulp's snap, `plead` up at its
+      // own shadow on the wall until he turns the phone down (phoneDownLib 10.5); open, watching him, after.
+      const eyes = swallow ? 'closed' : tr >= B.phoneOut - 1e-6 && !grown ? 'sad' : grown && tr >= B.gulp4 + 0.25 - 1e-6 && tr < B.phoneDownLib - 1e-6 ? 'plead' : 'open';
       exam.update(t, {
         key: lit ? spot : zone.light,
         wobble: settle ? 0.8 : 1,
         squash: swallow ? 0.3 : grown ? -0.2 * kick(t, B.gulp4, 1) : 0,
-        eyes: swallow ? 'closed' : 'open',
+        eyes,
         look: -1,
       });
       const gulping = t >= B.gulp4 - dr(1) - 1e-6 && t < B.gulp4 + 0.25 - 1e-6;
       exam.mesh.rotation.z = (tr >= 5 - 1e-6 && !gulping ? 10 : 0) * D;   // the head tilt at 5.0; upright for the gulp
     } else {
       const braced = tc >= dr(2) && tc < 6.5;
+      // v9: "That was it?" (problemOneSolved, v4's 6.5): when its eyes open again (6.75) it is `shy`, embarrassed at how
+      // small the problem was: a glance down and away from him and a little extra squash, to 7.5; then open, watching.
+      const shy = tc >= 6.75 && tc < 7.5;
       exam.update(t, {
         key: zone.light,
         wobble: braced ? 0.3 : 1,
-        squash: braced ? 0.25 : t0 === undefined ? 0 : kick(tc, t0, 0.3),
-        eyes: tc >= 15.5 || (tc >= dr(3) && tc < 6.75) ? 'closed' : 'open',
-        look: -1,
+        squash: braced ? 0.25 : (t0 === undefined ? 0 : kick(tc, t0, 0.3)) + (shy ? 0.1 : 0),
+        eyes: tc >= 15.5 || (tc >= dr(3) && tc < 6.75) ? 'closed' : shy ? 'shy' : 'open',
+        look: shy ? 1 : -1,
       });
       const watching = (tc >= 8 && tc < 9) || (tc >= 9 && t0 !== undefined && tc - t0 >= 0.25 - 1e-6 && tc < 15.5);
       exam.mesh.rotation.z = (watching ? 10 : 0) * D;   // tilted toward him; upright for each squash

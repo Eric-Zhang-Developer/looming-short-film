@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>v9-blob · eye states</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js" } }</script>
+<script type="module">
+  // One eye state per second, the film's blob (radius 2.5 cm) close up under a warm key, on cream:
+  //   node render.ts --page=evidence/v9-blob/eyes.html --sheet=0.5,1.5,...,8.5 --out=...
+  import * as THREE from 'three';
+  import { createStage, exposeForRender } from '/build/core/stage.js';
+  import { createBlob } from '/build/blob.js';
+  import { PALETTE } from '/build/core/palette.js';
+  const STATES = [['open'], ['blank'], ['plead'], ['sad'], ['shy', 1], ['sleepy'], ['tired'], ['side', 1], ['closed']];
+  const stage = createStage(), { scene, camera } = stage;
+  scene.background = new THREE.Color(PALETTE.cream).lerp(new THREE.Color(PALETTE.kraft), 0.3);
+  const blob = createBlob({ radius: 0.025, seed: 1 });
+  scene.add(blob.mesh);
+  const key = new THREE.PointLight(PALETTE.lamp, 0.6, 0, 2); key.position.set(-0.15, 0.2, 0.3); scene.add(key);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  camera.position.set(0, 0.024, 0.26); camera.lookAt(0, 0.024, 0);
+  stage.onFrame((t) => {
+    const [eyes, look = 1] = STATES[Math.min(STATES.length - 1, Math.floor(t))];
+    blob.update(t, { eyes, look, wobble: eyes === 'blank' ? 0 : 1, key });
+  });
+  window.STATES = STATES.map((s) => s[0]);
+  exposeForRender(stage, { duration: STATES.length, fps: 24 });
+</script>

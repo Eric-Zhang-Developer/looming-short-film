@@ -13,14 +13,14 @@ import { act } from '../characters/acting.ts';
 import { hipHeight } from '../characters/gator.ts';
 import { specPose, POSES } from '../characters/poses.ts';
 import { DIM, AMB_DIM } from './s08.ts';
-import { bedroom, closeHeads, ROOM, CAM, LOOK, LIE, LIE_HEAD, KNEE, HIP, PHONE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT } from './s07.ts';
+import { bedroom, closeHeads, ROOM, CAM, LOOK, LIE, LIE_HEAD, KNEE, FOOT, HIP, PHONE, at2, SPOT, FACE_FILL, SPILL, MOON_PANES, FACE_LIGHT } from './s07.ts';
 import { reminderInsert } from './s03.ts';
 import { COUNTDOWN } from '../props/canvas.ts';
 import type { ShotCtx } from '../film.ts';
 import type { Palette } from './s02.ts';
 
 const ID = 's09a', DEG = Math.PI / 180;
-export const BLOB_R = { start: 0.030 };                       // 2.5× (README §1, Q16)
+export const BLOB_R = { start: 0.054 };                       // v11: 4.5× (docs/notes/v11-beats.md)
 const F = (s: number) => Math.round(s * 12) / 12;
 // C4 (fix-bedroom): his face, not the blob. The lying head in profile fills the frame's left half; the blob is off frame
 // right (its left edge lands just past the frame edge); frame right holds his reach and the lamp's shade (CHEAT below).
@@ -49,8 +49,8 @@ const STEP = POSES.walk_side_a;
 const UP = F(4.25);                                           // the sit-up's first drawing, on the cut to the wide (fix-bedroom)
 const STAND_AT = [0.150, 0, 0.385];                           // on the floor in front of the bed, left of the blob
 const EDGE_AT = [0.175, ROOM.MT + 0.006, 0.352] as Vec3;
-const FOOT = [0.232, ROOM.MT + 0.001, 0.300] as Vec3;                 // the blob, slid off his knees to the bed's foot (3.5–3.67), back on the mattress
-const FLOOR = [0.236, 0, 0.368] as Vec3;                              // ...and hopped down after him (5.75–6.0)
+// v11: the 4.5× blob sits at the bed's foot from s07 on (s07's FOOT), so it no longer slides off his knees as he sits up.
+const FLOOR = [0.205, 0, 0.360] as Vec3;                              // it hops down after him (5.75–6.0), behind him and left of the lamp
 // Light levels.
 // fix-bedroom: the lamp-lit room read as day at 1:14 (cold-v4), so after lampOn the lamp is lower (0.32 → LAMP), the
 // ambient nearly gone (5% → 0.8% of s02's) and the fill a third: the light falls off from the nightstand to dark corners.
@@ -196,16 +196,14 @@ export async function build(ctx: ShotCtx) {
         bag.position.copy(new THREE.Vector3(-0.021, 0.022, -0.004).applyQuaternion(q).add(hand)); bag.quaternion.copy(q);
       } else { bag.position.set(...ROOM.BACKPACK); bag.rotation.set(0, 0, 0); }
 
-      // ---- the Exam: its eyes in the black, a blink at 1.0; slides to the bed's foot as he sits up (3.5–3.67); gasps at
+      // ---- the Exam (v11: 4.5×, at the bed's foot from the start, so no slide off his knees): its eyes in the black; gasps at
       // 4.25; watches him to the backpack; hops down after him (5.75–6.0) ----
-      let contact = KNEE, eyes = 'open', look = 1, squash = 0;
-      if (T >= UP - 1e-6) contact = T < F(4.417) ? KNEE.map((v, i) => lerp(v, FOOT[i], (T - UP + 1 / 12) / (1 / 6)) + (i === 1 ? 0.006 : 0)) as Vec3 : FOOT;
+      // v9 (v9-beats §2): `blank` and still (wobble 0) the whole shot: no blink at 1.0, no gasp at 4.25, no look after him.
+      // It moves (the slide, the hop) but it doesn't react: the choice is his.
+      let contact = FOOT, squash = 0;
       if (T >= F(5.75)) { const k = Math.min(1, (T - 5.75) / 0.25); contact = FOOT.map((v, i) => lerp(v, FLOOR[i], k) + (i === 1 ? 0.01 * Math.sin(Math.PI * k) : 0)) as Vec3; squash = k >= 1 ? 0.15 : -0.1; }
-      if (at2(T, 1.0, 1.08)) eyes = 'closed';
-      if (T >= 4.25 - 1e-6) eyes = 'gasp';
-      if (T >= 5 - 1e-6) { eyes = 'side'; look = -1; }
       R.placeBlob(BLOB_R.start, contact);
-      exam.update(t, { wobble: 0.8, eyes, look, squash, key: lit ? lamp : dark ? null : spot });
+      exam.update(t, { wobble: 0, eyes: 'blank', squash, key: lit ? lamp : dark ? null : spot });
 
       // ---- light. 2.75 (was phoneFaceDown 0.5): the phone spot, its fill and its spill go to 0 on one frame, and the ceiling shadow with them.
       // 4.0 lampOn: the nightstand lamp, low and warm; only the blob casts (its own field now: the lamp sees its face). ----

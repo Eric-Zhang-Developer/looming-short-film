@@ -1,6 +1,7 @@
 // node tools/check_timeline.ts [--file=path/to/timeline.ts]
 // Fails on gaps, overlaps, total outside TARGET ±5 s, duplicate beat names, beats outside their shot.
-// TARGET is the director's runtime: 3:30 (v8: "We can try to expand the time to 3 minutes 30 seconds", 2026-10-20; 3:24 from v7-s13: s13 grows 5 → 8 s under the v7 brief's "the director allows small timeline changes"; 3:21 from v6-stacks, he approved "Runtime goes to 3:21" for the stacks walk, 2026-10-18;
+// TARGET is the director's runtime: 3:47 (v9, docs/notes/v9-beats.md: the ending grows from an abrupt fade into a closing sequence,
+// "I like this longer exit", 2026-10-20); 3:30 before (v8: "We can try to expand the time to 3 minutes 30 seconds", 2026-10-20; 3:24 from v7-s13: s13 grows 5 → 8 s under the v7 brief's "the director allows small timeline changes"; 3:21 from v6-stacks, he approved "Runtime goes to 3:21" for the stacks walk, 2026-10-18;
 // was 3:15 from G4, 2026-10-15, and 180 before that).
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -13,7 +14,7 @@ const errs: string[] = [];
 const seen = new Map<string, string>();
 const rows: string[] = [];
 const E = 1e-6;
-const TARGET = 210;
+const TARGET = 228;
 let end = 0;
 for (const s of SHOTS) {
   if (s.start > end + E) errs.push(`gap: ${end}s to ${s.start}s before ${s.id}`);

@@ -1,5 +1,5 @@
 // s08 · 3:00 a.m., rock bottom (docs/shots/s08.md, v4; brief climax-a1). s07's bedroom, unchanged: him on his back with
-// the phone on under his chin, the Exam at 2.5× on his knees and its shadow over the ceiling. The music is out; the clock
+// the phone on under his chin, the Exam at 4.5× (v11) at the bed's foot and its shadow over the ceiling. The music is out; the clock
 // ticks alone. Four setups, cut on ticks:
 //   C1 0–2   the clock insert, 3:00:00, the second hand stepping
 //   C2 2–4   his face, the painted `numb` head lying on the pillow; on the 3.0 tick his head rolls back toward the clock
@@ -16,7 +16,7 @@ import { bedroom, closeHeads, headOn, ROOM, LIE, at2, SPOT, FACE_FILL, SPILL, MO
 import type { ShotCtx } from '../film.ts';
 
 const ID = 's08', DEG = Math.PI / 180;
-export const BLOB_R = { start: 0.030 };                       // 2.5× all shot (README §1, Q16)
+export const BLOB_R = { start: 0.054 };                       // v11: 4.5× all shot, s07's last gulp (docs/notes/v11-beats.md)
 // Cameras (re-solved at build). C1: face-on to the clock, the dial 60% of the frame height (Ø 0.020 / 0.6 = 0.0333 m of
 // frame at fov 20 → 0.0945 away), nudged right so the calendar's edge is just in at frame left.
 const C1: CamKey = { pos: [0.047, 0.099, 0.0960], look: [0.047, 0.099, 0] };
@@ -94,16 +94,15 @@ export async function build(ctx: ShotCtx) {
         drop.position.set(...DROP_AT).addScaledVector(down, 0.0015 * k);
       }
 
-      // ---- the Exam: 2.5× on his knees; follows his look to the circle at 4.0 and back at 5.0 (C3's blink: dropped, v7-bed) ----
-      let eyes = 'open', look = -1;
-      if (T >= 4 - 1e-6 && T < 5 - 1e-6) eyes = 'side';
+      // ---- the Exam: 4.5× at the bed's foot, behind his knees (v11; s07's FOOT). v9 (v9-beats §2): weather, not a creature. `blank` throughout, no wobble; it no
+      // longer follows his look to the circle (v8's side glance at 4.0–5.0) ----
       R.placeBlob(BLOB_R.start);
-      exam.update(t, { wobble: 0.8, eyes, look, key: spot });
+      exam.update(t, { wobble: 0, eyes: 'blank', look: -1, key: spot });
 
       // ---- C3, H: frozen in dread (the worried eyes carry the sweat), hands still on the phone; only his breath moves ----
       Hs.rig.pose({ body: 0, arm_l: -112 * DEG, arm_r: 112 * DEG });
       act(Hs.rig, t, [[0, 'dread']], { slump: 0, tilt: 0, tail: 0, breath: 3, depth: 0.008, blink: false });
-      Hs.set(t, { r: BLOB_R.start, colour: Hs.hues[0], wobble: 0.8, level: DIM });
+      Hs.set(t, { r: BLOB_R.start, colour: Hs.hues[0], wobble: 0, level: DIM });
 
       // ---- light: s07's end state; the spill lifted only in the clock insert ----
       spot.intensity = DIM * SPOT;

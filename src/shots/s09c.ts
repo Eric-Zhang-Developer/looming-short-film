@@ -4,7 +4,8 @@
 // far and low and the shadow runs long (the film's rule). Once the blob plants itself in his path and lamp 4 throws its
 // shadow back over him; he looks at it and steps around it. Then Marston's ribbon windows, warm, and he turns into depth
 // toward its door. Characters on 2s, light and camera on 1s, boil 10/s.
-// The 2.5× blob (Q16, director 2026-10-18). s10 imports the lamp constants: lamp 5 is the light behind him at the door.
+// v11: the 4.5× blob (docs/notes/v11-beats.md), taller than he is. s10 imports the lamp constants: lamp 5 is the light behind
+// him at the door.
 import * as THREE from 'three';
 import { ambient } from '../lights.ts';
 import { kf, ease, clamp, onTwos } from '../core/ease.ts';
@@ -23,7 +24,7 @@ import type { Gator } from '../characters/gator.ts';
 
 const ID = 's09c', D = Math.PI / 180;
 const B = SHOTS.find((s) => s.id === ID)!.beats;
-export const BLOB_R = { start: 0.030 };                 // 2.5× (README §1, Q16)
+export const BLOB_R = { start: 0.054 };                 // v11: 4.5×, 10.8 cm tall against his 8.5 cm head top
 const lin = (x: number) => x;
 
 // His root x(t): the spec's table, keyed on the timeline's beats (never hard-coded beat times). The resolve lands at
@@ -34,18 +35,25 @@ const XT: [number, number][] = [[B.walkStart, -0.120], [B.lamp1, 0.000], [B.lamp
 export const X = (t: number) => kf(t, XT, lin);
 const WALK_Z = 0.10, AROUND_Z = 0.13, HEEL = [-0.045, 0.015];   // blob contact from his root: behind him, camera side
 const TURN = 18.0, END = [1.36, -0.115];                // the turn into depth, and where he is at the cut
-const BLOCK = [0.650, 0.104];                           // the block: in his path, a hair in front of his plane
+// v11: the block stands 1 cm past his snout and 2 cm behind his walk line, so his side-steps toward the lens pass in
+// front of it (at 4.5× it is 12 cm wide; on his own plane his snout went into it, and stepping back onto the line, he did).
+const BLOCK = [0.700, 0.080];
 
-// The lamps. Each lamp beat is the frame the blob is under that lamp, so the lamp x's come from x(t) − 0.045.
-export const LAMP_H = 0.095;   // the light point, just above his head top (0.085). fix-walk: 0.105 → 0.095 stretches the
+// The lamps. Each lamp beat is the frame the blob is under that lamp, so the lamp x's come from x(t) − 0.045 − GAP.
+// v11: 0.135. The blob's top is at 0.108 now, so a lamp at 0.095 sat below it and threw its crown up the sky; 2.7 cm
+// above it, s = H / (H − 0.108) ≈ 5, so it still runs long between lamps, and the posts stand taller than he does.
+export const LAMP_H = 0.135;   // the light point (v10: 0.095, just above his head top 0.085). fix-walk: 0.105 → 0.095 stretches the
 // shadow's tip (s = H / (H − 0.060): 2.33 → 2.71); the puddles grow a little (1.32–1.36 → 1.41–1.45×, probe). Mid-span the shadow
 // now runs to the frame's edge, so the frame, not the lamp, sets how long it measures.
 // fix-walk: the lamps stand on the path's far edge, behind the hedge line, not on his walk line. The blob is a flat
 // cutout facing the lens; a lamp in its own plane throws it as a hairline along the path (cold-v4: "a ground puddle").
 // 7 cm behind it, the lamp throws it forward across the paving as a wedge as wide as the blob is tall.
 const LAMP_Z = 0.045;
+// walk-redo: the blob trails a further GAP behind HEEL, so it reads as its own shape beside him. v11: 0.035 → 0.055, so
+// the 12 cm blob's front edge clears his tail; and LAMP_X now includes it, so on a lamp beat the lamp is over the blob.
+const GAP = 0.055;
 const LAMP_BEATS = ['lamp1', 'lamp2', 'lamp3', 'lamp4', 'lamp5'];
-export const LAMP_X = LAMP_BEATS.map((b) => X(B[b]) + HEEL[0]);   // −0.045, 0.193, 0.433, 0.780, 0.930
+export const LAMP_X = LAMP_BEATS.map((b) => X(B[b]) + HEEL[0] - GAP);   // v11: over the blob itself on each beat
 // Key hand-overs (1 → 2, 2 → 3, 3 → 4 on the blob's landing, 4 → 5), each a 0.25 s crossfade centred on a pulse beat.
 const HANDOVER = [4.0, 7.0, B.blobBlocks, 14.5], FADE = 0.25;
 export const LAMP_COOL = (PALETTE: ShotCtx['PALETTE']) => new THREE.Color(PALETTE.cream).lerp(new THREE.Color(PALETTE.phone), 0.3);
@@ -55,7 +63,7 @@ const AMB_K = 0.3, FILL_I = 0.010, WARM_I = 0.25;
 // fix-walk: the wide is pushed in (0.71 → 0.59 m) and looks down 11° (was 9°), so his slump reads at 400 px and the
 // paving, the shadow's receiver, is a band; steeper lost the sky and the tower. It centres on the blob, so the key lamp and the shadow's tip
 // both stay in frame either side of each lamp.
-const CAM_Y = 0.160, CAM_Z: [number, number][] = [[B.blobBlocks, 0.70], [B.stepAround, 0.62]], LOOK_Y = 0.050, LOOK_Z = 0.12;
+const CAM_Y = 0.175, CAM_Z: [number, number][] = [[B.blobBlocks, 0.70], [B.stepAround, 0.62]], LOOK_Y = 0.060, LOOK_Z = 0.12;
 // The block's close-up (fix-walk): cut in after the stop and the flinch, the painted dread head (sweat) held, resolve on
 // DECIDE, and cut back to the wide as he side-steps past it.
 const CU = [B.blobBlocks + 1 / 3, DECIDE + 0.5], CU_I = 0.007;
@@ -67,9 +75,6 @@ const HOP = 0.5, HOP_H = 0.003;
 // steps a second; each step's leg spread is scaled to the distance x(t) covers in it, so the planted foot barely skates.
 const PULSE0 = B.lamp1, STEP = 0.25, SPREAD0 = 0.024;   // SPREAD0: the side set's contact spacing (poses.ts)
 const SWING = 14 * D, SWAY = 8 * D;                     // extra arm swing and tail sway on top of the poses' ±15° / ±6°
-// walk-redo: the blob trails a further GAP behind HEEL, so it reads as its own shape beside him. LAMP_X (exported) still
-// comes from HEEL alone; on a lamp beat the blob is GAP short of the lamp, which still lights it nearly from overhead.
-const GAP = 0.035;
 // walk-redo: his own light. The lamps sit behind him, so he was lit by their torn-edge rim and the through-light alone
 // (muddy hoodie, white fringe). The paper lights itself at SELF (its painted colour, so cream stays cream), no edge catch.
 const SELF = 0.45, THROUGH = 0.1;
@@ -316,7 +321,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
 
     // ---------- the Exam, on 2s: one hop per pulse at his heels; the block; the hop after him
     const ph = ((T + 1e-6) % HOP) / HOP, landing = ph < 1 / 6;
-    let bx, by = 0, bz, sq = landing ? 0.2 : 0, mirror = false, eyes = 'open', look = 1;
+    let bx, by = 0, bz, sq = landing ? 0.2 : 0, mirror = false;
     const heel = (tt: number) => [X(tt) + HEEL[0] - GAP, WALK_Z + HEEL[1]];
     if (T < 9.5) { [bx, bz] = heel(T); by = HOP_H * Math.sin(Math.PI * ph); }
     else if (T < B.blobBlocks) {                          // one big hop past him on the camera side: crouch, two drawings up
@@ -324,18 +329,17 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       if (T < 9.5 + 1 / 12) { [bx, bz] = [x0, z0]; sq = 0.25; }
       else if (T < 9.75) { bx = X(9.5) + HEEL[0] + 0.06; by = 0.022; bz = 0.125; sq = -0.2; }
       else { bx = BLOCK[0] - 0.02; by = 0.014; bz = 0.115; sq = -0.15; }
-      eyes = 'open';
     } else if (T < B.stepAround + 0.5) {                  // planted square in his path, turned to face him
       [bx, bz] = BLOCK; mirror = true; sq = T < B.stepAround + 0.5 ? 0.25 : 0;
-      eyes = T < DECIDE ? 'worried' : T < B.stepAround ? 'side' : 'gasp'; look = T < DECIDE ? 1 : -1;
     } else if (T < B.stepAround + 1) {                    // un-squashes, surprised, and hops after him
       const k = (T - B.stepAround - 0.5) / 0.5, [hx, hz] = heel(B.stepAround + 1);
-      bx = BLOCK[0] + (hx - BLOCK[0]) * k; bz = BLOCK[1] + (hz - BLOCK[1]) * k; by = 0.010 * Math.sin(Math.PI * k);
-      sq = k < 1 / 6 ? -0.1 : 0; eyes = 'gasp';
+      // v11: z jumps from behind his line to his heels at the hop's top, in one drawing; eased through it, the
+      // 12 cm blob passed through his tail on his own plane
+      bx = BLOCK[0] + (hx - BLOCK[0]) * k; bz = k < 0.5 ? BLOCK[1] : hz; by = 0.010 * Math.sin(Math.PI * k);
+      sq = k < 1 / 6 ? -0.1 : 0;
     } else if (T < TURN) { [bx, bz] = heel(T); by = HOP_H * Math.sin(Math.PI * ph); }
     else { bx = root[0] - 0.045 - GAP; bz = root[2] + 0.02; by = HOP_H * Math.sin(Math.PI * ph); }   // beside and a step behind him
     if (LAMP_BEATS.some((b) => Math.abs(T - B[b]) < 1e-3)) sq = 0.3;   // the light presses it down on each puddle beat
-    if (T >= B.marstonSeen && T < TURN) { eyes = 'side'; look = 1; }
     exam.mesh.position.set(bx, by, bz);
     cuKey.intensity = close ? CU_I : 0;
     if (close) cuKey.position.set(root[0] + 0.03, 0.10, root[2] + 0.05);
@@ -356,7 +360,9 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     warm.intensity = WARM_I * clamp((t - 17) / 0.5);
     warm.target.position.set(root[0], 0.04, root[2]); warm.target.updateMatrixWorld();
     winMats.forEach((m) => { m.emissiveIntensity = 0.75; });
-    exam.update(t, { squash: sq, wobble: 1, eyes, look, key });
+    // v9 (v9-beats §2): `blank` and no wobble the whole walk (v8: worried at the block, side, a gasp as he stepped
+    // around, side at Marston). It still hops, blocks and follows: weather moves, it doesn't emote.
+    exam.update(t, { squash: sq, wobble: 0, eyes: 'blank', key });
     selfLit(side.group); selfLit(back.group);            // last: after every boil, face and mouth-bar swap this frame
 
     // ---------- camera, on 1s: lateral track at his x + 0.06, the block's push-in in z, locked from the turn
