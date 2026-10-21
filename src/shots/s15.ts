@@ -3,7 +3,8 @@
 // hesitates, writes his name at the top of the practice sheet (nameWritten 4.5), and the blob flinches. He looks at it;
 // cut to the close-up on the painted surprised_smile head (nameSmile 5.5): the first mark is smaller than he thought.
 // Back on B′ at 7.5 he moves the pen to problem line 1, the brace s16 opens on. s11's desk set (marstonDesk), the 2.5×
-// blob (Q16) at the Marston mark under the ring pendant's constant warm light. Only the blob casts.
+// blob (v11: 4.5×, standing behind the desk and looming over it, s11's BEHIND) under the ring pendant's constant warm
+// light. Only the blob casts.
 // Characters and the props he handles on 2s; light and camera on 1s.
 // UNIT below is the pre-G4 master that s16 imports: its values are left as they were. s16 also imports BLOB_AT, PHONE,
 // PAGE, CAM_B2 and the practice-sheet helpers from here.
@@ -15,7 +16,7 @@ import { createBlob } from '../blob.ts';
 import { POSES, specPose } from '../characters/poses.ts';
 import { act } from '../characters/acting.ts';
 import { SHOTS } from '../timeline.ts';
-import { kitTools, marstonDesk, MARK, castOnly } from './s11.ts';
+import { kitTools, marstonDesk, MARK, BEHIND, WASH, castOnly } from './s11.ts';
 import { closeupRig, HEAD_AT } from './s09b.ts';
 import { loadHand, handFont, runParts, drawInt } from './s17b.ts';
 import { mulberry32, seedOf } from '../core/rng.ts';
@@ -41,19 +42,24 @@ export const UNIT = {
 };
 
 // ---------- v4 (this shot) ----------
-const BLOB_R = { start: 0.030 };                             // 2.5×, the v4 peak (README §1, Q16)
+const BLOB_R = { start: 0.054 };                             // v11: 4.5× (docs/notes/v11-beats.md)
 // The Marston mark (README §1), moved BLOB_DX along +x: at B′ the 9.3 cm cut gator's snout (cut-gator) reached the
-// 2.5× blob. 0 puts it back on the spec's mark. s11 and s13 use the same spot.
+// 2.5× blob. 0 puts it back on the spec's mark. v11: s15 no longer uses it (its 4.5× blob stands behind the desk at
+// s11's BEHIND); it stays exported, unchanged, for s16.
 export const BLOB_DX = 0.016;
 export const BLOB_AT = (r: number) => { const m = MARK(r); return [m[0] + BLOB_DX, 0, m[2]]; };
 export const PHONE: Vec3 = [-0.010, 0.0015, 0.114], PHONE_L = [-0.010, 0.004, 0.114];   // rest spot (and G4's light above it)
 export const CAM_A2: CamKey = { pos: [0.025, 0.239, 0.642], look: [0.025, 0.080, 0.080] };    // Camera A′ (README §8; G4's opening)
 export const CAM_B2: CamKey = { pos: [-0.010, 0.112, 0.358], look: [-0.010, 0.020, 0.084] };  // Camera B′
 export const PAGE: Vec3 = [-0.0205, 0.0003, 0.095];                // page centre (x −0.033…−0.008, z 0.080…0.110)
+// v11: s15's own B′, 4 cm further back and tipped up 4°, so the blob's crown (y 0.074, behind the desk) is in frame over
+// the page. CAM_B2 stays as it was: s16 imports it.
+const CAM_B15: CamKey = { pos: [-0.010, 0.112, 0.398], look: [-0.010, 0.030, 0.084] };
 const CU = [B.nameSmile, 7.5];                               // the close-up's cut in and out
 // CU: level with his head from in front, close enough that the painted head fills the frame's left half and the blob's
 // eyes are in at the right, so "he and the blob look at each other" holds in one frame.
-const CAM_CU: CamKey = { pos: [-0.028, 0.036, 0.074 + 0.24], look: [-0.028, 0.036, 0.074] };
+// v11: 1.8 cm right of his head (was on it), so both of the behind-the-desk blob's eyes (x 0.022, 0.068) are in at the right.
+const CAM_CU: CamKey = { pos: [-0.010, 0.036, 0.074 + 0.24], look: [-0.010, 0.036, 0.074] };
 const WARM = 0.3;                                            // v4 Marston warm: lerp(lamp, cream, 0.3) (README v4)
 // Intensities, by eye on the sheet: G4's lit zone (the old lamp pool at the blob), its fill and ambient.
 const ZONE_I = 0.25, FLUOR_I = 0.25, AMB_K = 0.6, FILL_I = 0.02, CU_KEY = 0.010;   // ZONE_I: s11's 0.8 blew the desk out from B′'s height
@@ -293,9 +299,9 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   scene.add(hero.group);
   const cu = await closeupRig({ assets }, tools, ['surprised_smile'], { seed: 15 });   // README §12: the painted head
   cu.rig.group.position.copy(hero.group.position); scene.add(cu.rig.group);
-  const M = BLOB_AT(BLOB_R.start);
+  const M = BEHIND;                                          // v11: on the floor behind the desk, looming over it (s11)
   const exam = createBlob({ radius: BLOB_R.start, seed: 1 });
-  exam.stain.position.set(M[0], 0.0004, M[2]);
+  exam.stain.position.set(M[0], M[1] + 0.0004, M[2]);
   scene.add(exam.mesh, exam.stain);
   castOnly(scene, [exam.mesh]);                              // only the blob casts (README v4)
 
@@ -313,6 +319,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   const tubes = fluorescent({ intensity: FLUOR_I });   // the distant room light; flicker 0: its update() is never called
   tubes.light.castShadow = false; scene.add(tubes.light);
   const amb = ambient(); amb.intensity *= AMB_K; scene.add(amb);
+  const wash = new THREE.PointLight(warm, WASH.i, WASH.d, 2); wash.position.set(...WASH.at); scene.add(wash);   // v11: s11's wall wash
 
   // ---------- camera and post ----------
   const FOCUS = V(UNIT.focus), look = new THREE.Vector3(), dir = new THREE.Vector3(), fv = new THREE.Vector3();
@@ -324,7 +331,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     boil(t, 10);
 
     // camera on 1s: B′ locked, the CU, B′ again
-    const cam = close ? CAM_CU : CAM_B2;
+    const cam = close ? CAM_CU : CAM_B15;
     camera.position.set(...cam.pos); camera.lookAt(look.set(...cam.look)); camera.getWorldDirection(dir);
     fx.set({ focus: dir.dot(fv.copy(close ? look : FOCUS).sub(camera.position)), aperture: close ? 0.008 : UNIT.aperture });
 
@@ -378,7 +385,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
       look: -1, key: zone.light,
     });
     exam.mesh.rotation.z = (tc >= NAME[0] && tc < NAME[1] ? 6 : 0) * D;   // leans toward the writing
-    exam.mesh.position.set(M[0] + kick(tc, B.nameWritten, 0.002), 0, M[2]);   // the recoil; its pool moves with it
+    exam.mesh.position.set(M[0] + kick(tc, B.nameWritten, 0.002), M[1], M[2]);   // the recoil; its shadow moves with it
 
     cuKey.intensity = close ? CU_KEY : 0;
     fill.intensity = close ? 0 : FILL_I;

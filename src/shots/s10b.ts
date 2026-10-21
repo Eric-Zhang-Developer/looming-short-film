@@ -1,6 +1,6 @@
 // s10b · The stacks (docs/shots/s10b.md, v6). v3's s10 walk (git 228d5b2^:src/shots/s10.ts) brought back after the
 // threshold, with its meaning flipped by the v4 rule. Same locked camera down a Marston stacks aisle, the same kit bays as
-// wings and coffered ceiling strips as borders; he walks toward the lens with the 2.5× blob waddling behind him. v6-stacks-2: the side rig turned 50° to us, so the snout reads.
+// wings and coffered ceiling strips as borders; he walks toward the lens with the blob (v11: 4.5×, over his head) waddling behind him. v6-stacks-2: the side rig turned 50° to us, so the snout reads.
 // v3 lit him from the phone, low, and threw the blob's shadow huge on the end wall. Now he looks at the phone once and
 // slides it into the hoodie pocket (pocketPhone 0.75), and the light comes from above: one warm strip light per bay, each a
 // downward spot, so as the blob passes under one its shadow is a small pool on the carpet just ahead of it (underLight1,
@@ -21,7 +21,7 @@ import type { PaperMesh } from '../material.ts';
 
 const ID = 's10b';
 const B = SHOTS.find((s) => s.id === ID)!.beats;          // v8: pocketPhone 0.75, underLight1 1.5, underLight2 3.0 (4 s, was 6)
-const BLOB_R = { start: 0.030 };                         // 2.5×, its size in s10 and s11 (README §1, Q16)
+const BLOB_R = { start: 0.054 };                         // v11: 4.5×, its size in s10 and s11 (docs/notes/v11-beats.md)
 // v8: 4 s (was 6). A brisker walk, not a shorter one: v3's 0.25 s step and 0.085 m/s keep the stride v6 had
 // (0.065 × 1/3 ≈ 0.085 × 0.25 ≈ 0.021 m a step, so the feet don't skate), and he still comes on most of the way.
 const STEP = 0.25, HOP = 0.5, HOP_H = 0.004;             // a footfall every 0.25 s; a hop per two steps
@@ -33,7 +33,10 @@ const xG = (t: number) => X0 + VX * t;
 const D = Math.PI / 180;
 const TURN_Y = -50;   // v6-stacks-2: the side rig turned 50° toward the lens (s10's fix for "front-on reads as a frog"): the snout shows
 const CAM: Vec3 = [0, 0.125, 0.95], PITCH = -6;                // v6-stacks-2: 4 cm higher and tipped 6° down, so the pools open up
-const BLOB = [-0.052, 0, -0.015];                        // behind him on screen left (he faces right), v3's offset widened for 2.5×
+// v11: the 12.3 cm blob fills two thirds of the 18 cm aisle, so it no longer rides his x drift (on screen left of him, its
+// edge crossed the shelf wings' line, x −0.09, and popped from behind a bay to in front of it). It walks the aisle at a
+// fixed x, 4.5 cm behind him, its crown over his head; he drifts across in front of it.
+const BLOB = [-0.025, 0, -0.045];                        // [x (absolute), y, z from his root]
 const WING_Z = [0.09, 0.19, 0.29, 0.39, 0.49], AISLE = 0.09;   // wings at these depths, inner edge ±0.09
 // One strip light per bay. On underLight1 and underLight2 the blob has just passed under tube 1 and tube 2 (3 cm ahead
 // of it; v6-stacks had 1.5, a sliver): a light straight over a cutout casts a line, so the pool shows once the blob is
@@ -168,7 +171,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
 
       // The blob rides his root behind him, one hop per two of his steps, squashing on landing.
       const ph = (T % HOP) / HOP, land = ph < 1 / 8 + 1e-6;
-      exam.mesh.position.set(root.x + BLOB[0], HOP_H * Math.sin(Math.PI * ph), root.z + BLOB[2]);
+      exam.mesh.position.set(BLOB[0], HOP_H * Math.sin(Math.PI * ph), root.z + BLOB[2]);
       // v9 (v9-beats §2): still weather under the tubes, `blank` and no wobble; it shrinks into feeling from s11.
       exam.update(tLocal, { wobble: 0, squash: land ? 0.12 : 0, eyes: 'blank' });   // key: the tube that lights it most (v6-stacks-2: the cones are narrower now)
     },

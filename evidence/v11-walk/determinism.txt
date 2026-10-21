@@ -1,0 +1,12 @@
+t=95.25  8b1121a13e6c98f9 8b1121a13e6c98f9 8b1121a13e6c98f9  PASS
+determinism: PASS
+t=106.5  7cf95d4cf5895846 7cf95d4cf5895846 7cf95d4cf5895846  PASS
+determinism: PASS
+t=114  f63f64eddf3a194f f63f64eddf3a194f f63f64eddf3a194f  PASS
+determinism: PASS
+t=120  074286fd227d1fe0 074286fd227d1fe0 074286fd227d1fe0  PASS
+determinism: PASS
+t=129  034f58e008c95695 034f58e008c95695 034f58e008c95695  PASS
+determinism: PASS
+t=133.5  4e5928fb5b95b2ea 4e5928fb5b95b2ea 4e5928fb5b95b2ea  PASS
+determinism: PASS

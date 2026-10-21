@@ -3,8 +3,9 @@
 // perforated cubicle panel at its end, the Y-back chair, the ribbon window with the night view, and the ring pendant over
 // the desk, lit all shot: a plain constant spot in v4's warm (no sensor, no wake, no timeout). He walks in, sits
 // (deskSit 0.5), lays out the page and the pen, and puts his phone face-down (2.5: s09a's choice, small and calm now).
-// The 2.5× blob (Q16) climbs up from the floor (blobClimbs 3.0) and settles beside him at the Marston mark (blobSettles
-// 5.0): big, a little nervous, and under light from above its shadow is a small pool. No laptop. Only the blob casts.
+// v11: the 4.5× blob can't climb onto the desk. It looms behind it, tries to climb (blobClimbs 3.0: on tiptoe against
+// its back edge, leaning over the top), and settles leaning on it (blobSettles 5.0): towering, a little nervous. The light
+// from above throws its shadow down behind the desk, out of sight. No laptop. Only the blob casts.
 // Characters and handled props on 2s, light and camera on 1s, boil 10/s.
 // s09b, s09c, s10, s13, s15, s16 and s17 import the shared kit helpers and the desk set from here.
 import * as THREE from 'three';
@@ -30,12 +31,19 @@ const dr = (n: number) => n / 12;
 const on2s = (t: number) => Math.floor(t * 12 + 1e-4) / 12;   // core onTwos can land on the previous drawing (float error)
 
 // ---------- tunables ----------
-const BLOB_R = { start: 0.030 };                       // 2.5×, the v4 peak (README §1, Q16): nothing grows or shrinks here
+const BLOB_R = { start: 0.054 };                       // v11: 4.5× (docs/notes/v11-beats.md): nothing grows or shrinks here
 export const MARK = (r: number) => [1.15 * (r - 0.012), 0, 0.074];   // README §1 Marston mark: left edge stays on the page corner
-// s15's BLOB_DX: at its close Camera B′ the 2.5× blob on the spec's mark touched his snout, so s15 sits it 16 mm right.
-// s11 uses the same spot so the s11 → s13 → s15 cuts don't move it.
-const BLOB_DX = 0.016, AT = [MARK(BLOB_R.start)[0] + BLOB_DX, 0, 0.074];
 const HIP = [-0.075, -0.012, 0.074], FLOOR = -0.034;
+// v11: at 4.5× (12.3 cm wide, 10.8 tall) it can't get onto a 3.4 cm desk beside him. It stands on the floor BEHIND the desk,
+// in the 3 cm between the window wall (z 0) and the privacy panel (z 0.0305), and looms over it: the panel and the apron hide
+// its lower half, its crown is 7.4 cm over the desk top (his head top about 6), its eyes just clear the panel top (0.019).
+// Its left edge (x −0.017) is right of the page and the desk's end, so his hands, page and pen never cross it. s13 and s15
+// use the same spot, so the cuts don't move it.
+export const BEHIND = [0.045, FLOOR, 0.015];
+// v11: the ring's spill on the window wall behind the desk, a non-casting fill (README §10's kind, for the backdrop): ink on
+// the night-dark wall read as two eyes and a floating highlight; on a warm-lit patch of wall the body reads whole. The
+// blob takes the zone light as its key (exam.update's key), so this never lights the ink itself. s15 uses it too.
+export const WASH = { at: [0.045, 0.085, 0.045] as Vec3, i: 0.03, d: 0.12 };
 const PHONE = ([-0.010, 0.0015, 0.114]) as Vec3, PAGE: Vec3 = [-0.0205, 0.0003, 0.095];
 const CAM = [0.020, 0.033], CAM_Z: [number, number][] = [[3.0, 0.668], [7.0, 0.628]];
 const WARM = 0.3;                                      // v4 Marston warm: lerp(PALETTE.lamp, PALETTE.cream, 0.3) (README v4)
@@ -70,19 +78,22 @@ const CUES: [number, string][] = [[-0.1, 'resolve'], [B.deskSit, 'neutral'], [B.
 const LOOKS: [number, number, string][] = [[2.0, 2.5, 'side'], [3.25, 5.0, 'side']];   // eyes down at the phone; down-right at the blob climbing
 
 // ---------- the Exam: hops in at his heels, waits on the floor in front of the desk, climbs, settles ----------
-// Contact point keys [t, x, y, z] on 2s (it hops: held between drawings). It trails him in at his heels, then hops past
-// his knees to wait on the floor in front of the desk (z 0.145, just out of the desk top's shadow, where the camera sees
-// it); at 2.5× it stands as tall as the desk top, looking up at it. Then up the apron and onto the mark.
-const FLOOR_AT = [0.072, FLOOR, 0.145];
+// Contact point keys [t, x, y, z] on 2s (it hops: held between drawings). v11: it trails him in at his heels BEHIND him
+// (z 0.015, between him and the window wall, so it never crosses him), hops along behind the desk and waits at BEHIND,
+// already looking down over it. blobClimbs is the try: it pushes up against the desk's back edge on tiptoe (the contact
+// rises 8 mm) and leans over the top toward him, and it doesn't fit; blobSettles, it sinks back and leans on the desk.
+const BZ = BEHIND[2];
 const PATH = [
-  [0, -0.235, FLOOR, 0.145], [dr(2), -0.215, FLOOR, 0.145], [dr(4), -0.190, FLOOR, 0.145], [dr(6), -0.165, FLOOR, 0.145],
-  [dr(7), -0.090, FLOOR, 0.145], [dr(8), -0.010, FLOOR, 0.145], [dr(9), ...FLOOR_AT], [3.0, ...FLOOR_AT],
-  [dr(38), 0.066, -0.018, 0.124],                     // 3.17: lands clinging to the desk's front edge
-  [3.5, 0.062, -0.010, 0.123],                        // 3.5: stretched up, holding on
-  [dr(44), 0.056, 0, 0.114],                          // 3.67: pulls itself up onto the top
-  [dr(46), 0.046, 0, 0.098],                          // 3.83
-  [4.0, ...AT],
+  [0, -0.235, FLOOR, BZ], [dr(2), -0.215, FLOOR, BZ], [dr(4), -0.190, FLOOR, BZ], [dr(6), -0.165, FLOOR, BZ],
+  [dr(7), -0.110, FLOOR, BZ], [dr(8), -0.040, FLOOR, BZ], [dr(9), ...BEHIND], [3.0, ...BEHIND],
+  [dr(38), 0.042, FLOOR + 0.004, BZ],                 // 3.17: up against the desk's back edge
+  [3.5, 0.040, FLOOR + 0.008, BZ],                    // 3.5: on tiptoe, stretched, leaning over the top
+  [dr(44), 0.042, FLOOR + 0.004, BZ],                 // 3.67: it won't go
+  [dr(46), 0.044, FLOOR, BZ],                         // 3.83: back down
+  [4.0, ...BEHIND],
 ];
+// Its lean over the desk toward him (deg, + leans left), on 2s: none while it waits, 9° in the try, 3° once it settles.
+const LEAN: [number, number][] = [[dr(37), 0], [dr(38), 6], [3.5, 9], [dr(44), 7], [dr(46), 2], [4.0, 0], [B.blobSettles, 3]];
 const hopping = (T: number) => T < dr(9) && Math.round(T * 12) % 2 === 1;   // the walk-in hops: up on every other drawing
 const SQUASH: [number, number][] = [[3.0 - dr(1), 0], [3.0, 0.3], [dr(38), -0.2], [3.5, -0.25], [dr(44), 0.2], [dr(46), 0], [4.0, 0.1], [dr(49), 0]];
 const kick = (t: number, t0: number, a: number) => (t < t0 ? 0 : a * Math.exp(-6 * (t - t0)) * Math.cos(18 * (t - t0)));   // spring() in cosine phase
@@ -279,8 +290,9 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
   const fill = new THREE.PointLight(warm, FILL_I, 0.07, 2);   // README §10: warm, before him just above eye line
   scene.add(fill);
   const amb = ambient(); amb.intensity *= AMB_K; scene.add(amb);
+  const wash = new THREE.PointLight(warm, WASH.i, WASH.d, 2); wash.position.set(...WASH.at); scene.add(wash);
 
-  const fx = post({ focus: CAM_Z[0][1] - AT[2], aperture: 0.025, maxblur: 0.01, lut: 'amber' });
+  const fx = post({ focus: CAM_Z[0][1] - HIP[2], aperture: 0.025, maxblur: 0.01, lut: 'amber' });
   const hand = new THREE.Vector3();
 
   function update(t: number) {
@@ -290,7 +302,7 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     // Camera: locked to 3.0, then a 0.04 push-in on z only, eased (on 1s). Focus rides the blob.
     const cz = kf(t, CAM_Z, ease);
     camera.position.set(CAM[0], CAM[1], cz); camera.rotation.set(0, 0, 0);
-    fx.set({ focus: cz - AT[2] });
+    fx.set({ focus: cz - HIP[2] });   // v11: on him (the blob is 6 cm behind his plane now; it was on it)
 
     // The Student on 2s: three steps in, the sit, then seated on s15's hip.
     hero.boil(t, 10);
@@ -331,8 +343,8 @@ export async function build({ scene, camera, assets, PALETTE, post }: ShotCtx) {
     exam.mesh.position.set(x, y + (hopping(T) ? 0.006 : 0), z);
     const squash = kf(T, SQUASH, (u) => (u >= 1 - 1e-9 ? 1 : 0)) + kick(T, dr(51), 0.12) + kick(T, dr(56), 0.12) + (Math.abs(T - 6) < 1e-6 ? 0.1 : 0);
     const eyes = Math.abs(T - 6) < 1e-6 ? 'closed' : T >= B.blobSettles ? 'worried' : T < 3.0 ? 'side' : 'open';
-    exam.update(t, { squash, wobble: kf(t, [[5.0, 1.4], [6.0, 1.0]]), eyes, look: T < 3.0 ? 1 : -1, key: zone.light });
-    exam.mesh.rotation.z = T < 3.0 && T >= dr(9) ? -6 * D : 0;   // waiting on the floor, tipped back to look up at the desk
+    exam.update(t, { squash, wobble: kf(t, [[5.0, 1.4], [6.0, 1.0]]), eyes, look: -1, key: zone.light });
+    exam.mesh.rotation.z = kf(T, LEAN, (u) => (u >= 1 - 1e-9 ? 1 : 0)) * D;   // v11: no longer tipped back to look up at the desk: it looks down over it
   }
 
   return { parts: { exam, hero, phone, wall, camera, light: zone.light }, update };

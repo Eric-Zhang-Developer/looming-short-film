@@ -58,7 +58,10 @@ export const CROWD: Record<string, Desk> = {
 // Where props sit, in the occupant's frame (x to their right, y away from them), and their turn (deg).
 const PROP_AT: Record<string, number[]> = { page: [0.026, 0.010, 8], pen: [0.016, -0.004, -30], textbook: [-0.024, -0.008, -6], backpack: [0, -0.088, 12] };
 const PHONE_AT = [0.030, -0.020], BLOB_AT = [0, 0.005], SEAT_AT = [0, -0.050];
-const HERO = { r: 0.030, at: [0.030, -0.028] };      // 2.5× (README §1, Q16), on the desk's right beside his page (s11's side)
+// v11: 4.5× (docs/notes/v11-beats.md), 12.3 cm across: wider than his 11 cm desk. It stands where s11 and s15 put it, behind
+// the desk (north of it, the side away from him), its contact on the desk's far edge, a little right of centre (s11's
+// BEHIND, x +0.03); it spills north over the empty desk d3, never over a person. The crowd keeps its v10 sizes.
+const HERO = { r: 0.054, at: [0.030, 0.030] };
 // Pool scale: the pendant 0.127 above the desk, the blob's height ≈ its radius above it (README §3: 0.127 / (0.127 − r)).
 const POOL = (r: number) => 0.127 / (0.127 - r);
 const SOUTH = 0.002, SOFT = 0.004;                     // pool shadows 2 mm south of the blob (the pendants hang north); soft edge

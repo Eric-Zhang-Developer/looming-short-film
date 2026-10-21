@@ -1,0 +1,3 @@
+> tsc -p tsconfig.json
+
+ok (27 shots, 91 beats, 228.0s)
